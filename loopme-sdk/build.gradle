@@ -104,7 +104,7 @@ ext {
     adapterName = 'Loopme'
     fileName = 'loopme-united-sdk'
     sdkName = "$fileName"
-    releaseVersion = '6.0.0'
+    releaseVersion = '6.0.1'
     fileName = "${fileName}-${releaseVersion}"
     apiVersion = "6"
 
@@ -144,7 +144,7 @@ allprojects {
 
 
 group = 'com.loopme'
-version = '6.0.0'
+version = '6.0.1'
 
 install {
     repositories.mavenInstaller {
@@ -184,7 +184,7 @@ bintray {
     pkg {
         repo = 'maven'
         name = 'loopme-united-sdk'
-        desc = 'LoopMe Android SDK LoopMe is the largest mobile video DSP and Ad Network, reaching over 1 billion consumers world-wide.'
+        desc = 'Please meet our New United SDK. It combines multiple premium ads technologies with the highest performance and lean resource consumption.'
 
         websiteUrl = 'https://github.com/loopme/android-united-sdk'
         vcsUrl = 'https://github.com/loopme/android-united-sdk.git'
@@ -201,14 +201,14 @@ static def getDate() {
 }
 
 task clearJar(type: Delete) {
-    delete 'build/outputs/loopme-sdk-5.0.0.jar'
+    delete 'build/outputs/loopme-sdk-6.0.0.jar'
 }
 
 task makeJar(type: Copy) {
     from('build/intermediates/bundles/release/')
     into('build/outputs/')
     include('classes.jar')
-    rename('classes.jar', 'loopme-sdk-6.0.0.jar')
+    rename('classes.jar', 'loopme-sdk-6.0.1.jar')
 }
 
 task wrapper(type: Wrapper) {

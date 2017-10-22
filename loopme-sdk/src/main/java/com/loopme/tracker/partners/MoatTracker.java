@@ -9,16 +9,17 @@ import com.loopme.BuildConfig;
 import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.tracker.AdIds;
-import com.loopme.tracker.interfaces.Tracker;
 import com.loopme.tracker.constants.AdType;
-import com.loopme.tracker.constants.TrackerType;
 import com.loopme.tracker.constants.Event;
+import com.loopme.tracker.constants.TrackerType;
+import com.loopme.tracker.interfaces.Tracker;
 import com.loopme.utils.ArrayUtils;
 import com.loopme.utils.Utils;
 import com.moat.analytics.mobile.loo.MoatAdEvent;
 import com.moat.analytics.mobile.loo.MoatAdEventType;
 import com.moat.analytics.mobile.loo.MoatAnalytics;
 import com.moat.analytics.mobile.loo.MoatFactory;
+import com.moat.analytics.mobile.loo.MoatOptions;
 import com.moat.analytics.mobile.loo.NativeVideoTracker;
 import com.moat.analytics.mobile.loo.WebAdTracker;
 
@@ -54,7 +55,9 @@ public class MoatTracker implements Tracker {
             Logging.out(LOG_TAG, "loopMeAd should not be null");
             return;
         }
-        MoatAnalytics.getInstance().start(loopMeAd.getContext().getApplication());
+        MoatOptions options = new MoatOptions();
+        options.disableAdIdCollection = true;
+        MoatAnalytics.getInstance().start(options, loopMeAd.getContext().getApplication());
         Logging.out(LOG_TAG, "Sdk started: " + TrackerType.MOAT.name());
     }
 
