@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:id="@+id/end_card_framelayout"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@color/black">
+
+    <ImageView
+        android:id="@+id/end_card_imageview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"/>
+
+    <ImageView
+        android:id="@+id/replay_imageview"
+        android:layout_width="@dimen/replay_imageview_width"
+        android:layout_height="@dimen/replay_imageview_heigth"
+        android:scaleType="center"
+        android:src="@drawable/l_replay"/>
+
+    <ImageView
+        android:id="@+id/close_imageview"
+        android:layout_width="@dimen/close_imageview_width"
+        android:layout_height="@dimen/close_imageview_heigth"
+        android:layout_gravity="right"
+        android:scaleType="center"
+        android:src="@drawable/l_close"/>
+
+</FrameLayout>

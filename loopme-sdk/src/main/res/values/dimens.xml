@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="progress_bar_max_height">20dp</dimen>
+    <dimen name="progress_bar_min_height">3dp</dimen>
+    <dimen name="time_view_margin">6dp</dimen>
+    <dimen name="text_size_12sp">12sp</dimen>
+    <dimen name="mute_view_size">40dp</dimen>
+    <dimen name="skip_view_size">40dp</dimen>
+    <dimen name="replay_view_size">40dp</dimen>
+    <dimen name="close_view_size">40dp</dimen>
+
+    <dimen name="time_textview_margin">6dp</dimen>
+    <dimen name="mute_imageview_width">40dp</dimen>
+    <dimen name="mute_imageview_heigth">40dp</dimen>
+    <dimen name="skip_imageview_width">40dp</dimen>
+    <dimen name="skip_imageview_heigth">40dp</dimen>
+    <dimen name="replay_imageview_width">40dp</dimen>
+    <dimen name="replay_imageview_heigth">40dp</dimen>
+    <dimen name="close_imageview_heigth">40dp</dimen>
+    <dimen name="close_imageview_width">40dp</dimen>
+
+    <dimen name="ad_browser_progress_button_width">30dp</dimen>
+    <dimen name="ad_browser_progress_button_height">20dp</dimen>
+    <dimen name="ad_browser_back_button_width">30dp</dimen>
+    <dimen name="ad_browser_back_button_height">17dp</dimen>
+    <dimen name="ad_browser_refresh_button_width">30dp</dimen>
+    <dimen name="ad_browser_refresh_button_height">20dp</dimen>
+    <dimen name="ad_browser_native_button_width">30dp</dimen>
+    <dimen name="ad_browser_native_button_height">17dp</dimen>
+    <dimen name="ad_browser_close_button_width">30dp</dimen>
+    <dimen name="ad_browser_close_button_height">17dp</dimen>
+    <dimen name="footer_height">2dp</dimen>
+    <dimen name="controls_linearlayout_height">40dp</dimen>
+</resources>

@@ -1,0 +1,44 @@
+package com.loopme.tracker.constants;
+
+public enum Event {
+    //IAS
+    IMPRESSION,
+    STARTED,
+    LOADED,
+    VIDEO_STARTED,
+    STOPPED,
+    COMPLETE,
+    CLICKED,
+    FIRST_QUARTILE,
+    MIDPOINT,
+    THIRD_QUARTILE,
+    PAUSED,
+    PLAYING,
+    EXPANDED_CHANGE,
+    USER_MINIMIZE,
+    USER_ACCEPT_INVITATION,
+    USER_CLOSE,
+    SKIPPED,
+    VOLUME_CHANGE,
+    ENTERED_FULLSCREEN,
+    EXITED_FULLSCREEN,
+    DURATION_CHANGED,
+    ERROR,
+    END_SESSION,
+
+    //MOAT
+    INIT,
+    START,
+    STOP,
+    CHANGE_TARGET_VIEW,
+    PREPARE,
+
+    //DV
+    START_MEASURING,
+    MUTE,
+    VIDEO_COMPLETE,
+    VIDEO_STOPPED,
+    RESUMED,
+    VIDEO_EVENT,
+    LINEAR_CHANGED
+}

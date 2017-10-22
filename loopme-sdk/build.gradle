@@ -1,0 +1,217 @@
+apply plugin: 'com.android.library'
+apply from: 'release-aar.gradle'
+
+repositories {
+    jcenter()
+    mavenLocal()
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion '25.0.3'
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 25
+        versionCode 0
+        versionName "6"
+        multiDexEnabled true
+    }
+
+    signingConfigs {
+        release {
+            storeFile rootProject.file(STORE_FILE)
+            storePassword STORE_PASSWORD
+            keyAlias KEY_ALIAS
+            keyPassword KEY_PASSWORD
+        }
+    }
+
+    buildTypes {
+        release {
+            buildConfigField "String", "BACKEND", BACKEND_URL
+            buildConfigField "String", "MOAT_TOKEN", MOAT_TOKEN
+            buildConfigField "String", "DV_TOKEN", DV_TOKEN
+            buildConfigField "String", "SDK_TYPE", SDK_TYPE
+            buildConfigField "String", "SUPPORTED_TRACKERS", SUPPORTED_TRACKERS
+            buildConfigField "Boolean", "DEBUG_MODE", "true"
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            debuggable false
+            versionNameSuffix '-release'
+        }
+        debug.initWith(buildTypes.release)
+        debug {
+            versionNameSuffix '-debug'
+            debuggable true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
+    dexOptions {
+        maxProcessCount 4
+        javaMaxHeapSize '4g'
+    }
+}
+
+
+dependencies {
+    compile fileTree(dir: 'libs', includes: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile 'com.android.support:cardview-v7:25.3.1'
+    compile 'testfairy:testfairy-android-sdk:1.4.3@aar'
+    compile 'com.squareup.retrofit2:converter-jackson:2.3.0'
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile project(':dvsdk-release')
+    compile files('libs/libAvid-loopme-3.6.7.jar')
+
+    compile 'com.google.android.gms:play-services-ads:9.6.1'
+    compile ('com.android.support:multidex:1.0.1')
+    release (name: 'LOO-moat-mobile-app-kit-2.1.0', ext: 'aar')
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+    }
+
+}
+
+ext {
+    adapterName = 'Loopme'
+    fileName = 'loopme-united-sdk'
+    sdkName = "$fileName"
+    releaseVersion = '6.0.0'
+    fileName = "${fileName}-${releaseVersion}"
+    apiVersion = "6"
+
+    bintrayRepo = 'maven'
+    bintrayName = 'loopme-united-sdk'
+
+    publishedGroupId = 'com.loopme'
+    libraryName = "$sdkName"
+    artifact = "$sdkName"
+
+    libraryDescription = 'LoopMe Android SDK'
+    description 'LoopMe Android SDK LoopMe is the largest mobile video DSP and Ad Network, reaching over 1 billion consumers world-wide.'
+
+    siteUrl = 'https://github.com/loopme/android-united-sdk'
+    gitUrl = 'https://github.com/loopme/android-united-sdk.git'
+
+    libraryVersion = releaseVersion
+
+    developerId = 'kknyrik'
+    developerName = 'Kateryna Knyrik'
+    developerEmail = 'katerina.knyrik@loopme.com'
+
+    licenseName = 'LoopMe License'
+    licenseUrl = 'https://github.com/loopme/loopme-android-sdk/blob/master/LICENSE.md'
+    allLicenses = ["Loopme-1.0"]
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+    apply plugin: 'com.android.library'
+    apply plugin: 'com.github.dcendents.android-maven'
+    apply plugin: 'com.jfrog.bintray'
+    apply plugin: 'maven-publish'
+}
+
+
+group = 'com.loopme'
+version = '6.0.0'
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                groupId 'com.loopme'
+                artifactId 'loopme-sdk'
+
+                name 'LoopMeSDK'
+                description 'Please meet our New United SDK. It combines multiple premium ads technologies with the highest performance and lean resource consumption.'
+                url 'https://github.com/loopme/android-united-sdk.git'
+
+                licenses {
+                    license {
+                        name 'LoopMe License'
+                        url 'https://github.com/loopme/loopme-android-sdk/blob/master/LICENSE.md'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'kknyrik'
+                        name 'Kateryna Knyrik'
+                        email 'katerina.knyrik@loopme.com'
+                    }
+                }
+            }
+        }
+    }
+}
+
+bintray {
+    user = BINTRAY_USER
+    key = BINTRAY_KEY
+
+    configurations = ['archives']
+    pkg {
+        repo = 'maven'
+        name = 'loopme-united-sdk'
+        desc = 'LoopMe Android SDK LoopMe is the largest mobile video DSP and Ad Network, reaching over 1 billion consumers world-wide.'
+
+        websiteUrl = 'https://github.com/loopme/android-united-sdk'
+        vcsUrl = 'https://github.com/loopme/android-united-sdk.git'
+        licenses = ['Apache-2.0']
+        publish = true
+        publicDownloadNumbers = true
+    }
+}
+
+static def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('.MMdd')
+    return formattedDate
+}
+
+task clearJar(type: Delete) {
+    delete 'build/outputs/loopme-sdk-5.0.0.jar'
+}
+
+task makeJar(type: Copy) {
+    from('build/intermediates/bundles/release/')
+    into('build/outputs/')
+    include('classes.jar')
+    rename('classes.jar', 'loopme-sdk-6.0.0.jar')
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
+}
+
