@@ -1,0 +1,79 @@
+apply plugin: 'com.android.application'
+
+repositories {
+    jcenter()
+    maven {
+        url 'https://dl.bintray.com/loopme/maven'
+    }
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
+
+    defaultConfig {
+        applicationId "com.loopme.tester"
+        minSdkVersion 19
+        targetSdkVersion 25
+        versionCode 16
+        versionName "2"
+        multiDexEnabled true
+        versionNameSuffix getDate()
+        buildConfigField "String", "TESTFAIRY_APP_TOKEN", TESTFAIRY_TOKEN
+
+    }
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    packagingOptions {
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/MANIFEST.MF'
+    }
+    lintOptions {
+        abortOnError false
+    }
+
+    configurations {
+        all*.exclude group: 'com.android.volley'
+    }
+
+}
+dependencies {
+    compile project(':loopme-sdk')
+    compile 'com.android.volley:volley:1.0.0'
+    compile 'com.google.code.gson:gson:2.8.0'
+
+    compile(name: 'loopme-vpaid-sdk-1.1', ext: 'aar')
+    compile('com.mopub:mopub-sdk:4.16.1@aar') {
+        transitive = true
+        exclude module: 'libAvid-mopub'
+        exclude module: 'moat-mobile-app-kit'
+    }
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'testfairy:testfairy-android-sdk:1.4.3@aar'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile 'com.android.support:cardview-v7:25.3.1'
+
+    compile group: 'com.squareup.retrofit2', name: 'converter-jackson', version: '2.3.0'
+    compile('com.android.support:multidex:1.0.1')
+}
+
+static def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('.MMdd')
+    return formattedDate
+}
+

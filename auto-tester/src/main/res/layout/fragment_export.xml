@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/shadow"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:id="@+id/export_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fragment_export_layout_margin"
+        android:background="@drawable/background_bordered"
+        android:clickable="true"
+        android:isScrollContainer="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/fragment_export_title_height"
+            android:background="@drawable/background_buttons"
+            android:clickable="true"
+            android:gravity="center"
+            android:text="@string/fragment_export_title"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_16sp"
+            android:textStyle="bold" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/fragment_import_export_scroll_height"
+            android:layout_margin="@dimen/fragment_import_export_scroll_margin">
+
+            <FrameLayout
+                android:id="@+id/fragment_export_files_list_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </ScrollView>
+
+        <TextView
+            android:id="@+id/fragment_export_path_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/dialog_path_textview_padding_left"
+            android:text="@string/fragment_export_path_example" />
+
+        <EditText
+            android:id="@+id/fragment_export_file_name_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:imeOptions="flagNoExtractUi|actionDone"
+            android:paddingLeft="@dimen/fragment_export_new_file_name_padding_left"
+            android:text="@string/default_file_name_appkeys" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="@dimen/fragment_export_buttons_layout_margin_bottom">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/fragment_export_new_folder_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/fragment_export_new_folder_button_margin"
+                    android:layout_weight="1"
+                    android:background="@drawable/background_buttons"
+                    android:text="@string/fragment_export_new_folder_button"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_12sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/fragment_export_cancel_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/fragment_export_cancel_button_margin"
+                    android:layout_weight="1"
+                    android:background="@drawable/background_buttons"
+                    android:text="@string/fragment_export_cancel_button"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_12sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/fragment_export_ok_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/fragment_export_ok_button_margin"
+                    android:layout_weight="1"
+                    android:background="@drawable/background_buttons"
+                    android:text="@string/fragment_import_ok_button"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</ScrollView>

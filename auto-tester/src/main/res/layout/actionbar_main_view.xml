@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/actionbar_height"
+    android:background="@color/red">
+
+    <TextView
+        android:id="@+id/action_bar_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/action_bar_title_margin_start"
+        android:layout_marginEnd="@dimen/action_bar_title_margin_end"
+        android:layout_centerVertical="true"
+        android:text="@string/ad_spots"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/text_size_16sp"
+        android:textAlignment="center"
+        android:textStyle="bold" />
+
+    <RelativeLayout
+        android:id="@+id/actionbar_info_and_add_buttons_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="@dimen/action_bar_info_buttons_margin_top"
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/action_bar_info_button"
+            android:layout_width="@dimen/action_bar_info_button_width"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/action_bar_info_margin_left"
+            android:padding="@dimen/action_bar_info_button_padding"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_action_about" />
+
+
+        <ImageView
+            android:id="@+id/action_bar_add_button"
+            android:layout_width="@dimen/action_bar_add_button_width"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/action_bar_add_button_padding"
+            android:src="@drawable/ic_action_new" />
+    </RelativeLayout>
+
+    <include layout="@layout/container_actionbar_cancel_save" />
+
+    <include layout="@layout/actionbar_adspot_cardview" />
+
+</RelativeLayout>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/appid_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/appid_layout_height"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="@dimen/appid_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="@string/adunitid"
+            android:textSize="@dimen/text_size_16sp" />
+
+        <AutoCompleteTextView
+            android:id="@+id/appid"
+            android:layout_width="@dimen/appid_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="3"
+            android:maxLines="1"
+            android:completionThreshold="1"
+            android:hint="@string/adunitid"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size_16sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/appkey_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/appkey_layout_height"
+        android:orientation="horizontal"
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="@dimen/app_key_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="@string/app_key"
+            android:textSize="@dimen/text_size_16sp" />
+
+        <AutoCompleteTextView
+            android:id="@+id/fragment_adspot_card_appkey_text"
+            android:layout_width="@dimen/fragment_adspot_card_appkey_text_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="3"
+            android:maxLines="1"
+            android:completionThreshold="1"
+            android:hint="@string/appkey"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size_16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/baseurl_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/baseurl_layout_height"
+        android:orientation="horizontal"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/title_url"
+            android:layout_width="@dimen/title_url_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="@string/base_url"
+            android:textSize="@dimen/text_size_16sp" />
+
+        <TextView
+            android:id="@+id/baseurl"
+            android:inputType="none"
+            android:layout_width="@dimen/baseurl_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="3"
+            android:completionThreshold="1"
+            android:hint="@string/baseurl"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size_16sp" />
+
+    </LinearLayout>
+</LinearLayout>
