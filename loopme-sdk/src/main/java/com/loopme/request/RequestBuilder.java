@@ -139,6 +139,8 @@ public class RequestBuilder implements Serializable {
             extImpObj.put(IT, requestUtils.getIt());
             JSONArray supportedTechsArray = new JSONArray(requestUtils.getSupportedTechs());
             extImpObj.put(SUPPORTED_TECS, supportedTechsArray);
+            extImpObj.put(TRACKERS, requestUtils.getTrackersSupported());
+
 
             impObj.put(EXT, extImpObj);
             impObj.put(BID_FLOOR, requestUtils.getBidFloor());
@@ -167,7 +169,6 @@ public class RequestBuilder implements Serializable {
             impObj.put(VIDEO, videoObj);
             impObj.put(DISPLAY_MANAGER, requestUtils.getDisplayManager());
             impObj.put(INSTL, requestUtils.getInstl());
-            impObj.put(TRACKERS, requestUtils.getTrackersSupported());
 
             impArray.put(impObj);
             requestObj.put(IMP, impArray);
