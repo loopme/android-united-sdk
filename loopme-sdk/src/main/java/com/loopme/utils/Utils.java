@@ -676,4 +676,28 @@ public class Utils {
         }
         return packagesAsString;
     }
+
+    public static boolean isSupportedFormat(String source) {
+        String fileName = getFileNameFromUrl(source);
+        return !TextUtils.isEmpty(fileName) && fileName.contains(Constants.MP4_FORMAT_EXT);
+    }
+
+    private static String getFileNameFromUrl(String source) {
+        if (TextUtils.isEmpty(source)) {
+            return "";
+        }
+        int lastIndexOfSlash = source.lastIndexOf("/");
+        return source.substring(lastIndexOfSlash, source.length());
+    }
+
+    public static String getSourceUrl(String message) {
+        if (TextUtils.isEmpty(message)) {
+            return "";
+        }
+        String[] tokens = message.split(":");
+        if (tokens.length >= 3) {
+            return tokens[tokens.length - 1];
+        }
+        return "";
+    }
 }

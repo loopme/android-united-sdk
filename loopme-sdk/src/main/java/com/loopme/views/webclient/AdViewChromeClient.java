@@ -1,5 +1,6 @@
 package com.loopme.views.webclient;
 
+import android.text.TextUtils;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -7,10 +8,12 @@ import android.webkit.WebView;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.tracker.partners.LoopMeTracker;
+import com.loopme.utils.Utils;
 
 public class AdViewChromeClient extends WebChromeClient {
     private OnErrorFromJsCallback mCallback;
     private static final String UNCAUGHT_ERROR = "Uncaught";
+    private static final String VIDEO_SOURCE = "VIDEO_SOURCE";
 
     public AdViewChromeClient() {
     }
@@ -31,7 +34,15 @@ public class AdViewChromeClient extends WebChromeClient {
             LoopMeTracker.post("Error from js console: " + consoleMessage.message(), Constants.ErrorType.JS);
             onErrorFromJs(consoleMessage.message());
         }
+        if (isVideoSourceEvent(consoleMessage.message())) {
+            onVideoSource(Utils.getSourceUrl(consoleMessage.message()));
+        }
         return super.onConsoleMessage(consoleMessage);
+    }
+
+    private boolean isVideoSourceEvent(String message) {
+        String[] tokens = message.split(":");
+        return TextUtils.equals(tokens[0], VIDEO_SOURCE);
     }
 
     @Override
@@ -45,7 +56,18 @@ public class AdViewChromeClient extends WebChromeClient {
         }
     }
 
+    private void onVideoSource(String source) {
+        if (mCallback != null && mCallback instanceof OnErrorFromJsCallbackVpaid) {
+            ((OnErrorFromJsCallbackVpaid) mCallback).onVideoSource(source);
+        }
+    }
+
     public interface OnErrorFromJsCallback {
         void onErrorFromJs(String message);
+
+    }
+
+    public interface OnErrorFromJsCallbackVpaid extends OnErrorFromJsCallback {
+        void onVideoSource(String source);
     }
 }

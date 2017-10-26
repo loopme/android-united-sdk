@@ -7,9 +7,12 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
+import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.common.LoopMeError;
 import com.loopme.tracker.constants.EventConstants;
+import com.loopme.tracker.partners.LoopMeTracker;
+import com.loopme.utils.UiUtils;
 import com.loopme.vast.VastVpaidEventTracker;
 import com.loopme.time.SimpleTimer;
 import com.loopme.ad.LoopMeAd;
@@ -233,7 +236,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     }
 
     private void handleCriticalError(String message) {
-        if (!TextUtils.isEmpty(message) && message.equalsIgnoreCase(NO_VAST_RESPONSE)) {
+        if (!TextUtils.isEmpty(message)) {
             onInternalLoadFail(new LoopMeError(message));
         }
     }
@@ -286,8 +289,8 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         mWebView.addJavascriptInterface(mVpaidBridge, ANDROID_JS_INTERFACE);
     }
 
-    private AdViewChromeClient.OnErrorFromJsCallback initOnErrorFromJsListener() {
-        return new AdViewChromeClient.OnErrorFromJsCallback() {
+    private AdViewChromeClient.OnErrorFromJsCallbackVpaid initOnErrorFromJsListener() {
+        return new AdViewChromeClient.OnErrorFromJsCallbackVpaid() {
 
             @Override
             public void onErrorFromJs(String message) {
@@ -297,7 +300,24 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
                     onPostWarning(Errors.GENERAL_VPAID_ERROR);
                 }
             }
+
+            @Override
+            public void onVideoSource(String source) {
+                checkSupportedSource(source);
+            }
         };
+    }
+
+    private void checkSupportedSource(String source) {
+        if (!Utils.isSupportedFormat(source)) {
+            shutdownAd(source);
+        }
+    }
+
+    private void shutdownAd(String source) {
+        onInternalLoadFail(Errors.GENERAL_VPAID_ERROR);
+        LoopMeTracker.post("Error from js console: unsupported asset " + source, Constants.ErrorType.JS);
+        UiUtils.broadcastIntent(mLoopMeAd.getContext(), Constants.DESTROY_INTENT, mLoopMeAd.getAdId());
     }
 
     private LoopMeWebView.OnPageLoadedCallback initOnPageLoadedCallback() {
