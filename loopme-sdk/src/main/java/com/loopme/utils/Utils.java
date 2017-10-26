@@ -679,7 +679,9 @@ public class Utils {
 
     public static boolean isSupportedFormat(String source) {
         String fileName = getFileNameFromUrl(source);
-        return !TextUtils.isEmpty(fileName) && fileName.contains(Constants.MP4_FORMAT_EXT);
+        return !TextUtils.isEmpty(fileName)
+                && (fileName.contains(Constants.MP4_FORMAT_EXT)
+                || fileName.contains(Constants.WEBM_FORMAT_EXT));
     }
 
     private static String getFileNameFromUrl(String source) {
