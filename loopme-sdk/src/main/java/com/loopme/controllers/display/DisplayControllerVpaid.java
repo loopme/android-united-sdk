@@ -34,11 +34,12 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         BridgeEventHandler,
         VastVpaidDisplayController {
 
+    private static final String LOG_TAG = DisplayControllerVpaid.class.getSimpleName();
+    private static final double VIDEO_25_WITH_SPARE_TIME_COEFFICIENT = 0.35;
     private static final String HTML_SOURCE_FILE = "loopmeAd.html";
     private static final String VPAID_CREATIVE_URL_STRING = "[VPAID_CREATIVE_URL]";
     private static final String ANDROID_JS_INTERFACE = "android";
     private static final int IMPRESSION_TIMER = 2000;
-    private static final String NO_VAST_RESPONSE = "no VAST tag response";
 
     private VpaidBridge mVpaidBridge;
     private ViewControllerVpaid mViewControllerVpaid;
@@ -53,6 +54,9 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     private SimpleTimer mImpressionTimer;
     private volatile String mCurrentVideoTime;
     private int mVideoDuration;
+    private boolean mIsFirstLaunch = true;
+    private volatile boolean mIsFirstQuartilePosted;
+    private CreativeType mCreativeType = CreativeType.NONE_VIDEO;
 
     public DisplayControllerVpaid(LoopMeAd loopMeAd) {
         super(loopMeAd);
@@ -106,12 +110,14 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
             super.onPause();
             callBridgeMethod(BridgeMethods.VPAID_PAUSE_AD);
         }
+        pauseViewController();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         callBridgeMethod(BridgeMethods.VPAID_RESUME_AD);
+        resumeViewController();
     }
 
     @Override
@@ -123,6 +129,25 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
                 destroy();
             }
         });
+        destroyViewController();
+    }
+
+    private void pauseViewController() {
+        if (mViewControllerVpaid != null) {
+            mViewControllerVpaid.pause();
+        }
+    }
+
+    private void resumeViewController() {
+        if (mViewControllerVpaid != null) {
+            mViewControllerVpaid.resume();
+        }
+    }
+
+    private void destroyViewController() {
+        if (mViewControllerVpaid != null) {
+            mViewControllerVpaid.destroy();
+        }
     }
 
     private void destroy() {
@@ -228,16 +253,12 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         return super.onRedirect(url, mLoopMeAd);
     }
 
-
     @Override
     public void trackError(String message) {
-        onMessage(Message.ERROR, Errors.VastError.VPAID.getValue());
-        handleCriticalError(message);
-    }
-
-    private void handleCriticalError(String message) {
         if (!TextUtils.isEmpty(message)) {
-            onInternalLoadFail(new LoopMeError(message));
+            UiUtils.broadcastIntent(mLoopMeAd.getContext(), Constants.DESTROY_INTENT, mLoopMeAd.getAdId());
+            LoopMeError error = new LoopMeError(901, "Error from vpaid js: trackError(): " + message, Constants.ErrorType.VPAID);
+            onInternalLoadFail(new LoopMeError(error));
         }
     }
 
@@ -275,6 +296,21 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     @Override
     public void postEvent(String eventType) {
         onMessage(Message.EVENT, eventType);
+        if (TextUtils.equals(eventType, EventConstants.FIRST_QUARTILE)) {
+            mIsFirstQuartilePosted = true;
+        }
+        startCheckTimer(eventType);
+    }
+
+    private void startCheckTimer(final String eventType) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (TextUtils.equals(eventType, EventConstants.START) && mCreativeType == CreativeType.VIDEO) {
+                    startVideoEventCheckTimer();
+                }
+            }
+        });
     }
     //endregion
 
@@ -297,27 +333,18 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
                 if (isVast4VerificationNeeded() && !mIsAdVerificationLoaded) {
                     DisplayControllerVpaid.this.onPostWarning(Errors.VERIFICATION_UNIT_NOT_EXECUTED);
                 } else {
-                    onPostWarning(Errors.GENERAL_VPAID_ERROR);
+                    Logging.out(LOG_TAG, "Error from JS " + message);
+                    LoopMeError error = new LoopMeError(Errors.GENERAL_VPAID_ERROR);
+                    error.addToMessage(message);
+                    onPostWarning(error);
                 }
             }
 
             @Override
             public void onVideoSource(String source) {
-                checkSupportedSource(source);
+                videoSourceEventOccurred(source);
             }
         };
-    }
-
-    private void checkSupportedSource(String source) {
-        if (!Utils.isSupportedFormat(source)) {
-            shutdownAd(source);
-        }
-    }
-
-    private void shutdownAd(String source) {
-        onInternalLoadFail(Errors.GENERAL_VPAID_ERROR);
-        LoopMeTracker.post("Error from js console: unsupported asset " + source, Constants.ErrorType.JS);
-        UiUtils.broadcastIntent(mLoopMeAd.getContext(), Constants.DESTROY_INTENT, mLoopMeAd.getAdId());
     }
 
     private LoopMeWebView.OnPageLoadedCallback initOnPageLoadedCallback() {
@@ -358,7 +385,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     //endregion
     @Override
     public void onAdImpression() {
-        mImpressionTimer.cancel();
+        mImpressionTimer.stop();
         for (String url : mAdParams.getImpressionsList()) {
             onMessage(Message.EVENT, url);
             onMessage(Message.LOG, "mAdParams.getImpressionsList() " + url);
@@ -383,6 +410,21 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
             }
         });
         mImpressionTimer.start();
+
+        startCloseButtonTimerOnUiThread();
+    }
+
+    private void startCloseButtonTimerOnUiThread() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int duration = mVideoDuration * 1000;
+                Logging.out(LOG_TAG, "mVideoDuration " + duration);
+                if (mViewControllerVpaid != null) {
+                    mViewControllerVpaid.startCloseButtonTimer(duration);
+                }
+            }
+        });
     }
 
     @Override
@@ -397,7 +439,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     @Override
     public void onAdShake() {
-
+        Logging.out(LOG_TAG, "onAdShake stub");
     }
 
     private void callBridgeMethod(BridgeMethods method) {
@@ -448,5 +490,69 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
                 }
             }
         }
+    }
+
+    private void videoSourceEventOccurred(String source) {
+        Logging.out(LOG_TAG, "Video source event received");
+        mCreativeType = CreativeType.VIDEO;
+        hideCloseButtonOnce();
+        checkVideoFormat(source);
+    }
+
+    private void hideCloseButtonOnce() {
+        if (mIsFirstLaunch && mViewControllerVpaid != null) {
+            mViewControllerVpaid.enableCloseButton(false);
+            mIsFirstLaunch = false;
+        }
+    }
+
+    private void checkVideoFormat(String source) {
+        if (Utils.isUsualFormat(source)) {
+            cancelExtraCloseButton();
+        } else {
+            LoopMeError error = new LoopMeError(Errors.UNUSUAL_VIDEO_FORMAT);
+            error.addToMessage(source);
+            onPostWarning(error);
+        }
+    }
+
+    private void startVideoEventCheckTimer() {
+        Logging.out(LOG_TAG, "startVideoEventCheckTimer");
+        SimpleTimer videoEventCheckTimer = initCheckVideoEventTimer(getDurationWithSpareTime());
+        videoEventCheckTimer.start();
+    }
+
+    private long getDurationWithSpareTime() {
+        return (long) (mVideoDuration * 1000 * VIDEO_25_WITH_SPARE_TIME_COEFFICIENT);
+    }
+
+    private SimpleTimer initCheckVideoEventTimer(long durationWithSpareTime) {
+        return new SimpleTimer(durationWithSpareTime, new SimpleTimer.Listener() {
+            @Override
+            public void onFinish() {
+                checkEvent25();
+            }
+        });
+    }
+
+    private void checkEvent25() {
+        if (mIsFirstQuartilePosted) {
+            Logging.out(LOG_TAG, "Unusual video format. Event video 25%.");
+            cancelExtraCloseButton();
+        } else {
+            Logging.out(LOG_TAG, "Video creative does not send event video 25%.");
+        }
+    }
+
+    private void cancelExtraCloseButton() {
+        if (mViewControllerVpaid != null) {
+            mViewControllerVpaid.cancelCloseButtonTimer();
+            mViewControllerVpaid.enableCloseButton(false);
+        }
+    }
+
+    private enum CreativeType {
+        VIDEO,
+        NONE_VIDEO;
     }
 }

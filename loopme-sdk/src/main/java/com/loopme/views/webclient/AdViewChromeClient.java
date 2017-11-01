@@ -31,8 +31,7 @@ public class AdViewChromeClient extends WebChromeClient {
             Logging.out(LOG_TAG, "Console Message: " + consoleMessage.message());
         }
         if (consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
-            LoopMeTracker.post("Error from js console: " + consoleMessage.message(), Constants.ErrorType.JS);
-            onErrorFromJs(consoleMessage.message());
+            onErrorFromJs(consoleMessage.message() + ". Source: " + consoleMessage.sourceId());
         }
         if (isVideoSourceEvent(consoleMessage.message())) {
             onVideoSource(Utils.getSourceUrl(consoleMessage.message()));
@@ -53,6 +52,8 @@ public class AdViewChromeClient extends WebChromeClient {
     private void onErrorFromJs(String message) {
         if (mCallback != null && message != null && message.contains(UNCAUGHT_ERROR)) {
             mCallback.onErrorFromJs(message);
+        } else if (mCallback == null) {
+            LoopMeTracker.post("Error from js console: " + message, Constants.ErrorType.JS);
         }
     }
 

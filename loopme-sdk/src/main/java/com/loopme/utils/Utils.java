@@ -25,6 +25,7 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.webkit.WebSettings;
 import android.widget.FrameLayout;
 
 import com.loopme.Constants;
@@ -83,9 +84,11 @@ public class Utils {
     private static PackageManager sPackageManager;
     private static LocationManager sLocationManager;
     private static SimpleDateFormat sFormatter = new SimpleDateFormat(DATE_PATTERN, Locale.US);
+    public static String sUserAgent;
 
     public static void init(Context context) {
         if (context != null) {
+            sUserAgent = WebSettings.getDefaultUserAgent(context);
             sResources = context.getResources();
             sPackageManager = context.getPackageManager();
             sAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
@@ -677,7 +680,7 @@ public class Utils {
         return packagesAsString;
     }
 
-    public static boolean isSupportedFormat(String source) {
+    public static boolean isUsualFormat(String source) {
         String fileName = getFileNameFromUrl(source);
         return !TextUtils.isEmpty(fileName)
                 && (fileName.contains(Constants.MP4_FORMAT_EXT)

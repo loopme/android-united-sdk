@@ -110,7 +110,7 @@ public class VastVpaidAssetsResolver {
         if (mFileLoader != null) {
             mFileLoader.stop();
         }
-        handleVpaidError(Errors.UNABLE_TO_FETCH_COMPANION);
+        handleVpaidError(Errors.COMPANION_ERROR);
     }
 
     private FileLoaderNewImpl.Callback initVpaidFileLoaderCallback() {

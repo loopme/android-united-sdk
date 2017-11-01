@@ -102,14 +102,14 @@ public class LoopMeWebView extends WebView {
     }
 
     public void destroy() {
-        super.destroy();
+        removeChildes();
         stopLoading();
         clearCache(true);
         clearHistory();
         setWebViewClient(null);
         setWebChromeClient(null);
         loadCommand("about:blank");
-        removeChildes();
+        super.destroy();
     }
 
     private void removeChildes() {

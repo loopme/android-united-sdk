@@ -215,10 +215,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         setLiveDebug(adParam);
     }
 
-    protected void postError(String errorMessage) {
-        LoopMeTracker.post(errorMessage);
-    }
-
     public void onInternalLoadFail(LoopMeError error) {
         onAdLoadFail(error);
         onPostWarning(error);

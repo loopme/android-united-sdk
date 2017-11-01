@@ -50,6 +50,7 @@ public class Constants {
 
 
     public static boolean sPartPreload = false;
+    public static final long CHECK_VPAID_AD_TYPE_TIMER = 3000;
 
     private Constants() {
     }
