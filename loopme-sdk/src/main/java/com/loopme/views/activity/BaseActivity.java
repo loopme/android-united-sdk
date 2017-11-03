@@ -274,9 +274,8 @@ public final class BaseActivity extends Activity
     }
 
     private void switchLoopMeBannerToPreviousMode() {
-        if (mDisplayController != null && mDisplayController instanceof DisplayControllerLoopMe) {
-            DisplayControllerLoopMe displayControllerLoopMe = (DisplayControllerLoopMe) mDisplayController;
-            displayControllerLoopMe.switchToPreviousMode();
+        if (mDisplayController instanceof DisplayControllerLoopMe) {
+            ((DisplayControllerLoopMe) mDisplayController).switchToPreviousMode();
         }
     }
 
