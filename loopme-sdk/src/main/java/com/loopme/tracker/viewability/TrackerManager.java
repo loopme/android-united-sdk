@@ -34,7 +34,8 @@ public class TrackerManager {
             if (isMoat(name)) {
                 MoatTracker.startSdk(mLoopMeAd);
             } else if (isIas(name)) {
-                IasTracker.startSdk(mLoopMeAd);
+//                IasTracker.startSdk(mLoopMeAd);
+                //there is no need to start sdk
             } else if (isDv(name)) {
                 DvTracker.startSdk(mLoopMeAd);
             }
@@ -71,7 +72,7 @@ public class TrackerManager {
                 break;
             }
             case IAS: {
-                tracker = new IasTracker(adType);
+                tracker = new IasTracker(mLoopMeAd, adType);
                 break;
             }
             case DV: {

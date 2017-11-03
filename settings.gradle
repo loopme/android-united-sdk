@@ -1,1 +1,5 @@
-include ':loopme-sdk', ':dvsdk-release', ':auto-tester', ':sample-banner', ':sample-interstitial'
+include ':loopme-sdk',
+        ':dvsdk-release',
+        ':auto-tester'
+//        ':sample-banner',
+//        ':sample-interstitial'

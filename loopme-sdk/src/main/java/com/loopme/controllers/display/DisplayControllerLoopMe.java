@@ -757,4 +757,5 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
     public boolean isVideoPaused() {
         return getCurrentVideoState() == Constants.VideoState.PAUSED;
     }
+
 }

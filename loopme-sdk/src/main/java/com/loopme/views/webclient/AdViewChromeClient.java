@@ -25,11 +25,11 @@ public class AdViewChromeClient extends WebChromeClient {
     public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
         if (consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.ERROR ||
                 consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.WARNING) {
-            Logging.out(LOG_TAG, "Console Message: " + consoleMessage.message());
+            Logging.out(LOG_TAG, "Console Message: " + consoleMessage.message() + " " + consoleMessage.sourceId());
         }
         if (consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
-            LoopMeTracker.post("Error from js console: " + consoleMessage.message(), Constants.ErrorType.JS);
-            onErrorFromJs(consoleMessage.message());
+            LoopMeTracker.post("Error from js console: " + consoleMessage.message() + " " + consoleMessage.sourceId(), Constants.ErrorType.JS);
+            onErrorFromJs(consoleMessage.message() + " " + consoleMessage.sourceId());
         }
         return super.onConsoleMessage(consoleMessage);
     }

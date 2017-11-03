@@ -1,5 +1,6 @@
 package com.loopme.tracker.viewability;
 
+import android.app.Activity;
 import android.media.MediaPlayer;
 import android.view.View;
 import android.webkit.WebView;
@@ -55,7 +56,7 @@ public class EventManager implements AdEvents {
     @Override
     public void onAdStartedEvent() {
         if (mTrackerManager != null) {
-            mTrackerManager.track(Event.STARTED);
+            mTrackerManager.track(Event.START);
             mTrackerManager.track(Event.VIDEO_STARTED);
         }
     }
@@ -84,7 +85,7 @@ public class EventManager implements AdEvents {
     @Override
     public void onAdLoadedEvent() {
         if (mTrackerManager != null) {
-            mTrackerManager.track(Event.LOADED);
+//            mTrackerManager.track(Event.LOADED);
         }
     }
 
@@ -120,7 +121,7 @@ public class EventManager implements AdEvents {
     @Override
     public void onAdUserMinimizeEvent() {
         if (mTrackerManager != null) {
-            mTrackerManager.track(Event.USER_MINIMIZE);
+//            mTrackerManager.track(Event.USER_MINIMIZE);
         }
     }
 
@@ -155,7 +156,7 @@ public class EventManager implements AdEvents {
     @Override
     public void onAdUserAcceptInvitationEvent() {
         if (mTrackerManager != null) {
-            mTrackerManager.track(Event.USER_ACCEPT_INVITATION);
+//            mTrackerManager.track(Event.USER_ACCEPT_INVITATION);
         }
     }
 
@@ -177,6 +178,20 @@ public class EventManager implements AdEvents {
     public void onStartWebMeasuringDelayed() {
         if (mTrackerManager != null) {
             mTrackerManager.track(Event.START_MEASURING);
+        }
+    }
+
+    @Override
+    public void onAdRecordReady() {
+        if (mTrackerManager != null) {
+            mTrackerManager.track(Event.RECORD_READY);
+        }
+    }
+
+    @Override
+    public void onAdRegisterView(Activity activity, View view) {
+        if (mTrackerManager != null) {
+            mTrackerManager.track(Event.REGISTER, activity, view);
         }
     }
 

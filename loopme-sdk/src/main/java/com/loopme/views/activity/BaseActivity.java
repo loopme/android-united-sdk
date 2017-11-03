@@ -18,6 +18,7 @@ import com.loopme.ad.LoopMeAd;
 import com.loopme.ad.LoopMeAdHolder;
 import com.loopme.controllers.display.BaseDisplayController;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
+import com.loopme.controllers.display.DisplayControllerVast;
 import com.loopme.controllers.interfaces.DisplayController;
 import com.loopme.receiver.AdReceiver;
 import com.loopme.receiver.MraidAdCloseButtonReceiver;
@@ -227,6 +228,7 @@ public final class BaseActivity extends Activity
     private void resumeAd() {
         if (mFirstLaunch) {
             startPlayInterstitial();
+
             resumeLoopMeController();
             mFirstLaunch = false;
         } else {
@@ -249,6 +251,10 @@ public final class BaseActivity extends Activity
     private void play() {
         if (mDisplayController != null) {
             mDisplayController.onPlay(START_DEFAULT_POSITION);
+
+            if (mDisplayController instanceof DisplayControllerVast) {
+                ( (DisplayControllerVast)mDisplayController).onAdRegisterView(this, mLoopMeContainerView);
+            }
         }
     }
 

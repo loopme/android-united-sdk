@@ -1,5 +1,6 @@
 package com.loopme.tracker.interfaces;
 
+import android.app.Activity;
 import android.media.MediaPlayer;
 import android.view.View;
 import android.webkit.WebView;
@@ -50,4 +51,8 @@ public interface AdEvents {
     void onInitTracker(AdType type);
 
     void onStartWebMeasuringDelayed();
+
+    void onAdRecordReady();
+
+    void onAdRegisterView(Activity activity, View view);
 }

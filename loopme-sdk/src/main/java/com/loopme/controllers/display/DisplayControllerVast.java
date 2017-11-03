@@ -1,5 +1,6 @@
 package com.loopme.controllers.display;
 
+import android.app.Activity;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.support.annotation.Nullable;
@@ -75,6 +76,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     private void vast4Verification() {
         if (isVast4VerificationNeeded()) {
             configureWebView();
+            super.onAdRegisterView(mLoopMeAd.getContext(), mWebView);
             vast4Verification(mWebView);
         } else {
             onVast4VerificationDoesNotNeed();
@@ -95,6 +97,25 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     public void onPlay(int position) {
+        onAdRecordReady();
+
+
+//        onAdResumedEvent();
+//        postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                destroyMediaPlayer();
+//                startMediaPlayer();
+//            }
+//        }, DELAY_UNTIL_EXECUTE);
+//
+//        onAdStartedEvent();
+    }
+
+    @Override
+    public void onAdRegisterView(Activity activity, View view) {
+        super.onAdRegisterView(activity, mWebView);
+        onAdResumedEvent();
         postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -102,6 +123,9 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
                 startMediaPlayer();
             }
         }, DELAY_UNTIL_EXECUTE);
+
+        onAdStartedEvent();
+
     }
 
     private void startMediaPlayer() {
@@ -346,7 +370,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     private void postEvents(MediaPlayer mediaPlayer) {
         onAdPreparedEvent(mediaPlayer, mViewControllerVast.getPlayerView());
-        onAdImpressionEvent();
+//        onAdImpressionEvent();
         onAdStartedEvent();
     }
 

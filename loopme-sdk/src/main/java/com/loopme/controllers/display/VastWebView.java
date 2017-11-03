@@ -23,6 +23,7 @@ public class VastWebView extends WebView {
         getSettings().setJavaScriptEnabled(true);
         getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         setBackgroundColor(Color.TRANSPARENT);
+        setWebContentsDebuggingEnabled(true);
         setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
         setWebChromeClient(new AdViewChromeClient(new AdViewChromeClient.OnErrorFromJsCallback() {
             @Override

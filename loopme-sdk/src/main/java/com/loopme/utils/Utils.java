@@ -731,4 +731,52 @@ public class Utils {
         }
         return positionArray;
     }
+
+    public static boolean isNotNull(Object[] args) {
+        if (args != null && args.length >= 1) {
+            for (Object object : args) {
+                if (object == null) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean hasInteger(Object[] args) {
+        if (isNotNull(args)) {
+            for (Object object : args) {
+                if (!(object instanceof Integer)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean hasStrings(Object[] args) {
+        if (isNotNull(args)) {
+            for (Object object : args) {
+                if (!(object instanceof String)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean isFirstQuartile(int adDuration, int currentPosition) {
+        int event25 = adDuration / 4;
+        return currentPosition >= event25;
+    }
+
+    public static boolean isMidpoint(int adDuration, int currentPosition) {
+        int event50 = adDuration / 2;
+        return currentPosition >= event50;
+    }
+
+    public static boolean isThirdQuartile(int adDuration, int currentPosition) {
+        int event75 = adDuration * 3 / 4;
+        return currentPosition >= event75;
+    }
 }

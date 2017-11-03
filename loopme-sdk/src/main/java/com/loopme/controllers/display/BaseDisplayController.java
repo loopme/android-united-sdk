@@ -1,5 +1,6 @@
 package com.loopme.controllers.display;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -311,5 +312,19 @@ public abstract class BaseDisplayController implements DisplayController, AdEven
                 }
             }
         }, DELAY_UNTIL_EXECUTE);
+    }
+
+    @Override
+    public void onAdRecordReady() {
+        if (mEventManager != null) {
+            mEventManager.onAdRecordReady();
+        }
+    }
+
+    @Override
+    public void onAdRegisterView(Activity activity, View view) {
+        if (mEventManager != null) {
+            mEventManager.onAdRegisterView(activity, view);
+        }
     }
 }
