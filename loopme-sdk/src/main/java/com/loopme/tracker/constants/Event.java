@@ -23,6 +23,8 @@ public enum Event {
     DURATION_CHANGED,//done
     END_SESSION,//done
     ERROR,//done
+    INJECT_JS,
+
 
     //MOAT
     INIT,

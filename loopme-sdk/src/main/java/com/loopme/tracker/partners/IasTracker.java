@@ -96,6 +96,10 @@ public class IasTracker implements Tracker {
         @Override
         public void track(Event event, Object... args) {
             switch (event) {
+                case INJECT_JS: {
+                    injectJsRes();
+                    break;
+                }
                 case REGISTER: {
                     registerView(args);
                     break;
@@ -182,6 +186,15 @@ public class IasTracker implements Tracker {
             }
         }
 
+        private void injectJsRes() {
+            String res = "http://pixel.adsafeprotected.com/jload?anId=927083&advId=INSERTMACRO&campId=INSERTMACRO&pubId=INSERTMACRO&chanId=INSERTMACRO&placementId=INSERTMACRO&adsafe_par&bundleId=INSERTMACRO\"></script>\n" + "<script type=\"text/javascript\" src=\"https://mobile-static.adsafeprotected.com/static/creative/avid-certification/scripts/placement-avid-logging.js?placementId=1";
+            Logging.out(LOG_TAG, res);
+            if (mVideoAdSession != null) {
+                mVideoAdSession.injectJavaScriptResource(res);
+            }
+
+        }
+
         private void registerFriendlyView(Object[] args) {
             if (Utils.isNotNull(args)
                     && args[0] instanceof View
@@ -257,8 +270,8 @@ public class IasTracker implements Tracker {
 
         private void recordAdCompleteEvent() {
             if (mAvidVideoPlaybackListener != null) {
-//                mAvidVideoPlaybackListener.recordAdCompleteEvent();
-//                Logging.out(LOG_TAG, "recordAdCompleteEvent");
+                mAvidVideoPlaybackListener.recordAdCompleteEvent();
+                Logging.out(LOG_TAG, "recordAdCompleteEvent");
             }
         }
 

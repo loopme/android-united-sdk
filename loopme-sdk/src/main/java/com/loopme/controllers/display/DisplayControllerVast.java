@@ -115,6 +115,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     @Override
     public void onAdRegisterView(Activity activity, View view) {
         super.onAdRegisterView(activity, mWebView);
+        onInject();
         onAdResumedEvent();
         postDelayed(new Runnable() {
             @Override

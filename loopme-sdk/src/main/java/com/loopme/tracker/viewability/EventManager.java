@@ -196,6 +196,13 @@ public class EventManager implements AdEvents {
     }
 
     @Override
+    public void onInject() {
+        if (mTrackerManager != null) {
+            mTrackerManager.track(Event.INJECT_JS);
+        }
+    }
+
+    @Override
     public void onAdDurationEvents(int position, int videoDuration) {
         onAdDurationChangedEvent(position, videoDuration);
         handleProgressDurationEvents(position, videoDuration);

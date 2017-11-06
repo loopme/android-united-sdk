@@ -327,4 +327,11 @@ public abstract class BaseDisplayController implements DisplayController, AdEven
             mEventManager.onAdRegisterView(activity, view);
         }
     }
+
+    @Override
+    public void onInject() {
+        if (mEventManager != null) {
+            mEventManager.onInject();
+        }
+    }
 }

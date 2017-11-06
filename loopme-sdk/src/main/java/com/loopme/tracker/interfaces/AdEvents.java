@@ -55,4 +55,6 @@ public interface AdEvents {
     void onAdRecordReady();
 
     void onAdRegisterView(Activity activity, View view);
+
+    void onInject();
 }
