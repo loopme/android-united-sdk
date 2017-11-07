@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -675,5 +676,10 @@ public class Utils {
             packagesAsString.add(packageInfo.packageName);
         }
         return packagesAsString;
+    }
+
+    public static String formatTime(double time) {
+        DecimalFormat formatter = new DecimalFormat("0.00");
+        return formatter.format(time);
     }
 }

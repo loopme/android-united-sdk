@@ -84,7 +84,7 @@ dependencies {
 
     compile 'com.google.android.gms:play-services-ads:9.6.1'
     compile ('com.android.support:multidex:1.0.1')
-    release (name: 'LOO-moat-mobile-app-kit-2.1.0', ext: 'aar')
+    compile (name: 'LOO-moat-mobile-app-kit-2.1.0', ext: 'aar')
 }
 
 buildscript {

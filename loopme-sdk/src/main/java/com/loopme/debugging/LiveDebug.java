@@ -138,4 +138,8 @@ public class LiveDebug {
         String thread = (Looper.getMainLooper() == Looper.myLooper()) ? "ui" : "bg";
         return MessageFormat.format("{0}: {1}: {2}", thread, logTag, text);
     }
+
+    public static boolean isDebugOn() {
+        return sIsDebugOn;
+    }
 }
