@@ -114,7 +114,7 @@ public class LoopMeTracker {
     private static String buildSdkFeedBackUrl(String token) {
         String url = Constants.OLD_TRACK_FEEDBACK_URL + "?";
         Map<String, String> requestParams = new HashMap<>();
-        requestParams.put(Params.ERROR_TYPE, Params.SDK_FEEDBACK);
+        requestParams.put(Params.EVENT_TYPE, Params.SDK_FEEDBACK);
         requestParams.put(Params.R, "1");
         requestParams.put(Params.ID, token);
         return url + HttpUtil.obtainRequestString(requestParams);
