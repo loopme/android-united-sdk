@@ -104,7 +104,7 @@ ext {
     adapterName = 'Loopme'
     fileName = 'loopme-united-sdk'
     sdkName = "$fileName"
-    releaseVersion = '6.0.1'
+    releaseVersion = '6.0.2'
     fileName = "${fileName}-${releaseVersion}"
     apiVersion = "6"
 
@@ -144,7 +144,7 @@ allprojects {
 
 
 group = 'com.loopme'
-version = '6.0.1'
+version = '6.0.2'
 
 install {
     repositories.mavenInstaller {
@@ -201,14 +201,14 @@ static def getDate() {
 }
 
 task clearJar(type: Delete) {
-    delete 'build/outputs/loopme-sdk-6.0.0.jar'
+    delete 'build/outputs/loopme-sdk-6.0.1.jar'
 }
 
 task makeJar(type: Copy) {
     from('build/intermediates/bundles/release/')
     into('build/outputs/')
     include('classes.jar')
-    rename('classes.jar', 'loopme-sdk-6.0.1.jar')
+    rename('classes.jar', 'loopme-sdk-6.0.2.jar')
 }
 
 task wrapper(type: Wrapper) {

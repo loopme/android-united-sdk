@@ -1,3 +1,6 @@
+## Version 6.0.2 (09 of November, 2017)
+- Added unsupported file format detection fro VPAID creatives
+
 ## Version 6.0.1 (22 of October, 2017)
 
 1. Support interstitial and banner ads of the following formats:
