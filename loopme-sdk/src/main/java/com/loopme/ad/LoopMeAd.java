@@ -116,8 +116,8 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     public void resume() {
         if (mDisplayController != null && isReady()) {
             mDisplayController.onResume();
+            Logging.out(LOG_TAG, "Ad resumed");
         }
-        Logging.out(LOG_TAG, "Ad resumed");
     }
 
     public void pause() {

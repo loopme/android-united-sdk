@@ -15,6 +15,7 @@ import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.LoopMeBannerGeneral;
 import com.loopme.MinimizedMode;
+import com.loopme.MoatViewAbilityUtils;
 import com.loopme.SwipeListener;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.AdSpotDimensions;
@@ -28,7 +29,6 @@ import com.loopme.controllers.view.View360Controller;
 import com.loopme.controllers.view.ViewControllerLoopMe;
 import com.loopme.loaders.FileLoaderNewImpl;
 import com.loopme.loaders.Loader;
-import com.loopme.models.BannerVisibility;
 import com.loopme.models.Errors;
 import com.loopme.common.LoopMeError;
 import com.loopme.models.Message;
@@ -238,9 +238,6 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
             resumeViewController();
             mVideoController.playVideo(position);
         }
-        if (mDisplayModeResolver != null) {
-            mDisplayModeResolver.animateAppear();
-        }
         onStartWebMeasuringDelayed();
     }
 
@@ -267,7 +264,6 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
         super.onPause();
         pauseControllers();
     }
-
 
     private void resumeInterstitial() {
         resumeVideoController();
@@ -306,25 +302,6 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
     private void resumeViewController() {
         if (mViewController != null) {
             mViewController.onResume();
-        }
-    }
-
-    public void ensureBannerIsVisible() {
-        if (isBanner() && mLoopMeAd instanceof LoopMeBannerGeneral) {
-            FrameLayout bannerView = ((LoopMeBannerGeneral) mLoopMeAd).getBannerView();
-            BannerVisibility visibility = UiUtils.ensureAdIsVisible(bannerView);
-
-            switch (visibility) {
-                case BANNER_VISIBLE: {
-                    setWebViewState(Constants.WebviewState.VISIBLE);
-                    break;
-                }
-                case BANNER_HALF_VISIBLE:
-                case BANNER_INVISIBLE: {
-                    setWebViewState(Constants.WebviewState.HIDDEN);
-                    break;
-                }
-            }
         }
     }
 
@@ -440,8 +417,16 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
 
     private void checkBannerVisibility() {
         if (isBanner() && mLoopMeAd != null) {
-            ViewTreeObserver observer = mLoopMeAd.getContainerView().getViewTreeObserver();
-            observer.addOnGlobalLayoutListener(initLayoutListener(observer));
+            MoatViewAbilityUtils.calculateViewAbilitySyncDelayed(mLoopMeAd.getContainerView(), new MoatViewAbilityUtils.OnResultListener() {
+                @Override
+                public void onResult(MoatViewAbilityUtils.ViewAbilityInfo info) {
+                    if (info.isVisibleMore50Percents()) {
+                        setWebViewState(Constants.WebviewState.VISIBLE);
+                    } else {
+                        setWebViewState(Constants.WebviewState.HIDDEN);
+                    }
+                }
+            });
         }
     }
 
@@ -665,19 +650,6 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
         }
     }
 
-    private ViewTreeObserver.OnGlobalLayoutListener initLayoutListener(final ViewTreeObserver observer) {
-        return new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                ensureBannerIsVisible();
-                if (observer.isAlive()) {
-                    observer.removeOnGlobalLayoutListener(this);
-                }
-                onMessage(Message.LOG, "onGlobalLayout");
-            }
-        };
-    }
-
     private void clearWebView(LoopMeWebView webView) {
         if (webView != null) {
             webView.destroy();
@@ -750,11 +722,6 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
         }
     }
 
-    public boolean isWebViewStateHidden() {
-        return mAdView != null &&
-                mAdView.getCurrentWebViewState() == Constants.WebviewState.HIDDEN;
-    }
-
     public void setMinimizedMode(MinimizedMode mode) {
         if (mDisplayModeResolver != null) {
             mDisplayModeResolver.setMinimizedMode(mode);
@@ -763,11 +730,6 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
 
     public boolean isMinimizedModeEnable() {
         return mDisplayModeResolver != null && mDisplayModeResolver.isMinimizedModeEnable();
-    }
-
-
-    public boolean isBackFromExpand() {
-        return mDisplayModeResolver != null && mDisplayModeResolver.isBackFromExpand();
     }
 
     public void switchToMinimizedMode() {
@@ -782,7 +744,17 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
         }
     }
 
-    public IViewController getViewController() {
-        return mViewController;
+    public void dismissAd() {
+        if (mLoopMeAd != null) {
+            mLoopMeAd.dismiss();
+        }
+    }
+
+    public boolean isVideoPlaying() {
+        return getCurrentVideoState() == Constants.VideoState.PLAYING;
+    }
+
+    public boolean isVideoPaused() {
+        return getCurrentVideoState() == Constants.VideoState.PAUSED;
     }
 }

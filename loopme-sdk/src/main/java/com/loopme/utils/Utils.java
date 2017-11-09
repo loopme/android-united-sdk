@@ -15,6 +15,10 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Vibrator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.DisplayMetrics;
@@ -32,6 +36,7 @@ import com.loopme.Logging;
 import com.loopme.LoopMeBanner;
 import com.loopme.ResourceInfo;
 import com.loopme.ad.AdParams;
+import com.loopme.ad.AdSpotDimensions;
 import com.loopme.request.AES;
 import com.loopme.tracker.constants.EventConstants;
 import com.loopme.vast.TrackingEvent;
@@ -44,6 +49,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -186,12 +192,6 @@ public class Utils {
         }
         packageInfoList.addAll(sPackageManager.getInstalledPackages(0));
         return packageInfoList;
-    }
-
-    public static void animateAppear(View view) {
-        if (view != null) {
-            view.animate().setDuration(500).alpha(1.0f);
-        }
     }
 
     public static float getSystemVolume() {
@@ -476,7 +476,7 @@ public class Utils {
         return (int) (getDisplayMetrics().widthPixels / density);
     }
 
-    public static DisplayMetrics getDisplayMetrics() {
+    private static DisplayMetrics getDisplayMetrics() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         if (sWindowManager != null) {
             sWindowManager.getDefaultDisplay().getMetrics(displayMetrics);
@@ -675,5 +675,60 @@ public class Utils {
             packagesAsString.add(packageInfo.packageName);
         }
         return packagesAsString;
+    }
+
+    public static void setDimensions(AdSpotDimensions adSpotDimensions) {
+        if (adSpotDimensions != null) {
+            DisplayMetrics dm = getDisplayMetrics();
+            int height;
+            int width;
+            // portrait mode
+            if (dm.heightPixels > dm.widthPixels) {
+                width = dm.widthPixels / 2;
+            } else { //landscape mode
+                width = dm.widthPixels / 3;
+            }
+            height = width * 2 / 3;
+
+            adSpotDimensions.setWidth(width);
+            adSpotDimensions.setHeight(height);
+        }
+    }
+
+    public static int[] getPositionsOnScreen(RecyclerView recyclerView) {
+        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+        int[] positionArray = {-1, -1};
+        if (layoutManager instanceof LinearLayoutManager) {
+            positionArray[0] = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+            positionArray[1] = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
+
+        } else if (layoutManager instanceof GridLayoutManager) {
+            positionArray[0] = ((GridLayoutManager) layoutManager).findFirstVisibleItemPosition();
+            positionArray[1] = ((GridLayoutManager) layoutManager).findLastVisibleItemPosition();
+
+        } else if (layoutManager instanceof StaggeredGridLayoutManager) {
+            int[] firsts;
+            int[] lasts;
+            try {
+                firsts = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null);
+                lasts = ((StaggeredGridLayoutManager) layoutManager).findLastVisibleItemPositions(null);
+            } catch (NullPointerException e) {
+                return positionArray;
+            }
+
+            List<Integer> firstList = new ArrayList<Integer>(firsts.length);
+            for (int first : firsts) {
+                firstList.add(first);
+            }
+
+            List<Integer> lastList = new ArrayList<Integer>(lasts.length);
+            for (int last : lasts) {
+                lastList.add(last);
+            }
+
+            positionArray[0] = Collections.min(firstList);
+            positionArray[1] = Collections.max(lastList);
+        }
+        return positionArray;
     }
 }

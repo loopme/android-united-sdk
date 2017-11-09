@@ -31,7 +31,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
     private boolean mIsVideoFinished;
 
     public void setMinimizedMode(MinimizedMode mode) {
-        if (mDisplayController != null && mDisplayController instanceof DisplayControllerLoopMe) {
+        if (isLoopMeController()) {
             ((DisplayControllerLoopMe) mDisplayController).setMinimizedMode(mode);
         }
     }
@@ -152,7 +152,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
 
     @Override
     public void pause() {
-        if (mDisplayController instanceof DisplayControllerLoopMe) {
+        if (isLoopMeController()) {
             ((DisplayControllerLoopMe) mDisplayController).setWebViewState(Constants.WebviewState.HIDDEN);
         } else {
             super.pause();
@@ -160,17 +160,26 @@ public class LoopMeBannerGeneral extends LoopMeAd {
     }
 
     public void switchToMinimizedMode() {
-        if (getDisplayController() != null && getDisplayController() instanceof DisplayControllerLoopMe && isShowing() && !mIsVideoFinished) {
+        if (isLoopMeBannerShowing() && isVideoNotFinished()) {
             DisplayControllerLoopMe displayControllerLoopMe = (DisplayControllerLoopMe) getDisplayController();
-            if (displayControllerLoopMe.isBackFromExpand()) {
-                return;
-            }
             if (displayControllerLoopMe.isMinimizedModeEnable()) {
                 displayControllerLoopMe.switchToMinimizedMode();
             } else {
                 pause();
             }
         }
+    }
+
+    private boolean isLoopMeBannerShowing() {
+        return isLoopMeController() && isShowing();
+    }
+
+    private boolean isVideoNotFinished() {
+        return !mIsVideoFinished;
+    }
+
+    private boolean isLoopMeController() {
+        return getDisplayController() instanceof DisplayControllerLoopMe;
     }
 
     public void playbackFinishedWithError() {
@@ -287,22 +296,11 @@ public class LoopMeBannerGeneral extends LoopMeAd {
      */
     private void onLoopMeBannerVideoDidReachEnd() {
         mIsVideoFinished = true;
+        destroyMinimizedViewDelayed();
         if (mAdListener != null) {
             mAdListener.onLoopMeBannerVideoDidReachEnd(this);
         }
         Logging.out(LOG_TAG, "Video did reach end");
-    }
-
-    private void switchToNormalModeDelayed() {
-        if (isFullScreen()) {
-            runOnUiThreadDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ((DisplayControllerLoopMe) getDisplayController()).switchToNormalMode();
-                    UiUtils.broadcastIntent(getContext(), Constants.DESTROY_INTENT, getAdId());
-                }
-            }, Constants.SHRINK_MODE_KEEP_AFTER_FINISH_TIME);
-        }
     }
 
     /**
@@ -376,22 +374,21 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         }
     }
 
-    private void destroyMinimizedView() {
-        if (mDisplayController != null && mDisplayController instanceof DisplayControllerLoopMe) {
-            ((DisplayControllerLoopMe) mDisplayController).destroyMinimizedView();
-        }
+    private void destroyMinimizedViewDelayed() {
+        runOnUiThreadDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isLoopMeController()) {
+                    ((DisplayControllerLoopMe) mDisplayController).destroyMinimizedView();
+                }
+            }
+        }, Constants.SHRINK_MODE_KEEP_AFTER_FINISH_TIME);
     }
 
     private void destroyBannerView() {
         if (mBannerView != null) {
             mBannerView.setVisibility(View.GONE);
             mBannerView.removeAllViews();
-        }
-    }
-
-    private void closeWebView() {
-        if (mDisplayController instanceof DisplayControllerLoopMe) {
-            ((DisplayControllerLoopMe) mDisplayController).setWebViewState(Constants.WebviewState.CLOSED);
         }
     }
 }

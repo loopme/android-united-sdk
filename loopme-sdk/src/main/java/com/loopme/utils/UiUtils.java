@@ -5,12 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
-import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
@@ -19,12 +16,7 @@ import com.loopme.Logging;
 import com.loopme.MinimizedMode;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
-import com.loopme.models.BannerVisibility;
 import com.loopme.views.activity.AdBrowserActivity;
-
-/**
- * Created by vynnykiakiv on 6/26/17.
- */
 
 public class UiUtils {
 
@@ -60,27 +52,6 @@ public class UiUtils {
         redirectIntent.putExtra(Constants.FORMAT_TAG, loopMeAd.getAdFormat());
         redirectIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return redirectIntent;
-    }
-
-    public static BannerVisibility ensureAdIsVisible(View view) {
-        if (view == null) {
-            return BannerVisibility.BANNER_INVISIBLE;
-        }
-
-        Rect rect = new Rect();
-        boolean b = view.getGlobalVisibleRect(rect);
-
-        int halfOfView = view.getHeight() / 2;
-        int rectHeight = rect.height();
-
-        if (b) {
-            if (rectHeight < halfOfView) {
-                return BannerVisibility.BANNER_HALF_VISIBLE;
-            } else if (rectHeight >= halfOfView) {
-                return BannerVisibility.BANNER_VISIBLE;
-            }
-        }
-        return BannerVisibility.BANNER_INVISIBLE;
     }
 
     public static AdSpotDimensions getViewSize(MinimizedMode minimizedMode, LoopMeAd loopMeAd, Constants.DisplayMode displayMode) {
@@ -120,12 +91,12 @@ public class UiUtils {
         return DEFAULT_DIMENSIONS;
     }
 
-    public static FrameLayout createFrameLayout(Context context, int width, int height) {
-        if (context == null) {
+    public static FrameLayout createFrameLayout(Context context, AdSpotDimensions dimensions) {
+        if (context == null || dimensions == null) {
             return null;
         }
         FrameLayout frameLayout = new FrameLayout(context);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(width, height);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(dimensions.getWidth(), dimensions.getHeight());
         frameLayout.setLayoutParams(params);
         return frameLayout;
     }
