@@ -29,6 +29,7 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.webkit.WebSettings;
 import android.widget.FrameLayout;
 
 import com.loopme.Constants;
@@ -90,9 +91,11 @@ public class Utils {
     private static PackageManager sPackageManager;
     private static LocationManager sLocationManager;
     private static SimpleDateFormat sFormatter = new SimpleDateFormat(DATE_PATTERN, Locale.US);
+    public static String sUserAgent;
 
     public static void init(Context context) {
         if (context != null) {
+            sUserAgent = WebSettings.getDefaultUserAgent(context);
             sResources = context.getResources();
             sPackageManager = context.getPackageManager();
             sAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
@@ -736,5 +739,31 @@ public class Utils {
             positionArray[1] = Collections.max(lastList);
         }
         return positionArray;
+    }
+
+    public static boolean isUsualFormat(String source) {
+        String fileName = getFileNameFromUrl(source);
+        return !TextUtils.isEmpty(fileName)
+                && (fileName.contains(Constants.MP4_FORMAT_EXT)
+                || fileName.contains(Constants.WEBM_FORMAT_EXT));
+    }
+
+    private static String getFileNameFromUrl(String source) {
+        if (TextUtils.isEmpty(source)) {
+            return "";
+        }
+        int lastIndexOfSlash = source.lastIndexOf("/");
+        return source.substring(lastIndexOfSlash, source.length());
+    }
+
+    public static String getSourceUrl(String message) {
+        if (TextUtils.isEmpty(message)) {
+            return "";
+        }
+        String[] tokens = message.split(":");
+        if (tokens.length >= 3) {
+            return tokens[tokens.length - 1];
+        }
+        return "";
     }
 }

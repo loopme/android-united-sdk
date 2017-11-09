@@ -1,7 +1,9 @@
 package com.loopme.vast;
 
+import android.text.TextUtils;
 import com.loopme.HttpUtil;
 import com.loopme.Logging;
+import com.loopme.tracker.constants.EventConstants;
 import com.loopme.utils.StringUtils;
 import com.loopme.utils.Utils;
 import com.loopme.xml.Tracking;

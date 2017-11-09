@@ -50,6 +50,7 @@ public class Constants {
 
 
     public static boolean sPartPreload = false;
+    public static final long CHECK_VPAID_AD_TYPE_TIMER = 3000;
 
     private Constants() {
     }
@@ -60,6 +61,7 @@ public class Constants {
     public static final String PERCENT_SYMBOL = "%";
     public static final String MP4_FORMAT = ".mp4";
     public static final String MP4_FORMAT_EXT = "mp4";
+    public static final String WEBM_FORMAT_EXT = "webm";
     public static final String APPKEY_TAG = "appkey";
     public static final String FORMAT_TAG = "format";
     public static final String BANNER_TAG = "banner";
