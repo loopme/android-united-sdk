@@ -3,7 +3,9 @@ package com.loopme.views.activity;
 import android.app.Activity;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
@@ -14,7 +16,7 @@ public class MraidVideoActivity extends Activity {
     private static final String LOG_TAG = MraidVideoActivity.class.getSimpleName();
     private static final String EXTRAS_VIDEO_URL = "videoUrl";
     private RelativeLayout mRelativeLayout;
-    private VideoView mVideoView;
+    private View mAdView;
     private CloseButton mCloseButton;
 
     @Override
@@ -22,20 +24,26 @@ public class MraidVideoActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         mRelativeLayout = new RelativeLayout(this);
-        mVideoView = new VideoView(this);
-        mVideoView.setVideoPath(getIntent().getStringExtra(EXTRAS_VIDEO_URL));
-        mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mp.start();
-            }
-        });
-        mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                mCloseButton.setVisibility(View.VISIBLE);
-            }
-        });
+        String url = getIntent().getStringExtra(EXTRAS_VIDEO_URL);
+        if (TextUtils.isEmpty(url)) {
+            mAdView = new ImageView(this);
+        } else {
+            mAdView = new VideoView(this);
+
+            ((VideoView) mAdView).setVideoPath(getIntent().getStringExtra(EXTRAS_VIDEO_URL));
+            ((VideoView) mAdView).setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    mp.start();
+                }
+            });
+            ((VideoView) mAdView).setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    mCloseButton.setVisibility(View.VISIBLE);
+                }
+            });
+        }
         setLayoutParams();
         setContentView(mRelativeLayout);
         initCloseButton();
@@ -45,7 +53,7 @@ public class MraidVideoActivity extends Activity {
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.MATCH_PARENT);
-        mRelativeLayout.addView(mVideoView, lp);
+        mRelativeLayout.addView(mAdView, lp);
     }
 
     private void initCloseButton() {
@@ -62,16 +70,16 @@ public class MraidVideoActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (mVideoView != null && !mVideoView.isPlaying()) {
-            mVideoView.resume();
+        if (mAdView != null && mAdView instanceof VideoView && !((VideoView) mAdView).isPlaying()) {
+            ((VideoView) mAdView).resume();
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (mVideoView != null && mVideoView.isPlaying()) {
-            mVideoView.pause();
+        if (mAdView != null && mAdView instanceof VideoView && ((VideoView) mAdView).isPlaying()) {
+            ((VideoView) mAdView).pause();
         }
     }
 }

@@ -8,21 +8,21 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 
 import com.loopme.Logging;
-import com.loopme.common.LoopMeError;
-import com.loopme.tracker.constants.EventConstants;
-import com.loopme.vast.VastVpaidEventTracker;
-import com.loopme.time.SimpleTimer;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.bridges.vpaid.BridgeEventHandler;
 import com.loopme.bridges.vpaid.VpaidBridge;
 import com.loopme.bridges.vpaid.VpaidBridgeImpl;
+import com.loopme.common.LoopMeError;
 import com.loopme.controllers.interfaces.VastVpaidDisplayController;
 import com.loopme.controllers.view.ViewControllerVpaid;
 import com.loopme.models.BridgeMethods;
 import com.loopme.models.Errors;
 import com.loopme.models.Message;
+import com.loopme.time.SimpleTimer;
+import com.loopme.tracker.constants.EventConstants;
 import com.loopme.utils.Utils;
 import com.loopme.vast.TrackingEvent;
+import com.loopme.vast.VastVpaidEventTracker;
 import com.loopme.views.LoopMeWebView;
 import com.loopme.views.webclient.AdViewChromeClient;
 import com.loopme.xml.Tracking;
@@ -377,6 +377,11 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     @Override
     public void onAdShake() {
+
+    }
+
+    @Override
+    public void setFullScreen(boolean isFullScreen) {
 
     }
 

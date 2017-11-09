@@ -1,7 +1,6 @@
 package com.loopme.utils;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -38,7 +37,10 @@ public class ValidationHelper {
     }
 
     public static boolean isValidFormat(String format) {
-        return format != null && (format.equalsIgnoreCase(Constants.BANNER_TAG) || format.equalsIgnoreCase(Constants.INTERSTITIAL_TAG));
+        return format != null
+                && (format.equalsIgnoreCase(Constants.BANNER_TAG)
+                || format.equalsIgnoreCase(Constants.INTERSTITIAL_TAG)
+                || format.equalsIgnoreCase(Constants.EXPANDABLE_BANNER_TAG));
     }
 
     public static boolean isCouldLoadAd(LoopMeAd loopMeAd) {

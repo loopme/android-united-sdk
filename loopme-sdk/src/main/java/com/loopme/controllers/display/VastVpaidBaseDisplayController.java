@@ -7,10 +7,10 @@ import android.webkit.WebView;
 
 import com.loopme.ad.AdParams;
 import com.loopme.ad.LoopMeAd;
+import com.loopme.common.LoopMeError;
 import com.loopme.controllers.interfaces.VastVpaidDisplayController;
 import com.loopme.loaders.VastVpaidAssetsResolver;
 import com.loopme.models.Errors;
-import com.loopme.common.LoopMeError;
 import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
 import com.loopme.tracker.partners.LoopMeTracker;
@@ -102,7 +102,7 @@ public abstract class VastVpaidBaseDisplayController extends BaseDisplayControll
 
     private void postWarning(LoopMeError error) {
         if (mLoopMeAd != null) {
-            mLoopMeAd.onPostWarning(error);
+            mLoopMeAd.onSendPostWarning(error);
         }
     }
 

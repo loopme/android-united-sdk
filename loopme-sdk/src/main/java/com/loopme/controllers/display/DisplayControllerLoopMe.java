@@ -20,6 +20,7 @@ import com.loopme.ad.AdParams;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.bridges.Bridge;
+import com.loopme.common.LoopMeError;
 import com.loopme.controllers.MraidController;
 import com.loopme.controllers.VideoController;
 import com.loopme.controllers.interfaces.LoopMeDisplayController;
@@ -30,7 +31,6 @@ import com.loopme.loaders.FileLoaderNewImpl;
 import com.loopme.loaders.Loader;
 import com.loopme.models.BannerVisibility;
 import com.loopme.models.Errors;
-import com.loopme.common.LoopMeError;
 import com.loopme.models.Message;
 import com.loopme.utils.UiUtils;
 import com.loopme.views.AdView;
@@ -448,6 +448,10 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
     @Override
     public boolean isFullScreen() {
         return mDisplayModeResolver != null && mDisplayModeResolver.isFullScreenMode();
+    }
+
+    public void setFullScreen(boolean isFullScreen) {
+        mDisplayModeResolver.switchToFullScreenMode(isFullScreen);
     }
 
     private void handleVideoStretch(boolean videoStretch) {

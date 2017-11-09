@@ -6,7 +6,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum AdType {
     BANNER("banner"),
-    INTERSTITIAL("interstitial");
+    INTERSTITIAL("interstitial"),
+    EXPANDABLE_BANNER("expandable_banner");
 
     private String mType;
 

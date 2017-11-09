@@ -21,7 +21,8 @@ public class AdSpotValidator {
     private static boolean validateAdType(AdSpot adSpot) {
         return adSpot != null && adSpot.getType() != null
                 && (TextUtils.equals(adSpot.getType().toString(), AdType.INTERSTITIAL.toString())
-                || TextUtils.equals(adSpot.getType().toString(), AdType.BANNER.toString()));
+                || TextUtils.equals(adSpot.getType().toString(), AdType.BANNER.toString())
+                || TextUtils.equals(adSpot.getType().toString(), AdType.EXPANDABLE_BANNER.toString()));
     }
 
     private static boolean validateSdk(AdSpot adSpot) {

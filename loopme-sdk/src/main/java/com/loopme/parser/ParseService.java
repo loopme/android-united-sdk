@@ -3,19 +3,18 @@ package com.loopme.parser;
 import android.text.TextUtils;
 
 import com.loopme.Constants;
-import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.Logging;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.AdType;
 import com.loopme.ad.LoopMeAd;
-import com.loopme.tracker.AdIds;
 import com.loopme.models.Errors;
 import com.loopme.models.response.Bid;
 import com.loopme.models.response.Ext;
 import com.loopme.models.response.ResponseJsonModel;
+import com.loopme.tracker.AdIds;
+import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.ValidationHelper;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -137,7 +136,15 @@ public class ParseService extends JsonParser {
     }
 
     private static String retrieveAdFormat(LoopMeAd loopMeAd) {
-        return loopMeAd.getAdFormat() == Constants.AdFormat.INTERSTITIAL ? Constants.INTERSTITIAL_TAG : Constants.BANNER_TAG;
+        if (loopMeAd.getAdFormat() == Constants.AdFormat.INTERSTITIAL) {
+            return Constants.INTERSTITIAL_TAG;
+        } else if (loopMeAd.getAdFormat() == Constants.AdFormat.BANNER) {
+            return Constants.EXPANDABLE_BANNER_TAG;
+        } else if (loopMeAd.getAdFormat() == Constants.AdFormat.EXPANDABLE_BANNER) {
+            return Constants.EXPANDABLE_BANNER_TAG;
+        } else {
+            return Constants.INTERSTITIAL_TAG;
+        }
     }
 
     private static String retrieveAdid(Bid bidObject) {

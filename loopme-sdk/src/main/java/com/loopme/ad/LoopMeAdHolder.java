@@ -6,6 +6,7 @@ import android.text.TextUtils;
 
 import com.loopme.Constants;
 import com.loopme.LoopMeBannerGeneral;
+import com.loopme.LoopMeExpandableBannerGeneral;
 import com.loopme.LoopMeInterstitialGeneral;
 
 import java.util.HashMap;
@@ -15,6 +16,7 @@ public class LoopMeAdHolder {
 
     private static final Map<Integer, LoopMeInterstitialGeneral> mNewImplInterstitialMap = new HashMap<>();
     private static final Map<Integer, LoopMeBannerGeneral> mNewImplBannerMap = new HashMap<>();
+    private static final Map<Integer, LoopMeExpandableBannerGeneral> mNewImplExpandableBannerMap = new HashMap<>();
 
     private LoopMeAdHolder() {
     }
@@ -23,6 +25,8 @@ public class LoopMeAdHolder {
         int id = loopMeAd.getAdId();
         if (loopMeAd.getAdFormat() == Constants.AdFormat.INTERSTITIAL) {
             mNewImplInterstitialMap.put(id, (LoopMeInterstitialGeneral) loopMeAd);
+        } else if (loopMeAd.getAdFormat() == Constants.AdFormat.EXPANDABLE_BANNER) {
+            mNewImplExpandableBannerMap.put(id, (LoopMeExpandableBannerGeneral) loopMeAd);
         } else {
             mNewImplBannerMap.put(id, (LoopMeBannerGeneral) loopMeAd);
         }
@@ -64,10 +68,28 @@ public class LoopMeAdHolder {
         }
     }
 
+    public static LoopMeExpandableBannerGeneral createExpandableBanner(String appKey, Activity activity) {
+        if (activity == null || TextUtils.isEmpty(appKey)) {
+            return null;
+        } else {
+            LoopMeExpandableBannerGeneral banner = new LoopMeExpandableBannerGeneral(activity, appKey);
+            mNewImplExpandableBannerMap.put(banner.getAdId(), banner);
+            return banner;
+        }
+    }
+
+    private static LoopMeExpandableBannerGeneral findExpandableBanner(int adId) {
+        if (mNewImplExpandableBannerMap.containsKey(adId)) {
+            return mNewImplExpandableBannerMap.get(adId);
+        } else {
+            return null;
+        }
+    }
     public static void removeAd(LoopMeAd loopMeAd) {
         if (loopMeAd != null) {
             mNewImplInterstitialMap.remove(loopMeAd.getAdId());
             mNewImplBannerMap.remove(loopMeAd.getAdId());
+            mNewImplExpandableBannerMap.remove(loopMeAd.getAdId());
         }
     }
 
@@ -79,6 +101,8 @@ public class LoopMeAdHolder {
         int format = intent.getIntExtra(Constants.FORMAT_TAG, Constants.DEFAULT_AD_ID);
         if (format == Constants.AdFormat.BANNER) {
             return LoopMeAdHolder.findBanner(adId);
+        } else if (format == Constants.AdFormat.EXPANDABLE_BANNER) {
+            return LoopMeAdHolder.findExpandableBanner(adId);
         } else {
             return LoopMeAdHolder.findInterstitial(adId);
         }

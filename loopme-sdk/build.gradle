@@ -84,7 +84,7 @@ dependencies {
 
     compile 'com.google.android.gms:play-services-ads:9.6.1'
     compile ('com.android.support:multidex:1.0.1')
-    release (name: 'LOO-moat-mobile-app-kit-2.1.0', ext: 'aar')
+    compile(name: 'LOO-moat-mobile-app-kit-2.1.0', ext: 'aar')
 }
 
 buildscript {
@@ -93,7 +93,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.3'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }

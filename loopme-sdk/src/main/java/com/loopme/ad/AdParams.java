@@ -2,13 +2,13 @@ package com.loopme.ad;
 
 import android.text.TextUtils;
 
+import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.tracker.AdIds;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.vast.WrapperParser;
-import com.loopme.xml.vast4.Wrapper;
-import com.loopme.Constants;
 import com.loopme.xml.Tracking;
+import com.loopme.xml.vast4.Wrapper;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -257,14 +257,15 @@ public class AdParams implements Serializable {
         }
 
         private boolean isValidFormatValue() {
-            return mBuilderFormat != null &&
-                    (mBuilderFormat.equalsIgnoreCase(Constants.BANNER_TAG) ||
-                            mBuilderFormat.equalsIgnoreCase(Constants.INTERSTITIAL_TAG));
+            return mBuilderFormat != null
+                    && (mBuilderFormat.equalsIgnoreCase(Constants.BANNER_TAG)
+                    || mBuilderFormat.equalsIgnoreCase(Constants.INTERSTITIAL_TAG)
+                    || mBuilderFormat.equalsIgnoreCase(Constants.EXPANDABLE_BANNER_TAG));
         }
 
         private boolean isValidOrientationValue(String orientation) {
-            return orientation != null && (orientation.equalsIgnoreCase(Constants.ORIENTATION_PORT) ||
-                    orientation.equalsIgnoreCase(Constants.ORIENTATION_LAND));
+            return orientation != null && (orientation.equalsIgnoreCase(Constants.ORIENTATION_PORT)
+                    || orientation.equalsIgnoreCase(Constants.ORIENTATION_LAND));
         }
 
         public AdParamsBuilder debug(boolean debug) {

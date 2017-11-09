@@ -110,6 +110,7 @@ public class LoopMeWebView extends WebView {
         setWebChromeClient(null);
         loadCommand("about:blank");
         removeChildes();
+        removeAllViews();
     }
 
     private void removeChildes() {

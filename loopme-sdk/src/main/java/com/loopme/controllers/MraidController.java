@@ -3,13 +3,12 @@ package com.loopme.controllers;
 import android.content.Context;
 import android.content.Intent;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
-import com.loopme.AdUtils;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.LoopMeBannerGeneral;
 import com.loopme.ad.LoopMeAd;
-import com.loopme.LoopMeBanner;
 import com.loopme.bridges.mraid.MraidBridge;
 import com.loopme.utils.InternetUtils;
 import com.loopme.views.MraidView;
@@ -58,7 +57,7 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     @Override
     public void resize(int width, int height) {
         Logging.out(LOG_TAG, "resize");
-        if (mLoopMeAd.getAdFormat() == Constants.AdFormat.BANNER) {
+        if (mLoopMeAd.getAdFormat() == Constants.AdFormat.BANNER || mLoopMeAd.getAdFormat() == Constants.AdFormat.EXPANDABLE_BANNER) {
             setBannerSize(width, height);
             mMraidView.resize();
             mMraidView.setState(Constants.MraidState.RESIZED);
@@ -68,7 +67,7 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     }
 
     private void setBannerSize(int width, int height) {
-        if (mLoopMeAd.getAdFormat() == Constants.AdFormat.BANNER) {
+        if (mLoopMeAd.getAdFormat() == Constants.AdFormat.BANNER || mLoopMeAd.getAdFormat() == Constants.AdFormat.EXPANDABLE_BANNER) {
             LoopMeBannerGeneral banner = (LoopMeBannerGeneral) mLoopMeAd;
             ViewGroup.LayoutParams params = banner.getBannerView().getLayoutParams();
             params.width = width;
@@ -90,8 +89,13 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
 
     @Override
     public void expand(boolean isExpand) {
+        mMraidView.setIsViewable(true);
         Logging.out(LOG_TAG, "expand " + isExpand);
-        AdUtils.startAdActivity(mLoopMeAd, isExpand);
+        mMraidView.setState(Constants.MraidState.EXPANDED);
+
+//        View view = mMraidView;
+        mMraidView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
     }
 
     @Override

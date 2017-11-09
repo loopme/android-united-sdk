@@ -34,6 +34,7 @@ public class MraidBridge extends WebViewClient {
     private static final String QUERY_PARAMETER_CUSTOM_CLOSE = "shouldUseCustomClose";
     private static final String QUERY_PARAMETER_CUSTOM_CLOSE_POSITION = "customClosePosition";
     private static final String ALLOW_OFF_SCREEN = "allowOffscreen";
+    public static final String SET_ORIENTATION_PROPERTIES = "setOrientationProperties";
 
     private static final String CLOSE = "close";
     private static final String OPEN = "open";
@@ -126,6 +127,8 @@ public class MraidBridge extends WebViewClient {
                 handleWebviewCommand(url);
                 break;
             }
+            case SET_ORIENTATION_PROPERTIES:
+
             default:
                 break;
         }
@@ -158,7 +161,7 @@ public class MraidBridge extends WebViewClient {
     }
 
     private void handleExpand() {
-        boolean custom = detectBooleanQueryParameter(mCommandUri, QUERY_PARAMETER_CUSTOM_CLOSE);
+        boolean custom = detectBooleanQueryParameter(mCommandUri, EXPAND);
         onExpand(custom);
     }
 

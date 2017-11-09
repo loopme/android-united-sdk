@@ -18,10 +18,10 @@ import com.loopme.models.Errors;
 import com.loopme.models.Message;
 import com.loopme.time.TimeUtils;
 import com.loopme.time.TimerWithPause;
-import com.loopme.utils.Utils;
-import com.loopme.vast.VastVpaidEventTracker;
 import com.loopme.tracker.constants.EventConstants;
+import com.loopme.utils.Utils;
 import com.loopme.vast.TrackingEvent;
+import com.loopme.vast.VastVpaidEventTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -368,6 +368,11 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     public void onAdShake() {
+
+    }
+
+    @Override
+    public void setFullScreen(boolean isFullScreen) {
 
     }
 

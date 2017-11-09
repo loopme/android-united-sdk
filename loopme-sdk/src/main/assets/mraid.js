@@ -499,10 +499,10 @@
   };
 
   mraid.expand = function(URL) {
-    console.log('mraid.expand');
-    if (!(this.getState() === STATES.DEFAULT || this.getState() === STATES.RESIZED)) {
-      broadcastEvent(EVENTS.ERROR, 'Ad can only be expanded from the default or resized state.', 'expand');
-    } else {
+      console.log('mraid.expand');
+      if (!(this.getState() === STATES.DEFAULT || this.getState() === STATES.RESIZED)) {
+          broadcastEvent(EVENTS.ERROR, 'Ad can only be expanded from the default or resized state.', 'expand');
+      } else {
       var args = ['expand',
         'shouldUseCustomClose', expandProperties.useCustomClose
       ];
@@ -510,8 +510,24 @@
       if (URL) {
         args = args.concat(['url', URL]);
       }
+      if (URL === undefined) {
+          console.log("mraid.expand (1-part)");
+      	  var iframe = document.createElement("IFRAME");
+          var command = "expand";
+          iframe.setAttribute("src", "mraid://" + command);
+          document.documentElement.appendChild(iframe);
+          iframe.parentNode.removeChild(iframe);
+          iframe = null;
+      } else {
+       	  console.log("mraid.expand " + URL);
+      	  var iframe = document.createElement("IFRAME");
+          var command = "expand?url=" + URL;
+          iframe.setAttribute("src", "mraid://" + command);
+          document.documentElement.appendChild(iframe);
+          iframe.parentNode.removeChild(iframe);
+          iframe = null;
+      }
 
-      bridge.executeNativeCall(args);
     }
   };
 
