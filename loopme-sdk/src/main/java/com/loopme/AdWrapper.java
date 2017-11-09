@@ -7,6 +7,9 @@ import android.os.CountDownTimer;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.interfaces.DisplayController;
+import com.loopme.debugging.Params;
+import com.loopme.tracker.partners.LoopMeTracker;
+import com.loopme.utils.Utils;
 
 public abstract class AdWrapper extends AdConfig {
     private static final String LOG_TAG = AdWrapper.class.getSimpleName();
@@ -15,6 +18,10 @@ public abstract class AdWrapper extends AdConfig {
     private String mAppKey;
     private Activity mActivity;
     private CountDownTimer mSleepLoadTimer;
+    private long mStartLoadingTime;
+    private int mLoadingCounter;
+    private int mShowMissedCounter;
+    private int mShowCounter;
 
     public AdWrapper(Activity activity, String appKey) {
         this.mActivity = activity;
@@ -45,6 +52,8 @@ public abstract class AdWrapper extends AdConfig {
                 show(mFirstLoopMeAd);
             } else if (isReady(mSecondLoopMeAd)) {
                 show(mSecondLoopMeAd);
+            } else {
+                postShowMissedEvent();
             }
         } else {
             Logging.out(LOG_TAG, "Ad is already presented on the screen");
@@ -230,12 +239,14 @@ public abstract class AdWrapper extends AdConfig {
     protected void load(LoopMeAd loopMeAd) {
         if (loopMeAd != null) {
             loopMeAd.load();
+            onLoad();
         }
     }
 
     protected void show(LoopMeAd loopMeAd) {
         if (loopMeAd != null) {
             loopMeAd.show();
+            onShow();
         }
     }
 
@@ -279,5 +290,42 @@ public abstract class AdWrapper extends AdConfig {
 
     public LoopMeError getAutoLoadingPausedError() {
         return new LoopMeError("Paused by auto loading");
+    }
+
+    protected void postShowMissedEvent() {
+        if (isNeedSendMissedEvent()) {
+            LoopMeTracker.postDebugEvent(Params.SDK_MISSED, getPassedTime());
+            mShowMissedCounter++;
+        }
+    }
+
+    private void onShow() {
+        if (isNeedSendShowEvent()) {
+            LoopMeTracker.postDebugEvent(Params.SDK_SHOW, getPassedTime());
+            mShowCounter++;
+        }
+    }
+
+    protected void onLoadedSuccess() {
+        LoopMeTracker.postDebugEvent(Params.SDK_READY, getPassedTime());
+    }
+
+
+    private void onLoad() {
+        mStartLoadingTime = System.currentTimeMillis();
+        mLoadingCounter++;
+    }
+
+    protected String getPassedTime() {
+        double time = (double) (System.currentTimeMillis() - mStartLoadingTime) / 1000;
+        return String.valueOf(Utils.formatTime(time));
+    }
+
+    private boolean isNeedSendMissedEvent() {
+        return mLoadingCounter != mShowMissedCounter;
+    }
+
+    private boolean isNeedSendShowEvent() {
+        return mLoadingCounter != mShowCounter;
     }
 }

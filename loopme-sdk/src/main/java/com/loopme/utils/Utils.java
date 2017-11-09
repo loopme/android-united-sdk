@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -476,7 +477,7 @@ public class Utils {
         return (int) (getDisplayMetrics().widthPixels / density);
     }
 
-    private static DisplayMetrics getDisplayMetrics() {
+    public static DisplayMetrics getDisplayMetrics() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         if (sWindowManager != null) {
             sWindowManager.getDefaultDisplay().getMetrics(displayMetrics);
@@ -675,6 +676,11 @@ public class Utils {
             packagesAsString.add(packageInfo.packageName);
         }
         return packagesAsString;
+    }
+
+    public static String formatTime(double time) {
+        DecimalFormat formatter = new DecimalFormat("0.00");
+        return formatter.format(time);
     }
 
     public static void setDimensions(AdSpotDimensions adSpotDimensions) {

@@ -96,6 +96,7 @@ public class LoopMeInterstitial extends AdWrapper {
                     mMainAdListener.onLoopMeInterstitialLoadSuccess(LoopMeInterstitial.this);
                 }
                 resetFailCounter();
+                onLoadedSuccess();
             }
 
             @Override

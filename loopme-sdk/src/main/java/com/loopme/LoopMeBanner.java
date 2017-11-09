@@ -63,9 +63,11 @@ public class LoopMeBanner extends AdWrapper {
                 bindView(mBannerView, mSecondLoopMeAd);
                 show(mSecondLoopMeAd);
                 mCurrentAd = SECOND_BANNER;
+            } else {
+                postShowMissedEvent();
             }
         } else {
-            LoopMeTracker.post("Bind view is null");
+            LoopMeTracker.post("Banner is already showing");
         }
     }
 
@@ -225,6 +227,7 @@ public class LoopMeBanner extends AdWrapper {
                     mMainAdListener.onLoopMeBannerLoadSuccess(LoopMeBanner.this);
                 }
                 resetFailCounter();
+                onLoadedSuccess();
             }
 
             @Override
