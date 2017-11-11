@@ -5,11 +5,12 @@ repositories {
     flatDir {
         dirs 'libs'
     }
+    google()
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.2"
 
     defaultConfig {
         applicationId "com.loopme.sample_banner"
@@ -44,14 +45,14 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    api fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
-    compile project(':loopme-sdk')
-    compile(name:'LOO-moat-mobile-app-kit-2.1.0', ext: 'aar')
-    compile 'com.android.support:appcompat-v7:25.1.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    testCompile 'junit:junit:4.12'
+    api project(':loopme-sdk')
+    api(name:'LOO-moat-mobile-app-kit-2.1.0', ext: 'aar')
+    api 'com.android.support:appcompat-v7:26.1.0'
+    api 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
 }
