@@ -93,7 +93,7 @@ dependencies {
     api('com.appsee:appsee-android:2.3.4@aar') {
         transitive = true;
     }
-    compile('io.fabric.sdk.android:fabric:1.3.10@aar') {
+    api('io.fabric.sdk.android:fabric:1.3.10@aar') {
         transitive = true;
     }
 
@@ -107,19 +107,6 @@ dependencies {
     testImplementation 'org.powermock:powermock-module-junit4-rule:1.6.5'
     testImplementation 'org.powermock:powermock-api-mockito:1.6.5'
     testImplementation 'org.powermock:powermock-classloading-xstream:1.6.5'
-}
-
-buildscript {
-    repositories {
-        mavenCentral()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
-    }
-
 }
 
 ext {
