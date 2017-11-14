@@ -185,7 +185,6 @@ public class Utils {
         if (inputStream == null) {
             return "";
         }
-
         try {
             while ((numberBytesRead = inputStream.read(bytes)) != -1) {
                 out.append(new String(bytes, 0, numberBytesRead));
@@ -205,7 +204,6 @@ public class Utils {
                     return true;
                 }
             }
-        }
         return false;
     }
 
@@ -654,5 +652,91 @@ public class Utils {
         }
         int lastIndexOfSlash = source.lastIndexOf("/");
         return source.substring(lastIndexOfSlash, source.length());
+    }
+
+    public static String formatTime(double time) {
+        DecimalFormat formatter = new DecimalFormat("0.00");
+        return formatter.format(time);
+    }
+
+    public static void setDimensions(AdSpotDimensions adSpotDimensions) {
+        if (adSpotDimensions != null) {
+            DisplayMetrics dm = getDisplayMetrics();
+            int height;
+            int width;
+            // portrait mode
+            if (dm.heightPixels > dm.widthPixels) {
+                width = dm.widthPixels / 2;
+            } else { //landscape mode
+                width = dm.widthPixels / 3;
+            }
+            height = width * 2 / 3;
+
+            adSpotDimensions.setWidth(width);
+            adSpotDimensions.setHeight(height);
+        }
+    }
+
+    public static int[] getPositionsOnScreen(RecyclerView recyclerView) {
+        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+        int[] positionArray = {-1, -1};
+        if (layoutManager instanceof LinearLayoutManager) {
+            positionArray[0] = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+            positionArray[1] = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
+
+        } else if (layoutManager instanceof GridLayoutManager) {
+            positionArray[0] = ((GridLayoutManager) layoutManager).findFirstVisibleItemPosition();
+            positionArray[1] = ((GridLayoutManager) layoutManager).findLastVisibleItemPosition();
+
+        } else if (layoutManager instanceof StaggeredGridLayoutManager) {
+            int[] firsts;
+            int[] lasts;
+            try {
+                firsts = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null);
+                lasts = ((StaggeredGridLayoutManager) layoutManager).findLastVisibleItemPositions(null);
+            } catch (NullPointerException e) {
+                return positionArray;
+            }
+
+            List<Integer> firstList = new ArrayList<Integer>(firsts.length);
+            for (int first : firsts) {
+                firstList.add(first);
+            }
+
+            List<Integer> lastList = new ArrayList<Integer>(lasts.length);
+            for (int last : lasts) {
+                lastList.add(last);
+            }
+
+            positionArray[0] = Collections.min(firstList);
+            positionArray[1] = Collections.max(lastList);
+        }
+        return positionArray;
+    }
+
+    public static boolean isUsualFormat(String source) {
+        String fileName = getFileNameFromUrl(source);
+        return !TextUtils.isEmpty(fileName)
+                && (fileName.contains(Constants.MP4_FORMAT_EXT)
+                || fileName.contains(Constants.WEBM_FORMAT_EXT));
+    }
+
+    private static String getFileNameFromUrl(String source) {
+        if (TextUtils.isEmpty(source)) {
+            return "";
+        }
+        int lastIndexOfSlash = source.lastIndexOf("/");
+        return source.substring(lastIndexOfSlash, source.length());
+    }
+
+    public static String getSourceUrl(String message) {
+        if (TextUtils.isEmpty(message)) {
+            return "";
+        }
+        String[] tokens = message.split(":");
+        if (tokens.length >= 3) {
+            return tokens[tokens.length - 1];
+        }
+        return "";
     }
 }

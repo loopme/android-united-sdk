@@ -273,6 +273,14 @@ public class MoatViewAbilityUtils {
             return mVisibility > FIFTY_PERCENT;
         }
 
+        public boolean isVisibleMore50Percents() {
+            return mVisibility > FIFTY_PERCENT;
+        }
+
+    }
+
+    public interface OnResultListener {
+        void onResult(ViewAbilityInfo info);
     }
 
     public interface OnResultListener {
