@@ -13,11 +13,6 @@ import com.loopme.MinimizedMode;
 import com.loopme.SwipeListener;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.utils.UiUtils;
-import com.loopme.utils.Utils;
-
-/**
- * Created by katerina on 7/26/17.
- */
 
 public class DisplayModeResolver {
     private static final String LOG_TAG = DisplayModeResolver.class.getSimpleName();
@@ -26,18 +21,10 @@ public class DisplayModeResolver {
     private boolean mIsFirstFullScreenCommand = true;
     private Constants.DisplayMode mCurrentDisplayMode = Constants.DisplayMode.NORMAL;
     private Constants.DisplayMode mPreviousDisplayMode = Constants.DisplayMode.NORMAL;
-
     private LoopMeAd mLoopMeAd;
     private FrameLayout mMinimizedView;
-    private boolean mIsBackFromExpand;
-
-    public MinimizedMode getMinimizedMode() {
-        return mMinimizedMode;
-    }
-
     private MinimizedMode mMinimizedMode;
     private DisplayControllerLoopMe mDisplayControllerLoopMe;
-
 
     public DisplayModeResolver(DisplayControllerLoopMe controllerLoopMe, LoopMeAd loopMeAd) {
         mDisplayControllerLoopMe = controllerLoopMe;
@@ -45,19 +32,18 @@ public class DisplayModeResolver {
     }
 
     public void switchToPreviousMode() {
-        if (mPreviousDisplayMode == Constants.DisplayMode.MINIMIZED) {
+        if (isPreviousMinimizedMode()) {
             switchToMinimizedMode();
-        } else if (mPreviousDisplayMode == Constants.DisplayMode.NORMAL) {
+        } else if (isPreviousNormalMode()) {
             switchToNormalMode();
         }
+        setFullscreenMode(false);
     }
 
     public void switchToFullScreenMode(boolean isFullScreen) {
-        //we should ignore first command
-        if (isFirstCommand()) {
-            return;
+        if (!isFirstCommand()) { //we should ignore first command
+            switchToFullScreenModeInternal(isFullScreen);
         }
-        switchToFullScreenModeInternal(isFullScreen);
     }
 
     private void switchToFullScreenModeInternal(boolean isFullScreen) {
@@ -66,17 +52,7 @@ public class DisplayModeResolver {
         } else {
             broadcastDestroyIntent();
         }
-        mDisplayControllerLoopMe.setFullscreenMode(isFullScreen);
-    }
-
-    private boolean isFirstCommand() {
-        if (mIsFirstFullScreenCommand) {
-            mIsFirstFullScreenCommand = false;
-            mDisplayControllerLoopMe.setFullscreenMode(false);
-            return true;
-        } else {
-            return false;
-        }
+        setFullscreenMode(isFullScreen);
     }
 
 
@@ -86,102 +62,59 @@ public class DisplayModeResolver {
 
     private void switchToFullScreenMode() {
         if (!isFullScreenMode()) {
-            setPreviousDisplayMode(mCurrentDisplayMode);
-            setCurrentDisplayMode(Constants.DisplayMode.FULLSCREEN);
-            if (mPreviousDisplayMode == Constants.DisplayMode.MINIMIZED) {
-                removeMinimizedView();
-            }
+            setDisplayMode(Constants.DisplayMode.FULLSCREEN);
+            removeMinimizedView();
             AdUtils.startAdActivity(mLoopMeAd);
-            Logging.out(LOG_TAG, "switch to fullscreen mode");
         }
-    }
-
-    public boolean isFullScreenMode() {
-        return mCurrentDisplayMode == Constants.DisplayMode.FULLSCREEN;
-    }
-
-    private void setCurrentDisplayMode(Constants.DisplayMode displayMode) {
-        mCurrentDisplayMode = displayMode;
     }
 
     public void switchToNormalMode() {
-        if (mCurrentDisplayMode == Constants.DisplayMode.NORMAL) {
-            return;
+        if (!isNormalMode()) {
+            setDisplayMode(Constants.DisplayMode.NORMAL);
+            removeMinimizedView();
+            rebuildView();
         }
-
-        if (isFullScreenMode()) {
-            mIsBackFromExpand = true;
-        }
-        Logging.out(LOG_TAG, "switch to normal mode");
-        setPreviousDisplayMode(mCurrentDisplayMode);
-        setCurrentDisplayMode(Constants.DisplayMode.NORMAL);
-        rebuildView();
-        removeMinimizedView();
-        mDisplayControllerLoopMe.setFullscreenMode(false);
     }
 
     public void switchToMinimizedMode() {
-        if (mCurrentDisplayMode == Constants.DisplayMode.MINIMIZED) {
-            if (isCurrentVideoStatePaused()) {
+        if (isMinimizedMode()) {
+            if (isVideoPausedOrPlaying()) {
                 setWebViewState(Constants.WebviewState.VISIBLE);
             }
-            return;
+        } else {
+            setDisplayMode(Constants.DisplayMode.MINIMIZED);
+            configureMinimizedView();
+            rebuildView(mMinimizedView);
+            setWebViewState(Constants.WebviewState.VISIBLE);
         }
-        Logging.out(LOG_TAG, "switch to minimized mode");
-        setPreviousDisplayMode(mCurrentDisplayMode);
-        setCurrentDisplayMode(Constants.DisplayMode.MINIMIZED);
-        int width = mMinimizedMode.getWidth();
-        int height = mMinimizedMode.getWidth();
-        mMinimizedView = UiUtils.createFrameLayout(mLoopMeAd.getContext(), width, height);
+    }
 
-        mDisplayControllerLoopMe.rebuildView(mMinimizedView);
+    private void configureMinimizedView() {
+        mMinimizedView = UiUtils.createFrameLayout(mLoopMeAd.getContext(), mMinimizedMode.getMinimizedViewDims());
         UiUtils.addBordersToView(mMinimizedView);
-
-        if (isWebViewStateHidden() && mMinimizedView != null) {
-            mMinimizedView.setAlpha(0);
-        }
-
-        mMinimizedMode.getRootView().addView(mMinimizedView);
+        mMinimizedMode.addView(mMinimizedView);
         UiUtils.configMinimizedViewLayoutParams(mMinimizedView, mMinimizedMode);
-
-        setWebViewState(Constants.WebviewState.VISIBLE);
-        mDisplayControllerLoopMe.setOnTouchListener(initSwipeListener(width));
+        mDisplayControllerLoopMe.setOnTouchListener(initSwipeListener());
     }
 
     private void rebuildView() {
-        FrameLayout initialView = mLoopMeAd.getContainerView();
-        initialView.setVisibility(View.VISIBLE);
-        mDisplayControllerLoopMe.rebuildView(initialView);
+        if (mLoopMeAd != null) {
+            FrameLayout initialView = mLoopMeAd.getContainerView();
+            rebuildView(initialView);
+            initialView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void rebuildView(FrameLayout view) {
+        if (mDisplayControllerLoopMe != null) {
+            mDisplayControllerLoopMe.rebuildView(view);
+        }
     }
 
     private void removeMinimizedView() {
         if (mMinimizedView != null && mMinimizedView.getParent() != null) {
             ((ViewGroup) mMinimizedView.getParent()).removeView(mMinimizedView);
         }
-    }
-
-    private void setPreviousDisplayMode(Constants.DisplayMode displayMode) {
-        mPreviousDisplayMode = displayMode;
-    }
-
-    private boolean isCurrentVideoStatePaused() {
-        return mDisplayControllerLoopMe.getCurrentVideoState() == Constants.VideoState.PAUSED;
-    }
-
-    private boolean isWebViewStateHidden() {
-        return mDisplayControllerLoopMe != null && mDisplayControllerLoopMe.isWebViewStateHidden();
-    }
-
-    private void setWebViewState(Constants.WebviewState webViewState) {
-        if (mDisplayControllerLoopMe != null) {
-            mDisplayControllerLoopMe.setWebViewState(webViewState);
-        }
-    }
-
-    private void animate(boolean toRight) {
-        Animation anim = AnimationUtils.makeOutAnimation(mLoopMeAd.getContext(), toRight);
-        anim.setDuration(ANIMATION_DURATION);
-        mMinimizedView.startAnimation(anim);
     }
 
     private void destroyMinimizedView() {
@@ -192,6 +125,10 @@ public class DisplayModeResolver {
         }
     }
 
+    private boolean isVideoPausedOrPlaying() {
+        return isCurrentVideoStatePaused() || isCurrentVideoStatePlaying();
+    }
+
     public void setMinimizedMode(MinimizedMode mode) {
         mMinimizedMode = mode;
     }
@@ -200,16 +137,33 @@ public class DisplayModeResolver {
         return mMinimizedMode != null && mMinimizedMode.getRootView() != null;
     }
 
-    private SwipeListener initSwipeListener(int width) {
-        return new SwipeListener(width, new SwipeListener.Listener() {
+    private SwipeListener initSwipeListener() {
+        return new SwipeListener(mMinimizedMode.getWidth(), new SwipeListener.Listener() {
             @Override
             public void onSwipe(boolean toRight) {
-                setWebViewState(Constants.WebviewState.HIDDEN);
-                animate(toRight);
-                switchToNormalMode();
-                mMinimizedMode = null;
+                dismissMinimizedView(toRight);
             }
         });
+    }
+
+    private void dismissMinimizedView(boolean toRight) {
+        setWebViewState(Constants.WebviewState.HIDDEN);
+        setCurrentDisplayMode(Constants.DisplayMode.NORMAL);
+        animateDismissOnSwipe(toRight);
+        mMinimizedMode = null;
+        dismissAd();
+    }
+
+    private void animateDismissOnSwipe(boolean toRight) {
+        Animation anim = AnimationUtils.makeOutAnimation(mLoopMeAd.getContext(), toRight);
+        anim.setDuration(ANIMATION_DURATION);
+        mMinimizedView.startAnimation(anim);
+    }
+
+    private void dismissAd() {
+        if (mDisplayControllerLoopMe != null) {
+            mDisplayControllerLoopMe.dismissAd();
+        }
     }
 
     private void broadcastDestroyIntent() {
@@ -220,21 +174,71 @@ public class DisplayModeResolver {
         return mCurrentDisplayMode;
     }
 
-    public void animateAppear() {
-        if (isMinimizedMode()) {
-            Utils.animateAppear(mMinimizedView);
-        }
-    }
-
     public boolean isMinimizedMode() {
         return mCurrentDisplayMode == Constants.DisplayMode.MINIMIZED;
     }
 
-    public Constants.DisplayMode getCurrentDisplayMode() {
-        return mCurrentDisplayMode;
+    private boolean isNormalMode() {
+        return mCurrentDisplayMode == Constants.DisplayMode.NORMAL;
     }
 
-    public boolean isBackFromExpand() {
-        return mIsBackFromExpand;
+    public boolean isFullScreenMode() {
+        return mCurrentDisplayMode == Constants.DisplayMode.FULLSCREEN;
+    }
+
+    private boolean isPreviousNormalMode() {
+        return mPreviousDisplayMode == Constants.DisplayMode.NORMAL;
+    }
+
+    private boolean isPreviousMinimizedMode() {
+        return mPreviousDisplayMode == Constants.DisplayMode.MINIMIZED;
+    }
+
+    public MinimizedMode getMinimizedMode() {
+        return mMinimizedMode;
+    }
+
+    private void setFullscreenMode(boolean mIsFirstFullScreen) {
+        if (mDisplayControllerLoopMe != null) {
+            mDisplayControllerLoopMe.setFullscreenMode(mIsFirstFullScreen);
+        }
+    }
+
+    private void setDisplayMode(Constants.DisplayMode mode) {
+        setPreviousDisplayMode(mCurrentDisplayMode);
+        setCurrentDisplayMode(mode);
+        Logging.out(LOG_TAG, "switch to " + mode.name() + " mode");
+    }
+
+    private void setCurrentDisplayMode(Constants.DisplayMode displayMode) {
+        mCurrentDisplayMode = displayMode;
+    }
+
+    private void setPreviousDisplayMode(Constants.DisplayMode displayMode) {
+        mPreviousDisplayMode = displayMode;
+    }
+
+    private boolean isCurrentVideoStatePlaying() {
+        return mDisplayControllerLoopMe != null && mDisplayControllerLoopMe.isVideoPlaying();
+    }
+
+    private boolean isCurrentVideoStatePaused() {
+        return mDisplayControllerLoopMe != null && mDisplayControllerLoopMe.isVideoPaused();
+    }
+
+    private void setWebViewState(Constants.WebviewState webViewState) {
+        if (mDisplayControllerLoopMe != null) {
+            mDisplayControllerLoopMe.setWebViewState(webViewState);
+        }
+    }
+
+    private boolean isFirstCommand() {
+        if (mIsFirstFullScreenCommand) {
+            mIsFirstFullScreenCommand = false;
+            setFullscreenMode(false);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

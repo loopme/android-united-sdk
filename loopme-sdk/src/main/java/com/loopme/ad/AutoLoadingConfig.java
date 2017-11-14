@@ -13,7 +13,6 @@ public abstract class AutoLoadingConfig {
     public void setAutoLoading(boolean autoLoadingEnabled) {
         sUserAutoLoadingValue = autoLoadingEnabled;
     }
-
     protected void setBackendAutoLoadingValue(boolean autoLoadingEnabled) {
         sBackendAutoLoadingValue = autoLoadingEnabled;
     }

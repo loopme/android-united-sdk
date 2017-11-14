@@ -25,4 +25,9 @@ public class SimpleTimer extends CountDownTimer {
             mListener.onFinish();
         }
     }
+
+    public void stop() {
+        mListener = null;
+        cancel();
+    }
 }

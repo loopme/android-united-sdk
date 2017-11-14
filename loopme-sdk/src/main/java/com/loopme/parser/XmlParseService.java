@@ -384,7 +384,8 @@ public class XmlParseService {
     }
 
     private static boolean isSupportedFormat(MediaFile mediaFile) {
-        return mediaFile != null && (mediaFile.getText().contains(Constants.MP4_FORMAT_EXT));
+        return mediaFile != null && (mediaFile.getText().contains(Constants.MP4_FORMAT_EXT)
+                || mediaFile.getText().contains(Constants.WEBM_FORMAT_EXT));
     }
 
     private static void sortList(List<MediaFile> supportedMediaFilesList) {

@@ -37,28 +37,34 @@ public abstract class BaseDisplayController implements DisplayController, AdEven
 
     @Override
     public void onStartLoad() {
-        initEventManager(mLoopMeAd);
+        initEventManager();
     }
 
     protected void initTrackers() {
-        if (mLoopMeAd == null) {
+        if (mEventManager == null) {
             return;
         }
-        if (mLoopMeAd.isVideo360() || mLoopMeAd.getDisplayController() instanceof DisplayControllerVast) {
+        if (isNativeTrackerNeeded()) {
             onInitTracker(AdType.NATIVE);
         } else {
             onInitTracker(AdType.WEB);
         }
     }
 
-    protected void initEventManager(LoopMeAd loopMeAd) {
-        if (loopMeAd != null && isTrackerNeeded(loopMeAd.getAdParams())) {
-            mEventManager = new EventManager(loopMeAd);
+    private boolean isNativeTrackerNeeded() {
+        return mLoopMeAd.isVideo360() || mLoopMeAd.getDisplayController() instanceof DisplayControllerVast;
+    }
+
+    protected void initEventManager() {
+        if (isTrackerNeeded()) {
+            mEventManager = new EventManager(mLoopMeAd);
         }
     }
 
-    private boolean isTrackerNeeded(AdParams adParams) {
-        return adParams != null && !adParams.getTrackers().isEmpty();
+    private boolean isTrackerNeeded() {
+        return mLoopMeAd != null
+                && mLoopMeAd.getAdParams() != null
+                && !mLoopMeAd.getAdParams().getTrackers().isEmpty();
     }
 
     protected void onInternalLoadFail(final LoopMeError error) {
@@ -133,23 +139,10 @@ public abstract class BaseDisplayController implements DisplayController, AdEven
     @Override
     public boolean onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
         onAdClickedEvent();
-        if (TextUtils.isEmpty(url)) {
-            return false;
-        }
-        onMessage(Message.LOG, "Handle none LoopMe url");
-        if (InternetUtils.isOnline(loopMeAd.getContext())) {
-            LoopMeAdHolder.putAd(loopMeAd);
-            Intent intent = UiUtils.createRedirectIntent(url, loopMeAd);
-            try {
-                loopMeAd.getContext().startActivity(intent);
-            } catch (ActivityNotFoundException e) {
-                e.printStackTrace();
-                return false;
-            }
-        } else {
-            onMessage(Message.LOG, "No internet connection");
-            return false;
-        }
+        onMessage(Message.LOG, "Handle url");
+        LoopMeAdHolder.putAd(loopMeAd);
+        Intent intent = UiUtils.createRedirectIntent(url, loopMeAd);
+        loopMeAd.getContext().startActivity(intent);
         return true;
     }
 

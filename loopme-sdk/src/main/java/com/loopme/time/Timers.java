@@ -200,10 +200,14 @@ public class Timers extends Observable {
         stopRequestTimer();
         stopFetcherTimer();
         stopExpirationTimer();
+        stopPrepareAssetsTimer();
+        stopPrepareVpaidJsTimer();
 
         mRequestTimer = null;
         mFetcherTimer = null;
         mExpirationTimer = null;
+        mPrepareVpaidJsTimer = null;
+        mPrepareAssetsTimer = null;
     }
 
     public void stopTimer(TimersType timersType) {

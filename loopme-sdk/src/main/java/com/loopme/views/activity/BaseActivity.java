@@ -10,6 +10,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.appsee.Appsee;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.R;
@@ -23,6 +24,8 @@ import com.loopme.receiver.AdReceiver;
 import com.loopme.receiver.MraidAdCloseButtonReceiver;
 import com.loopme.utils.Utils;
 import com.loopme.views.CloseButton;
+
+import io.fabric.sdk.android.Fabric;
 
 public final class BaseActivity extends Activity
         implements AdReceiver.Listener,
@@ -58,6 +61,8 @@ public final class BaseActivity extends Activity
         }
         requestSystemFlags();
         retrieveLoopMeAdOrFinish();
+        Fabric.with(this);
+        Appsee.start(getString(R.string.com_appsee_apikey));
         if (mLoopMeAd != null && mLoopMeAd.getAdParams() != null) {
             retrieveParams();
             setContentView();
@@ -163,6 +168,7 @@ public final class BaseActivity extends Activity
             mLoopMeAd.rebuildView(mLoopMeContainerView);
             ((BaseDisplayController) mDisplayController).onAdEnteredFullScreenEvent();
         }
+        Appsee.unmarkViewAsSensitive(mLoopMeContainerView);
     }
 
     private void initSensorManager() {
@@ -274,9 +280,8 @@ public final class BaseActivity extends Activity
     }
 
     private void switchLoopMeBannerToPreviousMode() {
-        if (mDisplayController != null && mDisplayController instanceof DisplayControllerLoopMe) {
-            DisplayControllerLoopMe displayControllerLoopMe = (DisplayControllerLoopMe) mDisplayController;
-            displayControllerLoopMe.switchToPreviousMode();
+        if (mDisplayController instanceof DisplayControllerLoopMe) {
+            ((DisplayControllerLoopMe) mDisplayController).switchToPreviousMode();
         }
     }
 

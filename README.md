@@ -24,7 +24,7 @@ If you have questions please contact us at support@loopmemedia.com.
 ## Features ##
 
 * Interstitial, banner, native video ad formats
-* Image / Rich media / Video / 360 video
+* Image / Rich media / Video / 360 video / VAST/ VPAID
 * Preloaded video ads
 * Minimized video mode
 * Expand to fullscreen mode
@@ -57,7 +57,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.loopme:loopme-sdk:6.0.0@aar'
+    compile 'com.loopme:loopme-sdk:6.0.2@aar'
 }
 ```
 
@@ -334,6 +334,10 @@ Please meet our New United SDK. It combines multiple premium ads technologies wi
 2. Ads Smart Loading feature
 3. Highly Reduced resource consumption
 4. Supports MOAT Viewability measurement
+
+**Version 6.0.2**
+- Added unsupported file format detection fro VPAID creatives
+
 
 See [Changelog](CHANGELOG.md)
 
