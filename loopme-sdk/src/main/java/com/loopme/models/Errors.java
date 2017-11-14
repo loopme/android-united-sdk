@@ -47,9 +47,9 @@ public class Errors {
     public static final LoopMeError VAST_COULD_NOT_FIND_SUPPORTED_FORMAT = new LoopMeError(403, "Could not find supported format", Constants.ErrorType.VAST);
     public static final LoopMeError PROBLEM_DISPLAYING_MEDIAFILE = new LoopMeError(405, "Problem displaying media file.", Constants.ErrorType.VAST);
     public static final LoopMeError COMPANION_ERROR = new LoopMeError(600, "General companion error", Constants.ErrorType.VAST);
-    public static final LoopMeError UNABLE_TO_FETCH_COMPANION = new LoopMeError(603, "Unable to fetch CompanionAds/Companion resource.", Constants.ErrorType.VAST);
-    public static final LoopMeError GENERAL_VPAID_ERROR = new LoopMeError(900, "General vpaid error", Constants.ErrorType.VPAID);
+    public static final LoopMeError GENERAL_VPAID_ERROR = new LoopMeError(901, "General vpaid error", Constants.ErrorType.VPAID);
     public static final LoopMeError VERIFICATION_UNIT_NOT_EXECUTED = new LoopMeError(410, "Verification unit was not executed.", Constants.ErrorType.VAST);
+    public static final LoopMeError UNUSUAL_VIDEO_FORMAT = new LoopMeError(1000, "Player tries to play unusual video format.", Constants.ErrorType.VPAID);
 
     public enum VastError {
         XML_PARSING(100),

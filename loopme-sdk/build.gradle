@@ -4,18 +4,20 @@ apply from: 'release-aar.gradle'
 repositories {
     jcenter()
     mavenLocal()
+    google()
+    maven { url 'https://maven.fabric.io/public' }
     flatDir {
         dirs 'libs'
     }
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.3'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 0
         versionName "6"
         multiDexEnabled true
@@ -72,39 +74,47 @@ android {
 
 
 dependencies {
-    compile fileTree(dir: 'libs', includes: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:recyclerview-v7:25.3.1'
-    compile 'com.android.support:cardview-v7:25.3.1'
-    compile 'testfairy:testfairy-android-sdk:1.4.3@aar'
-    compile 'com.squareup.retrofit2:converter-jackson:2.3.0'
-    compile 'com.google.code.gson:gson:2.8.0'
-    compile project(':dvsdk-release')
-    compile files('libs/libAvid-loopme-3.6.7.jar')
+    api fileTree(dir: 'libs', includes: ['*.jar'])
+    api 'com.android.support:appcompat-v7:26.1.0'
+    api 'com.android.support:recyclerview-v7:26.1.0'
+    api 'com.android.support:cardview-v7:26.1.0'
+    api 'com.squareup.retrofit2:converter-jackson:2.3.0'
+    api 'com.google.code.gson:gson:2.8.0'
+    api project(':dvsdk-release')
+    api files('libs/libAvid-loopme-3.6.7.jar')
 
-    compile 'com.google.android.gms:play-services-ads:9.6.1'
-    compile ('com.android.support:multidex:1.0.1')
-    release (name: 'LOO-moat-mobile-app-kit-2.1.0', ext: 'aar')
-}
+    api 'com.google.android.gms:play-services-ads:11.6.0'
+    api 'com.android.support:multidex:1.0.2'
+    api name: 'LOO-moat-mobile-app-kit-2.1.0', ext: 'aar'
 
-buildscript {
-    repositories {
-        mavenCentral()
-        jcenter()
+    api('com.crashlytics.sdk.android:crashlytics:2.7.1@aar') {
+        transitive = true;
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+    api('com.appsee:appsee-android:2.3.4@aar') {
+        transitive = true;
+    }
+    compile('io.fabric.sdk.android:fabric:1.3.10@aar') {
+        transitive = true;
     }
 
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.robolectric:robolectric:3.0'
+    testImplementation 'org.robolectric:shadows-support-v4:3.0'
+    testImplementation 'org.robolectric:shadows-httpclient:3.0'
+    testImplementation 'com.squareup:fest-android:1.0.7'
+    testImplementation 'org.mockito:mockito-core:1.9.5'
+    testImplementation 'org.powermock:powermock-module-junit4:1.6.5'
+    testImplementation 'org.powermock:powermock-module-junit4-rule:1.6.5'
+    testImplementation 'org.powermock:powermock-api-mockito:1.6.5'
+    testImplementation 'org.powermock:powermock-classloading-xstream:1.6.5'
 }
+
 
 ext {
     adapterName = 'Loopme'
     fileName = 'loopme-united-sdk'
     sdkName = "$fileName"
-    releaseVersion = '6.0.1'
+    releaseVersion = '6.0.2'
     fileName = "${fileName}-${releaseVersion}"
     apiVersion = "6"
 
@@ -144,7 +154,7 @@ allprojects {
 
 
 group = 'com.loopme'
-version = '6.0.1'
+version = '6.0.2'
 
 install {
     repositories.mavenInstaller {
@@ -201,14 +211,14 @@ static def getDate() {
 }
 
 task clearJar(type: Delete) {
-    delete 'build/outputs/loopme-sdk-6.0.0.jar'
+    delete 'build/outputs/loopme-sdk-6.0.1.jar'
 }
 
 task makeJar(type: Copy) {
     from('build/intermediates/bundles/release/')
     into('build/outputs/')
     include('classes.jar')
-    rename('classes.jar', 'loopme-sdk-6.0.1.jar')
+    rename('classes.jar', 'loopme-sdk-6.0.2.jar')
 }
 
 task wrapper(type: Wrapper) {

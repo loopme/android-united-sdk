@@ -116,8 +116,8 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     public void resume() {
         if (mDisplayController != null && isReady()) {
             mDisplayController.onResume();
+            Logging.out(LOG_TAG, "Ad resumed");
         }
-        Logging.out(LOG_TAG, "Ad resumed");
     }
 
     public void pause() {
@@ -215,27 +215,13 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         setLiveDebug(adParam);
     }
 
-    protected void postError(String errorMessage) {
-        LoopMeTracker.post(errorMessage);
-    }
-
     public void onInternalLoadFail(LoopMeError error) {
         onAdLoadFail(error);
         onPostWarning(error);
     }
 
     public void onPostWarning(LoopMeError error) {
-        if (error != null) {
-            LoopMeTracker.post(error.getMessage(), error.getErrorType());
-            if (isVastError(error)) {
-                LoopMeTracker.postVastError(String.valueOf(error.getErrorCode()));
-            }
-        }
-    }
-
-    private boolean isVastError(LoopMeError error) {
-        return TextUtils.equals(error.getErrorType(), Constants.ErrorType.VAST) ||
-                TextUtils.equals(error.getErrorType(), Constants.ErrorType.VPAID);
+        LoopMeTracker.post(error);
     }
 
     private void setLiveDebug(AdParams adParams) {

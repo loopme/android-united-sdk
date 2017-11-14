@@ -20,6 +20,7 @@ public class VpaidBridgeImpl implements VpaidBridge {
             "videoSlotCanAutoPlay: true }";
     private final BridgeEventHandler mBridge;
     private final CreativeParams mCreativeParams;
+    private volatile int mPreviousValue;
 
     public VpaidBridgeImpl(BridgeEventHandler eventHandler, AdParams adParams) {
         mBridge = eventHandler;
@@ -254,6 +255,10 @@ public class VpaidBridgeImpl implements VpaidBridge {
 
     @JavascriptInterface
     public void getAdRemainingTimeResult(int value) {
+        if (value == mPreviousValue && value != 0) {
+            return;
+        }
+        mPreviousValue = value;
         if (value == 0) {
             mBridge.postEvent(EventConstants.COMPLETE);
         } else {

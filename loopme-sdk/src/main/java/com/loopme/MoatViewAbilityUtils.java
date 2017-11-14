@@ -2,8 +2,11 @@ package com.loopme;
 
 import android.graphics.Rect;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import java.util.ArrayDeque;
@@ -14,17 +17,43 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class MoatViewAbilityUtils {
-
+    private static final String LOG_TAG = MoatViewAbilityUtils.class.getSimpleName();
+    private static Handler mHandler = new Handler(Looper.getMainLooper());
     private static final double TOTAL_OVERLAPPED = 1.0D;
     private static final double INVISIBLE = 0;
+    private static final double FIFTY_PERCENT = 0.5;
+    private static final long DELAY = 100;
 
     private MoatViewAbilityUtils() {
+    }
+
+    public static void calculateViewAbilitySyncDelayed(final View checkedView, final OnResultListener listener) {
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                calculateViewAbilitySync(checkedView, listener);
+            }
+        }, DELAY);
+    }
+
+    private static void calculateViewAbilitySync(final View view, final OnResultListener listener) {
+        long start = System.currentTimeMillis();
+        ViewAbilityInfo info = calculateViewAbilityInfo(view);
+        long time = System.currentTimeMillis() - start;
+        Logging.out(LOG_TAG, "time to calculate " + time + " mills");
+        if (listener != null) {
+            listener.onResult(info);
+        }
     }
 
     public static ViewAbilityInfo calculateViewAbilityInfo(View view) {
         if (view != null && isViewInFocus(view) && !isViewHidden(view) && getSquareOfView(view) > 0) {
             return calculateViewAbilityInfoInternal(view);
         } else {
+            Logging.out(LOG_TAG, "view != null " + (view != null));
+            Logging.out(LOG_TAG, "isViewInFocus " + isViewInFocus(view));
+            Logging.out(LOG_TAG, "isViewNotHidden(view) " + !isViewHidden(view));
+            Logging.out(LOG_TAG, "getSquareOfView(view) > 0 " + (getSquareOfView(view) > 0));
             return new ViewAbilityInfo();
         }
     }
@@ -171,7 +200,10 @@ public class MoatViewAbilityUtils {
                     int childCount = viewGroup.getChildCount();
 
                     for (int i = childCount - 1; i >= 0; --i) {
-                        arrayDeque.add(viewGroup.getChildAt(i));
+                        View childView = viewGroup.getChildAt(i);
+                        if (!isEmptyView(childView)) {
+                            arrayDeque.add(childView);
+                        }
                     }
                 }
 
@@ -189,6 +221,18 @@ public class MoatViewAbilityUtils {
             }
         }
 
+        return false;
+    }
+
+    private static boolean isEmptyView(View view) {
+        if (view == null) {
+            return true;
+        }
+        if (view instanceof FrameLayout && view.getClass() == FrameLayout.class) {
+            if (((FrameLayout) view).getChildCount() == 0 && view.getBackground() == null) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -213,6 +257,7 @@ public class MoatViewAbilityUtils {
 
         public void setVisibility(double mVisibility) {
             this.mVisibility = mVisibility;
+            Logging.out(LOG_TAG, "visibility : " + ((int) (mVisibility * 100)) + "%");
         }
 
         public double getOverlapping() {
@@ -221,7 +266,16 @@ public class MoatViewAbilityUtils {
 
         public void setOverlapping(double mOverlapping) {
             this.mOverlapping = mOverlapping;
+            Logging.out(LOG_TAG, "overlapping : " + ((int) (mOverlapping * 100)) + "%");
         }
 
+        public boolean isVisibleMore50Percents() {
+            return mVisibility > FIFTY_PERCENT;
+        }
+
+    }
+
+    public interface OnResultListener {
+        void onResult(ViewAbilityInfo info);
     }
 }

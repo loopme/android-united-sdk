@@ -16,7 +16,7 @@ public class AdView extends LoopMeWebView implements BridgeInterface, Bridge.Lis
     private static final String LOG_TAG = AdView.class.getSimpleName();
     private Constants.VideoState mCurrentVideoState = Constants.VideoState.IDLE;
     private Constants.WebviewState mViewState = Constants.WebviewState.CLOSED;
-
+    private boolean mCurrentFullScreenState;
     private Bridge.Listener mBridgeListener;
     private volatile Bridge mBridge;
 
