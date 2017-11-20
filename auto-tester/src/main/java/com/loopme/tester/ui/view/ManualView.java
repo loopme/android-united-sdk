@@ -49,7 +49,6 @@ public class ManualView implements View.OnClickListener, AdListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.load_ad_manual:
-                enableShowButton(true);
                 loadAd();
                 break;
             case R.id.show_ad_manual:
