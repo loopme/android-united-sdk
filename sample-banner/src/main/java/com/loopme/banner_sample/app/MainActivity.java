@@ -5,11 +5,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
+import com.loopme.banner_sample.app.model.Constants;
 import com.loopme.banner_sample.app.views.MainFeaturesFragment;
+import com.loopme.banner_sample.app.views.RecyclerViewFragment;
 import com.loopme.banner_sample.app.views.RecyclerViewShrinkFragment;
 import com.loopme.banner_sample.app.views.SimpleBannerFragment;
-import com.loopme.banner_sample.app.views.RecyclerViewFragment;
-import com.loopme.banner_sample.app.model.Constants;
 
 public class MainActivity extends AppCompatActivity implements MainFeaturesFragment.OnItemClickedListener {
 
@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements MainFeaturesFragm
                 break;
             }
             case Constants.RECYCLERVIEW_SHRINK: {
+
                 setAsMainView(RecyclerViewShrinkFragment.newInstance(), true);
                 setTitle("Recycler view with shrink mode");
                 break;
