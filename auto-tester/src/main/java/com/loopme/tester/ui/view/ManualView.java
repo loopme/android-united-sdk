@@ -70,14 +70,12 @@ public class ManualView implements View.OnClickListener, AdListener {
         mLoadButton.setOnClickListener(this);
         mShowButton.setOnClickListener(this);
         setReadyToLoading();
-//        disableShowButton();
-        enableShowButton(true);
+        disableShowButton();
     }
 
     private void showAd() {
         if (isShowButton()) {
-//            doShowButtonLogic();
-            mAd.showAd();
+            doShowButtonLogic();
         } else {
             doHideButtonLogic();
         }
@@ -274,9 +272,9 @@ public class ManualView implements View.OnClickListener, AdListener {
     }
 
     private void disableShowButton() {
-//        mShowButton.setText(mActivity.getString(R.string.show));
-//        mShowButton.setTextColor(ContextCompat.getColor(mActivity, R.color.dark_gray));
-//        mShowButton.setEnabled(false);
+        mShowButton.setText(mActivity.getString(R.string.show));
+        mShowButton.setTextColor(ContextCompat.getColor(mActivity, R.color.dark_gray));
+        mShowButton.setEnabled(false);
     }
 
     public void onDestroy() {
