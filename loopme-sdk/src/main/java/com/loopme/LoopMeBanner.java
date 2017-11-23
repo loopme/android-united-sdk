@@ -236,6 +236,7 @@ public class LoopMeBanner extends AdWrapper {
                     mMainAdListener.onLoopMeBannerLoadFail(LoopMeBanner.this, error);
                 }
                 increaseFailCounter(banner);
+                onLoadFail();
             }
 
             @Override

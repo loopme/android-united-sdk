@@ -310,6 +310,16 @@ public abstract class AdWrapper extends AdConfig {
         LoopMeTracker.postDebugEvent(Params.SDK_READY, getPassedTime());
     }
 
+    protected void onLoadFail() {
+        resetCounters();
+    }
+
+    private void resetCounters() {
+        mLoadingCounter = 0;
+        mShowCounter = 0;
+        mShowMissedCounter = 0;
+    }
+
 
     private void onLoad() {
         mStartLoadingTime = System.currentTimeMillis();

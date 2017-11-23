@@ -118,6 +118,7 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
         setAdState(Constants.AdState.NONE);
         stopTimer(TimersType.FETCHER_TIMER);
         destroyDisplayController();
+        UiUtils.broadcastIntent(getContext(), Constants.DESTROY_INTENT, getAdId());
         if (mAdListener != null) {
             mAdListener.onLoopMeInterstitialLoadFail(this, error);
         } else {
