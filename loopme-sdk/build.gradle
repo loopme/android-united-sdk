@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 apply from: 'release-aar.gradle'
+apply plugin: 'io.fabric'
 
 repositories {
     jcenter()
     mavenLocal()
     google()
     maven { url 'https://maven.fabric.io/public' }
-    maven { url 'https://www.testfairy.com/maven' }
     flatDir {
         dirs 'libs'
     }

@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.appsee.Appsee;
+import com.crashlytics.android.Crashlytics;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.R;
@@ -79,7 +80,7 @@ public final class BaseActivity extends Activity
     }
 
     private void initCrashlytics() {
-        Fabric.with(this);
+        Fabric.with(this, new Crashlytics());
         Appsee.start(getString(R.string.com_appsee_apikey));
         TestFairy.begin(this, "a44d0f385de2740ba8f9aefcf9c0eda6706acc0f");
     }
