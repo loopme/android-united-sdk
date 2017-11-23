@@ -138,7 +138,7 @@ public class AdSpotCardFragment extends BaseFragment {
 
     private void onPauseAd() {
         if (mManualViewMode) {
-            mManualView.onPause();
+//            mManualView.onPause();
         } else {
             mAutoView.onPause();
         }

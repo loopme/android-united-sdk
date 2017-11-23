@@ -739,4 +739,10 @@ public class Utils {
         }
         return "";
     }
+
+    public static void removeParent(ViewGroup view) {
+        if (view.getParent() != null) {
+            ((ViewGroup) view.getParent()).removeView(view);
+        }
+    }
 }

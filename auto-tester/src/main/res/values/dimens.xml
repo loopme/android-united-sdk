@@ -72,7 +72,7 @@
     <dimen name="fragment_edit_adtype_container_margin_right">10dp</dimen>
     <dimen name="fragment_edit_adtypr_label_width">0dp</dimen>
     <dimen name="fragment_edit_adtype_container_width">0dp</dimen>
-    <dimen name="fragment_edit_adtyoe_radiogroup_height">30dp</dimen>
+    <dimen name="fragment_edit_adtyoe_radiogroup_height">40dp</dimen>
     <dimen name="fragment_edit_adtyoe_radiobutton_width">90dp</dimen>
     <dimen name="frgment_edit_fragment_container_margin_left">10dp</dimen>
     <dimen name="frgment_edit_fragment_container_margin_right">10dp</dimen>

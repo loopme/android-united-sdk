@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum AdType {
     BANNER("banner"),
     INTERSTITIAL("interstitial");
-
     private String mType;
 
     AdType(String type) {

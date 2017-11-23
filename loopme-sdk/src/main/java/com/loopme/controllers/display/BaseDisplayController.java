@@ -16,8 +16,8 @@ import com.loopme.common.LoopMeError;
 import com.loopme.controllers.interfaces.DisplayController;
 import com.loopme.models.Message;
 import com.loopme.tracker.constants.AdType;
-import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.tracker.interfaces.AdEvents;
+import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.tracker.viewability.EventManager;
 import com.loopme.utils.InternetUtils;
 import com.loopme.utils.UiUtils;
@@ -83,7 +83,7 @@ public abstract class BaseDisplayController implements DisplayController, AdEven
             @Override
             public void run() {
                 if (mLoopMeAd != null) {
-                    mLoopMeAd.onPostWarning(error);
+                    mLoopMeAd.onSendPostWarning(error);
                 }
             }
         });

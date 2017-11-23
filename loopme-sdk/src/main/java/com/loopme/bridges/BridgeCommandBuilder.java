@@ -158,5 +158,12 @@ public class BridgeCommandBuilder {
                 .append("resize();");
         return builder.toString();
     }
+
+    public static String nativeCallComplete() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(MRAID_PREFIX)
+                .append("mraidbridge.nativeCallComplete()");
+        return builder.toString();
+    }
 }
 
