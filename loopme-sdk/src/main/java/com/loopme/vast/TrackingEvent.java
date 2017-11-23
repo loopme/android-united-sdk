@@ -10,6 +10,7 @@ public class TrackingEvent {
 
     public TrackingEvent(String url, int timeMillis) {
         this.timeMillis = timeMillis;
+        this.url = url;
     }
 
     @Override
@@ -17,11 +18,10 @@ public class TrackingEvent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        TrackingEvent event = (TrackingEvent) o;
+        TrackingEvent that = (TrackingEvent) o;
 
-        if (timeMillis != event.timeMillis) return false;
-        return url.equals(event.url);
-
+        if (timeMillis != that.timeMillis) return false;
+        return url != null ? url.equals(that.url) : that.url == null;
     }
 
     @Override
