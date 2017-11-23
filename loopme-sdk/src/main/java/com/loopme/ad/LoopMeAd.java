@@ -66,11 +66,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     }
 
     public boolean isBanner() {
-        return getAdFormat() == Constants.AdFormat.BANNER || isExpandableBanner();
-    }
-
-    public boolean isExpandableBanner() {
-        return getAdFormat() == Constants.AdFormat.EXPANDABLE_BANNER;
+        return getAdFormat() == Constants.AdFormat.BANNER;
     }
 
     public boolean isInterstitial() {

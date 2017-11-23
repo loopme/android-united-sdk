@@ -81,12 +81,8 @@
       call += encodeURIComponent(key) + '=' + encodeURIComponent(value);
     }
 
-    if (this.nativeCallInFlight) {
-      this.nativeCallQueue.push(call);
-    } else {
-      this.nativeCallInFlight = true;
-      window.location = call;
-    }
+    console.log('mraid url ' + call);
+    window.location = call;
   };
 
 
@@ -109,7 +105,7 @@
     };
     broadcastEvent(EVENTS.INFO, 'Set default position to ' + stringify(defaultPosition));
   };
-  
+
   bridge.setMaxSize = function(width, height) {
     maxSize = {
       width: width,
@@ -245,9 +241,9 @@
   };
 
   var resizeProperties = {
-    width: false, 
+    width: false,
     height: false,
-    offsetX: false, 
+    offsetX: false,
     offsetY: false,
     customClosePosition: 'top-right',
     allowOffscreen: true
@@ -499,10 +495,10 @@
   };
 
   mraid.expand = function(URL) {
-      console.log('mraid.expand');
-      if (!(this.getState() === STATES.DEFAULT || this.getState() === STATES.RESIZED)) {
-          broadcastEvent(EVENTS.ERROR, 'Ad can only be expanded from the default or resized state.', 'expand');
-      } else {
+    console.log('mraid.expand');
+    if (!(this.getState() === STATES.DEFAULT || this.getState() === STATES.RESIZED)) {
+      broadcastEvent(EVENTS.ERROR, 'Ad can only be expanded from the default or resized state.', 'expand');
+    } else {
       var args = ['expand',
         'shouldUseCustomClose', expandProperties.useCustomClose
       ];
@@ -510,24 +506,8 @@
       if (URL) {
         args = args.concat(['url', URL]);
       }
-      if (URL === undefined) {
-          console.log("mraid.expand (1-part)");
-      	  var iframe = document.createElement("IFRAME");
-          var command = "expand";
-          iframe.setAttribute("src", "mraid://" + command);
-          document.documentElement.appendChild(iframe);
-          iframe.parentNode.removeChild(iframe);
-          iframe = null;
-      } else {
-       	  console.log("mraid.expand " + URL);
-      	  var iframe = document.createElement("IFRAME");
-          var command = "expand?url=" + URL;
-          iframe.setAttribute("src", "mraid://" + command);
-          document.documentElement.appendChild(iframe);
-          iframe.parentNode.removeChild(iframe);
-          iframe = null;
-      }
 
+      bridge.executeNativeCall(args);
     }
   };
 

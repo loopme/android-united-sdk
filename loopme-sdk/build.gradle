@@ -6,6 +6,7 @@ repositories {
     mavenLocal()
     google()
     maven { url 'https://maven.fabric.io/public' }
+    maven { url 'https://www.testfairy.com/maven' }
     flatDir {
         dirs 'libs'
     }
@@ -82,6 +83,7 @@ dependencies {
     api 'com.google.code.gson:gson:2.8.0'
     api project(':dvsdk-release')
     api files('libs/libAvid-loopme-3.6.7.jar')
+    api 'testfairy:testfairy-android-sdk:1.+@aar'
 
     api 'com.google.android.gms:play-services-ads:11.6.0'
     api 'com.android.support:multidex:1.0.2'

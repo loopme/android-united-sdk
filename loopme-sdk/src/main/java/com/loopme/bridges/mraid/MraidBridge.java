@@ -10,6 +10,7 @@ import android.webkit.WebViewClient;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
+import com.loopme.MraidOrientation;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.Utils;
 import com.loopme.views.MraidView;
@@ -34,7 +35,10 @@ public class MraidBridge extends WebViewClient {
     private static final String QUERY_PARAMETER_CUSTOM_CLOSE = "shouldUseCustomClose";
     private static final String QUERY_PARAMETER_CUSTOM_CLOSE_POSITION = "customClosePosition";
     private static final String ALLOW_OFF_SCREEN = "allowOffscreen";
-    public static final String SET_ORIENTATION_PROPERTIES = "setOrientationProperties";
+    private static final String SET_ORIENTATION_PROPERTIES = "setOrientationProperties";
+
+    private static final String QUERY_PARAMETER_ALLOW_ORIENTATION_CHANGE = "allowOrientationChange";
+    private static final String QUERY_PARAMETER_FORCE_ORIENTATION = "forceOrientation";
 
     private static final String CLOSE = "close";
     private static final String OPEN = "open";
@@ -127,10 +131,21 @@ public class MraidBridge extends WebViewClient {
                 handleWebviewCommand(url);
                 break;
             }
-            case SET_ORIENTATION_PROPERTIES:
-
+            case SET_ORIENTATION_PROPERTIES: {
+                boolean allowOrientationChange = detectBooleanQueryParameter(mCommandUri, QUERY_PARAMETER_ALLOW_ORIENTATION_CHANGE);
+                MraidOrientation forceOrientation = detectOrientation(QUERY_PARAMETER_FORCE_ORIENTATION);
+                mOnMraidBridgeListener.setOrientationProperties(allowOrientationChange, forceOrientation);
+                break;
+            }
             default:
                 break;
+        }
+//        onNativeCallCompleted(command);
+    }
+
+    private void onNativeCallCompleted(String command) {
+        if (mOnMraidBridgeListener != null) {
+            mOnMraidBridgeListener.onNativeCallComplete(command);
         }
     }
 
@@ -161,7 +176,7 @@ public class MraidBridge extends WebViewClient {
     }
 
     private void handleExpand() {
-        boolean custom = detectBooleanQueryParameter(mCommandUri, EXPAND);
+        boolean custom = detectBooleanQueryParameter(mCommandUri, USE_CUSTOM_CLOSE);
         onExpand(custom);
     }
 
@@ -235,6 +250,21 @@ public class MraidBridge extends WebViewClient {
         }
     }
 
+    private String detectStringQueryParameter(String parameter) {
+        return detectQueryParameter(mCommandUri, parameter);
+    }
+
+    private MraidOrientation detectOrientation(String parameter) {
+        String orientation = detectStringQueryParameter(parameter);
+        if (Constants.ORIENTATION_PORT.equals(orientation)) {
+            return MraidOrientation.PORTRAIT;
+        } else if (Constants.ORIENTATION_LAND.equals(orientation)) {
+            return MraidOrientation.LANDSCAPE;
+        } else {
+            return MraidOrientation.NONE;
+        }
+    }
+
     public interface OnMraidBridgeListener {
 
         void close();
@@ -250,5 +280,10 @@ public class MraidBridge extends WebViewClient {
         void onLoadSuccess();
 
         void onChangeCloseButtonVisibility(boolean hasOwnCloseButton);
+
+        void onNativeCallComplete(String command);
+
+        void setOrientationProperties(boolean allowOrientationChange, MraidOrientation forceOrientation);
+
     }
 }

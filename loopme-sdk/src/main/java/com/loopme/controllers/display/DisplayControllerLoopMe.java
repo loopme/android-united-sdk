@@ -7,9 +7,11 @@ import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
-import android.view.ViewTreeObserver;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
@@ -33,6 +35,7 @@ import com.loopme.loaders.Loader;
 import com.loopme.models.Errors;
 import com.loopme.models.Message;
 import com.loopme.utils.UiUtils;
+import com.loopme.utils.Utils;
 import com.loopme.views.AdView;
 import com.loopme.views.LoopMeWebView;
 import com.loopme.views.MraidView;
@@ -114,13 +117,50 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
         }
     }
 
+    private void setBannerLayoutParams(ViewGroup bannerView) {
+        if (mMraidController != null && bannerView != null) {
+            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(350, 250);
+            if (bannerView.getParent() instanceof RelativeLayout) {
+                params = new RelativeLayout.LayoutParams(mMraidController.getWidth(), mMraidController.getHeight());
+            } else if (bannerView.getParent() instanceof FrameLayout) {
+                params = new FrameLayout.LayoutParams(mMraidController.getWidth(), mMraidController.getHeight());
+            } else if (bannerView.getParent() instanceof LinearLayout) {
+                params = new LinearLayout.LayoutParams(mMraidController.getWidth(), mMraidController.getHeight());
+            }
+            bannerView.setLayoutParams(params);
+        }
+    }
+
     private void buildMraidContainer(FrameLayout containerView) {
+        setMraidBannerSize();
+        setBannerLayoutParams(containerView);
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT);
+        Utils.removeParent(mMraidView);
         containerView.addView(mMraidView, layoutParams);
     }
 
+    private void setMraidBannerSize() {
+        if (mMraidController != null) {
+            mMraidController.setBannerSize(mLoopMeAd.getAdParams().getHtml());
+        }
+    }
+
+    public void collapseMraidBanner() {
+        if (mLoopMeAd instanceof LoopMeBannerGeneral) {
+            LoopMeBannerGeneral banner = (LoopMeBannerGeneral) mLoopMeAd;
+            buildMraidContainer(banner.getBannerView());
+            onCollapseBanner();
+            UiUtils.broadcastIntent(mLoopMeAd.getContext(), Constants.DESTROY_INTENT, mLoopMeAd.getAdId());
+        }
+    }
+
+    private void onCollapseBanner() {
+        if (mMraidController != null) {
+            mMraidController.onCollapseBanner();
+        }
+    }
 
     private void preloadMraidAd() {
         if (mAdParams.isMraidAd()) {
@@ -276,7 +316,7 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
 
     private void pauseControllers() {
         pauseViewController();
-        pauseMraid();
+//        pauseMraid();
         pauseVideoController();
         if (isInterstitial()) {
             setWebViewState(Constants.WebviewState.HIDDEN);
@@ -609,6 +649,9 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
         }
     }
 
+    public MraidView getMraidView() {
+        return mMraidView;
+    }
     private void surfaceTextureDestroyed() {
         if (mVideoController != null) {
             mVideoController.surfaceTextureDestroyed();
@@ -757,4 +800,6 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
     public boolean isVideoPaused() {
         return getCurrentVideoState() == Constants.VideoState.PAUSED;
     }
+
+
 }

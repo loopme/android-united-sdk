@@ -259,8 +259,7 @@ public class AdParams implements Serializable {
         private boolean isValidFormatValue() {
             return mBuilderFormat != null
                     && (mBuilderFormat.equalsIgnoreCase(Constants.BANNER_TAG)
-                    || mBuilderFormat.equalsIgnoreCase(Constants.INTERSTITIAL_TAG)
-                    || mBuilderFormat.equalsIgnoreCase(Constants.EXPANDABLE_BANNER_TAG));
+                    || mBuilderFormat.equalsIgnoreCase(Constants.INTERSTITIAL_TAG));
         }
 
         private boolean isValidOrientationValue(String orientation) {

@@ -2,15 +2,20 @@ package com.loopme.controllers;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
+import com.loopme.AdUtils;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.LoopMeBannerGeneral;
+import com.loopme.MraidOrientation;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.bridges.mraid.MraidBridge;
+import com.loopme.controllers.display.DisplayControllerLoopMe;
+import com.loopme.parser.ParseService;
 import com.loopme.utils.InternetUtils;
+import com.loopme.utils.Utils;
 import com.loopme.views.MraidView;
 import com.loopme.views.activity.AdBrowserActivity;
 import com.loopme.views.activity.MraidVideoActivity;
@@ -23,6 +28,12 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     private LoopMeAd mLoopMeAd;
     private MraidView mMraidView;
 
+    private int mWidth;
+    private int mHeight;
+
+    private boolean mAllowOrientationChange = true;
+    private MraidOrientation mForceOrientation = MraidOrientation.NONE;
+
     public MraidController(LoopMeAd loopMeAd) {
         mLoopMeAd = loopMeAd;
     }
@@ -33,9 +44,24 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
 
     @Override
     public void close() {
-        Logging.out(LOG_TAG, "close");
-        // TODO: 10/2/17 change to   mLoopMeAd.dismiss() after merge with auto loading
-        mLoopMeAd.destroy();
+        if (mMraidView.isExpanded()) {
+            Logging.out(LOG_TAG, "collapse banner");
+            ((DisplayControllerLoopMe) mLoopMeAd.getDisplayController()).collapseMraidBanner();
+        } else {
+            Logging.out(LOG_TAG, "close");
+            mLoopMeAd.dismiss();
+        }
+    }
+
+    @Override
+    public void onNativeCallComplete(String command) {
+        mMraidView.onNativeCallComplete(command);
+    }
+
+    @Override
+    public void setOrientationProperties(boolean allowOrientationChange, MraidOrientation forceOrientation) {
+        mAllowOrientationChange = allowOrientationChange;
+        mForceOrientation = forceOrientation;
     }
 
     @Override
@@ -57,7 +83,7 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     @Override
     public void resize(int width, int height) {
         Logging.out(LOG_TAG, "resize");
-        if (mLoopMeAd.getAdFormat() == Constants.AdFormat.BANNER || mLoopMeAd.getAdFormat() == Constants.AdFormat.EXPANDABLE_BANNER) {
+        if (mLoopMeAd.getAdFormat() == Constants.AdFormat.BANNER) {
             setBannerSize(width, height);
             mMraidView.resize();
             mMraidView.setState(Constants.MraidState.RESIZED);
@@ -67,7 +93,7 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     }
 
     private void setBannerSize(int width, int height) {
-        if (mLoopMeAd.getAdFormat() == Constants.AdFormat.BANNER || mLoopMeAd.getAdFormat() == Constants.AdFormat.EXPANDABLE_BANNER) {
+        if (mLoopMeAd.getAdFormat() == Constants.AdFormat.BANNER) {
             LoopMeBannerGeneral banner = (LoopMeBannerGeneral) mLoopMeAd;
             ViewGroup.LayoutParams params = banner.getBannerView().getLayoutParams();
             params.width = width;
@@ -89,13 +115,13 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
 
     @Override
     public void expand(boolean isExpand) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(Constants.EXTRAS_ALLOW_ORIENTATION_CHANGE, mAllowOrientationChange);
+        bundle.putInt(Constants.EXTRAS_FORCE_ORIENTATION, mForceOrientation.getActivityInfoOrientation());
+        AdUtils.startAdActivity(mLoopMeAd, isExpand, bundle);
         mMraidView.setIsViewable(true);
         Logging.out(LOG_TAG, "expand " + isExpand);
         mMraidView.setState(Constants.MraidState.EXPANDED);
-
-//        View view = mMraidView;
-        mMraidView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-
     }
 
     @Override
@@ -128,5 +154,26 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
         if (mLoopMeAd != null) {
             mLoopMeAd.getContext().sendBroadcast(intent);
         }
+    }
+
+    public void onCollapseBanner() {
+        mMraidView.notifySizeChangeEvent(mWidth, mHeight);
+        mMraidView.setState(Constants.MraidState.DEFAULT);
+        mMraidView.setIsViewable(true);
+        mMraidView.setWebViewState(Constants.WebviewState.VISIBLE);
+    }
+
+    public int getWidth() {
+        return mWidth;
+    }
+
+    public int getHeight() {
+        return mHeight;
+    }
+
+    public void setBannerSize(String html) {
+        ParseService parser = new ParseService();
+        mWidth = Utils.convertDpToPixel(300);
+        mHeight = Utils.convertDpToPixel(50);
     }
 }

@@ -134,15 +134,6 @@
                 android:text="@string/banner"
                 android:textColor="@color/color_selector" />
 
-            <RadioButton
-                android:id="@+id/expandable_banner"
-                android:layout_width="@dimen/fragment_edit_adtyoe_radiobutton_width"
-                android:layout_height="match_parent"
-                android:background="@drawable/right_selector"
-                android:button="@android:color/transparent"
-                android:gravity="center"
-                android:text="@string/expandable_banner"
-                android:textColor="@color/color_selector" />
         </RadioGroup>
 
     </LinearLayout>

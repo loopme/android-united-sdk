@@ -65,7 +65,6 @@ public class Constants {
     public static final String APPKEY_TAG = "appkey";
     public static final String FORMAT_TAG = "format";
     public static final String BANNER_TAG = "banner";
-    public static final String EXPANDABLE_BANNER_TAG = "expandable_banner";
     public static final String UNKNOWN_NAME = "unknown";
     public static final String VIDEO_FOLDER = "LoopMeAds";
     public static final String EVENT_VIDEO_25 = "VIDEO_25";
@@ -114,6 +113,8 @@ public class Constants {
     public static boolean PART_PRELOAD = false;
     public static String sCacheDirectory = "";
     private static AdSpotDimensions sAdSpotDimensions;
+    public static final String EXTRAS_ALLOW_ORIENTATION_CHANGE = "allowOrientationChange";
+    public static final String EXTRAS_FORCE_ORIENTATION = "forceOrientation";
 
 
     public class AdFormat {

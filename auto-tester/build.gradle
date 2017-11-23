@@ -60,7 +60,6 @@ dependencies {
     api 'testfairy:testfairy-android-sdk:1.4.3@aar'
     api 'com.android.support:recyclerview-v7:26.1.0'
     api 'com.android.support:cardview-v7:26.1.0'
-    api('com.android.support:multidex:1.0.2')
     api('com.mopub:mopub-sdk:4.18.0@aar') {
         transitive = true
         exclude module: 'libAvid-mopub'

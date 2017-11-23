@@ -110,5 +110,4 @@
     <string name="landscape_interstitial">Landscape interstitial</string>
     <string name="portrait_interstitial">Portrait interstitial</string>
     <string name="enable_auto_loading">Enable auto loading</string>
-    <string name="expandable_banner">Expandable banner</string>
 </resources>

@@ -15,7 +15,6 @@ import com.loopme.tester.R;
 import com.loopme.tester.ads.Ad;
 import com.loopme.tester.ads.AdListener;
 import com.loopme.tester.ads.AdLoopMeBanner;
-import com.loopme.tester.ads.AdLoopMeExpandableBanner;
 import com.loopme.tester.ads.AdLoopMeInterstitial;
 import com.loopme.tester.ads.AdMopubBanner;
 import com.loopme.tester.ads.AdMopubInterstitial;
@@ -345,14 +344,7 @@ public class ManualView implements View.OnClickListener, AdListener {
             mAd = initializeLoopmeBanner();
         } else if (adType == AdType.BANNER && adSdk == AdSdk.MOPUB) {
             mAd = initializeMopubBanner();
-        } else if (adType == AdType.EXPANDABLE_BANNER && (adSdk == AdSdk.LOOPME || adSdk == AdSdk.LMVPAID)) {
-            mAd = initializeLoopmeExpandableBanner();
         }
-    }
-
-    private Ad initializeLoopmeExpandableBanner() {
-        FrameLayout expandableBanner = (FrameLayout) mRootView.findViewById(R.id.loopme_expandable_banner);
-        return new AdLoopMeExpandableBanner(mActivity, mAdSpot.getAppKey(), expandableBanner, this, mIsAutoLoadingEnabled);
     }
 
     private Ad initializeLoopmeInterstitial() {

@@ -39,8 +39,7 @@ public class ValidationHelper {
     public static boolean isValidFormat(String format) {
         return format != null
                 && (format.equalsIgnoreCase(Constants.BANNER_TAG)
-                || format.equalsIgnoreCase(Constants.INTERSTITIAL_TAG)
-                || format.equalsIgnoreCase(Constants.EXPANDABLE_BANNER_TAG));
+                || format.equalsIgnoreCase(Constants.INTERSTITIAL_TAG));
     }
 
     public static boolean isCouldLoadAd(LoopMeAd loopMeAd) {

@@ -139,9 +139,7 @@ public class ParseService extends JsonParser {
         if (loopMeAd.getAdFormat() == Constants.AdFormat.INTERSTITIAL) {
             return Constants.INTERSTITIAL_TAG;
         } else if (loopMeAd.getAdFormat() == Constants.AdFormat.BANNER) {
-            return Constants.EXPANDABLE_BANNER_TAG;
-        } else if (loopMeAd.getAdFormat() == Constants.AdFormat.EXPANDABLE_BANNER) {
-            return Constants.EXPANDABLE_BANNER_TAG;
+            return Constants.BANNER_TAG;
         } else {
             return Constants.INTERSTITIAL_TAG;
         }

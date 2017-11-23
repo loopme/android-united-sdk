@@ -183,8 +183,6 @@ public class AdSpot extends BaseModel implements Serializable, Parcelable {
             mAdType = AdType.BANNER;
         } else if (AdType.INTERSTITIAL.toString().equalsIgnoreCase(type)) {
             mAdType = AdType.INTERSTITIAL;
-        } else if (AdType.EXPANDABLE_BANNER.toString().equalsIgnoreCase(type)) {
-            mAdType = AdType.EXPANDABLE_BANNER;
         }
         return mAdType;
     }

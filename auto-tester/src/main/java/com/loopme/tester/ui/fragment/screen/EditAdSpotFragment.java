@@ -106,8 +106,6 @@ public class EditAdSpotFragment extends BaseFragment {
             mAdTypeGroup.check(R.id.banner);
         } else if (type == AdType.INTERSTITIAL) {
             mAdTypeGroup.check(R.id.interstitial);
-        } else if (type == AdType.EXPANDABLE_BANNER) {
-            mAdTypeGroup.check(R.id.expandable_banner);
         }
     }
 
@@ -229,8 +227,6 @@ public class EditAdSpotFragment extends BaseFragment {
             return AdType.BANNER;
         } else if (typeId == R.id.interstitial) {
             return AdType.INTERSTITIAL;
-        } else if (typeId == R.id.expandable_banner) {
-            return AdType.EXPANDABLE_BANNER;
         } else {
             return null;
         }
