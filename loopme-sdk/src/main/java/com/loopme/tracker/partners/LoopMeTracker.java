@@ -94,7 +94,7 @@ public class LoopMeTracker {
     }
 
     public static void trackSdkFeedBack(List<String> packageIds, String token) {
-        if (Utils.isPackageInstalled(packageIds, Utils.getInstalledPackagesAsStringsList())) {
+        if (Utils.isPackageInstalled(packageIds)) {
             sendDataToServer(buildSdkFeedBackUrl(token), null, null);
         }
     }
