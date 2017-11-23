@@ -197,10 +197,12 @@ public class Utils {
         return out.toString();
     }
 
-    public static boolean isPackageInstalled(List<String> packageIds, List<String> installedList) {
-        for (String packageName : installedList) {
+    public static boolean isPackageInstalled(List<String> packageIds) {
+        List<PackageInfo> packages = getInstalledPackages();
+
+        for (PackageInfo packageInfo : packages) {
             for (int i = 0; i < packageIds.size(); i++) {
-                if (packageIds.get(i).equalsIgnoreCase(packageName)) {
+                if (packageIds.get(i).equalsIgnoreCase(packageInfo.packageName)) {
                     return true;
                 }
             }
@@ -653,5 +655,11 @@ public class Utils {
         }
         int lastIndexOfSlash = source.lastIndexOf("/");
         return source.substring(lastIndexOfSlash, source.length());
+    }
+
+    public static void removeParent(ViewGroup view) {
+        if (view.getParent() != null) {
+            ((ViewGroup) view.getParent()).removeView(view);
+        }
     }
 }
