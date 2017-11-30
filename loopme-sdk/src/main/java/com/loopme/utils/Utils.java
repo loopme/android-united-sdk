@@ -70,6 +70,8 @@ public class Utils {
     private static WindowManager sWindowManager;
     private static PackageManager sPackageManager;
     public static String sUserAgent;
+    private static int DEFAULT_WIDTH = 100;
+    private static int DEFAULT_HEIGHT = 100;
 
     public static void init(Context context) {
         if (context != null) {
@@ -566,6 +568,10 @@ public class Utils {
         return new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
     }
 
+    public static ViewGroup.LayoutParams createDefaultLayoutParams() {
+        return new FrameLayout.LayoutParams(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    }
+
     private static float getDensity() {
         if (sResources != null) {
             return sResources.getDisplayMetrics().density;
@@ -660,6 +666,14 @@ public class Utils {
     public static void removeParent(ViewGroup view) {
         if (view.getParent() != null) {
             ((ViewGroup) view.getParent()).removeView(view);
+        }
+    }
+
+    public static ViewGroup.LayoutParams getLayoutParamsDependsOnOs() {
+        if (Utils.isApi19()) {
+            return Utils.createDefaultLayoutParams();
+        } else {
+            return Utils.createMatchParentLayoutParams();
         }
     }
 }
