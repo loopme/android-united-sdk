@@ -199,12 +199,10 @@ public class Utils {
         return out.toString();
     }
 
-    public static boolean isPackageInstalled(List<String> packageIds) {
-        List<PackageInfo> packages = getInstalledPackages();
-
-        for (PackageInfo packageInfo : packages) {
+    public static boolean isPackageInstalled(List<String> packageIds, List<String> installedList) {
+        for (String packageName : installedList) {
             for (int i = 0; i < packageIds.size(); i++) {
-                if (packageIds.get(i).equalsIgnoreCase(packageInfo.packageName)) {
+                if (packageIds.get(i).equalsIgnoreCase(packageName)) {
                     return true;
                 }
             }
@@ -666,14 +664,6 @@ public class Utils {
     public static void removeParent(ViewGroup view) {
         if (view.getParent() != null) {
             ((ViewGroup) view.getParent()).removeView(view);
-        }
-    }
-
-    public static ViewGroup.LayoutParams getLayoutParamsDependsOnOs() {
-        if (Utils.isApi19()) {
-            return Utils.createDefaultLayoutParams();
-        } else {
-            return Utils.createMatchParentLayoutParams();
         }
     }
 }
