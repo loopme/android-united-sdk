@@ -1,6 +1,7 @@
 package com.loopme.views;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
@@ -12,6 +13,7 @@ import com.loopme.controllers.MraidController;
 public class MraidView extends LoopMeWebView {
 
     private static final String LOG_TAG = MraidView.class.getSimpleName();
+    private String mCurrentAdState;
 
     public MraidView(Context context, MraidController mraidController) {
         super(context);
@@ -51,9 +53,12 @@ public class MraidView extends LoopMeWebView {
     }
 
     public void setState(String state) {
-        String command = BridgeCommandBuilder.mraidSetState(state);
-        Logging.out(LOG_TAG, "setState " + state);
-        loadCommand(command);
+        if (!TextUtils.equals(mCurrentAdState, state)) {
+            String command = BridgeCommandBuilder.mraidSetState(state);
+            mCurrentAdState = state;
+            Logging.out(LOG_TAG, "setState " + state);
+            loadCommand(command);
+        }
     }
 
     public void notifySizeChangeEvent(int width, int height) {
@@ -71,4 +76,14 @@ public class MraidView extends LoopMeWebView {
     public void setWebViewState(Constants.WebviewState state) {
         super.setWebViewState(BridgeCommandBuilder.LOOPME_PREFIX, state);
     }
+
+    public boolean isExpanded() {
+        return TextUtils.equals(mCurrentAdState, Constants.MraidState.EXPANDED);
+    }
+
+    public void onNativeCallComplete(String command) {
+        loadCommand(command);
+        Logging.out(LOG_TAG, "onNativeCallComplete " + command);
+    }
+
 }

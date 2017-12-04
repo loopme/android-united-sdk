@@ -1,9 +1,5 @@
 package com.loopme;
 
-/**
- * Created by vynnykiakiv on 8/4/17.
- */
-
 public class ResourceInfo {
     private String mUrl;
     private String mResourceName;

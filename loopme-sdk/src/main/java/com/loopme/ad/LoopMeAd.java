@@ -9,9 +9,8 @@ import android.widget.FrameLayout;
 import com.loopme.AdTargeting;
 import com.loopme.AdTargetingData;
 import com.loopme.Constants;
-import com.loopme.IdGenerator;
-import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.Helpers;
+import com.loopme.IdGenerator;
 import com.loopme.IntegrationType;
 import com.loopme.Logging;
 import com.loopme.common.LoopMeError;
@@ -24,7 +23,7 @@ import com.loopme.loaders.AdFetchTask;
 import com.loopme.models.Errors;
 import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
-import com.loopme.utils.Utils;
+import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.ValidationHelper;
 
 import java.util.Observable;
@@ -215,13 +214,31 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         setLiveDebug(adParam);
     }
 
+    protected void postError(String errorMessage) {
+        LoopMeTracker.post(errorMessage);
+    }
+
     public void onInternalLoadFail(LoopMeError error) {
         onAdLoadFail(error);
-        onPostWarning(error);
+        onSendPostWarning(error);
     }
 
     public void onPostWarning(LoopMeError error) {
         LoopMeTracker.post(error);
+
+    }
+    public void onSendPostWarning(LoopMeError error) {
+        if (error != null) {
+            LoopMeTracker.post(error.getMessage(), error.getErrorType());
+            if (isVastError(error)) {
+                LoopMeTracker.postVastError(String.valueOf(error.getErrorCode()));
+            }
+        }
+    }
+
+    private boolean isVastError(LoopMeError error) {
+        return TextUtils.equals(error.getErrorType(), Constants.ErrorType.VAST)
+                || TextUtils.equals(error.getErrorType(), Constants.ErrorType.VPAID);
     }
 
     private void setLiveDebug(AdParams adParams) {
@@ -454,6 +471,10 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     public boolean isFullScreen() {
         return mDisplayController != null && mDisplayController.isFullScreen();
+    }
+
+    public void setFullScreen(boolean isFullScreen) {
+        mDisplayController.setFullScreen(isFullScreen);
     }
 
     public FrameLayout getContainerView() {

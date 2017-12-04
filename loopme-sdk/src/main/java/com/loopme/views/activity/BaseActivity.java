@@ -9,7 +9,10 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
+import com.appsee.Appsee;
+import com.crashlytics.android.Crashlytics;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.R;
@@ -23,6 +26,10 @@ import com.loopme.receiver.AdReceiver;
 import com.loopme.receiver.MraidAdCloseButtonReceiver;
 import com.loopme.utils.Utils;
 import com.loopme.views.CloseButton;
+import com.loopme.views.MraidView;
+import com.testfairy.TestFairy;
+
+import io.fabric.sdk.android.Fabric;
 
 public final class BaseActivity extends Activity
         implements AdReceiver.Listener,
@@ -47,6 +54,7 @@ public final class BaseActivity extends Activity
     private MraidAdCloseButtonReceiver mMraidCloseButtonReceiver;
     private boolean mIsDestroyBroadcastReceived;
 
+    private MraidView mMraidView;
 
     @Override
     public final void onCreate(Bundle savedInstanceState) {
@@ -58,6 +66,7 @@ public final class BaseActivity extends Activity
         }
         requestSystemFlags();
         retrieveLoopMeAdOrFinish();
+        initCrashlytics();
         if (mLoopMeAd != null && mLoopMeAd.getAdParams() != null) {
             retrieveParams();
             setContentView();
@@ -68,6 +77,12 @@ public final class BaseActivity extends Activity
         } else {
             finish();
         }
+    }
+
+    private void initCrashlytics() {
+        Fabric.with(this, new Crashlytics());
+        Appsee.start(getString(R.string.com_appsee_apikey));
+        TestFairy.begin(this, "a44d0f385de2740ba8f9aefcf9c0eda6706acc0f");
     }
 
     private void setMraidSettings() {
@@ -99,7 +114,6 @@ public final class BaseActivity extends Activity
 
     @Override
     protected void onDestroy() {
-        Logging.out(LOG_TAG, "onDestroy");
         clearLayout();
         destroyReceivers();
         super.onDestroy();
@@ -151,6 +165,22 @@ public final class BaseActivity extends Activity
             } else {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
             }
+        } else {
+            applyMraidOrientation();
+        }
+    }
+
+    private void applyMraidOrientation() {
+        int orientation = parseOrientation();
+        setRequestedOrientation(orientation);
+    }
+
+    private int parseOrientation() {
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            return extras.getInt(Constants.EXTRAS_FORCE_ORIENTATION);
+        } else {
+            return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
         }
     }
 
@@ -159,11 +189,35 @@ public final class BaseActivity extends Activity
         mLoopMeContainerView = (FrameLayout) findViewById(R.id.loopme_container_view);
         if (mLoopMeAd.isInterstitial()) {
             mLoopMeAd.bindView(mLoopMeContainerView);
+        } else if (mLoopMeAd.isMraidAd()) {
+            mLoopMeContainerView.addView(buildLayout());
         } else {
             mLoopMeAd.rebuildView(mLoopMeContainerView);
             ((BaseDisplayController) mDisplayController).onAdEnteredFullScreenEvent();
         }
+        Appsee.unmarkViewAsSensitive(mLoopMeContainerView);
     }
+
+    private RelativeLayout buildLayout() {
+        RelativeLayout relativeLayout = new RelativeLayout(this);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.MATCH_PARENT);
+        if (mDisplayController != null) {
+            mMraidView = ((DisplayControllerLoopMe) mDisplayController).getMraidView();
+        } else {
+            Logging.out(LOG_TAG, "mAdController is null");
+        }
+
+        if (mMraidView != null) {
+            Utils.removeParent(mMraidView);
+            relativeLayout.addView(mMraidView, params);
+            return relativeLayout;
+        } else {
+            return null;
+        }
+    }
+
 
     private void initSensorManager() {
         if (mLoopMeAd != null) {
@@ -257,6 +311,9 @@ public final class BaseActivity extends Activity
         if (isBanner()) {
             switchLoopMeBannerToPreviousMode();
             ((BaseDisplayController) mDisplayController).onAdExitedFullScreenEvent();
+            if (mLoopMeAd.getAdFormat() == Constants.AdFormat.BANNER) {
+                collapseBanner();
+            }
             super.onBackPressed();
         }
     }
@@ -295,14 +352,19 @@ public final class BaseActivity extends Activity
         mMraidCloseButton = new CloseButton(this);
         mMraidCloseButton.addInLayout(mLoopMeContainerView);
         mMraidCloseButton.setOnClickListener(initMraidCloseButtonListener());
-        mMraidCloseButton.setVisibility(View.GONE);
+        onCloseButtonVisibilityChanged(mIsCloseButtonPresent);
+//        mMraidCloseButton.setVisibility(View.GONE);
     }
 
     private View.OnClickListener initMraidCloseButtonListener() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                closeMraidAd();
+                if (mLoopMeAd.getAdFormat() == Constants.AdFormat.INTERSTITIAL) {
+                    closeMraidAd();
+                } else {
+                    collapseBanner();
+                }
             }
         };
     }
@@ -335,6 +397,12 @@ public final class BaseActivity extends Activity
     public void onAdShake() {
         if (mDisplayController != null) {
             mDisplayController.onAdShake();
+        }
+    }
+
+    private void collapseBanner() {
+        if (mDisplayController != null) {
+            ((DisplayControllerLoopMe) mDisplayController).collapseMraidBanner();
         }
     }
 }

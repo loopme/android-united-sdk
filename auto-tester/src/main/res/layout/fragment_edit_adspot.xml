@@ -133,6 +133,7 @@
                 android:gravity="center"
                 android:text="@string/banner"
                 android:textColor="@color/color_selector" />
+
         </RadioGroup>
 
     </LinearLayout>

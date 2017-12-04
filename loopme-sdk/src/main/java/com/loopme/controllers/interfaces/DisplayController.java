@@ -32,4 +32,6 @@ public interface DisplayController {
     WebView getWebView();
 
     void onAdShake();
+
+    void setFullScreen(boolean isFullScreen);
 }

@@ -113,11 +113,14 @@ public class Constants {
     public static boolean PART_PRELOAD = false;
     public static String sCacheDirectory = "";
     private static AdSpotDimensions sAdSpotDimensions;
+    public static final String EXTRAS_ALLOW_ORIENTATION_CHANGE = "allowOrientationChange";
+    public static final String EXTRAS_FORCE_ORIENTATION = "forceOrientation";
 
 
     public class AdFormat {
         public static final int BANNER = 1000;
         public static final int INTERSTITIAL = 1001;
+        public static final int EXPANDABLE_BANNER = 1002;
 
         private AdFormat() {
         }
