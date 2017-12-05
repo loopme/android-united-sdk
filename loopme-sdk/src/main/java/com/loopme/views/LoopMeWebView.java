@@ -23,7 +23,6 @@ import com.loopme.views.webclient.AdViewChromeClient;
 public class LoopMeWebView extends WebView {
     private static final String LOG_TAG = LoopMeWebView.class.getSimpleName();
     private OnPageLoadedCallback mCallback;
-    private static boolean sDeadlockCleared = false;
     protected Constants.WebviewState mViewState = Constants.WebviewState.CLOSED;
 
     public LoopMeWebView(Context context, AttributeSet attrs) {
@@ -32,10 +31,6 @@ public class LoopMeWebView extends WebView {
 
     public LoopMeWebView(Context context) {
         super(context);
-        if (!sDeadlockCleared) {
-            resolveWebViewDeadlock(getContext());
-            sDeadlockCleared = true;
-        }
         configureWebSettings();
     }
 
@@ -56,6 +51,7 @@ public class LoopMeWebView extends WebView {
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
         setDebugConfig();
+        Logging.out(LOG_TAG, "Encoding: " + getSettings().getDefaultTextEncodingName());
     }
 
     private void setDebugConfig() {
@@ -118,11 +114,11 @@ public class LoopMeWebView extends WebView {
         }
     }
 
-    protected void setWebViewState(String sdkPrefix, Constants.WebviewState webViewStatestate) {
-        if (mViewState != webViewStatestate) {
-            mViewState = webViewStatestate;
-            String command = BridgeCommandBuilder.webviewState(sdkPrefix, mViewState);
-            Logging.out(LOG_TAG, "setWebViewState() : " + webViewStatestate.name());
+    public void setWebViewState(Constants.WebviewState webviewState) {
+        if (mViewState != webviewState) {
+            mViewState = webviewState;
+            String command = BridgeCommandBuilder.webviewState(BridgeCommandBuilder.LOOPME_PREFIX, mViewState);
+            Logging.out(LOG_TAG, "setWebViewState() : " + webviewState.name());
             loadCommand(command);
         }
     }
@@ -130,26 +126,5 @@ public class LoopMeWebView extends WebView {
     protected void loadCommand(String command) {
         Logging.out(LOG_TAG, command);
         loadUrl(command);
-    }
-
-    private void resolveWebViewDeadlock(@NonNull final Context context) {
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
-            final WebView webView = new WebView(context.getApplicationContext());
-            webView.setBackgroundColor(Color.TRANSPARENT);
-            webView.loadDataWithBaseURL(null, "", "text/html", Constants.UTF_8, null);
-
-            final WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-            params.width = 1;
-            params.height = 1;
-            params.type = WindowManager.LayoutParams.TYPE_TOAST;
-            params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                    | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-                    | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;
-            params.format = PixelFormat.TRANSPARENT;
-            params.gravity = Gravity.START | Gravity.TOP;
-
-            final WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-            windowManager.addView(webView, params);
-        }
     }
 }

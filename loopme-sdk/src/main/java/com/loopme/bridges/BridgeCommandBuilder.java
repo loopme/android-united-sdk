@@ -159,10 +159,10 @@ public class BridgeCommandBuilder {
         return builder.toString();
     }
 
-    public static String nativeCallComplete() {
+    public static String mraidNativeCallComplete() {
         StringBuilder builder = new StringBuilder();
         builder.append(MRAID_PREFIX)
-                .append("mraidbridge.nativeCallComplete()");
+                .append("nativeCallComplete()");
         return builder.toString();
     }
 }

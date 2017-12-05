@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import java.util.ArrayDeque;
@@ -199,7 +200,10 @@ public class MoatViewAbilityUtils {
                     int childCount = viewGroup.getChildCount();
 
                     for (int i = childCount - 1; i >= 0; --i) {
-                        arrayDeque.add(viewGroup.getChildAt(i));
+                        View childView = viewGroup.getChildAt(i);
+                        if (!isEmptyView(childView)) {
+                            arrayDeque.add(childView);
+                        }
                     }
                 }
 
@@ -217,6 +221,18 @@ public class MoatViewAbilityUtils {
             }
         }
 
+        return false;
+    }
+
+    private static boolean isEmptyView(View view) {
+        if (view == null) {
+            return true;
+        }
+        if (view instanceof FrameLayout && view.getClass() == FrameLayout.class) {
+            if (((FrameLayout) view).getChildCount() == 0 && view.getBackground() == null) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -250,6 +266,7 @@ public class MoatViewAbilityUtils {
 
         public void setOverlapping(double mOverlapping) {
             this.mOverlapping = mOverlapping;
+            Logging.out(LOG_TAG, "overlapping : " + ((int) (mOverlapping * 100)) + "%");
         }
 
         public boolean isVisibleMore50Percents() {

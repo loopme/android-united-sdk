@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.ad.AdParams;
+import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.AdType;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.models.Errors;
@@ -76,6 +77,7 @@ public class ParseService extends JsonParser {
         AdIds adIds = parseAdIds(bidObject);
         boolean autoLoadingValue = retrieveAutoLoadingWithDefaultTrue(bidObject);
         List<String> packageIds = retrievePackageIds(bidObject.getExt());
+        AdSpotDimensions adSpotDimensions = retrieveAdDimensionsForNoneVastOrDefault(bidObject);
 
         return new AdParams.AdParamsBuilder(retrieveAdFormat(loopMeAd))
                 .html(html)
@@ -88,7 +90,23 @@ public class ParseService extends JsonParser {
                 .mraid(false)
                 .adIds(adIds)
                 .autoLoading(autoLoadingValue)
+                .adSpotDimensions(adSpotDimensions)
                 .build();
+    }
+
+    private static AdSpotDimensions retrieveAdDimensionsForNoneVastOrDefault(Bid bidObject) {
+        AdSpotDimensions adSpotDimensions = new AdSpotDimensions(Constants.DEFAULT_BANNER_WIDTH, Constants.DEFAULT_BANNER_HEIGHT);
+
+        String creativeType = parseCreativeTypeFromBid(bidObject);
+        if (isHtmlAd(creativeType) || isMraidAd(creativeType)) {
+            String html = retrieveAdm(bidObject);
+            HtmlParser parser = new HtmlParser(html);
+            int adWidth = parser.getAdWidth();
+            int adHeight = parser.getAdHeight();
+            adSpotDimensions = new AdSpotDimensions(adWidth, adHeight);
+        }
+
+        return adSpotDimensions;
     }
 
     private static List<String> retrievePackageIds(Ext ext) {
@@ -227,6 +245,15 @@ public class ParseService extends JsonParser {
     private static String parseCreativeTypeFromModel(ResponseJsonModel responseModel) {
         try {
             return responseModel.getSeatbid().get(FIRST_ELEMENT).getBid().get(FIRST_ELEMENT).getExt().getCrtype();
+        } catch (IllegalArgumentException | NullPointerException ex) {
+            ex.printStackTrace();
+        }
+        return AdType.HTML.name();
+    }
+
+    private static String parseCreativeTypeFromBid(Bid bid) {
+        try {
+            return bid.getExt().getCrtype();
         } catch (IllegalArgumentException | NullPointerException ex) {
             ex.printStackTrace();
         }

@@ -768,8 +768,12 @@ public class Utils {
     }
 
     public static void removeParent(ViewGroup view) {
-        if (view.getParent() != null) {
+        if (view != null && view.getParent() != null) {
             ((ViewGroup) view.getParent()).removeView(view);
         }
+    }
+
+    public static boolean isLandscape() {
+        return ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE == getScreenOrientation();
     }
 }

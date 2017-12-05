@@ -66,7 +66,7 @@ public final class BaseActivity extends Activity
         }
         requestSystemFlags();
         retrieveLoopMeAdOrFinish();
-        initCrashlytics();
+        initCrashLytics();
         if (mLoopMeAd != null && mLoopMeAd.getAdParams() != null) {
             retrieveParams();
             setContentView();
@@ -79,14 +79,14 @@ public final class BaseActivity extends Activity
         }
     }
 
-    private void initCrashlytics() {
+    private void initCrashLytics() {
         Fabric.with(this, new Crashlytics());
         Appsee.start(getString(R.string.com_appsee_apikey));
         TestFairy.begin(this, "a44d0f385de2740ba8f9aefcf9c0eda6706acc0f");
     }
 
     private void setMraidSettings() {
-        if (mLoopMeAd != null && mLoopMeAd.getAdParams().isMraidAd()) {
+        if (mLoopMeAd != null && mLoopMeAd.isMraidAd()) {
             initMraidCloseButton();
             initMraidCloseButtonReceiver();
         }
@@ -157,30 +157,25 @@ public final class BaseActivity extends Activity
 
     private void initOrientation() {
         mInitialOrientation = Utils.getScreenOrientation();
-        if (!mLoopMeAd.isMraidAd()) {
-            if (isInterstitial()) {
-                if (!mIs360) {
-                    applyOrientationFromAdParams();
-                }
-            } else {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-            }
-        } else {
+        if (mLoopMeAd.isMraidAd()) {
             applyMraidOrientation();
+        } else {
+            applyLoopMeOrientation();
+        }
+    }
+
+    private void applyLoopMeOrientation() {
+        if (isInterstitial() && !mIs360) {
+            applyOrientationFromAdParams();
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         }
     }
 
     private void applyMraidOrientation() {
-        int orientation = parseOrientation();
-        setRequestedOrientation(orientation);
-    }
-
-    private int parseOrientation() {
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            return extras.getInt(Constants.EXTRAS_FORCE_ORIENTATION);
-        } else {
-            return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+        if (mLoopMeAd.isMraidAd() && mDisplayController instanceof DisplayControllerLoopMe) {
+            int orientation = ((DisplayControllerLoopMe) mDisplayController).getMraidOrientation();
+            setRequestedOrientation(orientation);
         }
     }
 
@@ -189,35 +184,12 @@ public final class BaseActivity extends Activity
         mLoopMeContainerView = (FrameLayout) findViewById(R.id.loopme_container_view);
         if (mLoopMeAd.isInterstitial()) {
             mLoopMeAd.bindView(mLoopMeContainerView);
-        } else if (mLoopMeAd.isMraidAd()) {
-            mLoopMeContainerView.addView(buildLayout());
         } else {
             mLoopMeAd.rebuildView(mLoopMeContainerView);
             ((BaseDisplayController) mDisplayController).onAdEnteredFullScreenEvent();
         }
         Appsee.unmarkViewAsSensitive(mLoopMeContainerView);
     }
-
-    private RelativeLayout buildLayout() {
-        RelativeLayout relativeLayout = new RelativeLayout(this);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.MATCH_PARENT);
-        if (mDisplayController != null) {
-            mMraidView = ((DisplayControllerLoopMe) mDisplayController).getMraidView();
-        } else {
-            Logging.out(LOG_TAG, "mAdController is null");
-        }
-
-        if (mMraidView != null) {
-            Utils.removeParent(mMraidView);
-            relativeLayout.addView(mMraidView, params);
-            return relativeLayout;
-        } else {
-            return null;
-        }
-    }
-
 
     private void initSensorManager() {
         if (mLoopMeAd != null) {
@@ -309,11 +281,9 @@ public final class BaseActivity extends Activity
     @Override
     public void onBackPressed() {
         if (isBanner()) {
+            collapseMraidBanner();
             switchLoopMeBannerToPreviousMode();
             ((BaseDisplayController) mDisplayController).onAdExitedFullScreenEvent();
-            if (mLoopMeAd.getAdFormat() == Constants.AdFormat.BANNER) {
-                collapseBanner();
-            }
             super.onBackPressed();
         }
     }
@@ -353,27 +323,24 @@ public final class BaseActivity extends Activity
         mMraidCloseButton.addInLayout(mLoopMeContainerView);
         mMraidCloseButton.setOnClickListener(initMraidCloseButtonListener());
         onCloseButtonVisibilityChanged(mIsCloseButtonPresent);
-//        mMraidCloseButton.setVisibility(View.GONE);
     }
 
     private View.OnClickListener initMraidCloseButtonListener() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mLoopMeAd.getAdFormat() == Constants.AdFormat.INTERSTITIAL) {
+                if (mLoopMeAd.isInterstitial()) {
                     closeMraidAd();
                 } else {
-                    collapseBanner();
+                    collapseMraidBanner();
                 }
             }
         };
     }
 
     private void closeMraidAd() {
-        if (mDisplayController != null && mDisplayController instanceof DisplayControllerLoopMe) {
-            DisplayControllerLoopMe displayControllerLoopMe = (DisplayControllerLoopMe) mDisplayController;
-            displayControllerLoopMe.closeMraidAd();
-            BaseActivity.this.finish();
+        if (mDisplayController instanceof DisplayControllerLoopMe) {
+            ((DisplayControllerLoopMe) mDisplayController).closeMraidAd();
         }
     }
 
@@ -400,7 +367,7 @@ public final class BaseActivity extends Activity
         }
     }
 
-    private void collapseBanner() {
+    private void collapseMraidBanner() {
         if (mDisplayController != null) {
             ((DisplayControllerLoopMe) mDisplayController).collapseMraidBanner();
         }

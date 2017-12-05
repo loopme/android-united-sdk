@@ -12,6 +12,7 @@ import com.loopme.utils.Utils;
 
 public class AdViewChromeClient extends WebChromeClient {
     private OnErrorFromJsCallback mCallback;
+    private String mPrevErrorMessage = "";
     private static final String UNCAUGHT_ERROR = "Uncaught";
     private static final String VIDEO_SOURCE = "VIDEO_SOURCE";
 
@@ -50,10 +51,19 @@ public class AdViewChromeClient extends WebChromeClient {
     }
 
     private void onErrorFromJs(String message) {
-        if (mCallback != null && message != null && message.contains(UNCAUGHT_ERROR)) {
+        if (mCallback != null && message != null && message.contains(UNCAUGHT_ERROR) && isNewError(message)) {
             mCallback.onErrorFromJs(message);
         } else if (mCallback == null) {
             LoopMeTracker.post("Error from js console: " + message, Constants.ErrorType.JS);
+        }
+    }
+
+    private boolean isNewError(String newErrorMessage) {
+        if ((!TextUtils.equals(newErrorMessage, mPrevErrorMessage))) {
+            mPrevErrorMessage = newErrorMessage;
+            return true;
+        } else {
+            return false;
         }
     }
 

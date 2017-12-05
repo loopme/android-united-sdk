@@ -152,11 +152,17 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     }
 
     protected void destroyDisplayController() {
-        if (mDisplayController != null) {
-            Logging.out(LOG_TAG, "Release " + mDisplayController.toString());
-            mDisplayController.onDestroy();
-            mDisplayController = null;
-        }
+        // we need delay destroy view to let little bit time for previous commands to complete
+        runOnUiThreadDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mDisplayController != null) {
+                    Logging.out(LOG_TAG, "Release " + mDisplayController.toString());
+                    mDisplayController.onDestroy();
+                    mDisplayController = null;
+                }
+            }
+        }, Constants.DESTROY_TIME_DELAY);
     }
 
     /**

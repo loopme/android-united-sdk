@@ -13,14 +13,13 @@ import com.loopme.controllers.MraidController;
 public class MraidView extends LoopMeWebView {
 
     private static final String LOG_TAG = MraidView.class.getSimpleName();
-    private String mCurrentAdState;
+    private String mCurrentMraidState;
 
-    public MraidView(Context context, MraidController mraidController) {
+    public MraidView(Context context, final MraidController mraidController) {
         super(context);
         getSettings().setAllowUniversalAccessFromFileURLs(true);
         mraidController.setMraidView(this);
-        setWebViewClient(new MraidBridge(mraidController, this));
-        Logging.out(LOG_TAG, "Encoding: " + getSettings().getDefaultTextEncodingName());
+        setWebViewClient(new MraidBridge(mraidController));
         setDefaultWebChromeClient();
     }
 
@@ -53,9 +52,9 @@ public class MraidView extends LoopMeWebView {
     }
 
     public void setState(String state) {
-        if (!TextUtils.equals(mCurrentAdState, state)) {
+        if (!TextUtils.equals(mCurrentMraidState, state)) {
             String command = BridgeCommandBuilder.mraidSetState(state);
-            mCurrentAdState = state;
+            mCurrentMraidState = state;
             Logging.out(LOG_TAG, "setState " + state);
             loadCommand(command);
         }
@@ -73,17 +72,23 @@ public class MraidView extends LoopMeWebView {
         loadCommand(command);
     }
 
-    public void setWebViewState(Constants.WebviewState state) {
-        super.setWebViewState(BridgeCommandBuilder.LOOPME_PREFIX, state);
-    }
-
     public boolean isExpanded() {
-        return TextUtils.equals(mCurrentAdState, Constants.MraidState.EXPANDED);
+        return TextUtils.equals(mCurrentMraidState, Constants.MraidState.EXPANDED);
     }
 
-    public void onNativeCallComplete(String command) {
+    public void onMraidCallComplete(String completedCommand) {
+        String command = BridgeCommandBuilder.mraidNativeCallComplete();
         loadCommand(command);
-        Logging.out(LOG_TAG, "onNativeCallComplete " + command);
+        Logging.out(LOG_TAG, "onMraidCallComplete " + completedCommand);
     }
 
+    public void onLoopMeCallComplete(String completedCommand) {
+        String command = BridgeCommandBuilder.isNativeCallFinished(true);
+        loadCommand(command);
+        Logging.out(LOG_TAG, "onLoopMeCallComplete " + completedCommand);
+    }
+
+    public boolean isResized() {
+        return TextUtils.equals(mCurrentMraidState, Constants.MraidState.RESIZED);
+    }
 }

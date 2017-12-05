@@ -2,19 +2,22 @@ package com.loopme.controllers;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import com.loopme.AdUtils;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.LoopMeBannerGeneral;
 import com.loopme.MraidOrientation;
+import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.bridges.mraid.MraidBridge;
+import com.loopme.common.LoopMeError;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
-import com.loopme.parser.ParseService;
 import com.loopme.utils.InternetUtils;
+import com.loopme.utils.UiUtils;
 import com.loopme.utils.Utils;
 import com.loopme.views.MraidView;
 import com.loopme.views.activity.AdBrowserActivity;
@@ -33,9 +36,14 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
 
     private boolean mAllowOrientationChange = true;
     private MraidOrientation mForceOrientation = MraidOrientation.NONE;
+    private static final int ADDITIONAL_WIDTH = 30;
+    private static final int ADDITIONAL_HEIGHT = 30;
 
     public MraidController(LoopMeAd loopMeAd) {
         mLoopMeAd = loopMeAd;
+        if (mLoopMeAd.isBanner()) {
+            setAdContainerSize(loopMeAd.getAdParams().getAdSpotDimensions());
+        }
     }
 
     public void setMraidView(MraidView mraidView) {
@@ -44,18 +52,33 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
 
     @Override
     public void close() {
-        if (mMraidView.isExpanded()) {
+        if (isExpanded()) {
             Logging.out(LOG_TAG, "collapse banner");
             ((DisplayControllerLoopMe) mLoopMeAd.getDisplayController()).collapseMraidBanner();
+        } else if (isResized()) {
+            resizeToInitialState();
         } else {
             Logging.out(LOG_TAG, "close");
             mLoopMeAd.dismiss();
         }
     }
 
+    private boolean isResized() {
+        return mMraidView != null && mMraidView.isResized();
+    }
+
     @Override
-    public void onNativeCallComplete(String command) {
-        mMraidView.onNativeCallComplete(command);
+    public void onMraidCallComplete(String command) {
+        if (mMraidView != null) {
+            mMraidView.onMraidCallComplete(command);
+        }
+    }
+
+    @Override
+    public void onLoopMeCallComplete(String command) {
+        if (mMraidView != null) {
+            mMraidView.onLoopMeCallComplete(command);
+        }
     }
 
     @Override
@@ -83,17 +106,27 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     @Override
     public void resize(int width, int height) {
         Logging.out(LOG_TAG, "resize");
-        if (mLoopMeAd.getAdFormat() == Constants.AdFormat.BANNER) {
-            setBannerSize(width, height);
-            mMraidView.resize();
+        if (mLoopMeAd.isBanner()) {
+            setAdContainerSize(width + ADDITIONAL_WIDTH, height + ADDITIONAL_HEIGHT);
             mMraidView.setState(Constants.MraidState.RESIZED);
             mMraidView.notifySizeChangeEvent(width, height);
             mMraidView.setIsViewable(true);
         }
     }
 
-    private void setBannerSize(int width, int height) {
-        if (mLoopMeAd.getAdFormat() == Constants.AdFormat.BANNER) {
+    private void resizeToInitialState() {
+        Logging.out(LOG_TAG, "banner goes back to default ");
+
+        if (mLoopMeAd.isBanner()) {
+            setAdContainerSize(mWidth, mHeight);
+            mMraidView.setState(Constants.MraidState.DEFAULT);
+            mMraidView.notifySizeChangeEvent(mWidth, mHeight);
+            mMraidView.setIsViewable(true);
+        }
+    }
+
+    private void setAdContainerSize(int width, int height) {
+        if (mLoopMeAd.isBanner()) {
             LoopMeBannerGeneral banner = (LoopMeBannerGeneral) mLoopMeAd;
             ViewGroup.LayoutParams params = banner.getBannerView().getLayoutParams();
             params.width = width;
@@ -105,29 +138,37 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     @Override
     public void playVideo(String url) {
         Logging.out(LOG_TAG, "playVideo");
-        Intent i = new Intent(mMraidView.getContext(), MraidVideoActivity.class);
-        i.putExtra(EXTRAS_VIDEO_URL, url);
-        i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        mMraidView.getContext().startActivity(i);
+        Intent intent = new Intent(mMraidView.getContext(), MraidVideoActivity.class);
+        intent.putExtra(EXTRAS_VIDEO_URL, url);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mMraidView.getContext().startActivity(intent);
         mMraidView.setIsViewable(true);
     }
 
     @Override
-    public void expand(boolean isExpand) {
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(Constants.EXTRAS_ALLOW_ORIENTATION_CHANGE, mAllowOrientationChange);
-        bundle.putInt(Constants.EXTRAS_FORCE_ORIENTATION, mForceOrientation.getActivityInfoOrientation());
-        AdUtils.startAdActivity(mLoopMeAd, isExpand, bundle);
+    public void expand(boolean useCustomClose) {
+        AdUtils.startAdActivity(mLoopMeAd, useCustomClose);
         mMraidView.setIsViewable(true);
-        Logging.out(LOG_TAG, "expand " + isExpand);
         mMraidView.setState(Constants.MraidState.EXPANDED);
+        Logging.out(LOG_TAG, "expand " + useCustomClose);
     }
 
     @Override
     public void onLoadSuccess() {
+        if (mMraidView != null) {
+            mMraidView.setState(Constants.MraidState.DEFAULT);
+            mMraidView.notifyReady();
+        }
         if (mLoopMeAd != null) {
             mLoopMeAd.onAdLoadSuccess();
+        }
+    }
+
+    @Override
+    public void onLoadFail(LoopMeError error) {
+        if (mLoopMeAd != null) {
+            mLoopMeAd.onInternalLoadFail(error);
         }
     }
 
@@ -157,10 +198,10 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     }
 
     public void onCollapseBanner() {
+        destroyExpandedView();
         mMraidView.notifySizeChangeEvent(mWidth, mHeight);
         mMraidView.setState(Constants.MraidState.DEFAULT);
         mMraidView.setIsViewable(true);
-        mMraidView.setWebViewState(Constants.WebviewState.VISIBLE);
     }
 
     public int getWidth() {
@@ -171,9 +212,36 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
         return mHeight;
     }
 
-    public void setBannerSize(String html) {
-        ParseService parser = new ParseService();
-        mWidth = Utils.convertDpToPixel(300);
-        mHeight = Utils.convertDpToPixel(50);
+    public void setAdContainerSize(AdSpotDimensions dimensions) {
+        if (dimensions != null) {
+            mWidth = Utils.convertDpToPixel(dimensions.getWidth()) + ADDITIONAL_WIDTH;
+            mHeight = Utils.convertDpToPixel(dimensions.getHeight() + ADDITIONAL_HEIGHT);
+            Logging.out(LOG_TAG, "MRAID width " + mWidth);
+            Logging.out(LOG_TAG, "MRAID height " + mHeight);
+        }
+    }
+
+    public int getForceOrientation() {
+        return mForceOrientation.getActivityInfoOrientation();
+    }
+
+    public boolean isExpanded() {
+        return mMraidView != null && mMraidView.isExpanded();
+    }
+
+    public void destroyExpandedView() {
+        if (isExpanded()) {
+            UiUtils.broadcastIntent(mLoopMeAd.getContext(), Constants.DESTROY_INTENT, mLoopMeAd.getAdId());
+        }
+    }
+
+    public void onRebuildView(FrameLayout containerView) {
+        if (containerView != null && mMraidView != null) {
+            Utils.removeParent(mMraidView);
+            RelativeLayout.LayoutParams mraidViewLayoutParams = new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.MATCH_PARENT);
+            containerView.addView(mMraidView, mraidViewLayoutParams);
+        }
     }
 }

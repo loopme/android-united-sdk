@@ -1,6 +1,7 @@
 package com.loopme.controllers.display;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.support.annotation.Nullable;
@@ -75,9 +76,9 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
             initMraidControllers();
         } else {
             initLoopMeControllers();
+            initVideoController();
+            initViewController();
         }
-        initVideoController();
-        initViewController();
     }
 
     private void initLoopMeControllers() {
@@ -132,27 +133,19 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
     }
 
     private void buildMraidContainer(FrameLayout containerView) {
-        setMraidBannerSize();
         setBannerLayoutParams(containerView);
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams mraidViewLayoutParams = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT);
         Utils.removeParent(mMraidView);
-        containerView.addView(mMraidView, layoutParams);
-    }
-
-    private void setMraidBannerSize() {
-        if (mMraidController != null) {
-            mMraidController.setBannerSize(mLoopMeAd.getAdParams().getHtml());
-        }
+        containerView.addView(mMraidView, mraidViewLayoutParams);
     }
 
     public void collapseMraidBanner() {
-        if (mLoopMeAd instanceof LoopMeBannerGeneral) {
+        if (mLoopMeAd instanceof LoopMeBannerGeneral && isMraidAd()) {
             LoopMeBannerGeneral banner = (LoopMeBannerGeneral) mLoopMeAd;
             buildMraidContainer(banner.getBannerView());
             onCollapseBanner();
-            UiUtils.broadcastIntent(mLoopMeAd.getContext(), Constants.DESTROY_INTENT, mLoopMeAd.getAdId());
         }
     }
 
@@ -316,7 +309,7 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
 
     private void pauseControllers() {
         pauseViewController();
-//        pauseMraid();
+        pauseMraid();
         pauseVideoController();
         if (isInterstitial()) {
             setWebViewState(Constants.WebviewState.HIDDEN);
@@ -327,9 +320,6 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
         if (mMraidView != null) {
             mMraidView.notifySizeChangeEvent(MRAID_WIDTH, MRAID_HEIGHT);
             mMraidView.setIsViewable(true);
-            if (isBanner()) {
-                mMraidView.setState(Constants.MraidState.EXPANDED);
-            }
         }
     }
 
@@ -382,8 +372,7 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
 
     @Override
     public void onDestroy() {
-        setMraidWebViewState(Constants.WebviewState.CLOSED);
-        setWebViewState(Constants.WebviewState.CLOSED);
+        destroyMraidController();
         destroyVideoController();
         stopVideoLoader();
         clearWebView(mAdView);
@@ -395,6 +384,12 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
         mOnTouchListener = null;
         mDisplayModeResolver.destroy();
         super.onDestroy();
+    }
+
+    private void destroyMraidController() {
+        if (mMraidController != null) {
+            mMraidController.destroyExpandedView();
+        }
     }
 
     public void destroyMinimizedView() {
@@ -441,8 +436,14 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
 
     @Override
     public void onRebuildView(FrameLayout containerView) {
-        if (mViewController != null) {
-            mViewController.rebuildView(containerView, mAdView);
+        if (isMraidAd()) {
+            if (mMraidController != null) {
+                mMraidController.onRebuildView(containerView);
+            }
+        } else {
+            if (mViewController != null) {
+                mViewController.rebuildView(containerView, mAdView);
+            }
         }
     }
 
@@ -468,7 +469,11 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
 
     @Override
     public boolean isFullScreen() {
-        return mDisplayModeResolver != null && mDisplayModeResolver.isFullScreenMode();
+        return (mDisplayModeResolver != null && mDisplayModeResolver.isFullScreenMode()) || isMraidExpandMode();
+    }
+
+    private boolean isMraidExpandMode() {
+        return mMraidController != null && mMraidController.isExpanded();
     }
 
     public void setFullScreen(boolean isFullScreen) {
@@ -652,6 +657,7 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
     public MraidView getMraidView() {
         return mMraidView;
     }
+
     private void surfaceTextureDestroyed() {
         if (mVideoController != null) {
             mVideoController.surfaceTextureDestroyed();
@@ -802,4 +808,19 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
     }
 
 
+    public int getMraidOrientation() {
+        if (mMraidController != null) {
+            return mMraidController.getForceOrientation();
+        } else {
+            return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+        }
+    }
+
+    public void dismiss() {
+        setWebViewState(Constants.WebviewState.CLOSED);
+    }
+
+    private boolean isMraidAd() {
+        return mLoopMeAd != null && mLoopMeAd.isMraidAd();
+    }
 }

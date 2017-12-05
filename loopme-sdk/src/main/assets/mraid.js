@@ -82,7 +82,12 @@
     }
 
     console.log('mraid url ' + call);
-    window.location = call;
+    if (this.nativeCallInFlight) {
+      this.nativeCallQueue.push(call);
+    } else {
+      this.nativeCallInFlight = true;
+      window.location = call;
+    }
   };
 
 

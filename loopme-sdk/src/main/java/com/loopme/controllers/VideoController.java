@@ -147,10 +147,6 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
         Logging.out(LOG_TAG, "waitForVideo mHandler.startCurrentTimePoster");
     }
 
-    private boolean isAdViewVisible() {
-        return mAdView != null && mAdView.getCurrentWebViewState() == Constants.WebviewState.VISIBLE;
-    }
-
     public void initPlayerFromFile(String filePath) {
         mLoopMePlayer = new LoopMeMediaPlayer(filePath, this);
     }

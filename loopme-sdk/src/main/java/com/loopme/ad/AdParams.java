@@ -65,6 +65,8 @@ public class AdParams implements Serializable {
     private List<String> mTrackersList = new ArrayList<>();
     private boolean mAutoLoading;
 
+    AdSpotDimensions mAdSpotDimensions;
+
     public AdParams() {
     }
 
@@ -85,9 +87,14 @@ public class AdParams implements Serializable {
         mIsDebug = builder.mIsDebug;
         mAdIds = builder.mAdIds;
         mAutoLoading = builder.mAutoLoading;
+        mAdSpotDimensions = builder.mAdSpotDimensions;
         Logging.out(LOG_TAG, "Server response indicates  ad params: "
                 + "format: " + mFormat + ", isAutoloading: " + mAutoLoading
                 + ", mraid: " + mIsMraid + ", expire in: " + mExpiredDate);
+    }
+
+    public AdSpotDimensions getAdSpotDimensions() {
+        return mAdSpotDimensions;
     }
 
     public boolean getPartPreload() {
@@ -177,6 +184,7 @@ public class AdParams implements Serializable {
         private boolean mIsDebug;
         private AdIds mAdIds;
         private boolean mAutoLoading;
+        private AdSpotDimensions mAdSpotDimensions;
 
 
         public AdParamsBuilder(String format) {
@@ -274,6 +282,11 @@ public class AdParams implements Serializable {
 
         public AdParamsBuilder adIds(AdIds adIds) {
             mAdIds = adIds;
+            return this;
+        }
+
+        public AdParamsBuilder adSpotDimensions(AdSpotDimensions adSpotDimensions) {
+            mAdSpotDimensions = adSpotDimensions;
             return this;
         }
     }

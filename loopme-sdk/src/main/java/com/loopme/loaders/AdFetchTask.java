@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.text.TextUtils;
 
 import com.loopme.Constants;
+import com.loopme.Logging;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.AdType;
 import com.loopme.ad.LoopMeAd;
@@ -32,6 +33,7 @@ import retrofit2.Response;
 
 public class AdFetchTask implements Runnable, Observer {
 
+    private static final String LOG_TAG = AdFetchTask.class.getSimpleName();
     private static final int RESPONSE_NO_ADS = 204;
 
     private AdType mAdType;
@@ -81,6 +83,7 @@ public class AdFetchTask implements Runnable, Observer {
         try {
             JSONObject data = RequestBuilder.buildRequestJson(mLoopMeAd.getContext(), mLoopMeAd);
             Response<ResponseJsonModel> response = mHttpService.fetchAdSync(data);
+            Logging.out(LOG_TAG, "response received");
             stopRequestTimer();
             parseResponse(response);
         } catch (IOException e) {
