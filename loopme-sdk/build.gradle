@@ -7,6 +7,7 @@ repositories {
     mavenLocal()
     google()
     maven { url 'https://maven.fabric.io/public' }
+    maven { url 'https://www.testfairy.com/maven' }
     flatDir {
         dirs 'libs'
     }
@@ -96,6 +97,9 @@ dependencies {
         transitive = true;
     }
     api('io.fabric.sdk.android:fabric:1.3.10@aar') {
+        transitive = true;
+    }
+    compile('io.fabric.sdk.android:fabric:1.3.10@aar') {
         transitive = true;
     }
 

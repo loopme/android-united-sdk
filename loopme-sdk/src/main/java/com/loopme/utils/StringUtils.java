@@ -35,13 +35,6 @@ public class StringUtils {
         return Build.UNKNOWN;
     }
 
-    private static String deleteLastCharacter(String encryptedString) {
-        if (!TextUtils.isEmpty(encryptedString)) {
-            return encryptedString.substring(0, encryptedString.length() - 1);
-        }
-        return "";
-    }
-
     public static boolean hasMp4Extension(String videoUrl) {
         if (TextUtils.isEmpty(videoUrl)) {
             return false;
@@ -50,46 +43,8 @@ public class StringUtils {
         return TextUtils.equals(tokens[tokens.length - 1], Constants.MP4_FORMAT_EXT);
     }
 
-    private static String getTimeInIso8061Format() {
-        TimeZone tz = TimeZone.getDefault();
-        SimpleDateFormat dateFormat = new SimpleDateFormat(ISO_8601_TIME_FORMAT);
-        dateFormat.setTimeZone(tz);
-        return dateFormat.format(new Date());
-    }
-
     public static String setErrorCode(String vastErrorUrl, String vastErrorCode) {
         return replace(vastErrorUrl, ERROR_CODE, vastErrorCode);
-    }
-
-    public static String setTimeStamp(String url) {
-        return replace(url, TIMESTAMP_CODE_PATTERN, getTimeInIso8061Format());
-    }
-
-    public static String setPlayTime(String trackUrl, String currentPosition) {
-        return replace(trackUrl, PLAY_TIME, currentPosition);
-    }
-
-    public static String generateHtml(List<String> jsScriptList) {
-        String htmlStartTag = " <html><head></head><body>\n";
-        String htmlJsScript = "<script type=\"text/javascript\" src=\"[JSRESOURCE]\"></script>\n";
-        String htmlEndTag = "</body></html>";
-        for (String jsLink : jsScriptList) {
-            htmlStartTag = htmlStartTag + replace(htmlJsScript, JS_RESOURCE, jsLink);
-        }
-
-        return htmlStartTag + htmlEndTag;
-    }
-
-    private static String replace(String baseString, String pattern, String contentToReplace) {
-        if (!TextUtils.isEmpty(baseString)) {
-            if (baseString.contains(pattern)) {
-                return baseString.replace(pattern, contentToReplace);
-            } else {
-                return baseString;
-            }
-        } else {
-            return "";
-        }
     }
 
     public static String setMessage(String url, String addMessage) {
@@ -106,5 +61,50 @@ public class StringUtils {
         }
 
         return completeUrl;
+    }
+
+    public static String generateHtml(List<String> jsScriptList) {
+        String htmlStartTag = " <html><head></head><body>\n";
+        String htmlJsScript = "<script type=\"text/javascript\" src=\"[JSRESOURCE]\"></script>\n";
+        String htmlEndTag = "</body></html>";
+        for (String jsLink : jsScriptList) {
+            htmlStartTag = htmlStartTag + replace(htmlJsScript, JS_RESOURCE, jsLink);
+        }
+
+        return htmlStartTag + htmlEndTag;
+    }
+
+    private static String setPlayTime(String trackUrl, String currentPosition) {
+        return replace(trackUrl, PLAY_TIME, currentPosition);
+    }
+
+    private static String setTimeStamp(String url) {
+        return replace(url, TIMESTAMP_CODE_PATTERN, getTimeInIso8061Format());
+    }
+
+    private static String getTimeInIso8061Format() {
+        TimeZone tz = TimeZone.getDefault();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(ISO_8601_TIME_FORMAT);
+        dateFormat.setTimeZone(tz);
+        return dateFormat.format(new Date());
+    }
+
+    private static String replace(String baseString, String pattern, String contentToReplace) {
+        if (!TextUtils.isEmpty(baseString)) {
+            if (baseString.contains(pattern)) {
+                return baseString.replace(pattern, contentToReplace);
+            } else {
+                return baseString;
+            }
+        } else {
+            return "";
+        }
+    }
+
+    private static String deleteLastCharacter(String encryptedString) {
+        if (!TextUtils.isEmpty(encryptedString)) {
+            return encryptedString.substring(0, encryptedString.length() - 1);
+        }
+        return "";
     }
 }
