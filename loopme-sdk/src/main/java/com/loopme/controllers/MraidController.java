@@ -36,8 +36,6 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
 
     private boolean mAllowOrientationChange = true;
     private MraidOrientation mForceOrientation = MraidOrientation.NONE;
-    private static final int ADDITIONAL_WIDTH = 30;
-    private static final int ADDITIONAL_HEIGHT = 30;
 
     public MraidController(LoopMeAd loopMeAd) {
         mLoopMeAd = loopMeAd;
@@ -107,7 +105,7 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     public void resize(int width, int height) {
         Logging.out(LOG_TAG, "resize");
         if (mLoopMeAd.isBanner()) {
-            setAdContainerSize(width + ADDITIONAL_WIDTH, height + ADDITIONAL_HEIGHT);
+            setAdContainerSize(width, height);
             mMraidView.setState(Constants.MraidState.RESIZED);
             mMraidView.notifySizeChangeEvent(width, height);
             mMraidView.setIsViewable(true);
@@ -214,8 +212,8 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
 
     public void setAdContainerSize(AdSpotDimensions dimensions) {
         if (dimensions != null) {
-            mWidth = Utils.convertDpToPixel(dimensions.getWidth()) + ADDITIONAL_WIDTH;
-            mHeight = Utils.convertDpToPixel(dimensions.getHeight() + ADDITIONAL_HEIGHT);
+            mWidth = Utils.convertDpToPixel(dimensions.getWidth());
+            mHeight = Utils.convertDpToPixel(dimensions.getHeight());
             Logging.out(LOG_TAG, "MRAID width " + mWidth);
             Logging.out(LOG_TAG, "MRAID height " + mHeight);
         }
