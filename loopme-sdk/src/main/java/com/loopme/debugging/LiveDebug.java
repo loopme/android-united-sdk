@@ -39,8 +39,8 @@ public class LiveDebug {
     public static void setLiveDebug(final Context context, final boolean debug, final String appKey) {
         Logging.out(LOG_TAG, "setLiveDebug " + debug);
         if (sIsDebugOn != debug) {
+            sIsDebugOn = debug;
             if (debug) {
-                sIsDebugOn = debug;
                 Handler handler = new Handler(Looper.getMainLooper());
                 handler.post(new Runnable() {
                     @Override

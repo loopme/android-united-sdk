@@ -14,6 +14,15 @@ public class Tracking {
     @Text
     private String text;
 
+    public Tracking() {
+    }
+
+    public Tracking(String event, String offset, String text) {
+        this.event = event;
+        this.offset = offset;
+        this.text = text;
+    }
+
     public String getEvent() {
         return event;
     }
