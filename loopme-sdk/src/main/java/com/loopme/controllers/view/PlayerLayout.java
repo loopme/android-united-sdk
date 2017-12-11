@@ -135,7 +135,7 @@ public class PlayerLayout extends FrameLayout implements View.OnTouchListener, V
     private void configureTextureView() {
         mPlayerTextureView = new TextureView(getContext());
         mPlayerTextureView.setId(PLAYER_VIEW_ID);
-        mPlayerTextureView.setLayoutParams(Utils.createMatchParentLayoutParams());
+        mPlayerTextureView.setLayoutParams(Utils.createDefaultLayoutParams());
     }
 
     @Override
@@ -145,10 +145,8 @@ public class PlayerLayout extends FrameLayout implements View.OnTouchListener, V
             onSkipClick();
         } else if (id == WEBVIEW_ID || id == PLAYER_VIEW_ID) {
             onPlayerClick();
-        } else {
-            if (id == MUTE_BUTTON_ID) {
-                muteVideo();
-            }
+        } else if (id == MUTE_BUTTON_ID) {
+            muteVideo();
         }
     }
 

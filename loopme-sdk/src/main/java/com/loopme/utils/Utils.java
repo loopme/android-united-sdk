@@ -70,6 +70,8 @@ public class Utils {
     private static WindowManager sWindowManager;
     private static PackageManager sPackageManager;
     public static String sUserAgent;
+    private static int DEFAULT_WIDTH = 100;
+    private static int DEFAULT_HEIGHT = 100;
 
     public static void init(Context context) {
         if (context != null) {
@@ -197,12 +199,10 @@ public class Utils {
         return out.toString();
     }
 
-    public static boolean isPackageInstalled(List<String> packageIds) {
-        List<PackageInfo> packages = getInstalledPackages();
-
-        for (PackageInfo packageInfo : packages) {
+    public static boolean isPackageInstalled(List<String> packageIds, List<String> installedList) {
+        for (String packageName : installedList) {
             for (int i = 0; i < packageIds.size(); i++) {
-                if (packageIds.get(i).equalsIgnoreCase(packageInfo.packageName)) {
+                if (packageIds.get(i).equalsIgnoreCase(packageName)) {
                     return true;
                 }
             }
@@ -564,6 +564,10 @@ public class Utils {
 
     public static ViewGroup.LayoutParams createMatchParentLayoutParams() {
         return new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+    }
+
+    public static ViewGroup.LayoutParams createDefaultLayoutParams() {
+        return new FrameLayout.LayoutParams(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
     private static float getDensity() {

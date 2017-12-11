@@ -45,10 +45,6 @@ public class Utils {
     }
 
     public static long getTimeDelay() {
-        if (isLg()) {
-            return TIME_DELAY_LG;
-        } else {
-            return TIME_DELAY;
-        }
+        return TIME_DELAY_LG;
     }
 }
