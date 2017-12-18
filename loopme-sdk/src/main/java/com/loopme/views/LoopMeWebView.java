@@ -2,14 +2,10 @@ package com.loopme.views;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.PixelFormat;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.ViewGroup;
-import android.view.WindowManager;
+import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -32,6 +28,7 @@ public class LoopMeWebView extends WebView {
     public LoopMeWebView(Context context) {
         super(context);
         configureWebSettings();
+        allowCookies();
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -52,6 +49,14 @@ public class LoopMeWebView extends WebView {
         setHorizontalScrollBarEnabled(false);
         setDebugConfig();
         Logging.out(LOG_TAG, "Encoding: " + getSettings().getDefaultTextEncodingName());
+    }
+
+    private void allowCookies() {
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            cookieManager.setAcceptThirdPartyCookies(this, true);
+        }
     }
 
     private void setDebugConfig() {

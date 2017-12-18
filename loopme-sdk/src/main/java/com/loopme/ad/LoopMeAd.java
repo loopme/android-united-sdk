@@ -234,7 +234,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     }
     public void onSendPostWarning(LoopMeError error) {
-        if (error != null) {
+        if (error != null && error.getErrorCode() != Errors.NO_ADS_FOUND.getErrorCode()) {
             LoopMeTracker.post(error.getMessage(), error.getErrorType());
             if (isVastError(error)) {
                 LoopMeTracker.postVastError(String.valueOf(error.getErrorCode()));
