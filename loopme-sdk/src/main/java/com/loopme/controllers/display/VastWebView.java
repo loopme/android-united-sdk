@@ -3,6 +3,8 @@ package com.loopme.controllers.display;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
+import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -16,6 +18,7 @@ public class VastWebView extends WebView {
         super(context);
         mListener = listener;
         configure();
+        allowCookies();
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -38,6 +41,14 @@ public class VastWebView extends WebView {
                 onFinishLoad();
             }
         });
+    }
+
+    private void allowCookies() {
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            cookieManager.setAcceptThirdPartyCookies(this, true);
+        }
     }
 
     public void destroy() {

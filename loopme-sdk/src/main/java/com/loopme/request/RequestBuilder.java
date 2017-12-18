@@ -70,6 +70,7 @@ public class RequestBuilder implements Serializable {
     private static final String TRACKERS = "trackers";
     private static final String INSTL = "instl";
     private static final String SUPPORTED_TECS = "supported_techs";
+    private static final String METRIC = "metric";
 
     public static JSONObject buildRequestJson(Context context, LoopMeAd loopMeAd) {
         RequestUtils requestUtils = new RequestUtils(context, loopMeAd);
@@ -139,7 +140,9 @@ public class RequestBuilder implements Serializable {
             extImpObj.put(IT, requestUtils.getIt());
             JSONArray supportedTechsArray = new JSONArray(requestUtils.getSupportedTechs());
             extImpObj.put(SUPPORTED_TECS, supportedTechsArray);
-            extImpObj.put(TRACKERS, requestUtils.getTrackersSupported());
+
+            JSONArray trackersArray = new JSONArray(requestUtils.getTrackersSupported());
+            extImpObj.put(METRIC, trackersArray);
 
 
             impObj.put(EXT, extImpObj);

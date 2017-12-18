@@ -18,8 +18,10 @@ import com.loopme.BuildConfig;
 import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.R;
 import com.loopme.ad.LoopMeAd;
-import com.loopme.LoopMeInterstitial;
 import com.loopme.utils.StringUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -31,6 +33,11 @@ import static android.content.Context.WIFI_SERVICE;
 
 public class RequestUtils {
 
+    private static final String VIEWABILITY_VENDOR = "viewability";
+    private static final String MOAT = "moat";
+    private static final String IAS = "ias";
+    private static final String TYPE_KEY = "type";
+    private static final String VENDOR_KEY = "vendor";
     private static final String VIDEO = "HTML - for usual MP4 video";
     private static final String VAST2 = "VAST2";
     private static final String VAST3 = "VAST3";
@@ -452,7 +459,13 @@ public class RequestUtils {
         return techsList;
     }
 
-    public String getTrackersSupported() {
-        return "[" + BuildConfig.SUPPORTED_TRACKERS + "]";
+    public JSONObject getTrackersSupported() {
+        JSONObject object = null;
+        try {
+            object = new JSONObject().put(TYPE_KEY, VIEWABILITY_VENDOR).put(VENDOR_KEY, MOAT);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return object;
     }
 }
