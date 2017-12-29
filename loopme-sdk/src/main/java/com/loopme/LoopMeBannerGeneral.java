@@ -295,7 +295,6 @@ public class LoopMeBannerGeneral extends LoopMeAd {
      */
     private void onLoopMeBannerVideoDidReachEnd() {
         mIsVideoFinished = true;
-        destroyMinimizedViewDelayed();
         if (mAdListener != null) {
             mAdListener.onLoopMeBannerVideoDidReachEnd(this);
         }
@@ -378,17 +377,6 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         if (mDisplayController instanceof DisplayControllerLoopMe) {
             ((DisplayControllerLoopMe) mDisplayController).dismiss();
         }
-    }
-
-    private void destroyMinimizedViewDelayed() {
-        runOnUiThreadDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isLoopMeController()) {
-                    ((DisplayControllerLoopMe) mDisplayController).destroyMinimizedView();
-                }
-            }
-        }, Constants.SHRINK_MODE_KEEP_AFTER_FINISH_TIME);
     }
 
     private void destroyBannerView() {
