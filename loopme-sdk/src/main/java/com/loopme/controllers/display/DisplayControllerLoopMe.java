@@ -19,7 +19,6 @@ import com.loopme.Logging;
 import com.loopme.LoopMeBannerGeneral;
 import com.loopme.MinimizedMode;
 import com.loopme.MoatViewAbilityUtils;
-import com.loopme.SwipeListener;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
@@ -442,7 +441,7 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
             }
         } else {
             if (mViewController != null) {
-                mViewController.rebuildView(containerView, mAdView);
+                mViewController.rebuildView(containerView, mAdView, Constants.DisplayMode.NORMAL);
             }
         }
     }
@@ -759,15 +758,9 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
         }
     }
 
-    public void rebuildView(FrameLayout view) {
+    public void rebuildView(FrameLayout view, Constants.DisplayMode displayMode) {
         if (mVideoController != null) {
-            mViewController.rebuildView(view, mAdView);
-        }
-    }
-
-    public void setOnTouchListener(SwipeListener swipeListener) {
-        if (mAdView != null) {
-            mAdView.setOnTouchListener(swipeListener);
+            mViewController.rebuildView(view, mAdView, displayMode);
         }
     }
 

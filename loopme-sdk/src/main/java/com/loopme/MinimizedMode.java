@@ -1,5 +1,6 @@
 package com.loopme;
 
+import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -15,13 +16,16 @@ public class MinimizedMode {
     private int mMarginRight = 10;
     private int mMarginBottom = 10;
     private ViewGroup mRoot;
+    private RecyclerView mRecyclerView;
+    private int mPosition;
 
-    public MinimizedMode(ViewGroup root) {
-        if (root == null) {
-            Logging.out(LOG_TAG, "Error: Root view should be not null. Minimized mode will not work");
+    public MinimizedMode(ViewGroup root, RecyclerView recyclerView) {
+        if (root == null || recyclerView == null) {
+            Logging.out(LOG_TAG, "Error: Root view or recyclerView should be not null. Minimized mode will not work");
             return;
         }
         mRoot = root;
+        mRecyclerView = recyclerView;
         Utils.setDimensions(mMinimizedViewDims);
     }
 
@@ -69,5 +73,15 @@ public class MinimizedMode {
             mRoot.addView(view);
         }
 
+    }
+
+    public void onViewClicked() {
+        if (mRecyclerView != null) {
+            mRecyclerView.smoothScrollToPosition(mPosition);
+        }
+    }
+
+    public void setPosition(int position) {
+        mPosition = position;
     }
 }

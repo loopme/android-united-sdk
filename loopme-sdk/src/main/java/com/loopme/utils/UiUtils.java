@@ -24,7 +24,7 @@ public class UiUtils {
     private static final AdSpotDimensions DEFAULT_DIMENSIONS = new AdSpotDimensions(0, 0);
 
     @SuppressLint("NewApi")
-    public static void addBordersToView(FrameLayout bannerView) {
+    private static void addBordersToView(FrameLayout bannerView) {
         ShapeDrawable drawable = new ShapeDrawable(new RectShape());
         drawable.getPaint().setColor(Color.BLACK);
         drawable.getPaint().setStyle(Paint.Style.FILL_AND_STROKE);
@@ -98,6 +98,7 @@ public class UiUtils {
         FrameLayout frameLayout = new FrameLayout(context);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(dimensions.getWidth(), dimensions.getHeight());
         frameLayout.setLayoutParams(params);
+        addBordersToView(frameLayout);
         return frameLayout;
     }
 

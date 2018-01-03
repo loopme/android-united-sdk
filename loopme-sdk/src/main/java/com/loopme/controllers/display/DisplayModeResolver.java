@@ -9,8 +9,8 @@ import android.widget.FrameLayout;
 import com.loopme.AdUtils;
 import com.loopme.Constants;
 import com.loopme.Logging;
+import com.loopme.LoopMeGestureListener;
 import com.loopme.MinimizedMode;
-import com.loopme.SwipeListener;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.utils.UiUtils;
 
@@ -84,30 +84,29 @@ public class DisplayModeResolver {
         } else {
             setDisplayMode(Constants.DisplayMode.MINIMIZED);
             configureMinimizedView();
-            rebuildView(mMinimizedView);
+            mMinimizedView.setOnTouchListener(initGestureListener());
+            rebuildView(mMinimizedView, Constants.DisplayMode.MINIMIZED);
             setWebViewState(Constants.WebviewState.VISIBLE);
         }
     }
 
     private void configureMinimizedView() {
         mMinimizedView = UiUtils.createFrameLayout(mLoopMeAd.getContext(), mMinimizedMode.getMinimizedViewDims());
-        UiUtils.addBordersToView(mMinimizedView);
         mMinimizedMode.addView(mMinimizedView);
         UiUtils.configMinimizedViewLayoutParams(mMinimizedView, mMinimizedMode);
-        mDisplayControllerLoopMe.setOnTouchListener(initSwipeListener());
     }
 
     private void rebuildView() {
         if (mLoopMeAd != null) {
             FrameLayout initialView = mLoopMeAd.getContainerView();
-            rebuildView(initialView);
+            rebuildView(initialView, Constants.DisplayMode.NORMAL);
             initialView.setVisibility(View.VISIBLE);
         }
     }
 
-    private void rebuildView(FrameLayout view) {
+    private void rebuildView(FrameLayout view, Constants.DisplayMode displayMode) {
         if (mDisplayControllerLoopMe != null) {
-            mDisplayControllerLoopMe.rebuildView(view);
+            mDisplayControllerLoopMe.rebuildView(view, displayMode);
         }
     }
 
@@ -137,21 +136,32 @@ public class DisplayModeResolver {
         return mMinimizedMode != null && mMinimizedMode.getRootView() != null;
     }
 
-    private SwipeListener initSwipeListener() {
-        return new SwipeListener(mMinimizedMode.getWidth(), new SwipeListener.Listener() {
-            @Override
-            public void onSwipe(boolean toRight) {
-                dismissMinimizedView(toRight);
-            }
-        });
-    }
-
     private void dismissMinimizedView(boolean toRight) {
         setWebViewState(Constants.WebviewState.HIDDEN);
         setCurrentDisplayMode(Constants.DisplayMode.NORMAL);
         animateDismissOnSwipe(toRight);
         mMinimizedMode = null;
         dismissAd();
+    }
+
+    private View.OnTouchListener initGestureListener() {
+        return new LoopMeGestureListener(mLoopMeAd.getContext(), new LoopMeGestureListener.Listener() {
+            @Override
+            public void onSwipe(boolean toRight) {
+                dismissMinimizedView(toRight);
+            }
+
+            @Override
+            public void onClick() {
+                onMinimizedViewClicked();
+            }
+        });
+    }
+
+    private void onMinimizedViewClicked() {
+        if (mMinimizedMode != null) {
+            mMinimizedMode.onViewClicked();
+        }
     }
 
     private void animateDismissOnSwipe(boolean toRight) {

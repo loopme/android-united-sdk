@@ -16,6 +16,7 @@ class NativeVideoController {
 
     private static final String LOG_TAG = NativeVideoController.class.getSimpleName();
 
+    private static final int FIRST_POSITION = 0;
     private int mItemCount;
     private Activity mActivity;
     private MinimizedMode mMinimizedMode;
@@ -293,6 +294,7 @@ class NativeVideoController {
 
     public void setMinimizedMode(MinimizedMode mode) {
         mMinimizedMode = mode;
+        mMinimizedMode.setPosition(mAppKeysMap.keyAt(FIRST_POSITION));
     }
 
     private LoopMeBanner.Listener initBannerListener() {

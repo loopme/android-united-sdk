@@ -295,6 +295,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
      */
     private void onLoopMeBannerVideoDidReachEnd() {
         mIsVideoFinished = true;
+        switchToNormalMode();
         if (mAdListener != null) {
             mAdListener.onLoopMeBannerVideoDidReachEnd(this);
         }

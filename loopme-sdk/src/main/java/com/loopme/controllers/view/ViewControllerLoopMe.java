@@ -68,7 +68,7 @@ public class ViewControllerLoopMe implements TextureView.SurfaceTextureListener,
     }
 
     @Override
-    public void rebuildView(ViewGroup bannerView, AdView adView) {
+    public void rebuildView(ViewGroup bannerView, AdView adView, Constants.DisplayMode displayMode) {
         Logging.out(LOG_TAG, "rebuildView");
         if (bannerView != null && adView != null && mTextureView != null) {
             bannerView.setBackgroundColor(Color.BLACK);
@@ -76,7 +76,9 @@ public class ViewControllerLoopMe implements TextureView.SurfaceTextureListener,
             clearView(adView);
 
             bannerView.addView(mTextureView, CHILD_INDEX_0);
-            bannerView.addView(adView, CHILD_INDEX_1);
+            if (displayMode == Constants.DisplayMode.NORMAL) {
+                bannerView.addView(adView, CHILD_INDEX_1);
+            }
         }
     }
 
