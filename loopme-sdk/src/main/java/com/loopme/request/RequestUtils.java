@@ -460,9 +460,9 @@ public class RequestUtils {
     }
 
     public JSONObject getTrackersSupported() {
-        JSONObject object = null;
+        JSONObject object = new JSONObject();
         try {
-            object = new JSONObject().put(TYPE_KEY, VIEWABILITY_VENDOR).put(VENDOR_KEY, MOAT);
+            object.put(TYPE_KEY, VIEWABILITY_VENDOR).put(VENDOR_KEY, MOAT);
         } catch (JSONException e) {
             e.printStackTrace();
         }
