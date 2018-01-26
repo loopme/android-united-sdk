@@ -61,6 +61,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     private boolean mIsFirstLaunch = true;
     private volatile boolean mIsFirstQuartilePosted;
     private CreativeType mCreativeType = CreativeType.NONE_VIDEO;
+    private boolean mIsVpaidEventTracked;
 
     public DisplayControllerVpaid(LoopMeAd loopMeAd) {
         super(loopMeAd);
@@ -300,10 +301,18 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     @Override
     public void postEvent(String eventType) {
         onMessage(Message.EVENT, eventType);
+        postVpaidDidReachEnd(eventType);
         if (TextUtils.equals(eventType, EventConstants.FIRST_QUARTILE)) {
             mIsFirstQuartilePosted = true;
         }
         startCheckTimer(eventType);
+    }
+
+    private void postVpaidDidReachEnd(String eventType) {
+        if (!mIsVpaidEventTracked && TextUtils.equals(eventType, EventConstants.COMPLETE)) {
+            onAdVideoDidReachEnd();
+            mIsVpaidEventTracked = true;
+        }
     }
 
     private void startCheckTimer(final String eventType) {

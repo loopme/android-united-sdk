@@ -170,7 +170,12 @@ public abstract class VastVpaidBaseDisplayController extends BaseDisplayControll
 
     protected void onAdVideoDidReachEnd() {
         if (mLoopMeAd != null) {
-            mLoopMeAd.onAdVideoDidReachEnd();
+            mLoopMeAd.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mLoopMeAd.onAdVideoDidReachEnd();
+                }
+            });
         }
     }
 
