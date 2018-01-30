@@ -51,7 +51,7 @@ public class LoopMeInterstitial extends AdWrapper {
 
 
     @Override
-    public int getAdFormat() {
+    public Constants.AdFormat getAdFormat() {
         return Constants.AdFormat.INTERSTITIAL;
     }
 

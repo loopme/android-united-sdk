@@ -134,7 +134,7 @@ public class LoopMeBanner extends AdWrapper {
     }
 
     @Override
-    public int getAdFormat() {
+    public Constants.AdFormat getAdFormat() {
         return Constants.AdFormat.BANNER;
     }
 

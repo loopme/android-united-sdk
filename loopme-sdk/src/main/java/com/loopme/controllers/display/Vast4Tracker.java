@@ -2,16 +2,13 @@ package com.loopme.controllers.display;
 
 import android.view.View;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.MoatViewAbilityUtils;
 import com.loopme.ad.AdParams;
-import com.loopme.controllers.interfaces.VastVpaidDisplayController;
 import com.loopme.utils.StringUtils;
 import com.loopme.vast.VastVpaidEventTracker;
-import com.loopme.views.LoopMeWebView;
 import com.loopme.webservice.ExecutorHelper;
 
 import java.util.List;
@@ -62,7 +59,7 @@ public class Vast4Tracker {
 
     private void postEventsByUrl(List<String> impressions) {
         for (String impressionUrl : impressions) {
-            VastVpaidEventTracker.postEvent(impressionUrl);
+            VastVpaidEventTracker.trackVastEvent(impressionUrl, "");
         }
     }
 

@@ -11,7 +11,6 @@ import com.loopme.ad.AdParams;
 import com.loopme.models.Errors;
 import com.loopme.common.LoopMeError;
 import com.loopme.parser.XmlParseService;
-import com.loopme.utils.StringUtils;
 import com.loopme.vast.VastVpaidEventTracker;
 import com.loopme.vast.WrapperParser;
 import com.loopme.xml.vast4.VastInfo;
@@ -198,11 +197,10 @@ public class VastWrapperFetcher {
     }
 
     private void trackByWrapperUrl(LoopMeError error) {
-        VastVpaidEventTracker.clear();
         WrapperParser parser = new WrapperParser(mWrappersList);
         for (String errorUrl : parser.getErrorUrlList()) {
             String code = String.valueOf(error.getErrorCode());
-            VastVpaidEventTracker.postEvent(errorUrl, code);
+            VastVpaidEventTracker.trackVastEvent(errorUrl, code);
         }
     }
 

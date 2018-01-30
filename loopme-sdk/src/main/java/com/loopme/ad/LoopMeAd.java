@@ -47,7 +47,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     private AdFetchTask mAdFetchTask;
 
     protected long mStartLoadingTime;
-    protected int mAdState;
+    protected Constants.AdState mAdState = Constants.AdState.NONE;
     private String mAppKey;
     protected boolean mIsReady;
     private int mAdId;
@@ -56,7 +56,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         if (context == null || TextUtils.isEmpty(appKey)) {
             throw new IllegalArgumentException(WRONG_PARAMETERS);
         }
-        setAdState(Constants.AdState.NONE);
         mContext = context;
         mAppKey = appKey;
         mTimers = new Timers(this);
@@ -73,7 +72,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         return getAdFormat() == Constants.AdFormat.INTERSTITIAL;
     }
 
-    public abstract int getAdFormat();
+    public abstract Constants.AdFormat getAdFormat();
 
     public abstract AdSpotDimensions getAdSpotDimensions();
 
@@ -463,11 +462,11 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         }
     }
 
-    public int getAdState() {
+    public Constants.AdState getAdState() {
         return mAdState;
     }
 
-    public void setAdState(int adState) {
+    public void setAdState(Constants.AdState adState) {
         this.mAdState = adState;
     }
 

@@ -11,25 +11,18 @@ import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.common.LoopMeError;
 import com.loopme.tracker.constants.EventConstants;
-import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.UiUtils;
-import com.loopme.vast.VastVpaidEventTracker;
 import com.loopme.time.SimpleTimer;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.bridges.vpaid.BridgeEventHandler;
 import com.loopme.bridges.vpaid.VpaidBridge;
 import com.loopme.bridges.vpaid.VpaidBridgeImpl;
-import com.loopme.common.LoopMeError;
 import com.loopme.controllers.interfaces.VastVpaidDisplayController;
 import com.loopme.controllers.view.ViewControllerVpaid;
 import com.loopme.models.BridgeMethods;
 import com.loopme.models.Errors;
 import com.loopme.models.Message;
-import com.loopme.time.SimpleTimer;
-import com.loopme.tracker.constants.EventConstants;
 import com.loopme.utils.Utils;
-import com.loopme.vast.TrackingEvent;
-import com.loopme.vast.VastVpaidEventTracker;
 import com.loopme.views.LoopMeWebView;
 import com.loopme.views.webclient.AdViewChromeClient;
 import com.loopme.xml.Tracking;
@@ -66,7 +59,6 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         super(loopMeAd);
         mVpaidBridge = new VpaidBridgeImpl(this, mLoopMeAd.getAdParams());
         mViewControllerVpaid = new ViewControllerVpaid(this);
-        VastVpaidEventTracker.addAllEvents(mLoopMeAd.getAdParams().getTrackingEventsList());
         mVideoDuration = mAdParams.getDuration();
         mLogTag = DisplayControllerVast.class.getSimpleName();
         Logging.out(mLogTag);
@@ -229,7 +221,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         if (!mIsStarted) {
             return;
         }
-        VastVpaidEventTracker.postEvent(EventConstants.CLOSE, mCurrentVideoTime);
+        postVideoEvent(EventConstants.CLOSE, mCurrentVideoTime);
         skipVideo();
     }
 
@@ -240,7 +232,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         }
         if (mIsWaitingForSkippableState && skippable) {
             mIsWaitingForSkippableState = false;
-            VastVpaidEventTracker.postEvent(EventConstants.SKIP, mCurrentVideoTime);
+            postVideoEvent(EventConstants.SKIP, mCurrentVideoTime);
             skipVideo();
         }
     }
@@ -248,7 +240,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     @Override
     public boolean onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
         for (String trackUrl : mAdParams.getVideoClicks()) {
-            onMessage(Message.EVENT, trackUrl);
+            postVideoEvent(trackUrl);
         }
         if (TextUtils.isEmpty(url)) {
             url = mAdParams.getVideoRedirectUrl();
@@ -269,14 +261,13 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     @Override
     public void postEvent(String eventType, int value) {
         for (Tracking tracking : mAdParams.getTrackingEventsList()) {
-            TrackingEvent event = new TrackingEvent(tracking.getText());
-            if (tracking.getEvent().equalsIgnoreCase(EventConstants.PROGRESS)) {
-                if (tracking.getOffset() == null) {
-                    continue;
-                }
-                int sendEventTime = mVideoDuration - value;
-                if (Utils.parseDuration(tracking.getOffset()) == sendEventTime) {
-                    onMessage(Message.EVENT, event.url);
+            if (tracking.isProgressEvent()) {
+                if (tracking.getOffset() != null) {
+                    int currentEventTime = mVideoDuration - value;
+                    int eventTime = Utils.parseDuration(tracking.getOffset());
+                    if (eventTime == currentEventTime) {
+                        postVideoEvent(tracking.getText());
+                    }
                 }
             }
         }
@@ -299,7 +290,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     @Override
     public void postEvent(String eventType) {
-        onMessage(Message.EVENT, eventType);
+        postVideoEvent(eventType);
         if (TextUtils.equals(eventType, EventConstants.FIRST_QUARTILE)) {
             mIsFirstQuartilePosted = true;
         }
@@ -391,7 +382,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     public void onAdImpression() {
         mImpressionTimer.stop();
         for (String url : mAdParams.getImpressionsList()) {
-            onMessage(Message.EVENT, url);
+            postVideoEvent(url);
             onMessage(Message.LOG, "mAdParams.getImpressionsList() " + url);
         }
 

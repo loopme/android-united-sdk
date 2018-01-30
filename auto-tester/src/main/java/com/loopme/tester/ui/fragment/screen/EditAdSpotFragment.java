@@ -22,10 +22,6 @@ import com.loopme.tester.ui.fragment.ActionBarFragment;
 import com.loopme.tester.ui.fragment.AppkeyEditorFragment;
 import com.loopme.tester.ui.fragment.BaseFragment;
 
-/**
- * Created by katerina on 2/13/17.
- */
-
 public class EditAdSpotFragment extends BaseFragment {
 
     private static final String ARG_VIEW_MODE = "ARG_VIEW_MODE";
@@ -38,6 +34,7 @@ public class EditAdSpotFragment extends BaseFragment {
     private Context mContext;
     private View mRootView;
     private OnEditAdFragmentListener mOnEditAdFragmentListener;
+    private AdSpot mAdSpotToUpdate;
 
     public static EditAdSpotFragment newInstance(Bundle args) {
         EditAdSpotFragment editAdSpotFragment = new EditAdSpotFragment();
@@ -136,11 +133,8 @@ public class EditAdSpotFragment extends BaseFragment {
     public void onSave() {
         AdSpot adSpot = createNewItem();
         if (adSpot != null) {
-            if (mViewMode == ViewMode.EDIT) {
-                onEditAdSpot(adSpot);
-            } else {
-                onCreateAdSpot(adSpot);
-            }
+            mAdSpotToUpdate = adSpot;
+            onCheckAdSpot(adSpot);
         }
     }
 
@@ -153,6 +147,12 @@ public class EditAdSpotFragment extends BaseFragment {
     private void onCreateAdSpot(AdSpot adSpot) {
         if (mOnEditAdFragmentListener != null) {
             mOnEditAdFragmentListener.onCreate(adSpot);
+        }
+    }
+
+    private void onCheckAdSpot(AdSpot adSpot) {
+        if (mOnEditAdFragmentListener != null) {
+            mOnEditAdFragmentListener.onCheckAdSpot(adSpot);
         }
     }
 
@@ -267,17 +267,36 @@ public class EditAdSpotFragment extends BaseFragment {
         super.onDetach();
     }
 
+    public void onCheckAdSpotResult(boolean isAdSpotAlreadyExist) {
+        if (!isAdSpotAlreadyExist) {
+            updateAdSpot();
+        } else {
+            Toast.makeText(mContext, R.string.adspot_already_exists, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void updateAdSpot() {
+        if (mAdSpotToUpdate != null) {
+            if (mViewMode == ViewMode.EDIT) {
+                onEditAdSpot(mAdSpotToUpdate);
+            } else {
+                onCreateAdSpot(mAdSpotToUpdate);
+            }
+        }
+    }
+
     public interface OnEditAdFragmentListener {
         void onCreate(AdSpot adSpot);
 
         void onEdit(AdSpot adSpot);
 
         void onClose();
+
+        void onCheckAdSpot(AdSpot adSpot);
     }
 
     @Override
     public boolean processBackPress() {
         return true;
     }
-
 }

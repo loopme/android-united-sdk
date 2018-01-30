@@ -4,7 +4,7 @@ public class Constants {
 
     public static final String PREFIX = "new-tester.";
 
-    public static final String TESTFAIRY_URL = "https://tsfr.io/ocvcek";
+    public static final String TESTFAIRY_URL = "https://tsfr.io/l1hXJjGT";
     public static final String INITIAL_VERSION_NAME = "1.9";
     //Please update this number every time making build for testing
     public static final int BASE_REVISION_CODE = 15;

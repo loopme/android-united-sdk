@@ -32,6 +32,7 @@ public class Constants {
     public static final long DESTROY_TIME_DELAY = 200;
 
     public static boolean sDebugMode = true;
+
     private Constants() {
     }
 
@@ -86,37 +87,41 @@ public class Constants {
     public static final String EXTRAS_FORCE_ORIENTATION = "forceOrientation";
 
 
-    public class AdFormat {
-        public static final int BANNER = 1000;
-        public static final int INTERSTITIAL = 1001;
-        public static final int EXPANDABLE_BANNER = 1002;
+    public enum AdFormat {
+        BANNER,
+        INTERSTITIAL,
+        EXPANDABLE_BANNER;
 
-        private AdFormat() {
+        public static AdFormat fromInt(int format) {
+            if (format == BANNER.ordinal()) {
+                return BANNER;
+            } else if (format == INTERSTITIAL.ordinal()) {
+                return INTERSTITIAL;
+            } else {
+                return EXPANDABLE_BANNER;
+            }
         }
     }
 
-    public class AdState {
+    public enum AdState {
         /**
          * Initial state of ad right after creation.
          * Can be also after onHide() notification or destroy().
          */
-        public static final int NONE = 200;
+        NONE,
 
         /**
          * Ad currently in "loading" process.
          * Can be between trigger load() and onLoadSuccess(), onLoadFail() notifications or destroy().
          * While Ad in this state all other calling `load` methods will be ignored
          */
-        public static final int LOADING = 201;
+        LOADING,
 
         /**
          * Ad currently displays on screen.
          * Can be between trigger show() and onHide() notification or destroy()
          */
-        public static final int SHOWING = 202;
-
-        private AdState() {
-        }
+        SHOWING
     }
 
     public class ConnectionType {

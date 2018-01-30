@@ -1,15 +1,12 @@
 package com.loopme.controllers.display;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.View;
 import android.webkit.WebView;
 
 import com.loopme.Logging;
-import com.loopme.ad.AdParams;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.ad.LoopMeAdHolder;
 import com.loopme.common.LoopMeError;
@@ -19,9 +16,7 @@ import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.interfaces.AdEvents;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.tracker.viewability.EventManager;
-import com.loopme.utils.InternetUtils;
 import com.loopme.utils.UiUtils;
-import com.loopme.vast.VastVpaidEventTracker;
 
 public abstract class BaseDisplayController implements DisplayController, AdEvents {
 
@@ -114,7 +109,6 @@ public abstract class BaseDisplayController implements DisplayController, AdEven
     @Override
     public void onDestroy() {
         onAdDestroyedEvent();
-        VastVpaidEventTracker.clear();
     }
 
     @Override
@@ -123,10 +117,6 @@ public abstract class BaseDisplayController implements DisplayController, AdEven
             case ERROR: {
                 LoopMeTracker.post(message);
                 onAdErrorEvent(message);
-                break;
-            }
-            case EVENT: {
-                VastVpaidEventTracker.postEvent(message);
                 break;
             }
             case LOG: {
