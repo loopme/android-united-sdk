@@ -290,36 +290,35 @@ public class Utils {
 
         for (Tracking tracking : adParams.getTrackingEventsList()) {
             TrackingEvent event = new TrackingEvent(tracking.getText());
-            if (tracking.getEvent().equalsIgnoreCase(EventConstants.CREATIVE_VIEW)) {
+            if (tracking.isCreativeViewEvent()) {
                 event.timeMillis = 0;
                 trackingEventsList.add(event);
             }
-            if (tracking.getEvent().equalsIgnoreCase(EventConstants.START)) {
+            if (tracking.isStartEvent()) {
                 event.timeMillis = 0;
                 trackingEventsList.add(event);
             }
-            if (tracking.getEvent().equalsIgnoreCase(EventConstants.FIRST_QUARTILE)) {
+            if (tracking.isFirstQuartileEvent()) {
                 event.timeMillis = duration / 4;
                 trackingEventsList.add(event);
             }
-            if (tracking.getEvent().equalsIgnoreCase(EventConstants.MIDPOINT)) {
+            if (tracking.isMidpointEvent()) {
                 event.timeMillis = duration / 2;
                 trackingEventsList.add(event);
             }
-            if (tracking.getEvent().equalsIgnoreCase(EventConstants.THIRD_QUARTILE)) {
+            if (tracking.isThirdQuartileEvent()) {
                 event.timeMillis = duration * 3 / 4;
                 trackingEventsList.add(event);
             }
-            if (tracking.getEvent().equalsIgnoreCase(EventConstants.PROGRESS)) {
-                if (tracking.getOffset() == null) {
-                    continue;
+            if (tracking.isProgressEvent()) {
+                if (tracking.getOffset() != null) {
+                    if (tracking.getOffset().contains("%")) {
+                        event.timeMillis = duration * Utils.parsePercent(adParams.getSkipTime()) / 100;
+                    } else {
+                        event.timeMillis = Utils.parseDuration(tracking.getOffset()) * 1000;
+                    }
+                    trackingEventsList.add(event);
                 }
-                if (tracking.getOffset().contains("%")) {
-                    event.timeMillis = duration * Utils.parsePercent(adParams.getSkipTime()) / 100;
-                } else {
-                    event.timeMillis = Utils.parseDuration(tracking.getOffset()) * 1000;
-                }
-                trackingEventsList.add(event);
             }
         }
         return trackingEventsList;

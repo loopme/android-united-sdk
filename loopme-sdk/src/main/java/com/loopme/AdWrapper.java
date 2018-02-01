@@ -28,7 +28,7 @@ public abstract class AdWrapper extends AdConfig {
         this.mAppKey = appKey;
     }
 
-    public abstract int getAdFormat();
+    public abstract Constants.AdFormat getAdFormat();
 
     public abstract void onAutoLoadPaused();
 

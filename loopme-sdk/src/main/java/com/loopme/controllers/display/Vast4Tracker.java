@@ -56,7 +56,7 @@ public class Vast4Tracker {
 
     private void postEventsByUrl(List<String> impressions) {
         for (String impressionUrl : impressions) {
-            VastVpaidEventTracker.postEvent(impressionUrl);
+            VastVpaidEventTracker.trackVastEvent(impressionUrl, "");
         }
     }
 

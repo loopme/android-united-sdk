@@ -2,6 +2,7 @@ package com.loopme.controllers.display;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.text.TextUtils;
 import android.view.View;
 import android.webkit.WebView;
 
@@ -13,7 +14,9 @@ import com.loopme.loaders.VastVpaidAssetsResolver;
 import com.loopme.models.Errors;
 import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
+import com.loopme.tracker.constants.EventConstants;
 import com.loopme.tracker.partners.LoopMeTracker;
+import com.loopme.vast.VastVpaidEventTracker;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -28,6 +31,8 @@ public abstract class VastVpaidBaseDisplayController extends BaseDisplayControll
     private Context mContext;
     private Vast4Tracker mVast4Tracker;
     private final VastVpaidAssetsResolver mVastVpaidAssetsResolver;
+    private VastVpaidEventTracker mEventTracker;
+    private boolean mIsVpaidEventTracked;
 
     public VastVpaidBaseDisplayController(LoopMeAd loopMeAd) {
         super(loopMeAd);
@@ -37,6 +42,29 @@ public abstract class VastVpaidBaseDisplayController extends BaseDisplayControll
         mVastVpaidAssetsResolver = new VastVpaidAssetsResolver();
         mTimer = new Timers(this);
         LoopMeTracker.initVastErrorUrl(mAdParams.getErrorUrlList());
+        mEventTracker = new VastVpaidEventTracker(mLoopMeAd.getAdParams().getTrackingEventsList());
+    }
+
+    public abstract void onVast4VerificationDoesNotNeed();
+
+    public void postVideoEvent(String event, String addMessage) {
+        if (mEventTracker != null) {
+            mEventTracker.postEvent(event, addMessage);
+        }
+    }
+
+    public void postVideoEvent(String eventsUrlOrType) {
+        postVideoEvent(eventsUrlOrType, "");
+        postVpaidDidReachEnd(eventsUrlOrType);
+    }
+
+    private void postVpaidDidReachEnd(String eventType) {
+        if (!mIsVpaidEventTracked) {
+            if (this instanceof DisplayControllerVpaid && TextUtils.equals(eventType, EventConstants.COMPLETE)) {
+                onAdVideoDidReachEnd();
+                mIsVpaidEventTracked = true;
+            }
+        }
     }
 
     @Override
@@ -147,7 +175,12 @@ public abstract class VastVpaidBaseDisplayController extends BaseDisplayControll
 
     protected void dismissAd() {
         if (mLoopMeAd != null) {
-            mLoopMeAd.dismiss();
+            mLoopMeAd.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mLoopMeAd.dismiss();
+                }
+            });
         }
     }
 

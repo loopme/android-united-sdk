@@ -49,7 +49,7 @@ public class UiUtils {
         Intent redirectIntent = new Intent(loopMeAd.getContext(), AdBrowserActivity.class);
         redirectIntent.putExtra(Constants.EXTRA_URL, url);
         redirectIntent.putExtra(Constants.AD_ID_TAG, loopMeAd.getAdId());
-        redirectIntent.putExtra(Constants.FORMAT_TAG, loopMeAd.getAdFormat());
+        redirectIntent.putExtra(Constants.FORMAT_TAG, loopMeAd.getAdFormat().ordinal());
         redirectIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return redirectIntent;
     }

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.loopme.tester.R;
 import com.loopme.tester.ui.fragment.BaseFragment;
@@ -75,6 +76,8 @@ public class ImportFragment extends BaseFragment implements
     private void onOkButtonClicked() {
         if (mSelectedFile != null) {
             onFileSelected(mSelectedFile);
+        } else {
+            Toast.makeText(getActivity(), "No file chosen", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -107,7 +110,7 @@ public class ImportFragment extends BaseFragment implements
     }
 
     public void setFileSelected(File file) {
-        mSelectedFile = file;
+        onFileSelected(file);
     }
 
     public interface OnImportFragmentListener {

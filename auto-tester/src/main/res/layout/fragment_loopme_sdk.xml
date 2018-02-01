@@ -25,9 +25,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="3"
-            android:maxLines="1"
             android:completionThreshold="1"
             android:hint="@string/adunitid"
+            android:maxLines="1"
             android:textColor="@android:color/black"
             android:textSize="@dimen/text_size_16sp" />
 
@@ -48,17 +48,23 @@
             android:text="@string/app_key"
             android:textSize="@dimen/text_size_16sp" />
 
-        <AutoCompleteTextView
-            android:id="@+id/fragment_adspot_card_appkey_text"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="@dimen/fragment_adspot_card_appkey_text_width"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_weight="3"
-            android:maxLines="1"
-            android:completionThreshold="1"
-            android:hint="@string/appkey"
-            android:textColor="@android:color/black"
-            android:textSize="@dimen/text_size_16sp" />
+            android:layout_weight="3">
+
+            <AutoCompleteTextView
+                android:id="@+id/fragment_adspot_card_appkey_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:completionThreshold="1"
+                android:hint="@string/appkey"
+                android:maxLines="1"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/text_size_16sp" />
+        </android.support.design.widget.TextInputLayout>
+
     </LinearLayout>
 
     <LinearLayout
@@ -79,13 +85,13 @@
 
         <TextView
             android:id="@+id/baseurl"
-            android:inputType="none"
             android:layout_width="@dimen/baseurl_width"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="3"
             android:completionThreshold="1"
             android:hint="@string/baseurl"
+            android:inputType="none"
             android:textColor="@android:color/black"
             android:textSize="@dimen/text_size_16sp" />
 

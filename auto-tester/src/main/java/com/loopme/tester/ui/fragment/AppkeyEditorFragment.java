@@ -178,35 +178,15 @@ public class AppkeyEditorFragment extends BaseFragment implements View.OnClickLi
     }
 
     private String getUnitId() {
-        if (mAppIdTextView != null) {
-            return mAppIdTextView.getText().toString();
-        } else {
-            return getString(R.string.empty_string);
-        }
+        return mAppIdTextView != null ? mAppIdTextView.getText().toString() : getString(R.string.empty_string);
     }
 
     public String getBaseUrl() {
-        if (mBaseUrlEditText != null) {
-            return mBaseUrlEditText.getText().toString();
-        } else {
-            return getString(R.string.empty_string);
-        }
+        return mBaseUrlEditText != null ? mBaseUrlEditText.getText().toString() : getString(R.string.empty_string);
     }
 
     public String getAppKey() {
-        if (mAppKeyEditText != null) {
-            return mAppKeyEditText.getText().toString();
-        } else {
-            return getString(R.string.empty_string);
-        }
-    }
-
-    public String getAdUnitId() {
-        if (mAppIdTextView != null) {
-            return mAppIdTextView.getText().toString();
-        } else {
-            return getString(R.string.empty_string);
-        }
+        return mAppKeyEditText != null ? mAppKeyEditText.getText().toString() : getString(R.string.empty_string);
     }
 
     public void setAppKeys(AdSdk sdk, AdSpot adSpot) {

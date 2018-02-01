@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 
 import com.appsee.Appsee;
 import com.crashlytics.android.Crashlytics;
@@ -252,7 +251,7 @@ public final class BaseActivity extends Activity
 
     private void resumeAd() {
         if (mFirstLaunch) {
-            startPlayInterstitial();
+            startPlayNoneLoopMeInterstitial();
             resumeLoopMeController();
             mFirstLaunch = false;
         } else {
@@ -266,8 +265,8 @@ public final class BaseActivity extends Activity
         }
     }
 
-    private void startPlayInterstitial() {
-        if (mLoopMeAd.isInterstitial()) {
+    private void startPlayNoneLoopMeInterstitial() {
+        if (mLoopMeAd.isInterstitial() && !(mDisplayController instanceof DisplayControllerLoopMe)) {
             play();
         }
     }

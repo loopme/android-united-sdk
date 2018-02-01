@@ -97,7 +97,7 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
 
     public void initVideoController() {
         VideoController.Callback callback = initVideoControllerCallback();
-        mVideoController = new VideoController(mAdView, callback);
+        mVideoController = new VideoController(mAdView, callback, mLoopMeAd.getAdFormat());
     }
 
     public void initViewController() {
@@ -110,34 +110,10 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
         }
     }
 
-
-    public void setMraidWebViewState(Constants.WebviewState state) {
-        if (mMraidView != null) {
-            mMraidView.setWebViewState(state);
-        }
-    }
-
-    private void setBannerLayoutParams(ViewGroup bannerView) {
-        if (mMraidController != null && bannerView != null) {
-            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(350, 250);
-            if (bannerView.getParent() instanceof RelativeLayout) {
-                params = new RelativeLayout.LayoutParams(mMraidController.getWidth(), mMraidController.getHeight());
-            } else if (bannerView.getParent() instanceof FrameLayout) {
-                params = new FrameLayout.LayoutParams(mMraidController.getWidth(), mMraidController.getHeight());
-            } else if (bannerView.getParent() instanceof LinearLayout) {
-                params = new LinearLayout.LayoutParams(mMraidController.getWidth(), mMraidController.getHeight());
-            }
-            bannerView.setLayoutParams(params);
-        }
-    }
-
     private void buildMraidContainer(FrameLayout containerView) {
-        setBannerLayoutParams(containerView);
-        FrameLayout.LayoutParams mraidViewLayoutParams = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT);
-        Utils.removeParent(mMraidView);
-        containerView.addView(mMraidView, mraidViewLayoutParams);
+        if (mMraidController != null) {
+            mMraidController.buildMraidContainer(containerView);
+        }
     }
 
     public void collapseMraidBanner() {
@@ -298,10 +274,10 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
     }
 
     private void resumeInterstitial() {
-        resumeVideoController();
-        resumeViewController();
         resumeMraid();
         if (isInterstitial()) {
+            resumeViewController();
+            resumeVideoController();
             setWebViewState(Constants.WebviewState.VISIBLE);
         }
     }
@@ -309,8 +285,8 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
     private void pauseControllers() {
         pauseViewController();
         pauseMraid();
-        pauseVideoController();
         if (isInterstitial()) {
+            pauseVideoController(false);
             setWebViewState(Constants.WebviewState.HIDDEN);
         }
     }
@@ -346,9 +322,9 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
         }
     }
 
-    private void pauseVideoController() {
+    private void pauseVideoController(boolean isSkip) {
         if (mVideoController != null) {
-            mVideoController.pauseVideo();
+            mVideoController.pauseVideo(isSkip);
         }
     }
 
@@ -535,7 +511,8 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
 
             @Override
             public void onJsVideoPause(final int time) {
-                onPause();
+                pauseViewController();
+                pauseVideoController(true);
             }
 
             @Override
@@ -651,10 +628,6 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
             mVideoController.setSurfaceTextureAvailable(true);
             mVideoController.setSurfaceTexture(surfaceTexture);
         }
-    }
-
-    public MraidView getMraidView() {
-        return mMraidView;
     }
 
     private void surfaceTextureDestroyed() {

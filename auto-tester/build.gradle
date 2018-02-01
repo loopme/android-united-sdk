@@ -18,7 +18,7 @@ android {
 
     defaultConfig {
         applicationId "com.loopme.tester"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 17
         versionName "2"
@@ -67,6 +67,8 @@ dependencies {
         exclude module: 'libAvid-mopub'
         exclude module: 'moat-mobile-app-kit'
     }
+    api 'com.android.support:design:26.1.0'
+
 }
 
 static def getDate() {

@@ -63,7 +63,7 @@ public class ValidationHelper {
             loopMeAd.onAdLoadFail(new LoopMeError(error));
             return false;
         } else if (!isProperlyAndroidVersion()) {
-            error = "Not supported Android version. Expected 4.4.4+";
+            error = "Not supported Android version. Expected 5+";
             Logging.out(LOG_TAG, error);
             loopMeAd.onAdLoadFail(new LoopMeError(error));
             return false;
@@ -88,6 +88,6 @@ public class ValidationHelper {
     }
 
     public static boolean isProperlyAndroidVersion() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }
 }

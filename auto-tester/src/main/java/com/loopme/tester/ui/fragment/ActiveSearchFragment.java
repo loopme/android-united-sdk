@@ -78,7 +78,11 @@ public class ActiveSearchFragment extends BaseFragment implements
     @Override
     public void onTextSearched(String searchString) {
         activeSearchVisibility(true);
-        onSearch(searchString);
+        if (TextUtils.isEmpty(searchString)) {
+            onUpdateList();
+        } else {
+            onSearch(searchString);
+        }
     }
 
     @Override
