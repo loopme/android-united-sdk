@@ -45,8 +45,6 @@ public abstract class VastVpaidBaseDisplayController extends BaseDisplayControll
         mEventTracker = new VastVpaidEventTracker(mLoopMeAd.getAdParams().getTrackingEventsList());
     }
 
-    public abstract void onVast4VerificationDoesNotNeed();
-
     public void postVideoEvent(String event, String addMessage) {
         if (mEventTracker != null) {
             mEventTracker.postEvent(event, addMessage);

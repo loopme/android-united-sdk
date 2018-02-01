@@ -16,7 +16,6 @@ import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.view.ViewControllerVast;
 import com.loopme.models.Errors;
-import com.loopme.models.Message;
 import com.loopme.time.TimeUtils;
 import com.loopme.time.TimerWithPause;
 import com.loopme.tracker.constants.EventConstants;
@@ -27,7 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DisplayControllerVast extends VastVpaidBaseDisplayController implements
-        LoopMeMediaPlayer.LoopMeMediaPlayerListener, Vast4Tracker.OnAdVerificationListener {
+        LoopMeMediaPlayer.LoopMeMediaPlayerListener,
+        Vast4Tracker.OnAdVerificationListener,
+        ViewControllerVast.ViewControllerVastListener {
 
     private static final int DELAY_UNTIL_EXECUTE = 100;
     private static final int COUNTDOWN_INTERVAL = 100;
@@ -45,18 +46,14 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     public DisplayControllerVast(LoopMeAd loopMeAd) {
         super(loopMeAd);
-        mViewControllerVast = new ViewControllerVast(this, initViewControllerVastListener());
+        mViewControllerVast = new ViewControllerVast(this, this);
         mLogTag = DisplayControllerVast.class.getSimpleName();
         Logging.out(mLogTag);
     }
 
-    private ViewControllerVast.ViewControllerVastListener initViewControllerVastListener() {
-        return new ViewControllerVast.ViewControllerVastListener() {
-            @Override
-            public void onSurfaceTextureReady(Surface surface) {
-                resumeMediaPlayer(surface);
-            }
-        };
+    @Override
+    public void onSurfaceTextureReady(Surface surface) {
+        resumeMediaPlayer(surface);
     }
 
     @Override
@@ -163,7 +160,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         List<TrackingEvent> eventsToRemove = new ArrayList<>();
         for (TrackingEvent event : mTrackingEventsList) {
             if (doneMillis > event.timeMillis) {
-                postVideoEvent( event.url);
+                postVideoEvent(event.url);
                 eventsToRemove.add(event);
             }
         }
@@ -272,11 +269,11 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     private void postVolumeStateEvent(boolean mute, boolean postEvent) {
         if (mute) {
             if (postEvent) {
-                postVideoEvent( EventConstants.MUTE);
+                postVideoEvent(EventConstants.MUTE);
             }
         } else {
             if (postEvent) {
-                postVideoEvent( EventConstants.UNMUTE);
+                postVideoEvent(EventConstants.UNMUTE);
             }
         }
     }
@@ -301,7 +298,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     @Override
     public void onCompletion(MediaPlayer mp) {
         skipVideo(false);
-        postVideoEvent( EventConstants.COMPLETE);
+        postVideoEvent(EventConstants.COMPLETE);
         onAdVideoDidReachEnd();
         onAdCompleteEvent();
     }
