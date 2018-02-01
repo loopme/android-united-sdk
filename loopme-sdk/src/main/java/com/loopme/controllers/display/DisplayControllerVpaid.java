@@ -5,13 +5,13 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.common.LoopMeError;
 import com.loopme.tracker.constants.EventConstants;
-import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.UiUtils;
 import com.loopme.vast.VastVpaidEventTracker;
 import com.loopme.time.SimpleTimer;
@@ -19,24 +19,23 @@ import com.loopme.ad.LoopMeAd;
 import com.loopme.bridges.vpaid.BridgeEventHandler;
 import com.loopme.bridges.vpaid.VpaidBridge;
 import com.loopme.bridges.vpaid.VpaidBridgeImpl;
-import com.loopme.common.LoopMeError;
 import com.loopme.controllers.interfaces.VastVpaidDisplayController;
 import com.loopme.controllers.view.ViewControllerVpaid;
 import com.loopme.models.BridgeMethods;
 import com.loopme.models.Errors;
 import com.loopme.models.Message;
-import com.loopme.time.SimpleTimer;
-import com.loopme.tracker.constants.EventConstants;
 import com.loopme.utils.Utils;
 import com.loopme.vast.TrackingEvent;
-import com.loopme.vast.VastVpaidEventTracker;
 import com.loopme.views.LoopMeWebView;
 import com.loopme.views.webclient.AdViewChromeClient;
 import com.loopme.xml.Tracking;
 
 public class DisplayControllerVpaid extends VastVpaidBaseDisplayController implements
         BridgeEventHandler,
-        VastVpaidDisplayController {
+        VastVpaidDisplayController,
+        AdViewChromeClient.OnErrorFromJsCallbackVpaid,
+        Vast4Tracker.OnAdVerificationListener,
+        Vast4WebViewClient.OnPageLoadedListener {
 
     private static final String LOG_TAG = DisplayControllerVpaid.class.getSimpleName();
     private static final double VIDEO_25_WITH_SPARE_TIME_COEFFICIENT = 0.35;
@@ -48,12 +47,10 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     private VpaidBridge mVpaidBridge;
     private ViewControllerVpaid mViewControllerVpaid;
 
-    private volatile OnPreparedListener mOnPreparedListener;
     private LoopMeWebView mWebView;
 
     private boolean mIsWaitingForSkippableState;
     private boolean mIsWaitingForWebView;
-    private volatile boolean mIsAdVerificationLoaded;
     private boolean mIsStarted;
     private SimpleTimer mImpressionTimer;
     private volatile String mCurrentVideoTime;
@@ -81,19 +78,15 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     //region DisplayController methods
     @Override
-    public void prepare(VastVpaidDisplayController.OnPreparedListener listener) {
-        mOnPreparedListener = listener;
+    public void prepare() {
         initWebView();
-        vast4Verification(mWebView);
-    }
-
-    @Override
-    public void onVast4VerificationDoesNotNeed() {
+        initVast4Tracker(mWebView);
         loadHtml(prepareHtml());
     }
 
     private String prepareHtml() {
         String html = Utils.readAssets(getAssetsManager(), HTML_SOURCE_FILE);
+        html = addVerificationScripts(html);
         return html.replace(VPAID_CREATIVE_URL_STRING, mAdParams.getVpaidJsUrl());
     }
 
@@ -211,9 +204,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     @Override
     public void onPrepared() {
-        if (mOnPreparedListener != null) {
-            mOnPreparedListener.onPrepared();
-        }
+        onAdReady();
     }
 
     @Override
@@ -247,7 +238,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     }
 
     @Override
-    public boolean onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
+    public void onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
         for (String trackUrl : mAdParams.getVideoClicks()) {
             onMessage(Message.EVENT, trackUrl);
         }
@@ -255,7 +246,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
             url = mAdParams.getVideoRedirectUrl();
         }
         onAdClicked();
-        return super.onRedirect(url, mLoopMeAd);
+        super.onRedirect(url, mLoopMeAd);
     }
 
     @Override
@@ -331,60 +322,65 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     @SuppressLint("JavascriptInterface")
     private void initWebView() {
         mWebView = new LoopMeWebView(mLoopMeAd.getContext());
-        mWebView.setWebChromeClient(new AdViewChromeClient(initOnErrorFromJsListener()));
-        mWebView.setOnPageLoadedCallback(initOnPageLoadedCallback());
-        mWebView.setWebViewClient(mWebView.getVpaidWebViewClient());
+        mWebView.setWebChromeClient(new AdViewChromeClient(this));
+        mWebView.setWebViewClient(initVast4WebViewClient());
         mIsWaitingForWebView = true;
         mWebView.addJavascriptInterface(mVpaidBridge, ANDROID_JS_INTERFACE);
     }
 
-    private AdViewChromeClient.OnErrorFromJsCallbackVpaid initOnErrorFromJsListener() {
-        return new AdViewChromeClient.OnErrorFromJsCallbackVpaid() {
-
-            @Override
-            public void onErrorFromJs(String message) {
-                if (isVast4VerificationNeeded() && !mIsAdVerificationLoaded) {
-                    DisplayControllerVpaid.this.onPostWarning(Errors.VERIFICATION_UNIT_NOT_EXECUTED);
-                } else {
-                    Logging.out(LOG_TAG, "Error from JS " + message);
-                    LoopMeError error = new LoopMeError(Errors.GENERAL_VPAID_ERROR);
-                    error.addToMessage(message);
-                    onPostWarning(error);
-                }
-            }
-
-            @Override
-            public void onVideoSource(String source) {
-                videoSourceEventOccurred(source);
-            }
-        };
+    private WebViewClient initVast4WebViewClient() {
+        Vast4WebViewClient vast4WebViewClient = new Vast4WebViewClient(this);
+        vast4WebViewClient.setOnPageLoadedListener(this);
+        return vast4WebViewClient;
     }
 
-    private LoopMeWebView.OnPageLoadedCallback initOnPageLoadedCallback() {
-        return new LoopMeWebView.OnPageLoadedCallback() {
-            @Override
-            public void onPageLoaded() {
-                if (mIsWaitingForWebView) {
-                    if (isVast4VerificationNeeded() && !mIsAdVerificationLoaded) {
-                        loadHtml(prepareHtml());
-                        mIsAdVerificationLoaded = true;
-                    } else {
-                        onPageFinished();
-                        mIsWaitingForWebView = false;
-                    }
-                }
-            }
-        };
+    @Override
+    public void onErrorFromJs(String message) {
+        postVpaidError(message);
+    }
+
+    @Override
+    public void onVideoSource(String source) {
+        videoSourceEventOccurred(source);
+    }
+
+    @Override
+    public void onVerificationJsLoaded() {
+        Logging.out(LOG_TAG, "verification script successfully loaded");
+    }
+
+    @Override
+    public void onVerificationJsFailed(String message) {
+        LoopMeError error = new LoopMeError(Errors.VERIFICATION_UNIT_NOT_EXECUTED);
+        error.addToMessage(message);
+        onPostWarning(error);
+    }
+
+    //    @Override
+    public void onPageLoaded() {
+        if (mIsWaitingForWebView) {
+            Logging.out(LOG_TAG, "Init webView done");
+            callBridgeMethod(BridgeMethods.VPAID_PREPARE_AD);
+            mIsWaitingForWebView = false;
+        }
+    }
+
+    private void postVpaidError(String message) {
+        Logging.out(LOG_TAG, "Error from JS " + message);
+        LoopMeError error = mIsStarted ? new LoopMeError(Errors.GENERAL_VPAID_ERROR) : new LoopMeError(Errors.VPAID_FILE_NOT_FOUND);
+        error.addToMessage(message);
+
+        if (mIsStarted) {
+            onPostWarning(error);
+        } else {
+            onInternalLoadFail(error);
+        }
     }
 
     private void loadHtml(String html) {
         if (mWebView != null) {
             mWebView.loadHtml(html);
         }
-    }
-
-    private void onPageFinished() {
-        callBridgeMethod(BridgeMethods.VPAID_PREPARE_AD);
     }
 
     @Override

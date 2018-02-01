@@ -161,7 +161,6 @@ public class ManualView implements View.OnClickListener, AdListener {
             initAd();
         }
         if (!isAdReady()) {
-            askAllowLogging();
             setLoadingView();
             mAd.loadAd();
         } else {
@@ -231,13 +230,6 @@ public class ManualView implements View.OnClickListener, AdListener {
                     mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
                 }
             });
-        }
-    }
-
-    private void askAllowLogging() {
-        if (mActivity instanceof MainActivity) {
-            ((MainActivity) mActivity).requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    BaseActivity.PERMISSION_REQUEST_CODE_SAVE_LOG);
         }
     }
 

@@ -19,8 +19,8 @@ import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.interfaces.AdEvents;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.tracker.viewability.EventManager;
-import com.loopme.utils.InternetUtils;
 import com.loopme.utils.UiUtils;
+import com.loopme.utils.Utils;
 import com.loopme.vast.VastVpaidEventTracker;
 
 public abstract class BaseDisplayController implements DisplayController, AdEvents {
@@ -137,13 +137,16 @@ public abstract class BaseDisplayController implements DisplayController, AdEven
     }
 
     @Override
-    public boolean onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
+    public void onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
         onAdClickedEvent();
         onMessage(Message.LOG, "Handle url");
         LoopMeAdHolder.putAd(loopMeAd);
         Intent intent = UiUtils.createRedirectIntent(url, loopMeAd);
-        loopMeAd.getContext().startActivity(intent);
-        return true;
+        if (Utils.isActivityResolved(intent, loopMeAd.getContext())) {
+            loopMeAd.getContext().startActivity(intent);
+        } else {
+            Logging.out(mLogTag, "Warning url = " + url);
+        }
     }
 
     // events region

@@ -13,7 +13,7 @@ public interface DisplayController {
 
     void onBuildVideoAdView(FrameLayout frameLayout);
 
-    boolean onRedirect(@Nullable String url, LoopMeAd loopMeAd);
+    void onRedirect(@Nullable String url, LoopMeAd loopMeAd);
 
     void onVolumeMute(boolean mute);
 

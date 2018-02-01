@@ -398,10 +398,10 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
     }
 
     @Override
-    public boolean onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
+    public void onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
         UiUtils.broadcastIntent(mLoopMeAd.getContext(), Constants.CLICK_INTENT);
         onAdClicked();
-        return super.onRedirect(url, loopMeAd);
+        super.onRedirect(url, loopMeAd);
     }
 
     @Override

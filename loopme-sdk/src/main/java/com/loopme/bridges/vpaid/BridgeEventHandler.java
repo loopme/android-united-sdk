@@ -16,7 +16,7 @@ public interface BridgeEventHandler {
 
     void setSkippableState(boolean skippable);
 
-    boolean onRedirect(String url, LoopMeAd loopMeAd);
+    void onRedirect(String url, LoopMeAd loopMeAd);
 
     void trackError(String message);
 

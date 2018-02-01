@@ -13,6 +13,7 @@ import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.LoopMeMediaPlayer;
 import com.loopme.ad.LoopMeAd;
+import com.loopme.common.LoopMeError;
 import com.loopme.controllers.view.ViewControllerVast;
 import com.loopme.models.Errors;
 import com.loopme.models.Message;
@@ -26,9 +27,8 @@ import com.loopme.vast.VastVpaidEventTracker;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class DisplayControllerVast extends VastVpaidBaseDisplayController implements
-        LoopMeMediaPlayer.LoopMeMediaPlayerListener {
+        LoopMeMediaPlayer.LoopMeMediaPlayerListener, Vast4Tracker.OnAdVerificationListener {
 
     private static final int DELAY_UNTIL_EXECUTE = 100;
     private static final int COUNTDOWN_INTERVAL = 100;
@@ -41,7 +41,8 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     private int mVideoDuration;
     private TimerWithPause mVideoTimer;
     private VastWebView mWebView;
-    private OnPreparedListener mPrepareListener;
+    private int mVerificationScriptCounter;
+    private int mVerificationScriptNumber;
 
     public DisplayControllerVast(LoopMeAd loopMeAd) {
         super(loopMeAd);
@@ -67,23 +68,20 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     @Override
-    public void prepare(OnPreparedListener listener) {
-        mPrepareListener = listener;
-        vast4Verification();
-    }
-
-    private void vast4Verification() {
+    public void prepare() {
         if (isVast4VerificationNeeded()) {
-            configureWebView();
-            vast4Verification(mWebView);
+            mWebView = new VastWebView(mLoopMeAd.getContext(), this);
+            initVast4Tracker(mWebView);
+            setScriptNumber();
+            vast4Verification();
         } else {
-            onVast4VerificationDoesNotNeed();
+            onAdReady();
         }
     }
 
-    @Override
-    public void onVast4VerificationDoesNotNeed() {
-        preparationFinished();
+    private void setScriptNumber() {
+        int size = mAdParams.getAdVerificationJavaScriptUrlList().size();
+        mVerificationScriptNumber = size == 0 ? 1 : size;
     }
 
     @Override
@@ -152,7 +150,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     private void resumeSdk24() {
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.N && !mViewControllerVast.isEndCard()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !mViewControllerVast.isEndCard()) {
             resumeMediaPlayer(getSurface());
         }
     }
@@ -209,7 +207,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     @Override
-    public boolean onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
+    public void onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
         if (isPlaying()) {
             url = mAdParams.getVideoRedirectUrl();
             for (String trackUrl : mAdParams.getVideoClicks()) {
@@ -222,7 +220,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
             }
         }
         onAdClicked();
-        return super.onRedirect(url, mLoopMeAd);
+        super.onRedirect(url, mLoopMeAd);
     }
 
     private String getCurrentPositionAsString() {
@@ -397,25 +395,23 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         muteVideo(mViewControllerVast.isMute(), false);
     }
 
-    private void configureWebView() {
-        mWebView = new VastWebView(mLoopMeAd.getContext(), new VastWebView.OnFinishLoadListener() {
-
-            @Override
-            public void onFinishLoad() {
-                preparationFinished();
-            }
-
-            @Override
-            public void onJsError(String message) {
-                DisplayControllerVast.this.onPostWarning(Errors.VERIFICATION_UNIT_NOT_EXECUTED);
-            }
-        });
+    @Override
+    public void onVerificationJsLoaded() {
+        checkScriptsNumber();
     }
 
-    private void preparationFinished() {
-        if (mPrepareListener != null) {
-            mPrepareListener.onPrepared();
-            mPrepareListener = null;
+    @Override
+    public void onVerificationJsFailed(String message) {
+        checkScriptsNumber();
+        LoopMeError error = new LoopMeError(Errors.VERIFICATION_UNIT_NOT_EXECUTED);
+        error.addToMessage(message);
+        onPostWarning(error);
+    }
+
+    private void checkScriptsNumber() {
+        mVerificationScriptCounter++;
+        if (mVerificationScriptCounter == mVerificationScriptNumber) {
+            onAdReady();
         }
     }
 

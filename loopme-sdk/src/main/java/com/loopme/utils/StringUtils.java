@@ -15,7 +15,6 @@ import java.util.TimeZone;
 
 public class StringUtils {
     private static final String ERROR_CODE = "[ERRORCODE]";
-    private static final String JS_RESOURCE = "[JSRESOURCE]";
     private static final String PLAY_TIME = "[CONTENTPLAYHEAD]";
     private static final String TIMESTAMP_CODE_PATTERN = "[TIMESTAMP]";
     private static final String ISO_8601_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.mmm'Z'";
@@ -63,17 +62,6 @@ public class StringUtils {
         return completeUrl;
     }
 
-    public static String generateHtml(List<String> jsScriptList) {
-        String htmlStartTag = " <html><head></head><body>\n";
-        String htmlJsScript = "<script type=\"text/javascript\" src=\"[JSRESOURCE]\"></script>\n";
-        String htmlEndTag = "</body></html>";
-        for (String jsLink : jsScriptList) {
-            htmlStartTag = htmlStartTag + replace(htmlJsScript, JS_RESOURCE, jsLink);
-        }
-
-        return htmlStartTag + htmlEndTag;
-    }
-
     private static String setPlayTime(String trackUrl, String currentPosition) {
         return replace(trackUrl, PLAY_TIME, currentPosition);
     }
@@ -89,7 +77,7 @@ public class StringUtils {
         return dateFormat.format(new Date());
     }
 
-    private static String replace(String baseString, String pattern, String contentToReplace) {
+    public static String replace(String baseString, String pattern, String contentToReplace) {
         if (!TextUtils.isEmpty(baseString)) {
             if (baseString.contains(pattern)) {
                 return baseString.replace(pattern, contentToReplace);

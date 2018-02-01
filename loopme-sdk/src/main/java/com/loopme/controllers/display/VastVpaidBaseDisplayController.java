@@ -39,8 +39,6 @@ public abstract class VastVpaidBaseDisplayController extends BaseDisplayControll
         LoopMeTracker.initVastErrorUrl(mAdParams.getErrorUrlList());
     }
 
-    public abstract void onVast4VerificationDoesNotNeed();
-
     @Override
     public void onStartLoad() {
         super.onStartLoad();
@@ -52,13 +50,20 @@ public abstract class VastVpaidBaseDisplayController extends BaseDisplayControll
         mVastVpaidAssetsResolver.resolve(mAdParams, mContext, createAssetsLoadListener());
     }
 
-    protected void vast4Verification(WebView webView) {
+    protected void vast4Verification() {
         if (isVast4VerificationNeeded()) {
-            mVast4Tracker = new Vast4Tracker(mLoopMeAd.getAdParams(), webView);
             mVast4Tracker.loadVerificationJavaScripts();
-        } else {
-            onVast4VerificationDoesNotNeed();
         }
+    }
+
+    protected void initVast4Tracker(WebView webView) {
+        if (isVast4VerificationNeeded() && mVast4Tracker == null) {
+            mVast4Tracker = new Vast4Tracker(mLoopMeAd.getAdParams(), webView);
+        }
+    }
+
+    protected String addVerificationScripts(String html) {
+        return mVast4Tracker != null ? mVast4Tracker.addVerificationScripts(html) : html;
     }
 
     protected void setVerificationView(View view) {
@@ -111,7 +116,7 @@ public abstract class VastVpaidBaseDisplayController extends BaseDisplayControll
             @Override
             public void run() {
                 startTimer(TimersType.PREPARE_VPAID_JS_TIMER);
-                prepare(initOnPreparedListener());
+                prepare();
             }
         });
     }
@@ -127,17 +132,6 @@ public abstract class VastVpaidBaseDisplayController extends BaseDisplayControll
         destroyTimers();
         breakAssetsLoading();
         LoopMeTracker.clear();
-    }
-
-    private OnPreparedListener initOnPreparedListener() {
-        return new OnPreparedListener() {
-
-            @Override
-            public void onPrepared() {
-                stopTimer(TimersType.PREPARE_VPAID_JS_TIMER);
-                onAdLoadSuccess();
-            }
-        };
     }
 
     protected void onAdLoadSuccess() {
@@ -208,8 +202,7 @@ public abstract class VastVpaidBaseDisplayController extends BaseDisplayControll
 
     private void onPrepareJsTimeout() {
         stopTimer(TimersType.PREPARE_VPAID_JS_TIMER);
-        onInternalLoadFail(Errors.VPAID_FILE_NOT_FOUND);
-        breakAssetsLoading();
+        onPostWarning(Errors.VERIFICATION_UNIT_NOT_EXECUTED);
     }
 
     private void breakAssetsLoading() {
@@ -241,5 +234,10 @@ public abstract class VastVpaidBaseDisplayController extends BaseDisplayControll
         if (mTimer != null) {
             mTimer.stopTimer(timersType);
         }
+    }
+
+    protected void onAdReady() {
+        stopTimer(TimersType.PREPARE_VPAID_JS_TIMER);
+        onAdLoadSuccess();
     }
 }
