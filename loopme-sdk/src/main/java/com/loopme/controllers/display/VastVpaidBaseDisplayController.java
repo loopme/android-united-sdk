@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.webkit.WebView;
 
+import com.loopme.Logging;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
@@ -23,6 +24,7 @@ import java.util.Observer;
 
 public abstract class VastVpaidBaseDisplayController extends BaseDisplayController
         implements VastVpaidDisplayController, Observer {
+    private static final String LOG_TAG = VastVpaidBaseDisplayController.class.getSimpleName();
     protected String mVideoUri;
     protected String mImageUri;
     protected AdParams mAdParams;
@@ -233,7 +235,10 @@ public abstract class VastVpaidBaseDisplayController extends BaseDisplayControll
 
     private void onPrepareJsTimeout() {
         stopTimer(TimersType.PREPARE_VPAID_JS_TIMER);
-        onPostWarning(Errors.VERIFICATION_UNIT_NOT_EXECUTED);
+        Logging.out(LOG_TAG, "Js loading timeout");
+        if (this instanceof DisplayControllerVpaid) {
+            onInternalLoadFail(Errors.JS_LOADING_TIMEOUT);
+        }
     }
 
     private void breakAssetsLoading() {

@@ -191,7 +191,7 @@ public class AdFetchTask implements Runnable, Observer {
         if (response == null) {
             onErrorResult(Errors.NO_CONTENT);
         } else if (response.code() == RESPONSE_NO_ADS) {
-            onErrorResult(new LoopMeError(response.code(), Errors.NO_ADS_FOUND.getMessage()));
+            onErrorResult(Errors.NO_ADS_FOUND);
         } else {
             onErrorResult(new LoopMeError(Constants.BAD_SERVERS_CODE + response.code()));
         }

@@ -37,6 +37,8 @@ public class PlayerLayout extends FrameLayout implements View.OnTouchListener, V
     private ProgressBar mProgressBar;
     private ImageView mSkipButton;
     private OnPlayerListener mListener;
+    private static final String TIME_FINISHED = "00:00";
+    private static final int MINIMAL_TIME_STEP = 200;
 
     public PlayerLayout(@NonNull Context context, WebView webView, OnPlayerListener listener) {
         super(context);
@@ -188,7 +190,7 @@ public class PlayerLayout extends FrameLayout implements View.OnTouchListener, V
 
     public void setProgress(int progress) {
         setProgressInProgressBar(getMaxDuration() - progress);
-        String timeStamp = Utils.createTimeStamp(progress);
+        String timeStamp = progress < MINIMAL_TIME_STEP ? TIME_FINISHED : Utils.createTimeStamp(progress + Constants.MILLIS_IN_SECOND);
         mTextView.setText(timeStamp);
     }
 

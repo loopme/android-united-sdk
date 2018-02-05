@@ -5,6 +5,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.loopme.Logging;
+import com.loopme.utils.StringUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -55,7 +56,7 @@ public class Vast4WebViewClient extends WebViewClient {
             }
             case LOAD_FAIL: {
                 String source = redirect.getPath();
-                onVerificationJsFailed(source);
+                onVerificationJsFailed(StringUtils.removeFirstSymbol(source));
                 break;
             }
         }

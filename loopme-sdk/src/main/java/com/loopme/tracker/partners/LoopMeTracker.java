@@ -13,14 +13,13 @@ import com.loopme.debugging.Params;
 import com.loopme.request.RequestUtils;
 import com.loopme.utils.StringUtils;
 import com.loopme.utils.Utils;
+import com.loopme.webservice.ExecutorHelper;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class LoopMeTracker {
     private static final String LOG_TAG = LoopMeTracker.class.getSimpleName();
@@ -28,13 +27,11 @@ public class LoopMeTracker {
     private static String sPackageId;
     private static String sAppKey;
     private static Set<String> sVastErrorUrlSet = new HashSet<>();
-    private static ExecutorService sExecutor;
 
     private LoopMeTracker() {
     }
 
     public static void init(LoopMeAd loopMeAd) {
-        sExecutor = Executors.newCachedThreadPool();
         if (loopMeAd != null) {
             sAppKey = loopMeAd.getAppKey();
             sPackageId = loopMeAd.getContext().getPackageName();
@@ -73,7 +70,7 @@ public class LoopMeTracker {
     }
 
     private static void sendDataToServer(final String errorUrl, final Map<String, String> headers, final String request) {
-        sExecutor.submit(new Runnable() {
+        ExecutorHelper.getExecutor().submit(new Runnable() {
             @Override
             public void run() {
                 HttpUtil.sendRequest(errorUrl, headers, request);
@@ -81,7 +78,7 @@ public class LoopMeTracker {
         });
     }
 
-    public static synchronized void postVastError(String vastErrorCode) {
+    private static synchronized void postVastError(String vastErrorCode) {
         for (String url : sVastErrorUrlSet) {
             String urlWithCode = StringUtils.setErrorCode(url, vastErrorCode);
             sendDataToServer(urlWithCode, null, null);
@@ -143,12 +140,16 @@ public class LoopMeTracker {
     }
 
     public static void post(LoopMeError error) {
-        if (error != null) {
+        if (shouldTrack(error)) {
             post(error.getMessage(), error.getErrorType());
             if (isVastError(error.getErrorType())) {
-                LoopMeTracker.postVastError(String.valueOf(error.getErrorCode()));
+                postVastError(String.valueOf(error.getErrorCode()));
             }
         }
+    }
+
+    private static boolean shouldTrack(LoopMeError error) {
+        return error != null && !TextUtils.isEmpty(error.getErrorType()) && !error.getErrorType().equalsIgnoreCase(Constants.ErrorType.DO_NOT_TRACK);
     }
 
     private static boolean isVastError(String errorType) {

@@ -95,4 +95,11 @@ public class StringUtils {
         }
         return "";
     }
+
+    public static String removeFirstSymbol(String message) {
+        if (!TextUtils.isEmpty(message)) {
+            return message.substring(1, message.length());
+        }
+        return "";
+    }
 }

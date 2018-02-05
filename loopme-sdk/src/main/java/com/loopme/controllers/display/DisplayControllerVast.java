@@ -328,7 +328,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         mVideoDuration = mp.getDuration();
         mViewControllerVast.adjustLayoutParams(mp.getVideoWidth(), mp.getVideoHeight());
         createVideoTimer(mVideoDuration);
-        prepareControls(mp.getDuration());
+        prepareControls(mVideoDuration);
         resumeMediaPlayer(getSurface());
         postEvents(mp);
         muteVideo(mViewControllerVast.isMute(), false);

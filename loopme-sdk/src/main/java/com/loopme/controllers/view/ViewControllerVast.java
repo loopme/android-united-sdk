@@ -1,24 +1,14 @@
 package com.loopme.controllers.view;
 
 import android.content.Context;
-import android.graphics.SurfaceTexture;
-import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.loopme.Constants;
-import com.loopme.R;
 import com.loopme.controllers.display.DisplayControllerVast;
-import com.loopme.utils.ImageUtils;
-import com.loopme.utils.Utils;
 
 public class ViewControllerVast {
 

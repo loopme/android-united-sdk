@@ -272,6 +272,7 @@ public class Constants {
         public static final String CUSTOM = "custom";
         public static final String VAST = "vast";
         public static final String VPAID = "vpaid";
+        public static final String DO_NOT_TRACK = "do not track";
     }
 
     class Params {

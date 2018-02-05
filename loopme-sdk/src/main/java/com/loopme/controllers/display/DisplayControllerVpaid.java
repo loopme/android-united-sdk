@@ -345,7 +345,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         onPostWarning(error);
     }
 
-    //    @Override
+    @Override
     public void onPageLoaded() {
         if (mIsWaitingForWebView) {
             Logging.out(LOG_TAG, "Init webView done");

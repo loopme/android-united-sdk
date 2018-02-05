@@ -22,7 +22,7 @@ public class Errors {
     public static final LoopMeError WRONG_AD_FORMAT = new LoopMeError(111, "Wrong Ad format: ");
     public static final LoopMeError AD_ALREADY_LOADING_OR_SHOWING = new LoopMeError(112, "Ad already loading or showing");
     public static final LoopMeError INCORRECT_INTEGRATION = new LoopMeError(113, "Incorrect integration");
-    public static final LoopMeError NO_ADS_FOUND = new LoopMeError(204, "No ads found");
+    public static final LoopMeError NO_ADS_FOUND = new LoopMeError(204, "No ads found", Constants.ErrorType.DO_NOT_TRACK);
     public static final LoopMeError NO_ERROR = new LoopMeError(115, "OK");
     public static final LoopMeError PARSE_VAST_ERROR = new LoopMeError(116, "Parse VAST response failed");
     public static final LoopMeError MOBILE_NETWORK_CACHE_ERROR = new LoopMeError("Mobile network. Video will not be cached");
@@ -50,32 +50,5 @@ public class Errors {
     public static final LoopMeError GENERAL_VPAID_ERROR = new LoopMeError(901, "General vpaid error", Constants.ErrorType.VPAID);
     public static final LoopMeError VERIFICATION_UNIT_NOT_EXECUTED = new LoopMeError(410, "Verification unit was not executed.", Constants.ErrorType.VAST);
     public static final LoopMeError UNUSUAL_VIDEO_FORMAT = new LoopMeError(1000, "Player tries to play unusual video format.", Constants.ErrorType.VPAID);
-
-    public enum VastError {
-        XML_PARSING(100),
-        TRAFFICKING(200),
-        WRAPPER(300),
-        WRAPPER_TIMEOUT(301),
-        WRAPPER_LIMIT(302),
-        WRAPPER_NO_VAST(303),
-        UNABLE_DISPLAY_LINEAR_AD(400),
-        FILE_NOT_FOUND(401),
-        TIMEOUT(402),
-        MEDIA_FILE_NO_SUPPORTED_TYPE(403),
-        MEDIA_FILE_UNSUPPORTED(405),
-        COMPANION(600),
-        UNDEFINED(900),
-        VPAID(901);
-
-        private int value;
-
-        VastError(int value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return String.valueOf(value);
-        }
-    }
-
+    public static final LoopMeError JS_LOADING_TIMEOUT = new LoopMeError(1001, "Js loading timeout", Constants.ErrorType.DO_NOT_TRACK);
 }
