@@ -364,7 +364,9 @@ public class AdParams implements Serializable {
     }
 
     public void setTrackingEventsList(List<Tracking> events) {
-        this.mTrackingEventsList = events;
+        if (events != null) {
+            this.mTrackingEventsList.addAll(events);
+        }
     }
 
     public List<String> getTrackers() {
