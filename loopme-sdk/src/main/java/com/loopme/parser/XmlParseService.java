@@ -50,7 +50,6 @@ public class XmlParseService {
             return null;
         }
         sAdParams = adParams;
-        setExpiredDate();
         String xml = bidObject.getAdm();
         Logging.out(LOG_TAG, xml);
         return parseResponse(xml);
@@ -106,7 +105,7 @@ public class XmlParseService {
         if (linear == null) {
             throw new IllegalArgumentException("NonLinear AD is not supported");
         }
-
+        setExpiredDate();
         setParamId(vast);
         setParamImpressions(inLine);
         setErrorUrl(inLine.getError());
