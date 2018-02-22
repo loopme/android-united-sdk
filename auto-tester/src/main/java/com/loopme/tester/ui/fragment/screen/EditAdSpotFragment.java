@@ -26,6 +26,7 @@ public class EditAdSpotFragment extends BaseFragment {
 
     private static final String ARG_VIEW_MODE = "ARG_VIEW_MODE";
     public static final String ARG_AD_SPOT = "ARG_AD_SPOT";
+    public static final String SHORT_APP_KEY = "test_mpu";
 
     private RadioGroup mSdkGroup;
     private RadioGroup mAdTypeGroup;
@@ -183,14 +184,17 @@ public class EditAdSpotFragment extends BaseFragment {
         String baseUrl = getBaseUrl(sdk);
         newAdSpot.setBaseUrl(baseUrl);
 
-        if (!TextUtils.isEmpty(appkey) && !TextUtils.isEmpty(baseUrl)) {
-            newAdSpot.setAppKey(appkey);
-            newAdSpot.setTime(System.currentTimeMillis());
-            return newAdSpot;
-        } else {
-            Toast.makeText(mContext, getString(R.string.to_save_adspot_fill_fields), Toast.LENGTH_LONG).show();
+        if (!isValidAppkey(appkey)) {
+            Toast.makeText(mContext, getString(R.string.appkey_is_to_short), Toast.LENGTH_LONG).show();
+            return null;
         }
-        return null;
+        newAdSpot.setAppKey(appkey);
+        newAdSpot.setTime(System.currentTimeMillis());
+        return newAdSpot;
+    }
+
+    private boolean isValidAppkey(String appkey) {
+        return TextUtils.equals(appkey, SHORT_APP_KEY) || (!TextUtils.isEmpty(appkey) && appkey.length() > 9);
     }
 
     private String getBaseUrl(AdSdk sdk) {

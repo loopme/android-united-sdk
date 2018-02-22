@@ -46,6 +46,7 @@
     <string name="ad_is_shown">Ad is shown</string>
     <string name="ad_loaded">Ad loaded</string>
     <string name="to_save_adspot_fill_fields">To save ad spot all fields must be initialized</string>
+    <string name="appkey_is_to_short">"Appkey length is to short"</string>
     <string name="empty_string" />
 
     <string name="fragment_import_cancel_button">Cancel</string>
