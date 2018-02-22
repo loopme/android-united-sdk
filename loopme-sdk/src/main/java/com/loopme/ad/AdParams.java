@@ -356,7 +356,7 @@ public class AdParams implements Serializable {
     }
 
     public void setCompanionCreativeViewEvents(List<String> companionCreativeViewEvents) {
-        this.mCompanionCreativeViewEventsList = companionCreativeViewEvents;
+        this.mCompanionCreativeViewEventsList.addAll(companionCreativeViewEvents);
     }
 
     public List<Tracking> getTrackingEventsList() {
@@ -440,6 +440,8 @@ public class AdParams implements Serializable {
 
         mAdVerificationJavaScriptUrlList.addAll(parser.getAdVerificationJavaScriptUrlList());
         mVideoClicksList.addAll(parser.getVideoClicksList());
+        mCompanionCreativeViewEventsList.addAll(parser.getCompanionCreativeViewList());
+        mEndCardClicksList.addAll(parser.getCompanionClickTrackingList());
     }
 
     public List<String> getErrorUrlList() {

@@ -1,5 +1,6 @@
 package com.loopme.xml;
 
+import android.text.TextUtils;
 import com.loopme.parser.xml.Attribute;
 import com.loopme.parser.xml.Text;
 import com.loopme.tracker.constants.EventConstants;
@@ -62,5 +63,9 @@ public class Tracking {
 
     public boolean isTypeOf(String eventType) {
         return event != null && event.equalsIgnoreCase(eventType);
+    }
+
+    public boolean hasText() {
+        return !TextUtils.isEmpty(text);
     }
 }

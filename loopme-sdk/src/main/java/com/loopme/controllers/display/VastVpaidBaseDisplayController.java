@@ -58,6 +58,24 @@ public abstract class VastVpaidBaseDisplayController extends BaseDisplayControll
         postVpaidDidReachEnd(eventsUrlOrType);
     }
 
+    protected void postVideoClicks(String currentPosition) {
+        for (String trackUrl : mAdParams.getVideoClicks()) {
+            postVideoEvent(trackUrl, currentPosition);
+        }
+    }
+
+    protected void postEndCardClicks() {
+        for (String trackUrl : mAdParams.getEndCardClicks()) {
+            postVideoEvent(trackUrl);
+        }
+    }
+
+    protected void onEndCardAppears() {
+        for (String trackUrl : mAdParams.getCompanionCreativeViewEvents()) {
+            postVideoEvent(trackUrl);
+        }
+    }
+
     private void postVpaidDidReachEnd(String eventType) {
         if (!mIsVpaidEventTracked) {
             if (this instanceof DisplayControllerVpaid && TextUtils.equals(eventType, EventConstants.COMPLETE)) {

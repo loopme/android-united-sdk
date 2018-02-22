@@ -43,6 +43,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     private VastWebView mWebView;
     private int mVerificationScriptCounter;
     private int mVerificationScriptNumber;
+    private boolean mIsAdSkipped;
 
     public DisplayControllerVast(LoopMeAd loopMeAd) {
         super(loopMeAd);
@@ -88,6 +89,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     public void onPlay(int position) {
+        mIsAdSkipped = false;
         postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -126,14 +128,18 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     public void onPause() {
         super.onPause();
         pauseMediaPlayer();
-        postVideoEvent(EventConstants.PAUSE);
+        if (!mIsAdSkipped) {
+            postVideoEvent(EventConstants.PAUSE);
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
         resumeSdk24AndAbove();
-        postVideoEvent(EventConstants.RESUME);
+        if (!mIsAdSkipped) {
+            postVideoEvent(EventConstants.RESUME);
+        }
     }
 
     private void resumeSdk24AndAbove() {
@@ -197,14 +203,10 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     public void onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
         if (isPlaying()) {
             url = mAdParams.getVideoRedirectUrl();
-            for (String trackUrl : mAdParams.getVideoClicks()) {
-                postVideoEvent(trackUrl, getCurrentPositionAsString());
-            }
+            postVideoClicks(getCurrentPositionAsString());
         } else {
             url = mAdParams.getEndCardRedirectUrl();
-            for (String trackUrl : mAdParams.getEndCardClicks()) {
-                postVideoEvent(trackUrl);
-            }
+            postEndCardClicks();
         }
         onAdClicked();
         super.onRedirect(url, mLoopMeAd);
@@ -247,12 +249,14 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     private void skipVideo(boolean skipEvent) {
+        mIsAdSkipped = true;
         pauseMediaPlayer();
         destroyVideoTimer();
         if (TextUtils.isEmpty(mImageUri)) {
             closeSelf();
         } else {
             mViewControllerVast.showEndCard(mImageUri);
+            onEndCardAppears();
         }
         if (skipEvent) {
             postVideoEvent(EventConstants.SKIP, getCurrentPositionAsString());
