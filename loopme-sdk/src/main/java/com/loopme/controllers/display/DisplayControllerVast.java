@@ -318,6 +318,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
+        Logging.out(mLogTag, "MediaPlayer onError():  what - " + what + "; extra - " + extra);
         onInternalLoadFail(Errors.PROBLEM_DISPLAYING_MEDIAFILE);
         closeSelf();
         return false;

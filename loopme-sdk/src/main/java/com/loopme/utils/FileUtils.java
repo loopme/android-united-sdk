@@ -156,7 +156,7 @@ public class FileUtils {
         Logging.out(LOG_TAG, "Cache dir: " + parentDir.getAbsolutePath());
 
         File[] files = parentDir.listFiles();
-        if (files == null){
+        if (files == null) {
             return null;
         }
         for (File file : files) {
@@ -171,30 +171,12 @@ public class FileUtils {
         return file != null && !file.isDirectory();
     }
 
-    public static String detectFileName(String videoUrl) {
-        String fileName = null;
-        try {
-            URL url = new URL(videoUrl);
-            fileName = url.getFile();
-            if (fileName != null && !fileName.isEmpty()) {
-                if (!fileName.endsWith(Constants.MP4_FORMAT)) {
-                    int urlHash = videoUrl.hashCode();
-                    // return positive value
-                    return Long.toString(urlHash & 0xFFFFFFFFL);
-                } else {
-                    fileName = fileName.replace(Constants.MP4_FORMAT, "");
-                    int lastSlash = fileName.lastIndexOf("/");
-                    int length = fileName.length();
-                    fileName = fileName.substring(lastSlash + 1, length);
-
-                    if (fileName.length() > MAX_FILE_NAME_LENGTH) {
-                        fileName = fileName.substring(0, MAX_FILE_NAME_LENGTH);
-                    }
-                }
-            }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+    public static String getFileName(String fileUrl) {
+        if (!TextUtils.isEmpty(fileUrl)) {
+            String[] components = fileUrl.split("/");
+            return components[components.length - 1];
+        } else {
+            return "";
         }
-        return fileName;
     }
 }
