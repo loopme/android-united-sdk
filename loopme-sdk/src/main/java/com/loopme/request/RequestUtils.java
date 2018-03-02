@@ -368,7 +368,10 @@ public class RequestUtils {
     }
 
     public int[] getProtocols() {
-        return new int[]{RequestConstants.PROTOCOLS_VAST_2_0, RequestConstants.PROTOCOLS_VAST_3_0};
+        return new int[]{RequestConstants.PROTOCOLS_VAST_2_0,
+                RequestConstants.PROTOCOLS_VAST_3_0,
+                RequestConstants.PROTOCOLS_VAST_4_0,
+                RequestConstants.PROTOCOLS_VAST_4_0_WRAPPER};
     }
 
 
