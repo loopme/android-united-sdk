@@ -51,6 +51,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     private String mAppKey;
     protected boolean mIsReady;
     private int mAdId;
+    private volatile boolean mIsReverseOrientaionRequest;
 
     public LoopMeAd(Activity context, String appKey) {
         if (context == null || TextUtils.isEmpty(appKey)) {
@@ -476,5 +477,13 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     public int getAdId() {
         return mAdId;
+    }
+
+    public void setReversOrientationRequest() {
+        mIsReverseOrientaionRequest = true;
+    }
+
+    public boolean isReverseOrientationRequest() {
+        return mIsReverseOrientaionRequest;
     }
 }
