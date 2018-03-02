@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.loopme.tester.BuildConfig;
+import com.loopme.tester.Constants;
 import com.loopme.tester.R;
 import com.loopme.tester.db.contracts.AdContract;
 import com.loopme.tester.enums.LoadType;
@@ -372,9 +373,9 @@ public class MainActivity extends BaseActivity implements
             }
             case SEARCH_BEFORE_CREATE_LOADER_ID: {
                 if (cursor != null && !cursor.isClosed() && cursor.getCount() >= 0 && cursor.moveToFirst()) {
-                    onCheckAdSpotResult(true);
+                    onCheckAdSpotResult(true, Utils.getAdSpotId(loader));
                 } else {
-                    onCheckAdSpotResult(false);
+                    onCheckAdSpotResult(false, Constants.AD_SPOT_DOES_NOT_EXIST_ID);
                 }
                 break;
             }
@@ -495,13 +496,13 @@ public class MainActivity extends BaseActivity implements
         Utils.requestPermission(this, permissionType, requestCode);
     }
 
-    private void onCheckAdSpotResult(final boolean isAdSpotAlreadyExist) {
+    private void onCheckAdSpotResult(final boolean isAdSpotAlreadyExist, final long existedAdSpotId) {
         postRunnable(new Runnable() {
             @Override
             public void run() {
                 Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.root);
                 if (fragment instanceof EditAdSpotFragment) {
-                    ((EditAdSpotFragment) fragment).onCheckAdSpotResult(isAdSpotAlreadyExist);
+                    ((EditAdSpotFragment) fragment).onCheckAdSpotResult(isAdSpotAlreadyExist, existedAdSpotId);
                 }
             }
         });
