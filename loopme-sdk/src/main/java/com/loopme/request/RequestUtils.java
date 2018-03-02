@@ -284,12 +284,7 @@ public class RequestUtils {
             return;
         }
         boolean isLandscape = Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation;
-        if (isReverseOrientation()) {
-            mOr = isLandscape ? "p" : "l";
-            Logging.out(RequestUtils.class.getSimpleName(), "Request with reversed screen orientation.");
-        } else {
-            mOr = isLandscape ? "l" : "p";
-        }
+        mOr = isLandscape ? "p" : "l";
     }
 
     private boolean isReverseOrientation() {
@@ -432,8 +427,13 @@ public class RequestUtils {
 
     private void setAdSize(Context context) {
         int[] adSize = RequestParamsUtils.getAdSize(context, mLoopMeAd);
-        mWidth = adSize[0];
-        mHeight = adSize[1];
+        if (isReverseOrientation()) {
+            mWidth = adSize[1];
+            mHeight = adSize[0];
+        } else {
+            mWidth = adSize[0];
+            mHeight = adSize[1];
+        }
     }
 
     public static String getAdvertisingIdInfo(Context context) {
