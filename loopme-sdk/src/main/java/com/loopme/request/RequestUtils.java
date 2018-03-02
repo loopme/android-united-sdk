@@ -15,6 +15,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import com.loopme.BuildConfig;
+import com.loopme.Logging;
 import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.R;
 import com.loopme.ad.LoopMeAd;
@@ -282,12 +283,17 @@ public class RequestUtils {
             mOr = "p";
             return;
         }
-        int orientation = context.getResources().getConfiguration().orientation;
-        if (Configuration.ORIENTATION_LANDSCAPE == orientation) {
-            mOr = "l";
+        boolean isLandscape = Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation;
+        if (isReverseOrientation()) {
+            mOr = isLandscape ? "p" : "l";
+            Logging.out(RequestUtils.class.getSimpleName(), "Request with reversed screen orientation.");
         } else {
-            mOr = "p";
+            mOr = isLandscape ? "l" : "p";
         }
+    }
+
+    private boolean isReverseOrientation() {
+        return mLoopMeAd != null && mLoopMeAd.isReverseOrientationRequest();
     }
 
     public String getChargeLevel(Context context) {
