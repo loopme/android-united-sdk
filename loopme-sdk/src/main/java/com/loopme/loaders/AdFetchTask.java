@@ -48,6 +48,7 @@ public class AdFetchTask implements Runnable, Observer {
     private static final String UNEXPECTED = "Unexpected";
     private boolean mIsVastVpaidAd;
     private Timers mTimers;
+    private volatile boolean mFirstRequest = true;
 
     public AdFetchTask(LoopMeAd loopMeAd, AdFetcherListener adFetcherListener) {
         mLoopMeAd = loopMeAd;
@@ -59,6 +60,10 @@ public class AdFetchTask implements Runnable, Observer {
 
     public void fetch() {
         startRequestTimer();
+        runFetchTask();
+    }
+
+    private void runFetchTask() {
         mFetchTask = mExecutorService.submit(this);
     }
 
@@ -75,6 +80,16 @@ public class AdFetchTask implements Runnable, Observer {
         if (mVastWrapperFetcher != null) {
             mVastWrapperFetcher.cancel();
             mVastWrapperFetcher = null;
+        }
+    }
+
+    private void handleNoAds() {
+        if (mFirstRequest) {
+            mFirstRequest = false;
+            mLoopMeAd.setReversOrientationRequest();
+            runFetchTask();
+        } else {
+            onErrorResult(Errors.NO_ADS_FOUND);
         }
     }
 
@@ -191,7 +206,7 @@ public class AdFetchTask implements Runnable, Observer {
         if (response == null) {
             onErrorResult(Errors.NO_CONTENT);
         } else if (response.code() == RESPONSE_NO_ADS) {
-            onErrorResult(Errors.NO_ADS_FOUND);
+            handleNoAds();
         } else {
             onErrorResult(new LoopMeError(Constants.BAD_SERVERS_CODE + response.code()));
         }

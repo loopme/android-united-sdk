@@ -15,6 +15,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import com.loopme.BuildConfig;
+import com.loopme.Logging;
 import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.R;
 import com.loopme.ad.LoopMeAd;
@@ -282,12 +283,12 @@ public class RequestUtils {
             mOr = "p";
             return;
         }
-        int orientation = context.getResources().getConfiguration().orientation;
-        if (Configuration.ORIENTATION_LANDSCAPE == orientation) {
-            mOr = "l";
-        } else {
-            mOr = "p";
-        }
+        boolean isLandscape = Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation;
+        mOr = isLandscape ? "p" : "l";
+    }
+
+    private boolean isReverseOrientation() {
+        return mLoopMeAd != null && mLoopMeAd.isReverseOrientationRequest();
     }
 
     public String getChargeLevel(Context context) {
@@ -426,8 +427,13 @@ public class RequestUtils {
 
     private void setAdSize(Context context) {
         int[] adSize = RequestParamsUtils.getAdSize(context, mLoopMeAd);
-        mWidth = adSize[0];
-        mHeight = adSize[1];
+        if (isReverseOrientation()) {
+            mWidth = adSize[1];
+            mHeight = adSize[0];
+        } else {
+            mWidth = adSize[0];
+            mHeight = adSize[1];
+        }
     }
 
     public static String getAdvertisingIdInfo(Context context) {
