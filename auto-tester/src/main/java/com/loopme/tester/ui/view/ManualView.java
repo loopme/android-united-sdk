@@ -1,16 +1,19 @@
 package com.loopme.tester.ui.view;
 
-import android.Manifest;
 import android.app.Activity;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.loopme.ad.LoopMeAd;
 import com.loopme.tester.R;
 import com.loopme.tester.ads.Ad;
 import com.loopme.tester.ads.AdListener;
@@ -22,11 +25,10 @@ import com.loopme.tester.enums.AdSdk;
 import com.loopme.tester.enums.AdType;
 import com.loopme.tester.model.AdSpot;
 import com.loopme.tester.ui.activity.BaseActivity;
-import com.loopme.tester.ui.activity.MainActivity;
 import com.loopme.utils.Utils;
 import com.mopub.mobileads.MoPubView;
 
-public class ManualView implements View.OnClickListener, AdListener {
+public class ManualView implements View.OnClickListener, AdListener, AdapterView.OnItemSelectedListener {
     private Ad mAd;
     private View mRootView;
     private AdSpot mAdSpot;
@@ -63,6 +65,13 @@ public class ManualView implements View.OnClickListener, AdListener {
         mLoadButton = (TextView) mRootView.findViewById(R.id.load_ad_manual);
         mShowButton = (TextView) mRootView.findViewById(R.id.show_ad_manual);
         mScrollView = (ScrollView) mRootView.findViewById(R.id.scrollview);
+
+        Spinner adTypeSpinner = (Spinner) mRootView.findViewById(R.id.ad_type_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(mActivity, R.array.ad_types, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adTypeSpinner.setAdapter(adapter);
+        adTypeSpinner.setOnItemSelectedListener(this);
+
         mShowButton.setText(R.string.show);
         mLoadingLabel = (TextView) mRootView.findViewById(R.id.loading_label_manual);
         mLoadingLabel.setVisibility(View.VISIBLE);
@@ -359,5 +368,22 @@ public class ManualView implements View.OnClickListener, AdListener {
         params.addRule(RelativeLayout.CENTER_IN_PARENT);
         moPubView.setLayoutParams(params);
         return new AdMopubBanner(moPubView, mAdSpot.getAppKey(), this);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        setPreferredAd(parent.getItemAtPosition(position).toString());
+    }
+
+    private void setPreferredAd(String preferredAd) {
+        LoopMeAd.Type type = LoopMeAd.Type.fromString(preferredAd);
+        if (mAd != null) {
+            mAd.setPreferredAd(type);
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }

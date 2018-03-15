@@ -111,4 +111,11 @@
     <string name="landscape_interstitial">Landscape interstitial</string>
     <string name="portrait_interstitial">Portrait interstitial</string>
     <string name="enable_auto_loading">Enable auto loading</string>
+
+    <string-array name="ad_types">
+        <item>ALL</item>
+        <item>HTML</item>
+        <item>VIDEO_SKIPPABLE</item>
+        <item>VIDEO_NON_SKIPPABLE</item>
+    </string-array>
 </resources>
