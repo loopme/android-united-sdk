@@ -42,7 +42,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     private AdParams mAdParams;
     private Activity mContext;
-    private AdType mAdType;
+    private Type mPreferredAdType = Type.ALL;
     private Timers mTimers;
     private AdFetchTask mAdFetchTask;
 
@@ -51,7 +51,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     private String mAppKey;
     protected boolean mIsReady;
     private int mAdId;
-    private volatile boolean mIsReverseOrientaionRequest;
+    private volatile boolean mIsReverseOrientationRequest;
 
     public LoopMeAd(Activity context, String appKey) {
         if (context == null || TextUtils.isEmpty(appKey)) {
@@ -210,6 +210,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         } else {
             onInternalLoadFail(Errors.DOWNLOAD_ERROR);
         }
+        mIsReverseOrientationRequest = false;
     }
 
     private void proceedPrepareAd(AdParams adParam) {
@@ -347,6 +348,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
             error.setErrorMessage(String.valueOf(error.getErrorCode()));
         }
         onInternalLoadFail(error);
+        mIsReverseOrientationRequest = false;
     }
 
     @Override
@@ -393,12 +395,14 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         this.mAdParams = mAdParams;
     }
 
-    public AdType getAdType() {
-        return mAdType;
+    public Type getPreferredAdType() {
+        return mPreferredAdType;
     }
 
-    public void setAdType(AdType mAdType) {
-        this.mAdType = mAdType;
+    public void setPreferredAdType(Type preferredAdType) {
+        if (preferredAdType != null) {
+            mPreferredAdType = preferredAdType;
+        }
     }
 
     public Activity getContext() {
@@ -480,10 +484,32 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     }
 
     public void setReversOrientationRequest() {
-        mIsReverseOrientaionRequest = true;
+        mIsReverseOrientationRequest = true;
     }
 
     public boolean isReverseOrientationRequest() {
-        return mIsReverseOrientaionRequest;
+        return mIsReverseOrientationRequest;
+    }
+
+    public enum Type {
+        HTML,
+        VIDEO_SKIPPABLE,
+        VIDEO_NON_SKIPPABLE,
+        ALL;
+
+        public static Type fromString(String type) {
+            if (TextUtils.isEmpty(type)) {
+                return ALL;
+            }
+            if (HTML.name().equalsIgnoreCase(type)) {
+                return HTML;
+            } else if (VIDEO_SKIPPABLE.name().equalsIgnoreCase(type)) {
+                return VIDEO_SKIPPABLE;
+            } else if (VIDEO_NON_SKIPPABLE.name().equalsIgnoreCase(type)) {
+                return VIDEO_NON_SKIPPABLE;
+            } else {
+                return ALL;
+            }
+        }
     }
 }

@@ -15,7 +15,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import com.loopme.BuildConfig;
-import com.loopme.Logging;
 import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.R;
 import com.loopme.ad.LoopMeAd;
@@ -68,6 +67,8 @@ public class RequestUtils {
     private int mHeight;
 
     private LoopMeAd mLoopMeAd;
+    private int mSkippable;
+    private int[] mApi;
 
     public RequestUtils(Context context, LoopMeAd loopMeAd) {
         if (loopMeAd != null) {
@@ -97,6 +98,8 @@ public class RequestUtils {
         setInstl();
         setIp(context);
         setPn(context);
+        setSkippable();
+        setApi();
     }
 
     public String getAppBundle() {
@@ -334,8 +337,27 @@ public class RequestUtils {
         return String.valueOf(System.currentTimeMillis());
     }
 
+
+    private void setApi() {
+        LoopMeAd.Type adType = mLoopMeAd.getPreferredAdType();
+        switch (adType) {
+            case ALL: {
+                mApi = new int[]{RequestConstants.FRAMEWORK_MRAID_2, RequestConstants.FRAMEWORK_VIPAID_2_0};
+                break;
+            }
+            case HTML: {
+                mApi = new int[]{RequestConstants.FRAMEWORK_MRAID_2};
+                break;
+            }
+            case VIDEO_SKIPPABLE:
+            case VIDEO_NON_SKIPPABLE: {
+                mApi = new int[]{RequestConstants.FRAMEWORK_VIPAID_2_0};
+            }
+        }
+    }
+
     public int[] getApi() {
-        return new int[]{RequestConstants.FRAMEWORK_MRAID_2, RequestConstants.FRAMEWORK_VIPAID_2_0};
+        return mApi;
     }
 
     public int getWidth() {
@@ -476,5 +498,20 @@ public class RequestUtils {
             e.printStackTrace();
         }
         return object;
+    }
+
+    public int getSkippable() {
+        return mSkippable;
+    }
+
+    private void setSkippable() {
+        LoopMeAd.Type adType = mLoopMeAd.getPreferredAdType();
+        switch (adType) {
+            case ALL:
+            case VIDEO_SKIPPABLE: {
+                mSkippable = 1;
+                break;
+            }
+        }
     }
 }

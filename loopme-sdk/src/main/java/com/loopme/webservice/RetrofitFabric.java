@@ -35,7 +35,7 @@ public class RetrofitFabric {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
-                .addNetworkInterceptor(new UserAgentInterceptor())
+                .addNetworkInterceptor(new HeaderInterceptor())
                 .build();
         return new Retrofit
                 .Builder()
@@ -49,7 +49,7 @@ public class RetrofitFabric {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
-                .addNetworkInterceptor(new UserAgentInterceptor())
+                .addNetworkInterceptor(new HeaderInterceptor())
                 .build();
         return new Retrofit.Builder()
                 .baseUrl(Constants.OPEN_RTB_URL)

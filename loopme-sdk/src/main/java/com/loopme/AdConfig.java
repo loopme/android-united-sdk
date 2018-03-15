@@ -112,4 +112,13 @@ public abstract class AdConfig implements AdTargeting {
     private boolean isApi19() {
         return Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT;
     }
+
+    public void setPreferredAd(LoopMeAd.Type type) {
+        if (mFirstLoopMeAd != null) {
+            mFirstLoopMeAd.setPreferredAdType(type);
+        }
+        if (mSecondLoopMeAd != null) {
+            mSecondLoopMeAd.setPreferredAdType(type);
+        }
+    }
 }
