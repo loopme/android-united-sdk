@@ -84,13 +84,17 @@ public class AdFetchTask implements Runnable, Observer {
     }
 
     private void handleNoAds() {
-        if (mFirstRequest) {
+        if (mFirstRequest && isInterstitial()) {
             mFirstRequest = false;
             mLoopMeAd.setReversOrientationRequest();
             runFetchTask();
         } else {
             onErrorResult(Errors.NO_ADS_FOUND);
         }
+    }
+
+    private boolean isInterstitial() {
+        return mLoopMeAd != null && mLoopMeAd.isInterstitial();
     }
 
     @Override

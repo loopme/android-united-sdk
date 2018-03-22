@@ -349,8 +349,7 @@ public class RequestUtils {
                 mApi = new int[]{RequestConstants.FRAMEWORK_MRAID_2};
                 break;
             }
-            case VIDEO_SKIPPABLE:
-            case VIDEO_NON_SKIPPABLE: {
+            case VIDEO: {
                 mApi = new int[]{RequestConstants.FRAMEWORK_VIPAID_2_0};
             }
         }
@@ -508,7 +507,7 @@ public class RequestUtils {
         LoopMeAd.Type adType = mLoopMeAd.getPreferredAdType();
         switch (adType) {
             case ALL:
-            case VIDEO_SKIPPABLE: {
+            case VIDEO: {
                 mSkippable = 1;
                 break;
             }

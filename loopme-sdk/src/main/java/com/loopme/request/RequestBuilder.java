@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.stream.Stream;
 
 /**
  * Created by katerina on 6/11/17.
@@ -130,16 +131,19 @@ public class RequestBuilder implements Serializable {
 
             switch (loopMeAd.getPreferredAdType()) {
                 case ALL: {
-                    impObj.put(BANNER, bannerObj);
-                    impObj.put(VIDEO, videoObj);
+                    if (!loopMeAd.isCustomBanner()) {
+                        impObj.put(BANNER, bannerObj);
+                    }
+                    if (!loopMeAd.isExpandBanner()) {
+                        impObj.put(VIDEO, videoObj);
+                    }
                     break;
                 }
                 case HTML: {
                     impObj.put(BANNER, bannerObj);
                     break;
                 }
-                case VIDEO_NON_SKIPPABLE:
-                case VIDEO_SKIPPABLE: {
+                case VIDEO: {
                     impObj.put(VIDEO, videoObj);
                     break;
                 }

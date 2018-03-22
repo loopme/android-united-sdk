@@ -82,7 +82,6 @@ public class Constants {
 
     public static boolean USE_MOBILE_NETWORK_FOR_CACHING = false;
     public static String sCacheDirectory = "";
-    private static AdSpotDimensions sAdSpotDimensions;
     public static final String EXTRAS_ALLOW_ORIENTATION_CHANGE = "allowOrientationChange";
     public static final String EXTRAS_FORCE_ORIENTATION = "forceOrientation";
 
@@ -312,14 +311,6 @@ public class Constants {
         public static final int LEFT = 2;
         public static final int RIGHT = 3;
         public static final int BACK = 4;
-    }
-
-    public static AdSpotDimensions getAdSpotDimensions() {
-        return sAdSpotDimensions;
-    }
-
-    public static void setAdSpotDimensions(AdSpotDimensions adSpotDimensions) {
-        sAdSpotDimensions = adSpotDimensions;
     }
 
     public enum RetrofitType {

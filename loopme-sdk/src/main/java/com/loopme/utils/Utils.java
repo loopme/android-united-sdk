@@ -34,7 +34,6 @@ import com.loopme.ResourceInfo;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.request.AES;
-import com.loopme.tracker.constants.EventConstants;
 import com.loopme.vast.TrackingEvent;
 import com.loopme.xml.Tracking;
 
@@ -536,12 +535,7 @@ public class Utils {
     }
 
     public static int convertDpToPixel(float dp) {
-        if (sResources != null) {
-            return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
-                    sResources.getDisplayMetrics());
-        } else {
-            return ZERO;
-        }
+        return sResources != null ? (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, sResources.getDisplayMetrics()) : ZERO;
     }
 
     public static int roundNumberToHundredth(int number) {
@@ -668,5 +662,21 @@ public class Utils {
 
     public static boolean isLandscape() {
         return ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE == getScreenOrientation();
+    }
+
+    public static boolean isCustomBannerSize(int width, int height) {
+        return !(isExpandBanner(width, height) || isMpuBanner(width, height));
+    }
+
+    public static boolean isExpandBanner(int width, int height) {
+        AdSpotDimensions expandBanner = new AdSpotDimensions(320, 50);
+        AdSpotDimensions customSize = new AdSpotDimensions(width, height);
+        return expandBanner.equals(customSize);
+    }
+
+    public static boolean isMpuBanner(int width, int height) {
+        AdSpotDimensions mpuBanner = new AdSpotDimensions(300, 250);
+        AdSpotDimensions customSize = new AdSpotDimensions(width, height);
+        return mpuBanner.equals(customSize);
     }
 }

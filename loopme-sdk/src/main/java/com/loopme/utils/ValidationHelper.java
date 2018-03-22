@@ -29,6 +29,7 @@ public class ValidationHelper {
 
     public interface OnValidationHelperListener {
         void onError(LoopMeError error);
+
         void onSuccess();
     }
 
@@ -64,6 +65,11 @@ public class ValidationHelper {
             return false;
         } else if (!isProperlyAndroidVersion()) {
             error = "Not supported Android version. Expected 5+";
+            Logging.out(LOG_TAG, error);
+            loopMeAd.onAdLoadFail(new LoopMeError(error));
+            return false;
+        } else if (loopMeAd.isCustomBannerHtml() || loopMeAd.isExpandBannerVideo()) {
+            error = "Container size is not valid for chosen ad type";
             Logging.out(LOG_TAG, error);
             loopMeAd.onAdLoadFail(new LoopMeError(error));
             return false;

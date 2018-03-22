@@ -21,9 +21,11 @@ import com.loopme.controllers.interfaces.DisplayController;
 import com.loopme.debugging.LiveDebug;
 import com.loopme.loaders.AdFetchTask;
 import com.loopme.models.Errors;
+import com.loopme.request.RequestParamsUtils;
 import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
 import com.loopme.tracker.partners.LoopMeTracker;
+import com.loopme.utils.Utils;
 import com.loopme.utils.ValidationHelper;
 
 import java.util.Observable;
@@ -323,7 +325,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     private void proceedFetchAd() {
         setAdState(Constants.AdState.LOADING);
         startTimer(TimersType.FETCHER_TIMER, null);
-        Constants.setAdSpotDimensions(getAdSpotDimensions());
         mAdFetchTask = new AdFetchTask(this, initAdFetcherListener());
         mAdFetchTask.fetch();
     }
@@ -493,8 +494,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     public enum Type {
         HTML,
-        VIDEO_SKIPPABLE,
-        VIDEO_NON_SKIPPABLE,
+        VIDEO,
         ALL;
 
         public static Type fromString(String type) {
@@ -503,13 +503,33 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
             }
             if (HTML.name().equalsIgnoreCase(type)) {
                 return HTML;
-            } else if (VIDEO_SKIPPABLE.name().equalsIgnoreCase(type)) {
-                return VIDEO_SKIPPABLE;
-            } else if (VIDEO_NON_SKIPPABLE.name().equalsIgnoreCase(type)) {
-                return VIDEO_NON_SKIPPABLE;
+            } else if (VIDEO.name().equalsIgnoreCase(type)) {
+                return VIDEO;
             } else {
                 return ALL;
             }
         }
+    }
+
+    public boolean isCustomBannerHtml() {
+        return isCustomBanner() && mPreferredAdType == Type.HTML;
+    }
+
+    public boolean isCustomBanner() {
+        int[] adSize = RequestParamsUtils.getAdSize(mContext, this);
+        int width = adSize[0];
+        int height = adSize[1];
+        return isBanner() && Utils.isCustomBannerSize(width, height);
+    }
+
+    public boolean isExpandBannerVideo() {
+        return isExpandBanner() && mPreferredAdType == Type.VIDEO;
+    }
+
+    public boolean isExpandBanner() {
+        int[] adSize = RequestParamsUtils.getAdSize(mContext, this);
+        int width = adSize[0];
+        int height = adSize[1];
+        return isBanner() && Utils.isExpandBanner(width, height);
     }
 }

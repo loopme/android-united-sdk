@@ -61,7 +61,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     public DisplayControllerVpaid(LoopMeAd loopMeAd) {
         super(loopMeAd);
-        mVpaidBridge = new VpaidBridgeImpl(this, mLoopMeAd.getAdParams());
+        mVpaidBridge = new VpaidBridgeImpl(this, mLoopMeAd.getAdParams(), mLoopMeAd.getAdSpotDimensions());
         mViewControllerVpaid = new ViewControllerVpaid(this);
         mVideoDuration = mAdParams.getDuration();
         mLogTag = DisplayControllerVast.class.getSimpleName();
