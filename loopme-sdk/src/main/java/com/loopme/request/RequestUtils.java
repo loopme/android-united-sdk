@@ -62,7 +62,7 @@ public class RequestUtils {
     private int mDeviceWidthPx;
     private int mDeviceHeightPx;
     private int mDeviceType;
-    private int mJs;
+    private int mJs = 1;
     private int mWidth;
     private int mHeight;
 
@@ -90,7 +90,7 @@ public class RequestUtils {
         setDeviceHeightPx(context);
         setDeviceWidthPx(context);
         setConnectionType(context);
-        setJs(context);
+        setJs(true);
         setUa(context);
         setWn(context);
         setOr(context);
@@ -184,16 +184,9 @@ public class RequestUtils {
         return mJs;
     }
 
-    public void setJs(Context context) {
-        if (context != null && context instanceof Activity) {
-            final Activity activity = (Activity) context;
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    boolean javaScriptEnabled = new WebView(activity).getSettings().getJavaScriptEnabled();
-                    mJs = javaScriptEnabled ? 1 : 0;
-                }
-            });
+    public void setJs(boolean enabled) {
+        if (enabled) {
+            mJs = 1;
         }
     }
 
