@@ -164,5 +164,8 @@
     <dimen name="results_container_margin_bottom">5dp</dimen>
     <dimen name="separator_height_10dp">10dp</dimen>
     <dimen name="enable_auoloading_checkbox_padding_left">5dp</dimen>
+    <dimen name="dialog_size_margin_right">10dp</dimen>
+    <dimen name="fragment_ad_spot_ad_type_spinner_width">220dp</dimen>
+    <dimen name="fragment_ad_spot_ad_type_spinner_margin">15dp</dimen>
 
 </resources>

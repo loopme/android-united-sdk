@@ -306,11 +306,11 @@
 
                 <Spinner
                     android:id="@+id/ad_type_spinner"
-                    android:layout_width="220dp"
+                    android:layout_width="@dimen/fragment_ad_spot_ad_type_spinner_width"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginBottom="15dp" />
+                    android:layout_marginBottom="@dimen/fragment_ad_spot_ad_type_spinner_margin" />
             </RelativeLayout>
         </RelativeLayout>
     </ScrollView>

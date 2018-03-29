@@ -41,7 +41,7 @@ android {
             buildConfigField "String", "DV_TOKEN", DV_TOKEN
             buildConfigField "String", "SDK_TYPE", SDK_TYPE
             buildConfigField "String", "SUPPORTED_TRACKERS", SUPPORTED_TRACKERS
-            buildConfigField "String", "OPEN_RTB_VERSION", '\"2.5\"'
+            buildConfigField "String", "OPEN_RTB_VERSION", OPEN_RTB_VERSION
             buildConfigField "Boolean", "DEBUG_MODE", "true"
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release

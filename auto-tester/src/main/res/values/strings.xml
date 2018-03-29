@@ -111,6 +111,8 @@
     <string name="landscape_interstitial">Landscape interstitial</string>
     <string name="portrait_interstitial">Portrait interstitial</string>
     <string name="enable_auto_loading">Enable auto loading</string>
+    <string name="dialog_size_hint_width">Width</string>
+    <string name="dialog_size_hint_height">Height</string>
 
     <string-array name="ad_types">
         <item>ALL</item>
