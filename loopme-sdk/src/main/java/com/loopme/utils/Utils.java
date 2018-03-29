@@ -669,14 +669,34 @@ public class Utils {
     }
 
     public static boolean isExpandBanner(int width, int height) {
-        AdSpotDimensions expandBanner = new AdSpotDimensions(320, 50);
+        AdSpotDimensions expandBanner = new AdSpotDimensions(Constants.Banner.EXPAND_BANNER_WIDTH, Constants.Banner.EXPAND_BANNER_HEIGHT);
         AdSpotDimensions customSize = new AdSpotDimensions(width, height);
         return expandBanner.equals(customSize);
     }
 
     public static boolean isMpuBanner(int width, int height) {
-        AdSpotDimensions mpuBanner = new AdSpotDimensions(300, 250);
+        AdSpotDimensions mpuBanner = new AdSpotDimensions(Constants.Banner.MPU_BANNER_WIDTH, Constants.Banner.MPU_BANNER_HEIGHT);
         AdSpotDimensions customSize = new AdSpotDimensions(width, height);
         return mpuBanner.equals(customSize);
+    }
+
+    public static boolean isWithinAcceptableLimits(int sizeToCheck, int currentSize) {
+        int minSizeToCheck = sizeToCheck - Constants.Banner.SIZE_DISCREPANCY;
+        int maxSizeToCheck = sizeToCheck + Constants.Banner.SIZE_DISCREPANCY;
+
+        return minSizeToCheck <= currentSize && currentSize <= maxSizeToCheck;
+    }
+
+    public static void roundBannersSize(int[] currentSizeArray, int[] bannerSizeToCheck) {
+        int currentWidth = currentSizeArray[0];
+        int currentHeight = currentSizeArray[1];
+
+        int bannerWidth = bannerSizeToCheck[0];
+        int bannerHeight = bannerSizeToCheck[1];
+
+        if (Utils.isWithinAcceptableLimits(bannerWidth, currentWidth) && Utils.isWithinAcceptableLimits(bannerHeight, currentHeight)) {
+            currentSizeArray[0] = bannerWidth;
+            currentSizeArray[1] = bannerHeight;
+        }
     }
 }

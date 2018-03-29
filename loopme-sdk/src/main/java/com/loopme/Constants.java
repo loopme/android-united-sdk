@@ -313,6 +313,17 @@ public class Constants {
         public static final int BACK = 4;
     }
 
+    public static class Banner {
+        public static final int MPU_BANNER_WIDTH = 300;
+        public static final int MPU_BANNER_HEIGHT = 250;
+        public static final int EXPAND_BANNER_WIDTH = 320;
+        public static final int EXPAND_BANNER_HEIGHT = 50;
+        public static final int SIZE_DISCREPANCY = 2;
+
+        public static int[] EXPANDABLE_BANNER_SIZE = {EXPAND_BANNER_WIDTH, EXPAND_BANNER_HEIGHT};
+        public static int[] MPU_BANNER_SIZE = {MPU_BANNER_WIDTH, MPU_BANNER_HEIGHT};
+    }
+
     public enum RetrofitType {
         FETCH, DOWNLOAD
     }
