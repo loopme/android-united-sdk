@@ -14,6 +14,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.loopme.ad.LoopMeAd;
+import com.loopme.request.RequestParamsUtils;
 import com.loopme.tester.R;
 import com.loopme.tester.ads.Ad;
 import com.loopme.tester.ads.AdListener;
@@ -28,7 +29,7 @@ import com.loopme.tester.ui.activity.BaseActivity;
 import com.loopme.utils.Utils;
 import com.mopub.mobileads.MoPubView;
 
-public class ManualView implements View.OnClickListener, AdListener, AdapterView.OnItemSelectedListener {
+public class ManualView implements View.OnClickListener, AdListener, AdapterView.OnItemSelectedListener, SizeDialog.Listener {
     private Ad mAd;
     private View mRootView;
     private AdSpot mAdSpot;
@@ -39,12 +40,38 @@ public class ManualView implements View.OnClickListener, AdListener, AdapterView
     private Activity mActivity;
     private boolean mIsFirstLaunch = true;
     private boolean mIsAutoLoadingEnabled;
+    private FrameLayout mBanner;
+
 
     public ManualView(View layout, AdSpot adSpot, Activity activity) {
         mRootView = layout;
         mAdSpot = adSpot;
         mActivity = activity;
+
         mIsAutoLoadingEnabled = getAutoLoadingState();
+        layout.findViewById(R.id.manual_view_relativelayout).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                callDialog();
+                return true;
+            }
+        });
+    }
+
+    private void callDialog() {
+        ViewGroup.LayoutParams layoutParams = mBanner.getLayoutParams();
+        final int widthDp = RequestParamsUtils.convertPixelToDp(mActivity, layoutParams.width);
+        final int heightDp = RequestParamsUtils.convertPixelToDp(mActivity, layoutParams.height);
+        SizeDialog dialog = SizeDialog.newInstance(widthDp, heightDp);
+        dialog.setListener(this);
+        dialog.show(mActivity.getFragmentManager(), "Size Dialog");
+    }
+
+    @Override
+    public void onNewBannerSize(int width, int height) {
+        int widthDp = Utils.convertDpToPixel(width);
+        int heightDp = Utils.convertDpToPixel(height);
+        mBanner.setLayoutParams(new RelativeLayout.LayoutParams(widthDp, heightDp));
     }
 
     @Override
@@ -79,6 +106,7 @@ public class ManualView implements View.OnClickListener, AdListener, AdapterView
         mShowButton.setOnClickListener(this);
         setReadyToLoading();
         disableShowButton();
+        mBanner = (FrameLayout) mRootView.findViewById(R.id.loopme_banner);
     }
 
     private void showAd() {

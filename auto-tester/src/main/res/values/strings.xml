@@ -115,7 +115,6 @@
     <string-array name="ad_types">
         <item>ALL</item>
         <item>HTML</item>
-        <item>VIDEO_SKIPPABLE</item>
-        <item>VIDEO_NON_SKIPPABLE</item>
+        <item>VIDEO</item>
     </string-array>
 </resources>
