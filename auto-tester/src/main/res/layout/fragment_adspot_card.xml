@@ -262,13 +262,6 @@
                     android:layout_height="@dimen/loopme_banner_view_hight"
                     android:layout_centerHorizontal="true"
                     android:visibility="gone" />
-
-                <FrameLayout
-                    android:id="@+id/loopme_vpaid_banner"
-                    android:layout_width="@dimen/vpaid_loopme_banner_view_width"
-                    android:layout_height="@dimen/vpaid_loopme_banner_view_height"
-                    android:layout_centerHorizontal="true"
-                    android:visibility="gone" />
             </RelativeLayout>
 
             <RelativeLayout
