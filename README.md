@@ -51,13 +51,13 @@ dependencies {
 }
 ```
 <br>2. LoopMe SDK is available as an AAR via jCenter; to use it, add the following to your `build.gradle`:
-```
+```java
 repositories {
     jcenter()
 }
 
 dependencies {
-    compile 'com.loopme:loopme-sdk:6.0.0@aar'
+    compile 'com.loopme:loopme-sdk:6.0.1@aar'
 }
 ```
 
