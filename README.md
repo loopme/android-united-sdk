@@ -78,17 +78,16 @@ For banner and native video - `LoopMeBanner.TEST_MPU`
 ```java
 public class YourActivity extends Activity implements LoopMeInterstitial.Listener {
   
-  private LoopMeInterstitial mInterstitial;
+    private LoopMeInterstitial mInterstitial;
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-	super.onCreate(savedInstanceState);
-
-	mInterstitial = LoopMeInterstitial.getInstance(YOUR_APPKEY, this);
-	mInterstitial.setListener(this);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+	       mInterstitial = LoopMeInterstitial.getInstance(YOUR_APPKEY, this);
+	       mInterstitial.setListener(this);
 	
-	mInterstitial.load();
-  }
+	       mInterstitial.load();
+    }
 }
 ```
 
@@ -304,12 +303,14 @@ They will be added in ad request.
 
 * <b>Config minimized mode</b><br>
 Minimized mode can be configured only for native video ads.
+
 ```java
 // root_view - the root view in layout
 RelativeLayout root = (RelativeLayout) findViewById(R.id.root_view);
 MinimizedMode mode = new MinimizedMode(root);
 mNativeVideoAdapter.setMinimizedMode(mode);
 ```
+
 <img src="screenshots/normal.png" alt="Native video" width="128">
 <img src="screenshots/shrink.png" alt="Minimized mode" width="128">
 
@@ -337,6 +338,14 @@ Please meet our New United SDK. It combines multiple premium ads technologies wi
 
 **Version 6.0.2**
 - Added unsupported file format detection fro VPAID creatives
+- Multiformat ad spots - combine several ad formats in a single spot to increase fill rate. 
+- VAST 4.0 support
+- Expandable banner ad format support
+- Updated list view ad unit
+- Updated samples 
+- Debugging reporting improvements
+- Access to read cookies for better HTML ads compliancy
+- A minimum API level supported increased to 21 (Android 5.0)
 
 
 See [Changelog](CHANGELOG.md)
