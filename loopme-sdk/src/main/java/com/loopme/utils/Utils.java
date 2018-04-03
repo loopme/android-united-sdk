@@ -699,4 +699,9 @@ public class Utils {
             currentSizeArray[1] = bannerHeight;
         }
     }
+
+    public static void adjustLayoutParams(ViewGroup.LayoutParams paramFrom, ViewGroup.LayoutParams paramTo) {
+        paramTo.width = paramFrom.width;
+        paramTo.height = paramFrom.height;
+    }
 }

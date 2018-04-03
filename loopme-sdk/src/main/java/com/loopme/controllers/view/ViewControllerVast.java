@@ -9,6 +9,7 @@ import android.widget.FrameLayout;
 
 import com.loopme.Constants;
 import com.loopme.controllers.display.DisplayControllerVast;
+import com.loopme.utils.Utils;
 
 public class ViewControllerVast {
 
@@ -83,7 +84,14 @@ public class ViewControllerVast {
         }
     }
 
-    public void adjustLayoutParams(int width, int height) {
+    public void adjustLayoutParams(int width, int height, boolean isBanner) {
+        adjustPlayerParams(width, height);
+        if (isBanner) {
+            Utils.adjustLayoutParams(mPlayerLayout.getPlayerView().getLayoutParams(), mContainerView.getLayoutParams());
+        }
+    }
+
+    private void adjustPlayerParams(int width, int height) {
         if (mPlayerLayout != null) {
             mPlayerLayout.adjustLayoutParams(width, height, mContainerView.getWidth(), mContainerView.getHeight());
         }

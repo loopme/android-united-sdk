@@ -331,7 +331,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     @Override
     public void onPrepared(MediaPlayer mp) {
         mVideoDuration = mp.getDuration();
-        mViewControllerVast.adjustLayoutParams(mp.getVideoWidth(), mp.getVideoHeight());
+        mViewControllerVast.adjustLayoutParams(mp.getVideoWidth(), mp.getVideoHeight(), mLoopMeAd.isBanner());
         createVideoTimer(mVideoDuration);
         prepareControls(mVideoDuration);
         resumeMediaPlayer(getSurface());
