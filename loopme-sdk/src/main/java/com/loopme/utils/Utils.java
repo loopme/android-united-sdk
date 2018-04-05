@@ -556,19 +556,13 @@ public class Utils {
     }
 
     public static ViewGroup.LayoutParams createMatchParentLayoutParams() {
-        return new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
-    }
-
-    public static ViewGroup.LayoutParams createDefaultLayoutParams() {
-        return new FrameLayout.LayoutParams(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        params.gravity = Gravity.CENTER;
+        return params;
     }
 
     private static float getDensity() {
-        if (sResources != null) {
-            return sResources.getDisplayMetrics().density;
-        } else {
-            return DEFAULT_DENSITY;
-        }
+        return sResources != null ? sResources.getDisplayMetrics().density : DEFAULT_DENSITY;
     }
 
     private static float countPercentOfBlackArea(FrameLayout.LayoutParams layoutParams,
