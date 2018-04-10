@@ -131,12 +131,8 @@ public class RequestBuilder implements Serializable {
 
             switch (loopMeAd.getPreferredAdType()) {
                 case ALL: {
-                    if (!loopMeAd.isCustomBanner()) {
-                        impObj.put(BANNER, bannerObj);
-                    }
-                    if (!loopMeAd.isExpandBanner()) {
-                        impObj.put(VIDEO, videoObj);
-                    }
+                    impObj.put(BANNER, bannerObj);
+                    impObj.put(VIDEO, videoObj);
                     break;
                 }
                 case HTML: {

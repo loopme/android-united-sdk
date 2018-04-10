@@ -14,8 +14,8 @@
         android:id="@+id/scrollview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/actionbar_root"
         android:layout_alignParentBottom="true"
+        android:layout_below="@id/actionbar_root"
         android:fillViewport="true">
 
 
@@ -277,6 +277,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentStart="true"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:padding="@dimen/text_size_15sp"
                     android:text="@string/load_textview_manual"
                     android:textColor="@color/red"
@@ -298,6 +299,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentEnd="true"
+                    android:background="?android:attr/selectableItemBackground"
                     android:enabled="false"
                     android:padding="@dimen/text_size_15sp"
                     android:text="@string/show"

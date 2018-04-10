@@ -91,7 +91,7 @@ public class EndCardLayout extends FrameLayout implements View.OnClickListener {
     private void configureEndCardImageView() {
         mEndCardImageView = new ImageView(getContext());
         mEndCardImageView.setId(END_CARD_VIEW_ID);
-        mEndCardImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        mEndCardImageView.setScaleType(ImageView.ScaleType.FIT_XY);
         mEndCardImageView.setLayoutParams(Utils.createMatchParentLayoutParams());
     }
 

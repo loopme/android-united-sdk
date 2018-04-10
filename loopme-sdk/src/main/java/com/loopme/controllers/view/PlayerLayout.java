@@ -137,7 +137,7 @@ public class PlayerLayout extends FrameLayout implements View.OnTouchListener, V
     private void configureTextureView() {
         mPlayerTextureView = new TextureView(getContext());
         mPlayerTextureView.setId(PLAYER_VIEW_ID);
-        mPlayerTextureView.setLayoutParams(Utils.createDefaultLayoutParams());
+        mPlayerTextureView.setLayoutParams(Utils.createMatchParentLayoutParams());
     }
 
     @Override
