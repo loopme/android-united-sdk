@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.loopme.AdUtils;
@@ -106,10 +105,21 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     public void resize(int width, int height) {
         Logging.out(LOG_TAG, "resize");
         if (mLoopMeAd.isBanner()) {
+            storeCurrentBannerSize();
             setAdContainerSize(width, height);
             mMraidView.setState(Constants.MraidState.RESIZED);
             mMraidView.notifySizeChangeEvent(width, height);
             mMraidView.setIsViewable(true);
+        }
+    }
+
+    private void storeCurrentBannerSize() {
+        if (mLoopMeAd.isBanner()) {
+            ViewGroup.LayoutParams params = ((LoopMeBannerGeneral) mLoopMeAd).getBannerView().getLayoutParams();
+            if (params != null) {
+                mWidth = params.width;
+                mHeight = params.height;
+            }
         }
     }
 
@@ -245,25 +255,10 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     }
 
     public void buildMraidContainer(FrameLayout containerView) {
-        setBannerLayoutParams(containerView);
         FrameLayout.LayoutParams mraidViewLayoutParams = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT);
         Utils.removeParent(mMraidView);
         containerView.addView(mMraidView, mraidViewLayoutParams);
-    }
-
-    private void setBannerLayoutParams(ViewGroup bannerView) {
-        if (bannerView != null) {
-            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(350, 250);
-            if (bannerView.getParent() instanceof RelativeLayout) {
-                params = new RelativeLayout.LayoutParams(getWidth(), getHeight());
-            } else if (bannerView.getParent() instanceof FrameLayout) {
-                params = new FrameLayout.LayoutParams(getWidth(), getHeight());
-            } else if (bannerView.getParent() instanceof LinearLayout) {
-                params = new LinearLayout.LayoutParams(getWidth(), getHeight());
-            }
-            bannerView.setLayoutParams(params);
-        }
     }
 }
