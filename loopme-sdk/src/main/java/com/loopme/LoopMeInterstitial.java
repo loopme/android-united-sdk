@@ -2,6 +2,7 @@ package com.loopme;
 
 
 import android.app.Activity;
+import android.os.Build;
 
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
@@ -31,6 +32,10 @@ public class LoopMeInterstitial extends AdWrapper {
      */
     public LoopMeInterstitial(Activity activity, String appKey) {
         super(activity, appKey);
+        if (Build.VERSION.SDK_INT < 21) {
+            LoopMeError error = new LoopMeError("Unsupported android version. Loopme-sdk requires android API_LEVEL >= 21.");
+            throw new UnsupportedClassVersionError(error.getMessage());
+        }
         mFirstLoopMeAd = LoopMeInterstitialGeneral.getInstance(appKey, activity);
         if (isAutoLoadingEnabled()) {
             mSecondLoopMeAd = LoopMeInterstitialGeneral.getInstance(appKey, activity);

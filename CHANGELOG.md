@@ -1,8 +1,16 @@
-## Version 6.0.2 (09 of November, 2017)
+## Version 6.0.2 (10 of April, 2017)
 - Added unsupported file format detection fro VPAID creatives
+- Multiformat ad spots - combine several ad formats in a single spot to increase fill rate. 
+- VAST 4.0 support
+- Expandable banner ad format support
+- Updated list view ad unit
+- Updated samples 
+- Debugging reporting improvements
+- Access to read cookies for better HTML ads compliancy
+- A minimum API level supported increased to 21 (Android 5.0)
+
 
 ## Version 6.0.1 (22 of October, 2017)
-
 1. Support interstitial and banner ads of the following formats:
 - VAST 2.0, 3.0, 4.0
 - VPAID 2.0

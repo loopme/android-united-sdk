@@ -10,8 +10,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import com.appsee.Appsee;
-import com.crashlytics.android.Crashlytics;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.R;
@@ -28,7 +26,6 @@ import com.loopme.views.CloseButton;
 import com.loopme.views.MraidView;
 import com.testfairy.TestFairy;
 
-import io.fabric.sdk.android.Fabric;
 
 public final class BaseActivity extends Activity
         implements AdReceiver.Listener,
@@ -79,8 +76,6 @@ public final class BaseActivity extends Activity
     }
 
     private void initCrashLytics() {
-        Fabric.with(this, new Crashlytics());
-        Appsee.start(getString(R.string.com_appsee_apikey));
         TestFairy.begin(this, "a44d0f385de2740ba8f9aefcf9c0eda6706acc0f");
     }
 
@@ -187,7 +182,6 @@ public final class BaseActivity extends Activity
             mLoopMeAd.rebuildView(mLoopMeContainerView);
             ((BaseDisplayController) mDisplayController).onAdEnteredFullScreenEvent();
         }
-        Appsee.unmarkViewAsSensitive(mLoopMeContainerView);
     }
 
     private void initSensorManager() {
