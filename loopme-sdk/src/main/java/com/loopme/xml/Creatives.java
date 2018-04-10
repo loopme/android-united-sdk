@@ -35,4 +35,28 @@ public class Creatives {
         }
         return new ArrayList<>();
     }
+
+    public boolean hasCreativeList() {
+        return creativeList != null && creativeList.size() > 0;
+    }
+
+    public List<String> getCompanionTrackingEvents() {
+        List<String> trackingEvents = new ArrayList<>();
+        if (creativeList != null) {
+            for (Creative creative : creativeList) {
+                trackingEvents.addAll(creative.getCompanionTrackingEvents());
+            }
+        }
+        return trackingEvents;
+    }
+
+    public List<String> getCompanionClickTrackingList() {
+        List<String> clickTrackingList = new ArrayList<>();
+        if (creativeList != null) {
+            for (Creative creative : creativeList) {
+                clickTrackingList.addAll(creative.getCompanionClickTrackingList());
+            }
+        }
+        return clickTrackingList;
+    }
 }

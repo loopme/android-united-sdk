@@ -39,8 +39,8 @@ public class LiveDebug {
     public static void setLiveDebug(final Context context, final boolean debug, final String appKey) {
         Logging.out(LOG_TAG, "setLiveDebug " + debug);
         if (sIsDebugOn != debug) {
+            sIsDebugOn = debug;
             if (debug) {
-                sIsDebugOn = debug;
                 Handler handler = new Handler(Looper.getMainLooper());
                 handler.post(new Runnable() {
                     @Override
@@ -137,5 +137,9 @@ public class LiveDebug {
     private static String formatLogMessage(String logTag, String text) {
         String thread = (Looper.getMainLooper() == Looper.myLooper()) ? "ui" : "bg";
         return MessageFormat.format("{0}: {1}: {2}", thread, logTag, text);
+    }
+
+    public static boolean isDebugOn() {
+        return sIsDebugOn;
     }
 }

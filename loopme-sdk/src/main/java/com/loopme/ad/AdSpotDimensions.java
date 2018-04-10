@@ -26,4 +26,22 @@ public class AdSpotDimensions {
     public void setHeight(int height) {
         this.height = height;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AdSpotDimensions that = (AdSpotDimensions) o;
+
+        if (width != that.width) return false;
+        return height == that.height;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = width;
+        result = 31 * result + height;
+        return result;
+    }
 }

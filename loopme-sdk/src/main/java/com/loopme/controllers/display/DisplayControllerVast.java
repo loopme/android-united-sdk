@@ -13,22 +13,22 @@ import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.LoopMeMediaPlayer;
 import com.loopme.ad.LoopMeAd;
+import com.loopme.common.LoopMeError;
 import com.loopme.controllers.view.ViewControllerVast;
 import com.loopme.models.Errors;
-import com.loopme.models.Message;
 import com.loopme.time.TimeUtils;
 import com.loopme.time.TimerWithPause;
-import com.loopme.utils.Utils;
-import com.loopme.vast.VastVpaidEventTracker;
 import com.loopme.tracker.constants.EventConstants;
+import com.loopme.utils.Utils;
 import com.loopme.vast.TrackingEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class DisplayControllerVast extends VastVpaidBaseDisplayController implements
-        LoopMeMediaPlayer.LoopMeMediaPlayerListener {
+        LoopMeMediaPlayer.LoopMeMediaPlayerListener,
+        Vast4Tracker.OnAdVerificationListener,
+        ViewControllerVast.ViewControllerVastListener {
 
     private static final int DELAY_UNTIL_EXECUTE = 100;
     private static final int COUNTDOWN_INTERVAL = 100;
@@ -41,23 +41,20 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     private int mVideoDuration;
     private TimerWithPause mVideoTimer;
     private VastWebView mWebView;
-    private OnPreparedListener mPrepareListener;
+    private int mVerificationScriptCounter;
+    private int mVerificationScriptNumber;
+    private boolean mIsAdSkipped;
 
     public DisplayControllerVast(LoopMeAd loopMeAd) {
         super(loopMeAd);
-        mViewControllerVast = new ViewControllerVast(this, initViewControllerVastListener());
-        VastVpaidEventTracker.addAllEvents(mLoopMeAd.getAdParams().getTrackingEventsList());
+        mViewControllerVast = new ViewControllerVast(this, this);
         mLogTag = DisplayControllerVast.class.getSimpleName();
         Logging.out(mLogTag);
     }
 
-    private ViewControllerVast.ViewControllerVastListener initViewControllerVastListener() {
-        return new ViewControllerVast.ViewControllerVastListener() {
-            @Override
-            public void onSurfaceTextureReady(Surface surface) {
-                resumeMediaPlayer(surface);
-            }
-        };
+    @Override
+    public void onSurfaceTextureReady(Surface surface) {
+        resumeMediaPlayer(surface);
     }
 
     @Override
@@ -67,23 +64,20 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     @Override
-    public void prepare(OnPreparedListener listener) {
-        mPrepareListener = listener;
-        vast4Verification();
-    }
-
-    private void vast4Verification() {
+    public void prepare() {
         if (isVast4VerificationNeeded()) {
-            configureWebView();
-            vast4Verification(mWebView);
+            mWebView = new VastWebView(mLoopMeAd.getContext(), this);
+            initVast4Tracker(mWebView);
+            setScriptNumber();
+            vast4Verification();
         } else {
-            onVast4VerificationDoesNotNeed();
+            onAdReady();
         }
     }
 
-    @Override
-    public void onVast4VerificationDoesNotNeed() {
-        preparationFinished();
+    private void setScriptNumber() {
+        int size = mAdParams.getAdVerificationJavaScriptUrlList().size();
+        mVerificationScriptNumber = size == 0 ? 1 : size;
     }
 
     @Override
@@ -95,6 +89,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     public void onPlay(int position) {
+        mIsAdSkipped = false;
         postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -110,18 +105,10 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     private void resumeMediaPlayer(Surface surface) {
         if (mLoopMePlayer != null) {
-            mLoopMePlayer.seekTo(getPassedTime());
             mLoopMePlayer.setSurface(surface);
             mLoopMePlayer.start();
             resumeVideoTimer();
         }
-    }
-
-    private int getPassedTime() {
-        if (mVideoTimer != null) {
-            return (int) mVideoTimer.timePassed();
-        }
-        return 0;
     }
 
     private void resumeVideoTimer() {
@@ -141,18 +128,22 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     public void onPause() {
         super.onPause();
         pauseMediaPlayer();
-        onMessage(Message.EVENT, EventConstants.PAUSE);
+        if (!mIsAdSkipped) {
+            postVideoEvent(EventConstants.PAUSE);
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        resumeSdk24();
-        onMessage(Message.EVENT, EventConstants.RESUME);
+        resumeSdk24AndAbove();
+        if (!mIsAdSkipped) {
+            postVideoEvent(EventConstants.RESUME);
+        }
     }
 
-    private void resumeSdk24() {
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.N && !mViewControllerVast.isEndCard()) {
+    private void resumeSdk24AndAbove() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !mViewControllerVast.isEndCard()) {
             resumeMediaPlayer(getSurface());
         }
     }
@@ -175,7 +166,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         List<TrackingEvent> eventsToRemove = new ArrayList<>();
         for (TrackingEvent event : mTrackingEventsList) {
             if (doneMillis > event.timeMillis) {
-                onMessage(Message.EVENT, event.url);
+                postVideoEvent(event.url);
                 eventsToRemove.add(event);
             }
         }
@@ -209,24 +200,24 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     @Override
-    public boolean onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
+    public void onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
         if (isPlaying()) {
             url = mAdParams.getVideoRedirectUrl();
-            for (String trackUrl : mAdParams.getVideoClicks()) {
-                VastVpaidEventTracker.postEvent(trackUrl, getCurrentPositionAsString());
-            }
+            postVideoClicks(getCurrentPositionAsString());
         } else {
             url = mAdParams.getEndCardRedirectUrl();
-            for (String trackUrl : mAdParams.getEndCardClicks()) {
-                onMessage(Message.EVENT, trackUrl);
-            }
+            postEndCardClicks();
         }
         onAdClicked();
-        return super.onRedirect(url, mLoopMeAd);
+        super.onRedirect(url, mLoopMeAd);
     }
 
     private String getCurrentPositionAsString() {
-        return mLoopMePlayer == null ? String.valueOf(0) : String.valueOf(mLoopMePlayer.getCurrentPosition() / 1000);
+        return String.valueOf(getPassedTime() / Constants.MILLIS_IN_SECOND);
+    }
+
+    private int getPassedTime() {
+        return mVideoTimer != null ? (int) mVideoTimer.timePassed() : 0;
     }
 
     private boolean isPlaying() {
@@ -235,7 +226,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     public void closeSelf() {
-        VastVpaidEventTracker.postEvent(EventConstants.CLOSE, getCurrentPositionAsString());
+        postVideoEvent(EventConstants.CLOSE, getCurrentPositionAsString());
         dismissAd();
     }
 
@@ -258,15 +249,17 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     private void skipVideo(boolean skipEvent) {
+        mIsAdSkipped = true;
         pauseMediaPlayer();
         destroyVideoTimer();
         if (TextUtils.isEmpty(mImageUri)) {
             closeSelf();
         } else {
             mViewControllerVast.showEndCard(mImageUri);
+            onEndCardAppears();
         }
         if (skipEvent) {
-            VastVpaidEventTracker.postEvent(EventConstants.SKIP, getCurrentPositionAsString());
+            postVideoEvent(EventConstants.SKIP, getCurrentPositionAsString());
         }
     }
 
@@ -280,11 +273,11 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     private void postVolumeStateEvent(boolean mute, boolean postEvent) {
         if (mute) {
             if (postEvent) {
-                onMessage(Message.EVENT, EventConstants.MUTE);
+                postVideoEvent(EventConstants.MUTE);
             }
         } else {
             if (postEvent) {
-                onMessage(Message.EVENT, EventConstants.UNMUTE);
+                postVideoEvent(EventConstants.UNMUTE);
             }
         }
     }
@@ -309,7 +302,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     @Override
     public void onCompletion(MediaPlayer mp) {
         skipVideo(false);
-        onMessage(Message.EVENT, EventConstants.COMPLETE);
+        postVideoEvent(EventConstants.COMPLETE);
         onAdVideoDidReachEnd();
         onAdCompleteEvent();
     }
@@ -329,16 +322,18 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
+        Logging.out(mLogTag, "MediaPlayer onError():  what - " + what + "; extra - " + extra);
         onInternalLoadFail(Errors.PROBLEM_DISPLAYING_MEDIAFILE);
+        closeSelf();
         return false;
     }
 
     @Override
     public void onPrepared(MediaPlayer mp) {
         mVideoDuration = mp.getDuration();
-        mViewControllerVast.adjustLayoutParams(mp.getVideoWidth(), mp.getVideoHeight());
+        mViewControllerVast.adjustLayoutParams(mp.getVideoWidth(), mp.getVideoHeight(), mLoopMeAd.isBanner());
         createVideoTimer(mVideoDuration);
-        prepareControls(mp.getDuration());
+        prepareControls(mVideoDuration);
         resumeMediaPlayer(getSurface());
         postEvents(mp);
         muteVideo(mViewControllerVast.isMute(), false);
@@ -371,6 +366,11 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     }
 
+    @Override
+    public void setFullScreen(boolean isFullScreen) {
+
+    }
+
     private TimerWithPause initVideoTimer(final int duration) {
         return new TimerWithPause(duration, COUNTDOWN_INTERVAL, true) {
             @Override
@@ -392,25 +392,23 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         muteVideo(mViewControllerVast.isMute(), false);
     }
 
-    private void configureWebView() {
-        mWebView = new VastWebView(mLoopMeAd.getContext(), new VastWebView.OnFinishLoadListener() {
-
-            @Override
-            public void onFinishLoad() {
-                preparationFinished();
-            }
-
-            @Override
-            public void onJsError(String message) {
-                DisplayControllerVast.this.onPostWarning(Errors.VERIFICATION_UNIT_NOT_EXECUTED);
-            }
-        });
+    @Override
+    public void onVerificationJsLoaded() {
+        checkScriptsNumber();
     }
 
-    private void preparationFinished() {
-        if (mPrepareListener != null) {
-            mPrepareListener.onPrepared();
-            mPrepareListener = null;
+    @Override
+    public void onVerificationJsFailed(String message) {
+        checkScriptsNumber();
+        LoopMeError error = new LoopMeError(Errors.VERIFICATION_UNIT_NOT_EXECUTED);
+        error.addToMessage(message);
+        onPostWarning(error);
+    }
+
+    private void checkScriptsNumber() {
+        mVerificationScriptCounter++;
+        if (mVerificationScriptCounter == mVerificationScriptNumber) {
+            onAdReady();
         }
     }
 

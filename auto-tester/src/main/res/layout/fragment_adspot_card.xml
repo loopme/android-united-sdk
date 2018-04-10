@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <FrameLayout
+        android:id="@+id/actionbar_root"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
+
+    <ScrollView
+        android:id="@+id/scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/actionbar_root"
+        android:fillViewport="true">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/ad_spot_main_views_linearlayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/fragment_adspot_card_appkey_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/fragment_adspot_card_appkey_margin"
+                    android:layout_marginTop="@dimen/fragment_adspot_card_appkey_margin"
+                    android:text="@string/app_key_example"
+                    android:textSize="@dimen/text_size_16sp" />
+
+                <RelativeLayout
+                    android:id="@+id/main_info_relativelayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true">
+
+                    <ImageView
+                        android:id="@+id/fragment_adspot_card_sdk_icon"
+                        android:layout_width="@dimen/fragment_adspot_card_size"
+                        android:layout_height="@dimen/fragment_adspot_card_size"
+                        android:padding="@dimen/fragment_adspot_card_padding"
+                        android:src="@android:color/holo_blue_dark" />
+
+                    <TextView
+                        android:id="@+id/fragment_adspot_card_ad_type_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@id/fragment_adspot_card_sdk_icon"
+                        android:text="@string/ad_type_info"
+                        android:textColor="@android:color/black"
+                        android:textSize="@dimen/text_size_16sp"
+                        android:textStyle="bold" />
+
+                    <RadioGroup
+                        android:id="@+id/fragment_adspot_card_adtype_radiogroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/fragment_adspot_card_adtype_radiogroup_width"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="end"
+                        android:layout_marginRight="@dimen/fragment_adspot_card_adtype_radiogroup_margin_right"
+                        android:layout_marginTop="@dimen/fragment_adspot_card_adtype_radiogroup_margin_top"
+                        android:checkedButton="@+id/fragment_adspot_card_manual_radio"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/fragment_adspot_card_manual_radio"
+                            android:layout_width="@dimen/fragment_adspot_card_manual_radio_width"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/left_selector"
+                            android:button="@android:color/transparent"
+                            android:gravity="center"
+                            android:text="@string/manual"
+                            android:textColor="@color/color_selector" />
+
+                        <RadioButton
+                            android:id="@+id/fragment_adspot_card_auto_radio"
+                            android:layout_width="@dimen/fragment_adspot_card_auto_radio_width"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/right_selector"
+                            android:button="@android:color/transparent"
+                            android:gravity="center"
+                            android:text="@string/auto"
+                            android:textColor="@color/color_selector" />
+
+                    </RadioGroup>
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/fragment_adspot_card_ad_baseurl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/fragment_adspot_card_ad_baseurl_marging_bottom"
+                    android:layout_marginStart="@dimen/fragment_adspot_card_ad_baseurl_marging_left"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_14sp" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/auto_relativelayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@id/ad_spot_main_views_linearlayout"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/auto_test_params_relative_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginBottom="@dimen/auto_test_params_relative_layout_margin_bottom"
+                    android:layout_marginRight="@dimen/auto_test_params_relative_layout_margin_right"
+                    android:layout_marginStart="@dimen/auto_test_params_relative_layout_margin_left"
+                    android:layout_marginTop="@dimen/auto_test_params_relative_layout_margin_top"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/amount_of_ad_requests"
+                        android:textSize="@dimen/text_size_16sp" />
+
+                    <EditText
+                        android:id="@+id/ad_requests"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="@dimen/text_size_16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/time_s_between_ad_requests"
+                        android:textSize="@dimen/text_size_16sp" />
+
+                    <EditText
+                        android:id="@+id/ad_request_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="@dimen/text_size_16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/time_s_when_ad_should_be_auto_closed"
+                        android:textSize="@dimen/text_size_16sp" />
+
+                    <EditText
+                        android:id="@+id/auto_close_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="@dimen/text_size_16sp" />
+
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:id="@+id/auto_buttons_relativelayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/auto_buttons_relativelayout_height"
+                    android:layout_alignParentBottom="true">
+
+                    <TextView
+                        android:id="@+id/run_ad_auto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentLeft="true"
+                        android:padding="@dimen/text_size_15sp"
+                        android:text="@string/run_ad_auto_button"
+                        android:textColor="@color/red"
+                        android:textSize="@dimen/text_size_20sp" />
+
+                    <TextView
+                        android:id="@+id/stop_ad_auto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentRight="true"
+                        android:padding="@dimen/text_size_15sp"
+                        android:text="@string/stop_button_auto"
+                        android:textColor="@color/red"
+                        android:textSize="@dimen/text_size_20sp" />
+
+                    <TextView
+                        android:id="@+id/loading_label_auto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="@dimen/loading_label_auto_margin_bottom"
+                        android:text="@string/status_loading_auto"
+                        android:textColor="@color/red"
+                        android:textSize="@dimen/text_size_20sp"
+                        android:visibility="gone" />
+
+                    <LinearLayout
+                        android:id="@+id/results_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_above="@id/stop_ad_auto"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginBottom="@dimen/results_container_margin_bottom"
+                        android:layout_marginRight="@dimen/auto_statistic_right_margin"
+                        android:gravity="right"
+                        android:orientation="vertical"
+                        android:visibility="visible">
+
+                        <TextView
+                            android:id="@+id/failed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/failed" />
+
+                        <TextView
+                            android:id="@+id/showed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/showed" />
+
+                        <TextView
+                            android:id="@+id/requests"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/requests" />
+
+                    </LinearLayout>
+
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/banners_view_relativelayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ad_spot_main_views_linearlayout"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="@dimen/banners_view_relativelayout_margin_bottom"
+                android:visibility="visible">
+
+                <FrameLayout
+                    android:id="@+id/loopme_banner"
+                    android:layout_width="@dimen/loopme_banner_view_width"
+                    android:layout_height="@dimen/loopme_banner_view_hight"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="gone" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/manual_view_relativelayout"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/manual_view_relativelayout_height"
+                android:layout_alignParentBottom="true"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/load_ad_manual"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentStart="true"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:padding="@dimen/text_size_15sp"
+                    android:text="@string/load_textview_manual"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_20sp" />
+
+                <TextView
+                    android:id="@+id/loading_label_manual"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="@dimen/loading_label_manual_padding_bottom"
+                    android:textColor="@color/dark_gray"
+                    android:textSize="@dimen/text_size_18sp" />
+
+                <TextView
+                    android:id="@+id/show_ad_manual"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:enabled="false"
+                    android:padding="@dimen/text_size_15sp"
+                    android:text="@string/show"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_20sp" />
+
+                <Spinner
+                    android:id="@+id/ad_type_spinner"
+                    android:layout_width="@dimen/fragment_ad_spot_ad_type_spinner_width"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="@dimen/fragment_ad_spot_ad_type_spinner_margin" />
+            </RelativeLayout>
+        </RelativeLayout>
+    </ScrollView>
+
+
+</RelativeLayout>

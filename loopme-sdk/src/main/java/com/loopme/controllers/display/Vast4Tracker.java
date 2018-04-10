@@ -2,28 +2,24 @@ package com.loopme.controllers.display;
 
 import android.view.View;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.MoatViewAbilityUtils;
 import com.loopme.ad.AdParams;
-import com.loopme.controllers.interfaces.VastVpaidDisplayController;
-import com.loopme.utils.StringUtils;
+import com.loopme.utils.JsUtils;
 import com.loopme.vast.VastVpaidEventTracker;
-import com.loopme.views.LoopMeWebView;
 import com.loopme.webservice.ExecutorHelper;
 
 import java.util.List;
-import java.util.concurrent.Executor;
 
 public class Vast4Tracker {
     private static final String LOG_TAG = Vast4Tracker.class.getSimpleName();
     public static final int IMPRESSION_TIME_NATIVE_VIDEO = 2000;
     private static final double FIFTY_PERCENTS = 0.5;
+    private static final int BODY_TAG_INDEX = 938;
 
     private boolean mIsImpressionTracked;
-    private Executor mExecutor;
     private AdParams mAdParams;
     private WebView mWebView;
     private View mAdView;
@@ -31,14 +27,12 @@ public class Vast4Tracker {
     public Vast4Tracker(AdParams adParams, WebView webView) {
         mAdParams = adParams;
         mWebView = webView;
-        mExecutor = ExecutorHelper.getExecutor();
-
     }
 
 
     public void postViewableEvents(final int doneMillis) {
         if (isImpressionTimePassed(doneMillis) && !mIsImpressionTracked) {
-            mExecutor.execute(new Runnable() {
+            ExecutorHelper.getExecutor().execute(new Runnable() {
                 @Override
                 public void run() {
                     postImpressionEvent();
@@ -62,7 +56,7 @@ public class Vast4Tracker {
 
     private void postEventsByUrl(List<String> impressions) {
         for (String impressionUrl : impressions) {
-            VastVpaidEventTracker.postEvent(impressionUrl);
+            VastVpaidEventTracker.trackVastEvent(impressionUrl, "");
         }
     }
 
@@ -73,10 +67,15 @@ public class Vast4Tracker {
     }
 
     public void loadVerificationJavaScripts() {
-        List<String> adVerificationJavaScriptUrlList = mAdParams.getAdVerificationJavaScriptUrlList();
-        String html = StringUtils.generateHtml(adVerificationJavaScriptUrlList);
+        List<String> jsUrlLost = mAdParams.getAdVerificationJavaScriptUrlList();
+        String html = JsUtils.buildHtml(jsUrlLost);
         Logging.out(LOG_TAG, "verification html " + html);
         mWebView.loadData(html, Constants.MIME_TYPE_TEXT_HTML, Constants.UTF_8);
+    }
+
+    public String getAdVerificationScript() {
+        List<String> jsUrlList = mAdParams.getAdVerificationJavaScriptUrlList();
+        return JsUtils.buildScript(jsUrlList).toString();
     }
 
     public void setAdView(View adView) {
@@ -85,5 +84,18 @@ public class Vast4Tracker {
 
     public void setWebView(WebView webView) {
         mWebView = webView;
+    }
+
+    public String addVerificationScripts(String html) {
+        String script = getAdVerificationScript();
+        StringBuilder builder = new StringBuilder(html);
+        builder.insert(BODY_TAG_INDEX, script);
+        return builder.toString();
+    }
+
+    public interface OnAdVerificationListener {
+        void onVerificationJsLoaded();
+
+        void onVerificationJsFailed(String message);
     }
 }

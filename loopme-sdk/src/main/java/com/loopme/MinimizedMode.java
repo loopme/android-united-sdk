@@ -1,41 +1,39 @@
 package com.loopme;
 
-import android.util.DisplayMetrics;
+import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
+import com.loopme.ad.AdSpotDimensions;
 import com.loopme.utils.Utils;
 
 public class MinimizedMode {
 
     private static final String LOG_TAG = MinimizedMode.class.getSimpleName();
-
-    private int mWidth = 100;
-    private int mHeight = 100;
+    private final AdSpotDimensions mMinimizedViewDims = new AdSpotDimensions(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    private static final int DEFAULT_HEIGHT = 100;
+    private static final int DEFAULT_WIDTH = 300;
     private int mMarginRight = 10;
     private int mMarginBottom = 10;
     private ViewGroup mRoot;
+    private RecyclerView mRecyclerView;
+    private int mPosition;
 
-    public MinimizedMode(ViewGroup root) {
-        if (root == null) {
-            Logging.out(LOG_TAG, "Error: Root view should be not null. Minimized mode will not work");
+    public MinimizedMode(ViewGroup root, RecyclerView recyclerView) {
+        if (root == null || recyclerView == null) {
+            Logging.out(LOG_TAG, "Error: Root view or recyclerView should be not null. Minimized mode will not work");
             return;
         }
         mRoot = root;
-
-        DisplayMetrics dm = Utils.getDisplayMetrics();
-        // portrait mode
-        if (dm.heightPixels > dm.widthPixels) {
-            mWidth = dm.widthPixels / 2;
-        } else { //landscape mode
-            mWidth = dm.widthPixels / 3;
-        }
-        mHeight = mWidth * 2 / 3;
-        mWidth = mWidth - 6;
+        mRecyclerView = recyclerView;
+        Utils.setDimensions(mMinimizedViewDims);
     }
 
     public void setViewSize(int width, int height) {
-        mWidth = Utils.convertDpToPixel(width);
-        mHeight = Utils.convertDpToPixel(height);
+        int widthInPx = Utils.convertDpToPixel(width);
+        int heightInPx = Utils.convertDpToPixel(height);
+        mMinimizedViewDims.setWidth(widthInPx);
+        mMinimizedViewDims.setHeight(heightInPx);
     }
 
     public void setMarginRight(int margin) {
@@ -47,11 +45,11 @@ public class MinimizedMode {
     }
 
     public int getWidth() {
-        return mWidth;
+        return mMinimizedViewDims.getWidth();
     }
 
     public int getHeight() {
-        return mHeight;
+        return mMinimizedViewDims.getHeight();
     }
 
     public ViewGroup getRootView() {
@@ -64,5 +62,26 @@ public class MinimizedMode {
 
     public int getMarginBottom() {
         return mMarginBottom;
+    }
+
+    public AdSpotDimensions getMinimizedViewDims() {
+        return mMinimizedViewDims;
+    }
+
+    public void addView(FrameLayout view) {
+        if (mRoot != null) {
+            mRoot.addView(view);
+        }
+
+    }
+
+    public void onViewClicked() {
+        if (mRecyclerView != null) {
+            mRecyclerView.smoothScrollToPosition(mPosition);
+        }
+    }
+
+    public void setPosition(int position) {
+        mPosition = position;
     }
 }

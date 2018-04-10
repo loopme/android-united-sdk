@@ -1,0 +1,37 @@
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_file_list_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:foreground="@drawable/selected_item"
+    android:background="?android:attr/activatedBackgroundIndicator">
+
+    <ImageView
+        android:id="@+id/fragment_file_list_item_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:paddingBottom="@dimen/file_dialog_list_item_image_padding_bottom"
+        android:paddingLeft="@dimen/file_dialog_list_item_image_padding_left"
+        android:paddingRight="@dimen/file_dialog_list_item_image_padding_right"
+        android:paddingTop="@dimen/file_dialog_list_item_image_padding_top"
+        android:src="@drawable/up_folder" />
+
+    <TextView
+        android:id="@+id/fragment_file_list_item_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="@dimen/fragment_file_list_item_text_margin_left"
+        android:text="@string/filemodel_file_name_example"
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_size_16sp" />
+
+    <View
+        android:id="@+id/line_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/line_view_height"
+        android:layout_marginLeft="@dimen/line_view_margin_left"
+        android:layout_marginRight="@dimen/line_view_margin_right"
+        android:background="@color/dark_gray" />
+</android.support.v7.widget.CardView>

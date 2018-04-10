@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/actionbar_root"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:id="@+id/fragment_edit_name_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/fragment_edit_name_container_height"
+        android:layout_marginLeft="@dimen/fragment_edit_name_container_margin_left"
+        android:layout_marginRight="@dimen/fragment_edit_name_container_margin_right"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/name_label"
+            android:layout_width="@dimen/fragment_edit_name_label_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:text="@string/name"
+            android:textSize="@dimen/text_size_16sp" />
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="@dimen/fragment_edit_name_value_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="3">
+
+            <EditText
+                android:id="@+id/name_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/name" />
+
+        </android.support.design.widget.TextInputLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/sdk_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/fragment_edit_sdk_container_height"
+        android:layout_marginLeft="@dimen/fragment_edit_sdk_container_margin_left"
+        android:layout_marginRight="@dimen/fragment_edit_sdk_container_margin_right"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/sdk_label"
+            android:layout_width="@dimen/fragment_edit_sdk_label_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="@string/sdk"
+            android:textSize="@dimen/text_size_16sp" />
+
+        <RadioGroup
+            android:id="@+id/sdk_radiogroup"
+            android:layout_width="@dimen/fragment_edit_sdk_radiogroup_width"
+            android:layout_height="@dimen/fragment_edit_sdk_radiogroup_height"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="3"
+            android:checkedButton="@+id/loopme_sdk"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/loopme_sdk"
+                android:layout_width="@dimen/fragment_edit_radiobutton_width"
+                android:layout_height="match_parent"
+                android:background="@drawable/left_selector"
+                android:button="@android:color/transparent"
+                android:gravity="center"
+                android:text="@string/loopme"
+                android:textColor="@color/color_selector" />
+
+
+            <RadioButton
+                android:id="@+id/mopub_sdk"
+                android:layout_width="@dimen/fragment_edit_radiobutton_width"
+                android:layout_height="match_parent"
+                android:background="@drawable/right_selector"
+                android:button="@android:color/transparent"
+                android:gravity="center"
+                android:text="@string/mopub"
+                android:textColor="@color/color_selector" />
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/adtype_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/fragment_edit_adtype_container_height"
+        android:layout_marginLeft="@dimen/fragment_edit_adtype_container_margin_left"
+        android:layout_marginRight="@dimen/fragment_edit_adtype_container_margin_right"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/adtype_label"
+            android:layout_width="@dimen/fragment_edit_adtypr_label_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="@string/ad_type"
+            android:textSize="@dimen/text_size_16sp" />
+
+        <RadioGroup
+            android:id="@+id/adtype_radiogroup"
+            android:layout_width="@dimen/fragment_edit_adtype_container_width"
+            android:layout_height="@dimen/fragment_edit_adtyoe_radiogroup_height"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="3"
+            android:checkedButton="@+id/interstitial"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/interstitial"
+                android:layout_width="@dimen/fragment_edit_adtyoe_radiobutton_width"
+                android:layout_height="match_parent"
+                android:background="@drawable/left_selector"
+                android:button="@android:color/transparent"
+                android:gravity="center"
+                android:text="@string/interstitial"
+                android:textColor="@color/color_selector" />
+
+            <RadioButton
+                android:id="@+id/banner"
+                android:layout_width="@dimen/fragment_edit_adtyoe_radiobutton_width"
+                android:layout_height="match_parent"
+                android:background="@drawable/right_selector"
+                android:button="@android:color/transparent"
+                android:gravity="center"
+                android:text="@string/banner"
+                android:textColor="@color/color_selector" />
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/appkey_editor_root"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/frgment_edit_fragment_container_margin_left"
+        android:layout_marginRight="@dimen/frgment_edit_fragment_container_margin_right"
+        android:visibility="visible" />
+
+</LinearLayout>

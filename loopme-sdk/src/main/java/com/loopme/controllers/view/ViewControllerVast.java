@@ -1,23 +1,15 @@
 package com.loopme.controllers.view;
 
 import android.content.Context;
-import android.graphics.SurfaceTexture;
-import android.view.Gravity;
-import android.view.MotionEvent;
+import android.graphics.Color;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.loopme.Constants;
-import com.loopme.R;
 import com.loopme.controllers.display.DisplayControllerVast;
-import com.loopme.utils.ImageUtils;
 import com.loopme.utils.Utils;
 
 public class ViewControllerVast {
@@ -27,6 +19,7 @@ public class ViewControllerVast {
     private FrameLayout mContainerView;
     private PlayerLayout mPlayerLayout;
     private EndCardLayout mEndCardLayout;
+    private FrameLayout mAdLayout;
 
     public ViewControllerVast(DisplayControllerVast displayControllerVast, ViewControllerVastListener listener) {
         mDisplayControllerVast = displayControllerVast;
@@ -37,10 +30,16 @@ public class ViewControllerVast {
         if (containerView != null && context != null) {
             mContainerView = containerView;
             mContainerView.removeAllViews();
+            mContainerView.setBackgroundColor(Color.TRANSPARENT);
             mPlayerLayout = new PlayerLayout(context, webView, initOnPlayerListener());
             mEndCardLayout = new EndCardLayout(context, initOnEndCardListener());
-            mContainerView.addView(mPlayerLayout);
-            mContainerView.addView(mEndCardLayout);
+
+            mAdLayout = new FrameLayout(containerView.getContext());
+            mAdLayout.setLayoutParams(Utils.createMatchParentLayoutParams());
+
+            mAdLayout.addView(mPlayerLayout);
+            mAdLayout.addView(mEndCardLayout);
+            mContainerView.addView(mAdLayout);
         }
     }
 
@@ -93,7 +92,14 @@ public class ViewControllerVast {
         }
     }
 
-    public void adjustLayoutParams(int width, int height) {
+    public void adjustLayoutParams(int width, int height, boolean isBanner) {
+        adjustPlayerParams(width, height);
+        if (isBanner) {
+            Utils.adjustLayoutParams(mPlayerLayout.getPlayerView().getLayoutParams(), mAdLayout.getLayoutParams());
+        }
+    }
+
+    private void adjustPlayerParams(int width, int height) {
         if (mPlayerLayout != null) {
             mPlayerLayout.adjustLayoutParams(width, height, mContainerView.getWidth(), mContainerView.getHeight());
         }

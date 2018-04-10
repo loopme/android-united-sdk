@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="@dimen/remove_layout_width"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/background_bordered"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/fragment_remove_title_height"
+            android:background="@drawable/background_buttons"
+            android:gravity="center"
+            android:text="@string/delete_adspot"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/fragment_adspot_to_remove_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/fragment_remove_adspot_textview_padding"
+            android:text="@string/remove_adspot"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_18sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/fragment_remove_layout_marging_bottom">
+
+            <Button
+                android:id="@+id/cancel_remove_adspot_button"
+                android:layout_width="@dimen/cancel_remove_adspot_button_width"
+                android:layout_height="@dimen/cancel_remove_adspot_button_height"
+                android:layout_marginRight="@dimen/cancel_remove_adspot_button_margin_right"
+                android:background="@drawable/background_buttons"
+                android:text="@string/fragment_export_cancel_button"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_12sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/remove_adspot_button"
+                android:layout_width="@dimen/remove_adspot_button_width"
+                android:layout_height="@dimen/remove_adspot_button_height"
+                android:background="@drawable/background_buttons"
+                android:text="@string/fragment_import_ok_button"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

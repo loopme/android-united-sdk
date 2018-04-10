@@ -3,64 +3,43 @@ package com.loopme;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.utils.Utils;
 
-/**
- * Created by katerina on 5/18/17.
- */
-
 public class Constants {
     public static final String UTF_8 = "UTF-8";
-    public static final String CONTENT_TYPE = "Content-Type";
-    public static final String USER_AGENT = "User-Agent";
-
-    public static final String TEST_URL = "http://loopme.me/api/mopub";
-    public static final String FETCH_AD = TEST_URL + "/ads";
-
-    public static final String MRAID_PREFIX = "javascript:mraidbridge.";
-    public static final String LOOPME_PREFIX = "javascript:window.L.bridge.set";
-    public static final String PREFIX_360 = "javascript:window.L.track";
     public static final String MIME_TYPE_TEXT_HTML = "text/html";
     public static final String MRAID_ANDROID_ASSET = "file:///android_asset/";
-
     public static final String EXTRA_URL = "extraUrl";
-    public static final String LOOPME_AD = "LOOPME_AD";
-    public static final String REDIRECT_URL = "redirect_url";
-    public static final String MRAID_CUSTOM_CLOSE = "useCustomClose";
     public static final String ADS = "ads";
-    public static final String LOAD_FILE = "LOAD_FILE";
-
     public static final String VIEWABLE = "VIEWABLE";
     public static final String NOT_VIEWABLE = "NOT_VIEWABLE";
     public static final String VIEW_UNDETERMINED = "VIEW_UNDETERMINED";
+    public static final String WEBM_FORMAT_EXT = "webm";
     public static final String LOOPME_SDK_TYPE = "loopme";
     public static final String ADNROID_DEVICE_OS = "android";
     public static final String SDK_DEBUG_MSG = "sdk_debug";
     public static final String SDK_ERROR_MSG = "sdk_error";
     public static final String BAD_SERVERS_CODE = "Bad servers response code ";
+    public static final String AD_ID_TAG = "adIdTag";
     public static final int MAX_FAIL_COUNT = 5;
     public static final int ONE_MINUTE_IN_MILLIS = 1000 * 60;
     public static final int SLEEP_TIME = ONE_MINUTE_IN_MILLIS * 15;
-    public static final String AD_ID_TAG = "adIdTag";
     public static final int DEFAULT_AD_ID = -1;
     public static final long ONE_SECOND_IN_MILLIS = 1000;
     public static final int AUTO_LOADING_ABSENCE = -1;
     public static final int BUTTON_SIZE = Utils.convertDpToPixel(40);
 
+    public static final int DEFAULT_BANNER_WIDTH = 350;
+    public static final int DEFAULT_BANNER_HEIGHT = 250;
+    public static final long DESTROY_TIME_DELAY = 200;
 
     public static boolean sDebugMode = true;
-
-
-    public static boolean sPartPreload = false;
 
     private Constants() {
     }
 
     public static final String HTTPS_SCHEME = "https";
     public static final String HTTP_PROTOCOL = "http";
-    public static final String FILE_FOLDER = "LoopMeAds";
-    public static final String PERCENT_SYMBOL = "%";
     public static final String MP4_FORMAT = ".mp4";
     public static final String MP4_FORMAT_EXT = "mp4";
-    public static final String APPKEY_TAG = "appkey";
     public static final String FORMAT_TAG = "format";
     public static final String BANNER_TAG = "banner";
     public static final String UNKNOWN_NAME = "unknown";
@@ -89,13 +68,8 @@ public class Constants {
     public static final String TYPE_VAST = "VAST";
     public static final String TYPE_APPLICATION_JAVASCRIPT = "application/javascript";
 
-    public static final int RESPONSE_NO_ADS = 204;
     public static final int RESPONSE_SUCCESS = 200;
-    public static final int RESPONSE_SERVER_ERROR = 504;
-    public static final int STATUS_INIT = 0;
-    public static final int STATUS_READY = 1;
     public static final int START_POSITION = 0;
-    public static final int DATABASE_VERSION = 1;
     public static final int SECONDS_IN_MINUTE = 60;
     public static final int MILLIS_IN_SECOND = 1000;
     public static final int REQUEST_TIMEOUT = 1000 * 15; //15 seconds
@@ -105,44 +79,48 @@ public class Constants {
     public static final int DEFAULT_EXPIRED_TIME = 1000 * 60 * 10;//10 minutes
     public static final long FETCH_TIMEOUT = 1000 * 60;//1 minute
     public static long CACHED_VIDEO_LIFE_TIME = 1000 * 60 * 60 * 32;//32 hours
-    public static final boolean APPEND_TO_FILE = true;
 
     public static boolean USE_MOBILE_NETWORK_FOR_CACHING = false;
-    public static boolean PART_PRELOAD = false;
     public static String sCacheDirectory = "";
-    private static AdSpotDimensions sAdSpotDimensions;
+    public static final String EXTRAS_ALLOW_ORIENTATION_CHANGE = "allowOrientationChange";
+    public static final String EXTRAS_FORCE_ORIENTATION = "forceOrientation";
 
 
-    public class AdFormat {
-        public static final int BANNER = 1000;
-        public static final int INTERSTITIAL = 1001;
+    public enum AdFormat {
+        BANNER,
+        INTERSTITIAL,
+        EXPANDABLE_BANNER;
 
-        private AdFormat() {
+        public static AdFormat fromInt(int format) {
+            if (format == BANNER.ordinal()) {
+                return BANNER;
+            } else if (format == INTERSTITIAL.ordinal()) {
+                return INTERSTITIAL;
+            } else {
+                return EXPANDABLE_BANNER;
+            }
         }
     }
 
-    public class AdState {
+    public enum AdState {
         /**
          * Initial state of ad right after creation.
          * Can be also after onHide() notification or destroy().
          */
-        public static final int NONE = 200;
+        NONE,
 
         /**
          * Ad currently in "loading" process.
          * Can be between trigger load() and onLoadSuccess(), onLoadFail() notifications or destroy().
          * While Ad in this state all other calling `load` methods will be ignored
          */
-        public static final int LOADING = 201;
+        LOADING,
 
         /**
          * Ad currently displays on screen.
          * Can be between trigger show() and onHide() notification or destroy()
          */
-        public static final int SHOWING = 202;
-
-        private AdState() {
-        }
+        SHOWING
     }
 
     public class ConnectionType {
@@ -293,6 +271,7 @@ public class Constants {
         public static final String CUSTOM = "custom";
         public static final String VAST = "vast";
         public static final String VPAID = "vpaid";
+        public static final String DO_NOT_TRACK = "do not track";
     }
 
     class Params {
@@ -334,12 +313,15 @@ public class Constants {
         public static final int BACK = 4;
     }
 
-    public static AdSpotDimensions getAdSpotDimensions() {
-        return sAdSpotDimensions;
-    }
+    public static class Banner {
+        public static final int MPU_BANNER_WIDTH = 300;
+        public static final int MPU_BANNER_HEIGHT = 250;
+        public static final int EXPAND_BANNER_WIDTH = 320;
+        public static final int EXPAND_BANNER_HEIGHT = 50;
+        public static final int SIZE_DISCREPANCY = 2;
 
-    public static void setAdSpotDimensions(AdSpotDimensions adSpotDimensions) {
-        sAdSpotDimensions = adSpotDimensions;
+        public static int[] EXPANDABLE_BANNER_SIZE = {EXPAND_BANNER_WIDTH, EXPAND_BANNER_HEIGHT};
+        public static int[] MPU_BANNER_SIZE = {MPU_BANNER_WIDTH, MPU_BANNER_HEIGHT};
     }
 
     public enum RetrofitType {

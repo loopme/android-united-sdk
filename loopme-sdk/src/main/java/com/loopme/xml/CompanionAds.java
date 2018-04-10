@@ -19,4 +19,8 @@ public class CompanionAds {
     public String getRequired() {
         return required;
     }
+
+    public boolean hasCompanionList() {
+        return companionList != null && companionList.size() > 0;
+    }
 }

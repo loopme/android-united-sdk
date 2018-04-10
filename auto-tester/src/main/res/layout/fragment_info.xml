@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_info_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/shadow"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="@dimen/info_fragment_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/background_bordered"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/about_dialog_tester_version_padding_left"
+                android:paddingRight="@dimen/about_dialog_tester_version_padding_right">
+
+                <TextView
+                    android:id="@+id/fragment_info_tester_version"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/about_dialog_tester_version_padding_top"
+                    android:text="@string/fragment_info_tester_version"
+                    android:textSize="@dimen/text_size_16sp" />
+
+                <TextView
+                    android:id="@+id/fragment_info_loopme_sdk_version"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/fragment_info_loopme_sdk_version"
+                    android:textSize="@dimen/text_size_16sp" />
+
+                <TextView
+                    android:id="@+id/fragment_info_mopub_sdk_version"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/about_dialog_mopub_sdk_version_padding_bottom"
+                    android:text="@string/fragment_info_mopub_sdk_version"
+                    android:textSize="@dimen/text_size_16sp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/separator_height"
+                android:background="@color/gray" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
+
+
+                <TextView
+                    android:id="@+id/fragment_info_check_update_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:padding="@dimen/about_dialog_check_update_textview_padding"
+                    android:text="@string/about_dialog_check_update"
+                    android:textColor="@color/blue"
+                    android:textSize="@dimen/text_size_16sp" />
+
+                <Button
+                    android:id="@+id/fragment_info_clear_cache_button"
+                    android:layout_width="@dimen/about_dialog_clear_cache_button_width"
+                    android:layout_height="@dimen/about_dialog_clear_cache_button_height"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/background_buttons"
+                    android:text="@string/about_dialog_clear_cache_button"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_12sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/separator_height_3dp" />
+
+                <Button
+                    android:id="@+id/fragment_info_import_button"
+                    android:layout_width="@dimen/about_dialog_import_button_width"
+                    android:layout_height="@dimen/about_dialog_clear_cache_button"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/background_buttons"
+                    android:text="@string/about_dialog_import_button"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_12sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/separator_height_3dp" />
+
+                <Button
+                    android:id="@+id/fragment_info_export_button"
+                    android:layout_width="@dimen/about_dialog_export_button_width"
+                    android:layout_height="@dimen/about_dialog_export_button"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/background_buttons"
+                    android:text="@string/about_dialog_export_button"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_size_12sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/separator_height_10dp" />
+
+
+                <Switch
+                    android:id="@+id/enable_auoloading_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/enable_auto_loading"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/text_size_16sp"
+                    android:layout_margin="@dimen/about_dialog_mopub_sdk_version_padding_bottom"
+                    android:paddingLeft="@dimen/enable_auoloading_checkbox_padding_left" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

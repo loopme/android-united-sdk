@@ -5,12 +5,14 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
+import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.common.LoopMeError;
 import com.loopme.tracker.constants.EventConstants;
-import com.loopme.vast.VastVpaidEventTracker;
+import com.loopme.utils.UiUtils;
 import com.loopme.time.SimpleTimer;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.bridges.vpaid.BridgeEventHandler;
@@ -29,33 +31,38 @@ import com.loopme.xml.Tracking;
 
 public class DisplayControllerVpaid extends VastVpaidBaseDisplayController implements
         BridgeEventHandler,
-        VastVpaidDisplayController {
+        VastVpaidDisplayController,
+        AdViewChromeClient.OnErrorFromJsCallbackVpaid,
+        Vast4Tracker.OnAdVerificationListener,
+        Vast4WebViewClient.OnPageLoadedListener {
 
+    private static final String LOG_TAG = DisplayControllerVpaid.class.getSimpleName();
+    private static final double VIDEO_25_WITH_SPARE_TIME_COEFFICIENT = 0.35;
     private static final String HTML_SOURCE_FILE = "loopmeAd.html";
     private static final String VPAID_CREATIVE_URL_STRING = "[VPAID_CREATIVE_URL]";
     private static final String ANDROID_JS_INTERFACE = "android";
     private static final int IMPRESSION_TIMER = 2000;
-    private static final String NO_VAST_RESPONSE = "no VAST tag response";
 
     private VpaidBridge mVpaidBridge;
     private ViewControllerVpaid mViewControllerVpaid;
 
-    private volatile OnPreparedListener mOnPreparedListener;
     private LoopMeWebView mWebView;
 
     private boolean mIsWaitingForSkippableState;
     private boolean mIsWaitingForWebView;
-    private volatile boolean mIsAdVerificationLoaded;
     private boolean mIsStarted;
     private SimpleTimer mImpressionTimer;
     private volatile String mCurrentVideoTime;
     private int mVideoDuration;
+    private boolean mIsFirstLaunch = true;
+    private volatile boolean mIsFirstQuartilePosted;
+    private CreativeType mCreativeType = CreativeType.NONE_VIDEO;
+    private boolean mIsVpaidEventTracked;
 
     public DisplayControllerVpaid(LoopMeAd loopMeAd) {
         super(loopMeAd);
-        mVpaidBridge = new VpaidBridgeImpl(this, mLoopMeAd.getAdParams());
+        mVpaidBridge = new VpaidBridgeImpl(this, mLoopMeAd.getAdParams(), mLoopMeAd.getAdSpotDimensions());
         mViewControllerVpaid = new ViewControllerVpaid(this);
-        VastVpaidEventTracker.addAllEvents(mLoopMeAd.getAdParams().getTrackingEventsList());
         mVideoDuration = mAdParams.getDuration();
         mLogTag = DisplayControllerVast.class.getSimpleName();
         Logging.out(mLogTag);
@@ -69,19 +76,15 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     //region DisplayController methods
     @Override
-    public void prepare(VastVpaidDisplayController.OnPreparedListener listener) {
-        mOnPreparedListener = listener;
+    public void prepare() {
         initWebView();
-        vast4Verification(mWebView);
-    }
-
-    @Override
-    public void onVast4VerificationDoesNotNeed() {
+        initVast4Tracker(mWebView);
         loadHtml(prepareHtml());
     }
 
     private String prepareHtml() {
         String html = Utils.readAssets(getAssetsManager(), HTML_SOURCE_FILE);
+        html = addVerificationScripts(html);
         return html.replace(VPAID_CREATIVE_URL_STRING, mAdParams.getVpaidJsUrl());
     }
 
@@ -103,12 +106,14 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
             super.onPause();
             callBridgeMethod(BridgeMethods.VPAID_PAUSE_AD);
         }
+        pauseViewController();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         callBridgeMethod(BridgeMethods.VPAID_RESUME_AD);
+        resumeViewController();
     }
 
     @Override
@@ -120,6 +125,25 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
                 destroy();
             }
         });
+        destroyViewController();
+    }
+
+    private void pauseViewController() {
+        if (mViewControllerVpaid != null) {
+            mViewControllerVpaid.pause();
+        }
+    }
+
+    private void resumeViewController() {
+        if (mViewControllerVpaid != null) {
+            mViewControllerVpaid.resume();
+        }
+    }
+
+    private void destroyViewController() {
+        if (mViewControllerVpaid != null) {
+            mViewControllerVpaid.destroy();
+        }
     }
 
     private void destroy() {
@@ -178,9 +202,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     @Override
     public void onPrepared() {
-        if (mOnPreparedListener != null) {
-            mOnPreparedListener.onPrepared();
-        }
+        onAdReady();
     }
 
     @Override
@@ -197,7 +219,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         if (!mIsStarted) {
             return;
         }
-        VastVpaidEventTracker.postEvent(EventConstants.CLOSE, mCurrentVideoTime);
+        postVideoEvent(EventConstants.CLOSE, mCurrentVideoTime);
         skipVideo();
     }
 
@@ -208,47 +230,42 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         }
         if (mIsWaitingForSkippableState && skippable) {
             mIsWaitingForSkippableState = false;
-            VastVpaidEventTracker.postEvent(EventConstants.SKIP, mCurrentVideoTime);
+            postVideoEvent(EventConstants.SKIP, mCurrentVideoTime);
             skipVideo();
         }
     }
 
     @Override
-    public boolean onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
+    public void onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
         for (String trackUrl : mAdParams.getVideoClicks()) {
-            onMessage(Message.EVENT, trackUrl);
+            postVideoEvent(trackUrl);
         }
         if (TextUtils.isEmpty(url)) {
             url = mAdParams.getVideoRedirectUrl();
         }
         onAdClicked();
-        return super.onRedirect(url, mLoopMeAd);
+        super.onRedirect(url, mLoopMeAd);
     }
-
 
     @Override
     public void trackError(String message) {
-        onMessage(Message.ERROR, Errors.VastError.VPAID.getValue());
-        handleCriticalError(message);
-    }
-
-    private void handleCriticalError(String message) {
-        if (!TextUtils.isEmpty(message) && message.equalsIgnoreCase(NO_VAST_RESPONSE)) {
-            onInternalLoadFail(new LoopMeError(message));
+        if (!TextUtils.isEmpty(message)) {
+            UiUtils.broadcastIntent(mLoopMeAd.getContext(), Constants.DESTROY_INTENT, mLoopMeAd.getAdId());
+            LoopMeError error = new LoopMeError(901, "Error from vpaid js: trackError(): " + message, Constants.ErrorType.VPAID);
+            onInternalLoadFail(new LoopMeError(error));
         }
     }
 
     @Override
     public void postEvent(String eventType, int value) {
         for (Tracking tracking : mAdParams.getTrackingEventsList()) {
-            TrackingEvent event = new TrackingEvent(tracking.getText());
-            if (tracking.getEvent().equalsIgnoreCase(EventConstants.PROGRESS)) {
-                if (tracking.getOffset() == null) {
-                    continue;
-                }
-                int sendEventTime = mVideoDuration - value;
-                if (Utils.parseDuration(tracking.getOffset()) == sendEventTime) {
-                    onMessage(Message.EVENT, event.url);
+            if (tracking.isProgressEvent()) {
+                if (tracking.getOffset() != null) {
+                    int currentEventTime = mVideoDuration - value;
+                    int eventTime = Utils.parseDuration(tracking.getOffset());
+                    if (eventTime == currentEventTime) {
+                        postVideoEvent(tracking.getText());
+                    }
                 }
             }
         }
@@ -271,7 +288,22 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     @Override
     public void postEvent(String eventType) {
-        onMessage(Message.EVENT, eventType);
+        postVideoEvent(eventType);
+        if (TextUtils.equals(eventType, EventConstants.FIRST_QUARTILE)) {
+            mIsFirstQuartilePosted = true;
+        }
+        startCheckTimer(eventType);
+    }
+
+    private void startCheckTimer(final String eventType) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (TextUtils.equals(eventType, EventConstants.START) && mCreativeType == CreativeType.VIDEO) {
+                    startVideoEventCheckTimer();
+                }
+            }
+        });
     }
     //endregion
 
@@ -279,52 +311,65 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     @SuppressLint("JavascriptInterface")
     private void initWebView() {
         mWebView = new LoopMeWebView(mLoopMeAd.getContext());
-        mWebView.setWebChromeClient(new AdViewChromeClient(initOnErrorFromJsListener()));
-        mWebView.setOnPageLoadedCallback(initOnPageLoadedCallback());
-        mWebView.setWebViewClient(mWebView.getVpaidWebViewClient());
+        mWebView.setWebChromeClient(new AdViewChromeClient(this));
+        mWebView.setWebViewClient(initVast4WebViewClient());
         mIsWaitingForWebView = true;
         mWebView.addJavascriptInterface(mVpaidBridge, ANDROID_JS_INTERFACE);
     }
 
-    private AdViewChromeClient.OnErrorFromJsCallback initOnErrorFromJsListener() {
-        return new AdViewChromeClient.OnErrorFromJsCallback() {
-
-            @Override
-            public void onErrorFromJs(String message) {
-                if (isVast4VerificationNeeded() && !mIsAdVerificationLoaded) {
-                    DisplayControllerVpaid.this.onPostWarning(Errors.VERIFICATION_UNIT_NOT_EXECUTED);
-                } else {
-                    onPostWarning(Errors.GENERAL_VPAID_ERROR);
-                }
-            }
-        };
+    private WebViewClient initVast4WebViewClient() {
+        Vast4WebViewClient vast4WebViewClient = new Vast4WebViewClient(this);
+        vast4WebViewClient.setOnPageLoadedListener(this);
+        return vast4WebViewClient;
     }
 
-    private LoopMeWebView.OnPageLoadedCallback initOnPageLoadedCallback() {
-        return new LoopMeWebView.OnPageLoadedCallback() {
-            @Override
-            public void onPageLoaded() {
-                if (mIsWaitingForWebView) {
-                    if (isVast4VerificationNeeded() && !mIsAdVerificationLoaded) {
-                        loadHtml(prepareHtml());
-                        mIsAdVerificationLoaded = true;
-                    } else {
-                        onPageFinished();
-                        mIsWaitingForWebView = false;
-                    }
-                }
-            }
-        };
+    @Override
+    public void onErrorFromJs(String message) {
+        postVpaidError(message);
+    }
+
+    @Override
+    public void onVideoSource(String source) {
+        videoSourceEventOccurred(source);
+    }
+
+    @Override
+    public void onVerificationJsLoaded() {
+        Logging.out(LOG_TAG, "verification script successfully loaded");
+    }
+
+    @Override
+    public void onVerificationJsFailed(String message) {
+        LoopMeError error = new LoopMeError(Errors.VERIFICATION_UNIT_NOT_EXECUTED);
+        error.addToMessage(message);
+        onPostWarning(error);
+    }
+
+    @Override
+    public void onPageLoaded() {
+        if (mIsWaitingForWebView) {
+            Logging.out(LOG_TAG, "Init webView done");
+            callBridgeMethod(BridgeMethods.VPAID_PREPARE_AD);
+            mIsWaitingForWebView = false;
+        }
+    }
+
+    private void postVpaidError(String message) {
+        Logging.out(LOG_TAG, "Error from JS " + message);
+        LoopMeError error = mIsStarted ? new LoopMeError(Errors.GENERAL_VPAID_ERROR) : new LoopMeError(Errors.VPAID_FILE_NOT_FOUND);
+        error.addToMessage(message);
+
+        if (mIsStarted) {
+            onPostWarning(error);
+        } else {
+            onInternalLoadFail(error);
+        }
     }
 
     private void loadHtml(String html) {
         if (mWebView != null) {
             mWebView.loadHtml(html);
         }
-    }
-
-    private void onPageFinished() {
-        callBridgeMethod(BridgeMethods.VPAID_PREPARE_AD);
     }
 
     @Override
@@ -338,9 +383,9 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     //endregion
     @Override
     public void onAdImpression() {
-        mImpressionTimer.cancel();
+        mImpressionTimer.stop();
         for (String url : mAdParams.getImpressionsList()) {
-            onMessage(Message.EVENT, url);
+            postVideoEvent(url);
             onMessage(Message.LOG, "mAdParams.getImpressionsList() " + url);
         }
 
@@ -363,6 +408,21 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
             }
         });
         mImpressionTimer.start();
+
+        startCloseButtonTimerOnUiThread();
+    }
+
+    private void startCloseButtonTimerOnUiThread() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int duration = mVideoDuration * 1000;
+                Logging.out(LOG_TAG, "mVideoDuration " + duration);
+                if (mViewControllerVpaid != null) {
+                    mViewControllerVpaid.startCloseButtonTimer(duration);
+                }
+            }
+        });
     }
 
     @Override
@@ -377,6 +437,11 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     @Override
     public void onAdShake() {
+        Logging.out(LOG_TAG, "onAdShake stub");
+    }
+
+    @Override
+    public void setFullScreen(boolean isFullScreen) {
 
     }
 
@@ -428,5 +493,69 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
                 }
             }
         }
+    }
+
+    private void videoSourceEventOccurred(String source) {
+        Logging.out(LOG_TAG, "Video source event received");
+        mCreativeType = CreativeType.VIDEO;
+        hideCloseButtonOnce();
+        checkVideoFormat(source);
+    }
+
+    private void hideCloseButtonOnce() {
+        if (mIsFirstLaunch && mViewControllerVpaid != null) {
+            mViewControllerVpaid.enableCloseButton(false);
+            mIsFirstLaunch = false;
+        }
+    }
+
+    private void checkVideoFormat(String source) {
+        if (Utils.isUsualFormat(source)) {
+            cancelExtraCloseButton();
+        } else {
+            LoopMeError error = new LoopMeError(Errors.UNUSUAL_VIDEO_FORMAT);
+            error.addToMessage(source);
+            onPostWarning(error);
+        }
+    }
+
+    private void startVideoEventCheckTimer() {
+        Logging.out(LOG_TAG, "startVideoEventCheckTimer");
+        SimpleTimer videoEventCheckTimer = initCheckVideoEventTimer(getDurationWithSpareTime());
+        videoEventCheckTimer.start();
+    }
+
+    private long getDurationWithSpareTime() {
+        return (long) (mVideoDuration * 1000 * VIDEO_25_WITH_SPARE_TIME_COEFFICIENT);
+    }
+
+    private SimpleTimer initCheckVideoEventTimer(long durationWithSpareTime) {
+        return new SimpleTimer(durationWithSpareTime, new SimpleTimer.Listener() {
+            @Override
+            public void onFinish() {
+                checkEvent25();
+            }
+        });
+    }
+
+    private void checkEvent25() {
+        if (mIsFirstQuartilePosted) {
+            Logging.out(LOG_TAG, "Unusual video format. Event video 25%.");
+            cancelExtraCloseButton();
+        } else {
+            Logging.out(LOG_TAG, "Video creative does not send event video 25%.");
+        }
+    }
+
+    private void cancelExtraCloseButton() {
+        if (mViewControllerVpaid != null) {
+            mViewControllerVpaid.cancelCloseButtonTimer();
+            mViewControllerVpaid.enableCloseButton(false);
+        }
+    }
+
+    private enum CreativeType {
+        VIDEO,
+        NONE_VIDEO;
     }
 }

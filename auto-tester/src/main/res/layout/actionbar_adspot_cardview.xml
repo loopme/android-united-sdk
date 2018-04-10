@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:id="@+id/actionbar_edit_adspot_layout"
+    android:layout_height="@dimen/actionbar_height">
+
+    <LinearLayout
+        android:id="@+id/action_bar_back_to_adspots"
+        android:layout_width="@dimen/action_bar_backto_adspots_width"
+        android:layout_height="@dimen/action_bar_backto_adspots_height"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/action_bar_back_arrow"
+            android:layout_width="@dimen/action_bar_back_arrow_width"
+            android:layout_height="@dimen/action_bar_back_arrow_height"
+            android:layout_marginLeft="@dimen/action_bar_back_arrow_margin_left"
+            android:layout_marginRight="@dimen/action_bar_back_arrow_margin_right"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_action_back" />
+
+        <TextView
+            android:id="@+id/ad_spots_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ad_spots"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_16sp" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/action_bar_edit_button"
+        android:layout_width="@dimen/action_bar_edit_button_width"
+        android:layout_height="@dimen/action_bar_edit_button_height"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:paddingRight="@dimen/action_bar_edit_button_padding_right"
+        android:src="@drawable/ic_action_edit" />
+
+</RelativeLayout>

@@ -2,13 +2,13 @@ package com.loopme.ad;
 
 import android.text.TextUtils;
 
+import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.tracker.AdIds;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.vast.WrapperParser;
-import com.loopme.xml.vast4.Wrapper;
-import com.loopme.Constants;
 import com.loopme.xml.Tracking;
+import com.loopme.xml.vast4.Wrapper;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -65,6 +65,8 @@ public class AdParams implements Serializable {
     private List<String> mTrackersList = new ArrayList<>();
     private boolean mAutoLoading;
 
+    AdSpotDimensions mAdSpotDimensions;
+
     public AdParams() {
     }
 
@@ -85,9 +87,14 @@ public class AdParams implements Serializable {
         mIsDebug = builder.mIsDebug;
         mAdIds = builder.mAdIds;
         mAutoLoading = builder.mAutoLoading;
+        mAdSpotDimensions = builder.mAdSpotDimensions;
         Logging.out(LOG_TAG, "Server response indicates  ad params: "
                 + "format: " + mFormat + ", isAutoloading: " + mAutoLoading
                 + ", mraid: " + mIsMraid + ", expire in: " + mExpiredDate);
+    }
+
+    public AdSpotDimensions getAdSpotDimensions() {
+        return mAdSpotDimensions;
     }
 
     public boolean getPartPreload() {
@@ -177,6 +184,7 @@ public class AdParams implements Serializable {
         private boolean mIsDebug;
         private AdIds mAdIds;
         private boolean mAutoLoading;
+        private AdSpotDimensions mAdSpotDimensions;
 
 
         public AdParamsBuilder(String format) {
@@ -257,14 +265,14 @@ public class AdParams implements Serializable {
         }
 
         private boolean isValidFormatValue() {
-            return mBuilderFormat != null &&
-                    (mBuilderFormat.equalsIgnoreCase(Constants.BANNER_TAG) ||
-                            mBuilderFormat.equalsIgnoreCase(Constants.INTERSTITIAL_TAG));
+            return mBuilderFormat != null
+                    && (mBuilderFormat.equalsIgnoreCase(Constants.BANNER_TAG)
+                    || mBuilderFormat.equalsIgnoreCase(Constants.INTERSTITIAL_TAG));
         }
 
         private boolean isValidOrientationValue(String orientation) {
-            return orientation != null && (orientation.equalsIgnoreCase(Constants.ORIENTATION_PORT) ||
-                    orientation.equalsIgnoreCase(Constants.ORIENTATION_LAND));
+            return orientation != null && (orientation.equalsIgnoreCase(Constants.ORIENTATION_PORT)
+                    || orientation.equalsIgnoreCase(Constants.ORIENTATION_LAND));
         }
 
         public AdParamsBuilder debug(boolean debug) {
@@ -274,6 +282,11 @@ public class AdParams implements Serializable {
 
         public AdParamsBuilder adIds(AdIds adIds) {
             mAdIds = adIds;
+            return this;
+        }
+
+        public AdParamsBuilder adSpotDimensions(AdSpotDimensions adSpotDimensions) {
+            mAdSpotDimensions = adSpotDimensions;
             return this;
         }
     }
@@ -343,7 +356,7 @@ public class AdParams implements Serializable {
     }
 
     public void setCompanionCreativeViewEvents(List<String> companionCreativeViewEvents) {
-        this.mCompanionCreativeViewEventsList = companionCreativeViewEvents;
+        this.mCompanionCreativeViewEventsList.addAll(companionCreativeViewEvents);
     }
 
     public List<Tracking> getTrackingEventsList() {
@@ -351,7 +364,9 @@ public class AdParams implements Serializable {
     }
 
     public void setTrackingEventsList(List<Tracking> events) {
-        this.mTrackingEventsList = events;
+        if (events != null) {
+            this.mTrackingEventsList.addAll(events);
+        }
     }
 
     public List<String> getTrackers() {
@@ -425,6 +440,8 @@ public class AdParams implements Serializable {
 
         mAdVerificationJavaScriptUrlList.addAll(parser.getAdVerificationJavaScriptUrlList());
         mVideoClicksList.addAll(parser.getVideoClicksList());
+        mCompanionCreativeViewEventsList.addAll(parser.getCompanionCreativeViewList());
+        mEndCardClicksList.addAll(parser.getCompanionClickTrackingList());
     }
 
     public List<String> getErrorUrlList() {

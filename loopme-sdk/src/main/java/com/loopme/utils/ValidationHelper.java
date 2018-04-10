@@ -1,7 +1,6 @@
 package com.loopme.utils;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -30,6 +29,7 @@ public class ValidationHelper {
 
     public interface OnValidationHelperListener {
         void onError(LoopMeError error);
+
         void onSuccess();
     }
 
@@ -38,7 +38,9 @@ public class ValidationHelper {
     }
 
     public static boolean isValidFormat(String format) {
-        return format != null && (format.equalsIgnoreCase(Constants.BANNER_TAG) || format.equalsIgnoreCase(Constants.INTERSTITIAL_TAG));
+        return format != null
+                && (format.equalsIgnoreCase(Constants.BANNER_TAG)
+                || format.equalsIgnoreCase(Constants.INTERSTITIAL_TAG));
     }
 
     public static boolean isCouldLoadAd(LoopMeAd loopMeAd) {
@@ -62,7 +64,12 @@ public class ValidationHelper {
             loopMeAd.onAdLoadFail(new LoopMeError(error));
             return false;
         } else if (!isProperlyAndroidVersion()) {
-            error = "Not supported Android version. Expected 4.4.4+";
+            error = "Not supported Android version. Expected 5+";
+            Logging.out(LOG_TAG, error);
+            loopMeAd.onAdLoadFail(new LoopMeError(error));
+            return false;
+        } else if (loopMeAd.isCustomBannerHtml() || loopMeAd.isExpandBannerVideo()) {
+            error = "Container size is not valid for chosen ad type";
             Logging.out(LOG_TAG, error);
             loopMeAd.onAdLoadFail(new LoopMeError(error));
             return false;
@@ -87,6 +94,6 @@ public class ValidationHelper {
     }
 
     public static boolean isProperlyAndroidVersion() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }
 }

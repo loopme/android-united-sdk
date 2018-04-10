@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">LoopMe Banner Sample</string>
+    <string name="sample_text">sample text</string>
+    <string name="title_simple">Simple</string>
+    <string name="title_recycler_view">RecyclerView</string>
+    <string name="example_text">example text</string>
+
+</resources>

@@ -14,12 +14,12 @@ import android.view.Display;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
-import com.loopme.LoopMeBanner;
+import com.loopme.Constants;
 import com.loopme.LoopMeBannerGeneral;
-import com.loopme.LoopMeInterstitial;
 import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.utils.ConnectionUtils;
+import com.loopme.utils.Utils;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -168,13 +168,18 @@ public class RequestParamsUtils {
         } else if (baseAd instanceof LoopMeBannerGeneral) {
             LoopMeBannerGeneral banner = (LoopMeBannerGeneral) baseAd;
             ViewGroup.LayoutParams params = RequestParamsUtils.getParamsSafety(banner);
-
+            int currentWidthInDp = 0;
+            int currentHeightInDp = 0;
             if (params != null) {
-                int widthInDp = RequestParamsUtils.convertPixelToDp(context, params.width);
-                int heightInDp = RequestParamsUtils.convertPixelToDp(context, params.height);
-                adSizeArray[0] = widthInDp;
-                adSizeArray[1] = heightInDp;
+                currentWidthInDp = RequestParamsUtils.convertPixelToDp(context, params.width);
+                currentHeightInDp = RequestParamsUtils.convertPixelToDp(context, params.height);
             }
+
+            adSizeArray[0] = currentWidthInDp;
+            adSizeArray[1] = currentHeightInDp;
+
+            Utils.roundBannersSize(adSizeArray, Constants.Banner.EXPANDABLE_BANNER_SIZE);
+            Utils.roundBannersSize(adSizeArray, Constants.Banner.MPU_BANNER_SIZE);
         }
         return adSizeArray;
     }

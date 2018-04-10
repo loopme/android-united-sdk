@@ -2,11 +2,7 @@ package com.loopme.controllers.interfaces;
 
 public interface VastVpaidDisplayController {
 
-    interface OnPreparedListener {
-        void onPrepared();
-    }
-
-    void prepare(OnPreparedListener listener);
+    void prepare();
 
     void skipVideo();
 

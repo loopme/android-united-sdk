@@ -23,6 +23,9 @@ import com.loopme.receiver.AdReceiver;
 import com.loopme.receiver.MraidAdCloseButtonReceiver;
 import com.loopme.utils.Utils;
 import com.loopme.views.CloseButton;
+import com.loopme.views.MraidView;
+import com.testfairy.TestFairy;
+
 
 public final class BaseActivity extends Activity
         implements AdReceiver.Listener,
@@ -47,6 +50,7 @@ public final class BaseActivity extends Activity
     private MraidAdCloseButtonReceiver mMraidCloseButtonReceiver;
     private boolean mIsDestroyBroadcastReceived;
 
+    private MraidView mMraidView;
 
     @Override
     public final void onCreate(Bundle savedInstanceState) {
@@ -58,6 +62,7 @@ public final class BaseActivity extends Activity
         }
         requestSystemFlags();
         retrieveLoopMeAdOrFinish();
+        initCrashLytics();
         if (mLoopMeAd != null && mLoopMeAd.getAdParams() != null) {
             retrieveParams();
             setContentView();
@@ -70,8 +75,12 @@ public final class BaseActivity extends Activity
         }
     }
 
+    private void initCrashLytics() {
+        TestFairy.begin(this, "a44d0f385de2740ba8f9aefcf9c0eda6706acc0f");
+    }
+
     private void setMraidSettings() {
-        if (mLoopMeAd != null && mLoopMeAd.getAdParams().isMraidAd()) {
+        if (mLoopMeAd != null && mLoopMeAd.isMraidAd()) {
             initMraidCloseButton();
             initMraidCloseButtonReceiver();
         }
@@ -99,7 +108,6 @@ public final class BaseActivity extends Activity
 
     @Override
     protected void onDestroy() {
-        Logging.out(LOG_TAG, "onDestroy");
         clearLayout();
         destroyReceivers();
         super.onDestroy();
@@ -143,14 +151,25 @@ public final class BaseActivity extends Activity
 
     private void initOrientation() {
         mInitialOrientation = Utils.getScreenOrientation();
-        if (!mLoopMeAd.isMraidAd()) {
-            if (isInterstitial()) {
-                if (!mIs360) {
-                    applyOrientationFromAdParams();
-                }
-            } else {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-            }
+        if (mLoopMeAd.isMraidAd()) {
+            applyMraidOrientation();
+        } else {
+            applyLoopMeOrientation();
+        }
+    }
+
+    private void applyLoopMeOrientation() {
+        if (isInterstitial() && !mIs360) {
+            applyOrientationFromAdParams();
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        }
+    }
+
+    private void applyMraidOrientation() {
+        if (mLoopMeAd.isMraidAd() && mDisplayController instanceof DisplayControllerLoopMe) {
+            int orientation = ((DisplayControllerLoopMe) mDisplayController).getMraidOrientation();
+            setRequestedOrientation(orientation);
         }
     }
 
@@ -226,7 +245,7 @@ public final class BaseActivity extends Activity
 
     private void resumeAd() {
         if (mFirstLaunch) {
-            startPlayInterstitial();
+            startPlayNoneLoopMeInterstitial();
             resumeLoopMeController();
             mFirstLaunch = false;
         } else {
@@ -240,8 +259,8 @@ public final class BaseActivity extends Activity
         }
     }
 
-    private void startPlayInterstitial() {
-        if (mLoopMeAd.isInterstitial()) {
+    private void startPlayNoneLoopMeInterstitial() {
+        if (mLoopMeAd.isInterstitial() && !(mDisplayController instanceof DisplayControllerLoopMe)) {
             play();
         }
     }
@@ -255,6 +274,7 @@ public final class BaseActivity extends Activity
     @Override
     public void onBackPressed() {
         if (isBanner()) {
+            collapseMraidBanner();
             switchLoopMeBannerToPreviousMode();
             ((BaseDisplayController) mDisplayController).onAdExitedFullScreenEvent();
             super.onBackPressed();
@@ -274,9 +294,8 @@ public final class BaseActivity extends Activity
     }
 
     private void switchLoopMeBannerToPreviousMode() {
-        if (mDisplayController != null && mDisplayController instanceof DisplayControllerLoopMe) {
-            DisplayControllerLoopMe displayControllerLoopMe = (DisplayControllerLoopMe) mDisplayController;
-            displayControllerLoopMe.switchToPreviousMode();
+        if (mDisplayController instanceof DisplayControllerLoopMe) {
+            ((DisplayControllerLoopMe) mDisplayController).switchToPreviousMode();
         }
     }
 
@@ -296,23 +315,25 @@ public final class BaseActivity extends Activity
         mMraidCloseButton = new CloseButton(this);
         mMraidCloseButton.addInLayout(mLoopMeContainerView);
         mMraidCloseButton.setOnClickListener(initMraidCloseButtonListener());
-        mMraidCloseButton.setVisibility(View.GONE);
+        onCloseButtonVisibilityChanged(mIsCloseButtonPresent);
     }
 
     private View.OnClickListener initMraidCloseButtonListener() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                closeMraidAd();
+                if (mLoopMeAd.isInterstitial()) {
+                    closeMraidAd();
+                } else {
+                    collapseMraidBanner();
+                }
             }
         };
     }
 
     private void closeMraidAd() {
-        if (mDisplayController != null && mDisplayController instanceof DisplayControllerLoopMe) {
-            DisplayControllerLoopMe displayControllerLoopMe = (DisplayControllerLoopMe) mDisplayController;
-            displayControllerLoopMe.closeMraidAd();
-            BaseActivity.this.finish();
+        if (mDisplayController instanceof DisplayControllerLoopMe) {
+            ((DisplayControllerLoopMe) mDisplayController).closeMraidAd();
         }
     }
 
@@ -336,6 +357,12 @@ public final class BaseActivity extends Activity
     public void onAdShake() {
         if (mDisplayController != null) {
             mDisplayController.onAdShake();
+        }
+    }
+
+    private void collapseMraidBanner() {
+        if (mDisplayController != null) {
+            ((DisplayControllerLoopMe) mDisplayController).collapseMraidBanner();
         }
     }
 }

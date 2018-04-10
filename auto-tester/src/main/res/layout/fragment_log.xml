@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_log_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/shadow"
+    android:orientation="vertical"
+    android:padding="@dimen/fragment_log_container_pudding">
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/fragment_info_margin"
+        android:background="@drawable/background_bordered"
+        android:clickable="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/fragment_log_title_textview"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/fragment_log_titel_hight"
+            android:background="@drawable/background_buttons"
+            android:clickable="true"
+            android:gravity="center"
+            android:text="@string/fragment_log_title"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_16sp"
+            android:textStyle="bold" />
+
+
+        <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/fragment_log_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:hint="@string/log_hint_example"
+                android:textSize="@dimen/text_size_16sp" />
+        </ScrollView>
+
+    </LinearLayout>
+
+</LinearLayout>

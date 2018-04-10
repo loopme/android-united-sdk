@@ -1,0 +1,79 @@
+apply plugin: 'com.android.application'
+
+repositories {
+    jcenter()
+    maven {
+        url 'https://dl.bintray.com/loopme/maven'
+    }
+    maven { url 'https://www.testfairy.com/maven' }
+
+    flatDir {
+        dirs 'libs'
+    }
+    google()
+}
+android {
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
+
+    defaultConfig {
+        applicationId "com.loopme.tester"
+        minSdkVersion 21
+        targetSdkVersion 26
+        versionCode 17
+        versionName "2"
+        multiDexEnabled true
+        versionNameSuffix getDate()
+        buildConfigField "String", "TESTFAIRY_APP_TOKEN", TESTFAIRY_TOKEN
+
+    }
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    packagingOptions {
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/MANIFEST.MF'
+    }
+    lintOptions {
+        abortOnError false
+    }
+
+    configurations {
+        all*.exclude group: 'com.android.volley'
+    }
+
+}
+dependencies {
+    api project(':loopme-sdk')
+    api 'com.android.volley:volley:1.0.0'
+    api 'com.google.code.gson:gson:2.8.0'
+    api 'com.android.support:appcompat-v7:26.1.0'
+    api 'testfairy:testfairy-android-sdk:1.5.5@aar'
+
+    api 'com.android.support:recyclerview-v7:26.1.0'
+    api 'com.android.support:cardview-v7:26.1.0'
+    api('com.mopub:mopub-sdk:4.18.0@aar') {
+        transitive = true
+        exclude module: 'libAvid-mopub'
+        exclude module: 'moat-mobile-app-kit'
+    }
+    api 'com.android.support:design:26.1.0'
+
+}
+
+static def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('.MMdd')
+    return formattedDate
+}
+

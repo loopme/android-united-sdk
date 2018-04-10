@@ -1,6 +1,7 @@
 package com.loopme;
 
 import android.app.Activity;
+import android.os.Build;
 import android.text.TextUtils;
 import android.widget.FrameLayout;
 
@@ -34,6 +35,10 @@ public class LoopMeBanner extends AdWrapper {
      */
     public LoopMeBanner(Activity activity, String appKey) {
         super(activity, appKey);
+        if (Build.VERSION.SDK_INT < 21) {
+            LoopMeError error = new LoopMeError("Unsupported android version. Loopme-sdk requires android API_LEVEL >= 21.");
+            throw new UnsupportedClassVersionError(error.getMessage());
+        }
         mFirstLoopMeAd = LoopMeBannerGeneral.getInstance(appKey, activity);
         if (isAutoLoadingEnabled()) {
             mSecondLoopMeAd = LoopMeBannerGeneral.getInstance(appKey, activity);
@@ -63,9 +68,11 @@ public class LoopMeBanner extends AdWrapper {
                 bindView(mBannerView, mSecondLoopMeAd);
                 show(mSecondLoopMeAd);
                 mCurrentAd = SECOND_BANNER;
+            } else {
+                postShowMissedEvent();
             }
         } else {
-            LoopMeTracker.post("Bind view is null");
+            LoopMeTracker.post("Banner is already showing");
         }
     }
 
@@ -132,7 +139,7 @@ public class LoopMeBanner extends AdWrapper {
     }
 
     @Override
-    public int getAdFormat() {
+    public Constants.AdFormat getAdFormat() {
         return Constants.AdFormat.BANNER;
     }
 
@@ -168,7 +175,7 @@ public class LoopMeBanner extends AdWrapper {
     }
 
     private void switchToNormalMode(LoopMeAd banner) {
-        if (banner != null && banner instanceof LoopMeBannerGeneral) {
+        if (banner instanceof LoopMeBannerGeneral) {
             ((LoopMeBannerGeneral) banner).switchToNormalMode();
         }
     }
@@ -182,7 +189,7 @@ public class LoopMeBanner extends AdWrapper {
     }
 
     private void setListener(LoopMeBannerGeneral.Listener listener, LoopMeAd banner) {
-        if (banner != null && banner instanceof LoopMeBannerGeneral) {
+        if (banner instanceof LoopMeBannerGeneral) {
             ((LoopMeBannerGeneral) banner).setListener(listener);
         }
     }
@@ -199,19 +206,19 @@ public class LoopMeBanner extends AdWrapper {
     }
 
     private void setMinimizedMode(MinimizedMode mode, LoopMeAd banner) {
-        if (banner != null && banner instanceof LoopMeBannerGeneral) {
+        if (banner instanceof LoopMeBannerGeneral) {
             ((LoopMeBannerGeneral) banner).setMinimizedMode(mode);
         }
     }
 
     private void showNativeVideo(LoopMeAd banner) {
-        if (banner != null && banner instanceof LoopMeBannerGeneral) {
+        if (banner instanceof LoopMeBannerGeneral) {
             ((LoopMeBannerGeneral) banner).showNativeVideo();
         }
     }
 
     public void switchToMinimizedMode(LoopMeAd banner) {
-        if (banner != null && banner instanceof LoopMeBannerGeneral) {
+        if (banner instanceof LoopMeBannerGeneral) {
             ((LoopMeBannerGeneral) banner).switchToMinimizedMode();
         }
     }
@@ -225,6 +232,7 @@ public class LoopMeBanner extends AdWrapper {
                     mMainAdListener.onLoopMeBannerLoadSuccess(LoopMeBanner.this);
                 }
                 resetFailCounter();
+                onLoadedSuccess();
             }
 
             @Override
@@ -233,6 +241,7 @@ public class LoopMeBanner extends AdWrapper {
                     mMainAdListener.onLoopMeBannerLoadFail(LoopMeBanner.this, error);
                 }
                 increaseFailCounter(banner);
+                onLoadFail();
             }
 
             @Override
@@ -278,6 +287,10 @@ public class LoopMeBanner extends AdWrapper {
                 }
             }
         };
+    }
+
+    public boolean isFullScreenMode() {
+        return mFirstLoopMeAd != null && mFirstLoopMeAd.isFullScreen();
     }
 
     public interface Listener {

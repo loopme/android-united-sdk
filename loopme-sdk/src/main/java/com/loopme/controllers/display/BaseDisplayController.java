@@ -1,26 +1,23 @@
 package com.loopme.controllers.display;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.View;
 import android.webkit.WebView;
 
 import com.loopme.Logging;
-import com.loopme.ad.AdParams;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.ad.LoopMeAdHolder;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.interfaces.DisplayController;
 import com.loopme.models.Message;
 import com.loopme.tracker.constants.AdType;
-import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.tracker.interfaces.AdEvents;
+import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.tracker.viewability.EventManager;
-import com.loopme.utils.InternetUtils;
 import com.loopme.utils.UiUtils;
+import com.loopme.utils.Utils;
 import com.loopme.vast.VastVpaidEventTracker;
 
 public abstract class BaseDisplayController implements DisplayController, AdEvents {
@@ -37,28 +34,34 @@ public abstract class BaseDisplayController implements DisplayController, AdEven
 
     @Override
     public void onStartLoad() {
-        initEventManager(mLoopMeAd);
+        initEventManager();
     }
 
     protected void initTrackers() {
-        if (mLoopMeAd == null) {
+        if (mEventManager == null) {
             return;
         }
-        if (mLoopMeAd.isVideo360() || mLoopMeAd.getDisplayController() instanceof DisplayControllerVast) {
+        if (isNativeTrackerNeeded()) {
             onInitTracker(AdType.NATIVE);
         } else {
             onInitTracker(AdType.WEB);
         }
     }
 
-    protected void initEventManager(LoopMeAd loopMeAd) {
-        if (loopMeAd != null && isTrackerNeeded(loopMeAd.getAdParams())) {
-            mEventManager = new EventManager(loopMeAd);
+    private boolean isNativeTrackerNeeded() {
+        return mLoopMeAd.isVideo360() || mLoopMeAd.getDisplayController() instanceof DisplayControllerVast;
+    }
+
+    protected void initEventManager() {
+        if (isTrackerNeeded()) {
+            mEventManager = new EventManager(mLoopMeAd);
         }
     }
 
-    private boolean isTrackerNeeded(AdParams adParams) {
-        return adParams != null && !adParams.getTrackers().isEmpty();
+    private boolean isTrackerNeeded() {
+        return mLoopMeAd != null
+                && mLoopMeAd.getAdParams() != null
+                && !mLoopMeAd.getAdParams().getTrackers().isEmpty();
     }
 
     protected void onInternalLoadFail(final LoopMeError error) {
@@ -77,7 +80,7 @@ public abstract class BaseDisplayController implements DisplayController, AdEven
             @Override
             public void run() {
                 if (mLoopMeAd != null) {
-                    mLoopMeAd.onPostWarning(error);
+                    mLoopMeAd.onSendPostWarning(error);
                 }
             }
         });
@@ -108,7 +111,6 @@ public abstract class BaseDisplayController implements DisplayController, AdEven
     @Override
     public void onDestroy() {
         onAdDestroyedEvent();
-        VastVpaidEventTracker.clear();
     }
 
     @Override
@@ -119,10 +121,6 @@ public abstract class BaseDisplayController implements DisplayController, AdEven
                 onAdErrorEvent(message);
                 break;
             }
-            case EVENT: {
-                VastVpaidEventTracker.postEvent(message);
-                break;
-            }
             case LOG: {
                 Logging.out(mLogTag, message);
                 break;
@@ -131,26 +129,16 @@ public abstract class BaseDisplayController implements DisplayController, AdEven
     }
 
     @Override
-    public boolean onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
+    public void onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
         onAdClickedEvent();
-        if (TextUtils.isEmpty(url)) {
-            return false;
-        }
-        onMessage(Message.LOG, "Handle none LoopMe url");
-        if (InternetUtils.isOnline(loopMeAd.getContext())) {
-            LoopMeAdHolder.putAd(loopMeAd);
-            Intent intent = UiUtils.createRedirectIntent(url, loopMeAd);
-            try {
-                loopMeAd.getContext().startActivity(intent);
-            } catch (ActivityNotFoundException e) {
-                e.printStackTrace();
-                return false;
-            }
+        onMessage(Message.LOG, "Handle url");
+        LoopMeAdHolder.putAd(loopMeAd);
+        Intent intent = UiUtils.createRedirectIntent(url, loopMeAd);
+        if (Utils.isActivityResolved(intent, loopMeAd.getContext())) {
+            loopMeAd.getContext().startActivity(intent);
         } else {
-            onMessage(Message.LOG, "No internet connection");
-            return false;
+            Logging.out(mLogTag, "Warning url = " + url);
         }
-        return true;
     }
 
     // events region

@@ -3,19 +3,22 @@ package com.loopme.controllers.display;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
+import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 import com.loopme.views.webclient.AdViewChromeClient;
 
 public class VastWebView extends WebView {
-    private OnFinishLoadListener mListener;
 
-    public VastWebView(Context context, OnFinishLoadListener listener) {
+    private Vast4Tracker.OnAdVerificationListener mListener;
+
+    public VastWebView(Context context, Vast4Tracker.OnAdVerificationListener listener) {
         super(context);
         mListener = listener;
         configure();
+        allowCookies();
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -27,17 +30,25 @@ public class VastWebView extends WebView {
         setWebChromeClient(new AdViewChromeClient(new AdViewChromeClient.OnErrorFromJsCallback() {
             @Override
             public void onErrorFromJs(String message) {
-                onJsError(message);
+                onVerificationJsFailed(message);
             }
         }));
 
-        setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                onFinishLoad();
-            }
-        });
+        setWebViewClient(new Vast4WebViewClient(mListener));
+    }
+
+    private void onVerificationJsFailed(String message) {
+        if (mListener != null) {
+            mListener.onVerificationJsFailed(message);
+        }
+    }
+
+    private void allowCookies() {
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            cookieManager.setAcceptThirdPartyCookies(this, true);
+        }
     }
 
     public void destroy() {
@@ -45,23 +56,5 @@ public class VastWebView extends WebView {
         setWebChromeClient(null);
         setWebViewClient(null);
         loadUrl("about:blank");
-    }
-
-    private void onFinishLoad() {
-        if (mListener != null) {
-            mListener.onFinishLoad();
-        }
-    }
-
-    private void onJsError(String message) {
-        if (mListener != null) {
-            mListener.onJsError(message);
-        }
-    }
-
-    public interface OnFinishLoadListener {
-        void onFinishLoad();
-
-        void onJsError(String message);
     }
 }

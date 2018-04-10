@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/gray">
+
+    <TextView
+        android:id="@+id/fragment_active_search_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/fragment_active_search_cancel_height"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/fragment_active_search_cancel_margin_right"
+        android:text="@string/cancel"
+        android:gravity="center_vertical"
+        android:textSize="@dimen/text_size_16sp"
+        android:textColor="@color/red" />
+
+    <com.loopme.tester.ui.view.LoopMeEditText
+        android:id="@+id/fragment_active_search_edit"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/fragment_active_search_edit_height"
+        android:lines="1"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:maxLength="10"
+        android:layout_toLeftOf="@id/fragment_active_search_cancel"
+        android:background="@drawable/edit_text_design"
+        android:hint="@string/search"
+        android:textSize="@dimen/text_size_16sp"
+        android:gravity="center" />
+
+
+</RelativeLayout>

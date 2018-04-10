@@ -126,4 +126,20 @@ public class Wrapper {
         }
         return new ArrayList<>();
     }
+
+    public List<String> getCompanionTrackingEvents() {
+        List<String> trackingEvents = new ArrayList<>();
+        if (creatives != null) {
+            trackingEvents.addAll(creatives.getCompanionTrackingEvents());
+        }
+        return trackingEvents;
+    }
+
+    public List<String> getCompanionClickTrackingList() {
+        List<String> clickTrackingList = new ArrayList<>();
+        if (creatives != null) {
+            clickTrackingList.addAll(creatives.getCompanionClickTrackingList());
+        }
+        return clickTrackingList;
+    }
 }
