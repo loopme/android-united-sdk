@@ -1,7 +1,9 @@
 package com.loopme.controllers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -19,17 +21,19 @@ import com.loopme.controllers.display.DisplayControllerLoopMe;
 import com.loopme.utils.InternetUtils;
 import com.loopme.utils.UiUtils;
 import com.loopme.utils.Utils;
+import com.loopme.views.CloseButton;
 import com.loopme.views.MraidView;
 import com.loopme.views.activity.AdBrowserActivity;
 import com.loopme.views.activity.MraidVideoActivity;
 
-public class MraidController implements MraidBridge.OnMraidBridgeListener {
+public class MraidController implements MraidBridge.OnMraidBridgeListener, View.OnClickListener {
 
     private static final String LOG_TAG = MraidController.class.getSimpleName();
     private static final String EXTRAS_VIDEO_URL = "videoUrl";
 
     private LoopMeAd mLoopMeAd;
     private MraidView mMraidView;
+    private CloseButton mCloseButton;
 
     private int mWidth;
     private int mHeight;
@@ -157,6 +161,7 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
 
     @Override
     public void expand(boolean useCustomClose) {
+        mLoopMeAd.getAdParams().setOwnCloseButton(useCustomClose);
         AdUtils.startAdActivity(mLoopMeAd, useCustomClose);
         mMraidView.setIsViewable(true);
         mMraidView.setState(Constants.MraidState.EXPANDED);
@@ -185,6 +190,17 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     public void onChangeCloseButtonVisibility(boolean hasOwnCloseButton) {
         setOwnCloseButton(hasOwnCloseButton);
         broadcastCloseButtonIntent(hasOwnCloseButton);
+        showCustomCloseInBanner(hasOwnCloseButton);
+    }
+
+    private void showCustomCloseInBanner(boolean useCloseButton) {
+        if (mCloseButton != null) {
+            if (useCloseButton) {
+                mCloseButton.setAlpha(0);
+            } else {
+                mCloseButton.setAlpha(1);
+            }
+        }
     }
 
     private void broadcastCloseButtonIntent(boolean hasOwnCloseButton) {
@@ -260,5 +276,21 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
                 FrameLayout.LayoutParams.MATCH_PARENT);
         Utils.removeParent(mMraidView);
         containerView.addView(mMraidView, mraidViewLayoutParams);
+        if (mLoopMeAd.isBanner()) {
+            initCloseButton(mLoopMeAd.getContext());
+        }
+    }
+
+    private void initCloseButton(Activity context) {
+        mCloseButton = new CloseButton(context);
+        mCloseButton.addInLayout(mLoopMeAd.getContainerView());
+        mCloseButton.setOnClickListener(this);
+        mCloseButton.setVisibility(View.VISIBLE);
+        mCloseButton.setAlpha(0);
+    }
+
+    @Override
+    public void onClick(View v) {
+        close();
     }
 }
