@@ -1,25 +1,24 @@
 apply plugin: 'com.android.library'
-apply from: 'release-aar.gradle'
+apply from: '../dependencies.gradle'
 
 repositories {
     jcenter()
     mavenLocal()
     google()
-    maven { url 'https://www.testfairy.com/maven' }
     flatDir {
         dirs 'libs'
     }
 }
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 26
-        versionCode 2
-        versionName "6.0"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
         multiDexEnabled true
     }
 
@@ -45,11 +44,10 @@ android {
             signingConfig signingConfigs.release
             minifyEnabled false
             debuggable false
-            versionNameSuffix '-release'
         }
         debug.initWith(buildTypes.release)
         debug {
-            versionNameSuffix '-debug'
+            versionNameSuffix "-debug"
             debuggable true
         }
     }
@@ -71,134 +69,29 @@ android {
         maxProcessCount 4
         javaMaxHeapSize '4g'
     }
+    packagingOptions {
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/MANIFEST.MF'
+    }
 }
 
 
 dependencies {
     api fileTree(dir: 'libs', includes: ['*.jar'])
-    api 'com.android.support:appcompat-v7:26.1.0'
-    api 'com.android.support:recyclerview-v7:26.1.0'
-    api 'com.android.support:cardview-v7:26.1.0'
-    api 'com.squareup.retrofit2:converter-jackson:2.3.0'
-    api 'com.google.code.gson:gson:2.8.0'
-    api project(':dvsdk-release')
     api files('libs/libAvid-loopme-3.6.7.jar')
-    api 'testfairy:testfairy-android-sdk:1.+@aar'
-
-    api 'com.google.android.gms:play-services-ads:11.6.0'
-    api 'com.android.support:multidex:1.0.2'
-    api name: 'LOO-moat-mobile-app-kit-2.1.0', ext: 'aar'
-
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.robolectric:robolectric:3.0'
-    testImplementation 'org.robolectric:shadows-support-v4:3.0'
-    testImplementation 'org.robolectric:shadows-httpclient:3.0'
-    testImplementation 'com.squareup:fest-android:1.0.7'
-    testImplementation 'org.mockito:mockito-core:1.9.5'
-    testImplementation 'org.powermock:powermock-module-junit4:1.6.5'
-    testImplementation 'org.powermock:powermock-module-junit4-rule:1.6.5'
-    testImplementation 'org.powermock:powermock-api-mockito:1.6.5'
-    testImplementation 'org.powermock:powermock-classloading-xstream:1.6.5'
-}
-
-ext {
-    adapterName = 'Loopme'
-    fileName = 'loopme-united-sdk'
-    sdkName = "$fileName"
-    releaseVersion = '6.0.2'
-    fileName = "${fileName}-${releaseVersion}"
-    apiVersion = "6"
-
-    bintrayRepo = 'maven'
-    bintrayName = 'loopme-united-sdk'
-
-    publishedGroupId = 'com.loopme'
-    libraryName = "$sdkName"
-    artifact = "$sdkName"
-
-    libraryDescription = 'LoopMe Android SDK'
-    description 'LoopMe Android SDK LoopMe is the largest mobile video DSP and Ad Network, reaching over 1 billion consumers world-wide.'
-
-    siteUrl = 'https://github.com/loopme/android-united-sdk'
-    gitUrl = 'https://github.com/loopme/android-united-sdk.git'
-
-    libraryVersion = releaseVersion
-
-    developerId = 'kknyrik'
-    developerName = 'Kateryna Knyrik'
-    developerEmail = 'katerina.knyrik@loopme.com'
-
-    licenseName = 'LoopMe License'
-    licenseUrl = 'https://github.com/loopme/loopme-android-sdk/blob/master/LICENSE.md'
-    allLicenses = ["Loopme-1.0"]
-}
-
-allprojects {
-    repositories {
-        jcenter()
-    }
-    apply plugin: 'com.android.library'
-    apply plugin: 'com.github.dcendents.android-maven'
-    apply plugin: 'com.jfrog.bintray'
-    apply plugin: 'maven-publish'
-}
-
-
-group = 'com.loopme'
-version = '6.0.2'
-
-install {
-    repositories.mavenInstaller {
-        pom {
-            project {
-                packaging 'aar'
-                groupId 'com.loopme'
-                artifactId 'loopme-sdk'
-
-                name 'LoopMeSDK'
-                description 'Please meet our New United SDK. It combines multiple premium ads technologies with the highest performance and lean resource consumption.'
-                url 'https://github.com/loopme/android-united-sdk.git'
-
-                licenses {
-                    license {
-                        name 'LoopMe License'
-                        url 'https://github.com/loopme/loopme-android-sdk/blob/master/LICENSE.md'
-                    }
-                }
-                developers {
-                    developer {
-                        id 'kknyrik'
-                        name 'Kateryna Knyrik'
-                        email 'katerina.knyrik@loopme.com'
-                    }
-                }
-            }
-        }
-    }
-}
-
-bintray {
-    user = BINTRAY_USER
-    key = BINTRAY_KEY
-
-    configurations = ['archives']
-    pkg {
-        repo = 'maven'
-        name = 'loopme-united-sdk'
-        desc = 'Please meet our New United SDK. It combines multiple premium ads technologies with the highest performance and lean resource consumption.'
-
-        websiteUrl = 'https://github.com/loopme/android-united-sdk'
-        vcsUrl = 'https://github.com/loopme/android-united-sdk.git'
-        licenses = ['Apache-2.0']
-        publish = true
-        publicDownloadNumbers = true
-    }
-}
-
-static def getDate() {
-    def date = new Date()
-    def formattedDate = date.format('.MMdd')
-    return formattedDate
+    api name: "LOO-moat-mobile-app-kit-$moatVersion", ext: 'aar'
+    api "com.android.support:appcompat-v7:$supportLibraryVersion"
+    api "com.android.support:recyclerview-v7:$supportLibraryVersion"
+    api "com.android.support:cardview-v7:$supportLibraryVersion"
+    api "com.android.support:support-annotations:$supportLibraryVersion"
+    api "com.google.android.gms:play-services-ads:$playServicesVersion"
+    api ("com.squareup.okhttp3:okhttp:$okHttpVersion")
+    api ("com.squareup.retrofit2:converter-jackson:$retrofitVersion")
+    testImplementation "junit:junit:$junitVersion"
 }
 
 task clearJar(type: Delete) {
@@ -216,3 +109,4 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.4'
 }
 
+apply from: '../publishing.gradle'

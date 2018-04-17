@@ -1,0 +1,52 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
+
+def artifact = new Properties()
+artifact.load(new FileInputStream("deploy.settings"))
+
+bintray {
+    user = BINTRAY_USER
+    key = BINTRAY_KEY
+    configurations = ['archives']
+    pkg {
+        repo = artifact.repo
+        name = artifact.name
+        desc = artifact.description
+
+        websiteUrl = artifact.websiteUrl
+        vcsUrl = artifact.vcsUrl
+        licenses = artifact.licenses
+        publish = true
+        publicDownloadNumbers = true
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            packaging 'aar'
+            groupId artifact.groupId
+            artifactId artifact.id
+
+            name artifact.projectName
+            description artifact.description
+            url artifact.vcsUrl
+
+            licenses {
+                license {
+                    name artifact.licenseLoopmeName
+                    url artifact.licenseLoopmeUrl
+                }
+            }
+            developers {
+                developer {
+                    id artifact.developerId
+                    name artifact.developerName
+                    email artifact.developerEmail
+                }
+            }
+        }
+    }
+}

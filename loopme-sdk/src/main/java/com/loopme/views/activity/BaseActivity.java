@@ -24,7 +24,6 @@ import com.loopme.receiver.MraidAdCloseButtonReceiver;
 import com.loopme.utils.Utils;
 import com.loopme.views.CloseButton;
 import com.loopme.views.MraidView;
-import com.testfairy.TestFairy;
 
 
 public final class BaseActivity extends Activity
@@ -76,7 +75,6 @@ public final class BaseActivity extends Activity
     }
 
     private void initCrashLytics() {
-        TestFairy.begin(this, "a44d0f385de2740ba8f9aefcf9c0eda6706acc0f");
     }
 
     private void setMraidSettings() {
