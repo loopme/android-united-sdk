@@ -6,6 +6,9 @@ apply plugin: 'maven-publish'
 def deployArtifact = new Properties()
 deployArtifact.load(new FileInputStream("deploy.settings"))
 
+group = 'com.loopme'
+version = '6.0.2'
+
 bintray {
     user = BINTRAY_USER
     key = BINTRAY_KEY
@@ -30,7 +33,7 @@ install {
             groupId 'com.loopme'
             artifactId 'loopme-sdk'
 
-            name 'loopme-united-sdk'
+            name 'LoopMeSDK'
             description deployArtifact.description
             url deployArtifact.vcsUrl
 
@@ -95,10 +98,6 @@ publishing {
 
 
 def addDependenciesToPom(def dependenciesNode, Dependency dep) {
-    if (dep.name == "moat") {
-        dep.group = "com.moat.analytics.mobile.loo"
-        dep.version = '2.1.0'
-    }
     if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified")
         return // ignore invalid dependencies
 

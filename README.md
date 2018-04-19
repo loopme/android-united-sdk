@@ -328,7 +328,6 @@ For banner nad native video - `onLoopMeBannerVideoDidReachEnd()` notification.
 Please meet our New United SDK. It combines multiple premium ads technologies with the highest performance and lean resource consumption.
 
 **Version 6.0.1**
-
 1. Support interstitial and banner ads of the following formats:
 - VAST 2.0, 3.0, 4.0
 - VPAID 2.0

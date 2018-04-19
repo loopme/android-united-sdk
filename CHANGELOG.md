@@ -1,4 +1,4 @@
-## Version 6.0.2 (10 of April, 2017)
+## Version 6.0.2 (19 of April, 2017)
 - Added unsupported file format detection fro VPAID creatives
 - Multiformat ad spots - combine several ad formats in a single spot to increase fill rate. 
 - VAST 4.0 support
