@@ -67,6 +67,8 @@ dependencies {
         exclude module: 'moat-mobile-app-kit'
     }
     api 'com.android.support:design:27.1.1'
+    api "com.android.support:multidex:1.0.3"
+
 }
 
 static def getDate() {

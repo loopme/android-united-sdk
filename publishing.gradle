@@ -3,21 +3,21 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'maven-publish'
 
-def artifact = new Properties()
-artifact.load(new FileInputStream("deploy.settings"))
+def deployArtifact = new Properties()
+deployArtifact.load(new FileInputStream("deploy.settings"))
 
 bintray {
     user = BINTRAY_USER
     key = BINTRAY_KEY
     configurations = ['archives']
     pkg {
-        repo = artifact.repo
-        name = artifact.name
-        desc = artifact.description
+        repo = deployArtifact.repo
+        name = deployArtifact.name
+        desc = deployArtifact.description
 
-        websiteUrl = artifact.websiteUrl
-        vcsUrl = artifact.vcsUrl
-        licenses = artifact.licenses
+        websiteUrl = deployArtifact.websiteUrl
+        vcsUrl = deployArtifact.vcsUrl
+        licenses = deployArtifact.licenses
         publish = true
         publicDownloadNumbers = true
     }
@@ -27,26 +27,94 @@ install {
     repositories.mavenInstaller {
         pom.project {
             packaging 'aar'
-            groupId artifact.groupId
-            artifactId artifact.id
+            groupId 'com.loopme'
+            artifactId 'loopme-sdk'
 
-            name artifact.projectName
-            description artifact.description
-            url artifact.vcsUrl
+            name 'loopme-united-sdk'
+            description deployArtifact.description
+            url deployArtifact.vcsUrl
 
             licenses {
                 license {
-                    name artifact.licenseLoopmeName
-                    url artifact.licenseLoopmeUrl
+                    name deployArtifact.licenseLoopmeName
+                    url deployArtifact.licenseLoopmeUrl
                 }
             }
             developers {
                 developer {
-                    id artifact.developerId
-                    name artifact.developerName
-                    email artifact.developerEmail
+                    id deployArtifact.developerId
+                    name deployArtifact.developerName
+                    email deployArtifact.developerEmail
                 }
             }
         }
     }
 }
+
+task androidJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+    classifier = 'javadoc'
+    from androidJavadocs.destinationDir
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'com.loopme'
+            artifactId 'loopme-sdk'
+            version '6.0.2'
+
+            artifact bundleRelease
+            artifact androidJavadocsJar
+            artifact androidSourcesJar
+
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+
+
+                configurations.getByName('api').getAllDependencies().each { Dependency dep ->
+                    addDependenciesToPom(dependenciesNode, dep)
+                }
+
+                configurations.getByName('implementation').getAllDependencies().each { Dependency dep ->
+                    addDependenciesToPom(dependenciesNode, dep)
+                }
+            }
+        }
+    }
+}
+
+
+def addDependenciesToPom(def dependenciesNode, Dependency dep) {
+    if (dep.name == "moat") {
+        dep.group = "com.moat.analytics.mobile.loo"
+        dep.version = '2.1.0'
+    }
+    if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified")
+        return // ignore invalid dependencies
+
+    def dependencyNode = dependenciesNode.appendNode('dependency')
+    dependencyNode.appendNode('groupId', dep.group)
+    dependencyNode.appendNode('artifactId', dep.name)
+    dependencyNode.appendNode('version', dep.version)
+}
+
+repositories {
+    maven {
+        url "${System.env.HOME}/.m2/repository"
+    }
+}
+install.dependsOn build
+uploadArchives.dependsOn build
+
+
+apply plugin: 'com.github.dcendents.android-maven'

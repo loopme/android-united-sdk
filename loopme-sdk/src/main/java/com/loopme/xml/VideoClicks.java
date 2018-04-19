@@ -45,9 +45,9 @@ public class VideoClicks {
     private ArrayList<String> getClickTrackingUrlList() {
         if (clickTrackingList != null) {
             ArrayList<String> clicksList = new ArrayList<>();
-            for (ClickTracking clickTraсking : clickTrackingList) {
-                if (!TextUtils.isEmpty(clickTraсking.getText())) {
-                    clicksList.add(clickTraсking.getText());
+            for (ClickTracking clickTracking : clickTrackingList) {
+                if (!TextUtils.isEmpty(clickTracking.getText())) {
+                    clicksList.add(clickTracking.getText());
                 }
             }
             return clicksList;

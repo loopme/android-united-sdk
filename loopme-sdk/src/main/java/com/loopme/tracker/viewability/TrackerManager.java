@@ -14,10 +14,6 @@ import com.loopme.tracker.partners.MoatTracker;
 import java.util.ArrayList;
 import java.util.List;
 
-//import com.loopme.tracker.partners.DvTracker;
-
-//import com.loopme.tracker.partners.DvTracker;
-
 public class TrackerManager {
 
     private static final String LOG_TAG = TrackerManager.class.getSimpleName();

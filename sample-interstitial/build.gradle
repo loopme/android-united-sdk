@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply from: '../dependencies.gradle'
 
 repositories {
     jcenter()
@@ -9,13 +10,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         applicationId "com.loopme.interstitial_sample"
-        minSdkVersion 19
-        targetSdkVersion 26
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
@@ -29,11 +30,9 @@ android {
         }
     }
 
-
     lintOptions {
         abortOnError false
     }
-
 
     packagingOptions {
         exclude 'META-INF/ASL2.0'
@@ -42,14 +41,13 @@ android {
         exclude 'META-INF/NOTICE.txt'
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/MANIFEST.MF'
-
     }
 }
 
 dependencies {
     api project(':loopme-sdk')
     api(name:'LOO-moat-mobile-app-kit-2.1.0', ext: 'aar')
-    api 'com.android.support:appcompat-v7:26.1.0'
-    api 'com.android.support.constraint:constraint-layout:1.0.2'
-    testImplementation 'junit:junit:4.12'
+    api "com.android.support:appcompat-v7:$supportLibraryVersion"
+    api "com.android.support.constraint:constraint-layout:$constraintLayout"
+    testImplementation "junit:junit:$junitVersion"
 }
