@@ -21,25 +21,25 @@ public class BannerSampleActivity extends Activity implements MoPubView.BannerAd
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.banner_bridge_layout);
+        setContentView(R.layout.banner_activity_main);
 
-        mBanner = (MoPubView) findViewById(R.id.mopubView);
+        mBanner = (MoPubView) findViewById(R.id.mopub_banner_view);
     }
 
     @Override
     protected void onPause() {
-        LoopMeMopubBanner.pause();
+        LoopMeMoPubBanner.pause();
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        LoopMeMopubBanner.resume();
+        LoopMeMoPubBanner.resume();
         super.onResume();
     }
 
     public void onHideClicked(View view){
-        LoopMeMopubBanner.destroy();
+        LoopMeMoPubBanner.destroy();
     }
 
     public void onLoadClicked(View view){
@@ -47,7 +47,7 @@ public class BannerSampleActivity extends Activity implements MoPubView.BannerAd
         mBanner.setBannerAdListener(this);
         mBanner.loadAd();
 
-        LoopMeBannerView loopmeView = (LoopMeBannerView) findViewById(R.id.loopme_view);
+        LoopMeContainerView loopmeView = findViewById(R.id.loopme_banner_view);
         Map extras = new HashMap();
         extras.put("bannerView", loopmeView);
         mBanner.setLocalExtras(extras);
@@ -56,7 +56,7 @@ public class BannerSampleActivity extends Activity implements MoPubView.BannerAd
     @Override
     protected void onDestroy() {
         mBanner.destroy();
-        LoopMeMopubBanner.destroy();
+        LoopMeMoPubBanner.destroy();
         super.onDestroy();
     }
 

@@ -19,7 +19,7 @@ public class InterstitialSampleActivity extends Activity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.interstitial_bridge_layout);
+        setContentView(R.layout.activity_main);
     }
 
     public void onShowClicked(View view){
@@ -29,9 +29,13 @@ public class InterstitialSampleActivity extends Activity implements
     }
 
     public void onLoadClicked(View view){
-    	mInterstitial = new MoPubInterstitial(InterstitialSampleActivity.this, AD_UNIT_ID);
+        mInterstitial = new MoPubInterstitial(InterstitialSampleActivity.this, AD_UNIT_ID);
         mInterstitial.setInterstitialAdListener(InterstitialSampleActivity.this);
         mInterstitial.load();
+    }
+
+    public void onTestBannerClicked(View view){
+        startActivity(new Intent(this, BannerSampleActivity.class));
     }
 
     @Override
