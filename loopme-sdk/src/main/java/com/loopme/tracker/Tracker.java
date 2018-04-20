@@ -1,4 +1,4 @@
-package com.loopme.tracker.interfaces;
+package com.loopme.tracker;
 
 import com.loopme.tracker.constants.Event;
 

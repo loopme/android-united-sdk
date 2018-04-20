@@ -3,6 +3,7 @@ package com.loopme.tracker.constants;
 public enum Event {
 
     REGISTER, //done
+    LOADED,
     REGISTER_FRIENDLY_VIEW,//----
     RECORD_READY,//done
     IMPRESSION,//done
@@ -15,6 +16,7 @@ public enum Event {
     COMPLETE,//done
     STOPPED,//done
     USER_CLOSE,//done
+    CLOSE,
     SKIPPED, //----
     VOLUME_CHANGE,//done
     ENTERED_FULLSCREEN,//done

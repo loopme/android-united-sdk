@@ -1,4 +1,4 @@
-package com.loopme.tracker.partners;
+package com.loopme.tracker.partners.ias;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,52 +10,57 @@ import com.integralads.avid.library.loopme.session.AbstractAvidAdSession;
 import com.integralads.avid.library.loopme.session.AvidAdSessionManager;
 import com.integralads.avid.library.loopme.session.AvidDisplayAdSession;
 import com.integralads.avid.library.loopme.session.AvidManagedVideoAdSession;
-import com.integralads.avid.library.loopme.session.AvidVideoAdSession;
 import com.integralads.avid.library.loopme.session.ExternalAvidAdSessionContext;
 import com.integralads.avid.library.loopme.video.AvidVideoPlaybackListener;
 import com.loopme.BuildConfig;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
+import com.loopme.tracker.Tracker;
 import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.constants.Event;
-import com.loopme.tracker.interfaces.Tracker;
 import com.loopme.utils.Utils;
+import com.moat.analytics.mobile.loo.NativeVideoTracker;
 
 public class IasTracker implements Tracker {
-    private final String LOG_TAG = IasTracker.class.getSimpleName();
+    private static final String LOG_TAG = IasTracker.class.getSimpleName();
     private Tracker mTracker;
     private boolean mDeferred;
     private boolean mIsInFullScreenMode;
     private boolean mBackFromFullScreen;
     private ExternalAvidAdSessionContext mAdSessionContext;
     private int mAdFormat;
+    private IasUrlProvider mUrlProvider;
 
-    public IasTracker(LoopMeAd loopMeAd, AdType type) {
-        mAdFormat = loopMeAd.getAdFormat();
-        if (loopMeAd == null) {
+    public IasTracker(LoopMeAd baseAd, AdType adType) {
+        if (baseAd == null) {
             Logging.out(LOG_TAG, "BaseAd should not be null!");
             return;
         }
+        String html = baseAd.getAdParams().getHtml();
+        mUrlProvider = new IasUrlProvider(baseAd.getAdParams().getAdIds());
+        mAdFormat = baseAd.getAdFormat();
         mDeferred = true;
         mAdSessionContext = createAvidAdSessionContext();
-        init(type, loopMeAd.getContext());
+        init(adType, baseAd.getContext());
     }
 
     private void init(AdType type, Context context) {
         if (type == AdType.NATIVE) {
             mTracker = new IasNativeTracker(context);
-        } else if (type == AdType.WEB_VIDEO) {
-            mTracker = new IasWebVideoTracker(context);
-        } else if (type == AdType.WEB_IMAGE) {
-            mTracker = new IasWebImageTracker(context);
+        } else {
+            mTracker = new IasWebTracker(context);
         }
     }
 
     @Override
     public void track(Event event, Object... args) {
-        if (mTracker != null) {
-            mTracker.track(event, args);
+        try {
+            if (mTracker != null) {
+                mTracker.track(event, args);
+            }
+        } catch (Exception e) {
+            Logging.out(LOG_TAG, e.getMessage());
         }
     }
 
@@ -68,19 +73,21 @@ public class IasTracker implements Tracker {
         return BuildConfig.VERSION_NAME;
     }
 
-    private class IasNativeTracker implements Tracker {
+    private class IasNativeTracker extends IasBaseTracker {
         private AvidVideoPlaybackListener mAvidVideoPlaybackListener;
         private AvidManagedVideoAdSession mVideoAdSession;
         private boolean mVideoStarted;
         private boolean mIsFirstQuartileTracked;
         private boolean mIsMidPointTracked;
         private boolean mIsThirdQuartileTracked;
-        private View mPlayerView;
+        private int mPreviousVolume = -1;
+        private boolean mIsInjected;
 
         private IasNativeTracker(Context context) {
             init(context);
         }
 
+        @Override
         public void init(Context context) {
             if (context == null) {
                 Logging.out(LOG_TAG, "Context should not be null!");
@@ -88,6 +95,7 @@ public class IasTracker implements Tracker {
             }
 
             mVideoAdSession = AvidAdSessionManager.startAvidManagedVideoAdSession(context, mAdSessionContext);
+            setAbstractAvidAdSession(mVideoAdSession);
             mAvidVideoPlaybackListener = mVideoAdSession.getAvidVideoPlaybackListener();
             Logging.out(LOG_TAG, "init " + mVideoAdSession);
             Logging.out(LOG_TAG, "init listener " + mAvidVideoPlaybackListener);
@@ -95,20 +103,14 @@ public class IasTracker implements Tracker {
 
         @Override
         public void track(Event event, Object... args) {
+            super.track(event, args);
             switch (event) {
-                case INJECT_JS: {
-                    injectJsRes();
+                case LOADED: {
+                    recordAdLoadedEvent();
                     break;
                 }
                 case REGISTER: {
-                    registerView(args);
-                    break;
-                }
-                case REGISTER_FRIENDLY_VIEW: {
-                    registerFriendlyView(args);
-                }
-                case RECORD_READY: {
-                    recordReady();
+                    injectJsRes();
                     break;
                 }
                 case IMPRESSION: {
@@ -156,7 +158,7 @@ public class IasTracker implements Tracker {
                     break;
                 }
                 case VOLUME_CHANGE: {
-                    recordAdVolumeChangeEvent(args);
+                    handleVolumeChange(args);
                     break;
                 }
                 case ENTERED_FULLSCREEN: {
@@ -179,63 +181,27 @@ public class IasTracker implements Tracker {
                     recordAdError(args);
                     break;
                 }
-                case END_SESSION: {
-                    endSession(args);
-                    break;
+                case CLOSE: {
+                    recordAdUserCloseEvent();
                 }
             }
         }
 
+        private void recordAdLoadedEvent() {
+            if (mAvidVideoPlaybackListener != null) {
+                mAvidVideoPlaybackListener.recordAdLoadedEvent();
+                Logging.out(LOG_TAG, "recordAdLoadedEvent");
+            }
+        }
+
         private void injectJsRes() {
-            String res = "http://pixel.adsafeprotected.com/jload?anId=927083&advId=INSERTMACRO&campId=INSERTMACRO&pubId=INSERTMACRO&chanId=INSERTMACRO&placementId=INSERTMACRO&adsafe_par&bundleId=INSERTMACRO\"></script>\n" + "<script type=\"text/javascript\" src=\"https://mobile-static.adsafeprotected.com/static/creative/avid-certification/scripts/placement-avid-logging.js?placementId=1";
-            Logging.out(LOG_TAG, res);
-            if (mVideoAdSession != null) {
-                mVideoAdSession.injectJavaScriptResource(res);
+            if (mVideoAdSession != null && !mIsInjected) {
+                mVideoAdSession.injectJavaScriptResource(mUrlProvider.getCmTagUrl());
+                mVideoAdSession.injectJavaScriptResource(mUrlProvider.getLoggingTagUrl());
+                mIsInjected = true;
+                Logging.out(LOG_TAG, "Ias js injected: " + mUrlProvider.getCmTagUrl());
+                Logging.out(LOG_TAG, "Ias js injected: " + mUrlProvider.getLoggingTagUrl());
             }
-
-        }
-
-        private void registerFriendlyView(Object[] args) {
-            if (Utils.isNotNull(args)
-                    && args[0] instanceof View
-                    && mVideoAdSession != null) {
-
-                View view = (View) args[0];
-                mVideoAdSession.registerFriendlyObstruction(view);
-            }
-        }
-
-        private void registerView(Object[] args) {
-            if (Utils.isNotNull(args)
-                    && args.length >= 2
-                    && args[0] instanceof Activity
-                    && args[1] instanceof View
-                    && mVideoAdSession != null) {
-
-                Activity activity = (Activity) args[0];
-                mPlayerView = (View) args[1];
-                mVideoAdSession.registerAdView(mPlayerView, activity);
-                Logging.out(LOG_TAG, "register view " + mPlayerView);
-            }
-        }
-
-        private void recordReady() {
-            if (mDeferred && mVideoAdSession != null) {
-                AvidDeferredAdSessionListener avidDeferredAdSessionListener = mVideoAdSession.getAvidDeferredAdSessionListener();
-                avidDeferredAdSessionListener.recordReadyEvent();
-                Logging.out(LOG_TAG, "recordReadyEvent");
-            }
-        }
-
-        private void endSession(Object[] args) {
-            if (Utils.isNotNull(args) && mVideoAdSession != null) {
-                mVideoAdSession.unregisterAdView(mPlayerView);
-                Logging.out(LOG_TAG, "unregisterAdView()");
-                mVideoAdSession.endSession();
-                mVideoAdSession = null;
-                Logging.out(LOG_TAG, "endSession()");
-            }
-            mDeferred = false;
         }
 
         private void recordAdImpressionEvent() {
@@ -319,7 +285,6 @@ public class IasTracker implements Tracker {
             }
         }
 
-
         private void resume() {
             if (mAvidVideoPlaybackListener != null) {
                 mAvidVideoPlaybackListener.recordAdPlayingEvent();
@@ -348,13 +313,28 @@ public class IasTracker implements Tracker {
             }
         }
 
-        private void recordAdVolumeChangeEvent(Object[] args) {
-            if (Utils.hasInteger(args)) {
-                Integer volume = (Integer) args[0];
-                if (mAvidVideoPlaybackListener != null) {
-                    mAvidVideoPlaybackListener.recordAdVolumeChangeEvent(volume);
-                    Logging.out(LOG_TAG, "recordAdVolumeChangeEvent");
+        private void handleVolumeChange(Object[] args) {
+            if (Utils.hasFloat(args)) {
+                int volume = (int) ((Float) args[0] * 100);
+                if (isVolumeChange(volume)) {
+                    recordAdVolumeChangeEvent(volume);
                 }
+            }
+        }
+
+        private boolean isVolumeChange(int volume) {
+            if (mPreviousVolume != volume) {
+                mPreviousVolume = volume;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        private void recordAdVolumeChangeEvent(int volume) {
+            if (mAvidVideoPlaybackListener != null) {
+                mAvidVideoPlaybackListener.recordAdVolumeChangeEvent(volume);
+                Logging.out(LOG_TAG, "recordAdVolumeChangeEvent " + volume);
             }
         }
 
@@ -426,27 +406,9 @@ public class IasTracker implements Tracker {
         }
     }
 
-    private class IasWebVideoTracker extends IasWebTracker {
+    private class IasWebTracker extends IasBaseTracker {
 
-        private IasWebVideoTracker(Context context) {
-            init(context);
-        }
-
-        @Override
-        public void init(Context context) {
-            if (context == null) {
-                Logging.out(LOG_TAG, "Context should not be null!");
-                return;
-            }
-            AvidVideoAdSession avidVideoAdSession = AvidAdSessionManager.startAvidVideoAdSession(context, mAdSessionContext);
-            setAbstractAvidAdSession(avidVideoAdSession);
-            Logging.out(LOG_TAG, "init " + avidVideoAdSession);
-        }
-    }
-
-    private class IasWebImageTracker extends IasWebTracker {
-
-        private IasWebImageTracker(Context context) {
+        private IasWebTracker(Context context) {
             init(context);
         }
 
@@ -462,11 +424,11 @@ public class IasTracker implements Tracker {
         }
     }
 
-    private abstract class IasWebTracker implements Tracker {
-        private AbstractAvidAdSession<WebView> mAbstractAvidAdSession;
-        private WebView mWebView;
+    private abstract class IasBaseTracker implements Tracker {
+        private AbstractAvidAdSession mAbstractAvidAdSession;
+        private View mView;
 
-        public abstract void init(Context context);
+        protected abstract void init(Context context);
 
         @Override
         public void track(Event event, Object... args) {
@@ -486,13 +448,43 @@ public class IasTracker implements Tracker {
                 }
 
                 case END_SESSION: {
-                    endSession();
+                    unregisterAndEndSession();
+                    break;
+                }
+                case INJECT_JS: {
+                    injectJs(args);
+                    break;
+                }
+                case CLOSE: {
+                    unregisterAndEndSession();
                     break;
                 }
             }
         }
 
-        protected void setAbstractAvidAdSession(AbstractAvidAdSession<WebView> mAbstractAvidAdSession) {
+        private void injectJs(Object[] args) {
+            if (isNativeTracker()) {
+                return;
+            }
+            if (Utils.isNotNull(args) && args[0] instanceof LoopMeAd) {
+                LoopMeAd loopMeAd = (LoopMeAd) args[0];
+                String html = putJsToCreative(loopMeAd.getAdParams().getHtml());
+                loopMeAd.getAdParams().setHtml(html);
+            }
+        }
+
+        private String putJsToCreative(String html) {
+            String firstPart = html.substring(0, 173);
+            String secondPart = html.substring(173);
+            String finalHtml = firstPart + mUrlProvider.getCmTagScript() + mUrlProvider.getLoggingTagScript();
+            return finalHtml + secondPart;
+        }
+
+        private boolean isNativeTracker() {
+            return this instanceof IasNativeTracker;
+        }
+
+        protected void setAbstractAvidAdSession(AbstractAvidAdSession mAbstractAvidAdSession) {
             this.mAbstractAvidAdSession = mAbstractAvidAdSession;
         }
 
@@ -510,13 +502,13 @@ public class IasTracker implements Tracker {
             if (Utils.isNotNull(args)
                     && args.length >= 2
                     && args[0] instanceof Activity
-                    && args[1] instanceof WebView
+                    && args[1] instanceof View
                     && mAbstractAvidAdSession != null) {
 
                 Activity activity = (Activity) args[0];
-                mWebView = (WebView) args[1];
-                mAbstractAvidAdSession.registerAdView(mWebView, activity);
-                Logging.out(LOG_TAG, "register view " + mWebView);
+                mView = (View) args[1];
+                mAbstractAvidAdSession.registerAdView(mView, activity);
+                Logging.out(LOG_TAG, "register view " + mView);
             }
         }
 
@@ -524,19 +516,38 @@ public class IasTracker implements Tracker {
             if (mDeferred && mAbstractAvidAdSession != null) {
                 AvidDeferredAdSessionListener avidDeferredAdSessionListener = mAbstractAvidAdSession.getAvidDeferredAdSessionListener();
                 avidDeferredAdSessionListener.recordReadyEvent();
+                mDeferred = false;
                 Logging.out(LOG_TAG, "recordReadyEvent()");
             }
         }
 
+        private void unregisterAndEndSession() {
+            unregisterAdView();
+            endSession();
+            mAbstractAvidAdSession = null;
+            mDeferred = false;
+        }
+
         private void endSession() {
             if (mAbstractAvidAdSession != null) {
-                mAbstractAvidAdSession.unregisterAdView(mWebView);
-                Logging.out(LOG_TAG, "unregisterAdView()");
                 mAbstractAvidAdSession.endSession();
-                mAbstractAvidAdSession = null;
                 Logging.out(LOG_TAG, "endSession()");
             }
-            mDeferred = false;
+        }
+
+        private void unregisterAdView() {
+            if (mAbstractAvidAdSession != null) {
+                mAbstractAvidAdSession.unregisterAdView(mView);
+                Logging.out(LOG_TAG, "unregisterAdView()");
+            }
+        }
+
+        protected WebView getView() {
+            if (!(this instanceof NativeVideoTracker)) {
+                return (WebView) mView;
+            } else {
+                return null;
+            }
         }
     }
 

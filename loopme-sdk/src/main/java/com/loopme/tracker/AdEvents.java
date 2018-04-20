@@ -1,4 +1,4 @@
-package com.loopme.tracker.interfaces;
+package com.loopme.tracker;
 
 import android.app.Activity;
 import android.media.MediaPlayer;
@@ -56,5 +56,9 @@ public interface AdEvents {
 
     void onAdRegisterView(Activity activity, View view);
 
-    void onInject();
+    void onAdInject();
+
+    void onAdRecordAdLoaded();
+
+    void onAdRecordAdClose();
 }

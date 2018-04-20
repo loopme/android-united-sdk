@@ -1,4 +1,4 @@
-package com.loopme.tracker.partners;
+package com.loopme.tracker.partners.moat;
 
 import android.app.Activity;
 import android.media.MediaPlayer;
@@ -11,8 +11,8 @@ import com.loopme.ad.LoopMeAd;
 import com.loopme.tracker.AdIds;
 import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.constants.Event;
-import com.loopme.tracker.constants.TrackerType;
-import com.loopme.tracker.interfaces.Tracker;
+import com.loopme.tracker.constants.Partner;
+import com.loopme.tracker.Tracker;
 import com.loopme.utils.ArrayUtils;
 import com.loopme.utils.Utils;
 import com.moat.analytics.mobile.loo.MoatAdEvent;
@@ -58,7 +58,7 @@ public class MoatTracker implements Tracker {
         MoatOptions options = new MoatOptions();
         options.disableAdIdCollection = true;
         MoatAnalytics.getInstance().start(options, loopMeAd.getContext().getApplication());
-        Logging.out(LOG_TAG, "Sdk started: " + TrackerType.MOAT.name());
+        Logging.out(LOG_TAG, "Sdk started: " + Partner.MOAT.name());
     }
 
 

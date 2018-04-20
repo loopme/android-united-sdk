@@ -1,4 +1,4 @@
-package com.loopme.tracker.viewability;
+package com.loopme.tracker;
 
 import android.app.Activity;
 import android.media.MediaPlayer;
@@ -9,7 +9,6 @@ import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.constants.Event;
-import com.loopme.tracker.interfaces.AdEvents;
 
 public class EventManager implements AdEvents {
     private static final String LOG_TAG = EventManager.class.getSimpleName();
@@ -196,9 +195,16 @@ public class EventManager implements AdEvents {
     }
 
     @Override
-    public void onInject() {
+    public void onAdInject() {
         if (mTrackerManager != null) {
             mTrackerManager.track(Event.INJECT_JS);
+        }
+    }
+
+    @Override
+    public void onAdRecordAdLoaded() {
+        if (mTrackerManager != null) {
+            mTrackerManager.track(Event.LOADED);
         }
     }
 
@@ -248,6 +254,13 @@ public class EventManager implements AdEvents {
         } else if (position > quarter75 && !mQuarter75Tracked) {
             mQuarter75Tracked = true;
             onAdVideoThirdQuartileEvent();
+        }
+    }
+
+    @Override
+    public void onAdRecordAdClose() {
+        if (mTrackerManager != null) {
+            mTrackerManager.track(Event.CLOSE);
         }
     }
 }

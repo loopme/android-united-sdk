@@ -18,47 +18,47 @@ import com.loopme.controllers.interfaces.DisplayController;
 import com.loopme.models.Message;
 import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.partners.LoopMeTracker;
-import com.loopme.tracker.interfaces.AdEvents;
-import com.loopme.tracker.viewability.EventManager;
+import com.loopme.tracker.AdEvents;
+import com.loopme.tracker.EventManager;
 import com.loopme.utils.InternetUtils;
 import com.loopme.utils.UiUtils;
 import com.loopme.vast.VastVpaidEventTracker;
 
-public abstract class BaseDisplayController implements DisplayController, AdEvents {
+public abstract class BaseTrackableController implements DisplayController, AdEvents {
 
     private static final long DELAY_UNTIL_EXECUTE = 100;
     protected String mLogTag;
     private EventManager mEventManager;
     private LoopMeAd mLoopMeAd;
 
-
-    public BaseDisplayController(LoopMeAd loopMeAd) {
+    public BaseTrackableController(LoopMeAd loopMeAd) {
         mLoopMeAd = loopMeAd;
     }
 
     @Override
     public void onStartLoad() {
-        initEventManager(mLoopMeAd);
+        if (isEventManagerNeeded()) {
+            mEventManager = new EventManager(mLoopMeAd);
+        }
     }
 
     protected void initTrackers() {
-        if (mLoopMeAd == null) {
-            return;
-        }
-        if (mLoopMeAd.isVideo360() || mLoopMeAd.getDisplayController() instanceof DisplayControllerVast) {
+        if (isNativeAd()) {
             onInitTracker(AdType.NATIVE);
         } else {
             onInitTracker(AdType.WEB);
         }
     }
 
-    protected void initEventManager(LoopMeAd loopMeAd) {
-        if (loopMeAd != null && isTrackerNeeded(loopMeAd.getAdParams())) {
-            mEventManager = new EventManager(loopMeAd);
-        }
+    private boolean isNativeAd() {
+        return mLoopMeAd != null && (mLoopMeAd.isVideo360() || mLoopMeAd.isVastAd());
     }
 
-    private boolean isTrackerNeeded(AdParams adParams) {
+    private boolean isEventManagerNeeded() {
+        if (mLoopMeAd == null) {
+            return false;
+        }
+        AdParams adParams = mLoopMeAd.getAdParams();
         return adParams != null && !adParams.getTrackers().isEmpty();
     }
 
@@ -329,9 +329,23 @@ public abstract class BaseDisplayController implements DisplayController, AdEven
     }
 
     @Override
-    public void onInject() {
+    public void onAdInject() {
         if (mEventManager != null) {
-            mEventManager.onInject();
+            mEventManager.onAdInject();
+        }
+    }
+
+    @Override
+    public void onAdRecordAdLoaded() {
+        if (mEventManager != null) {
+            mEventManager.onAdRecordAdLoaded();
+        }
+    }
+
+    @Override
+    public void onAdRecordAdClose() {
+        if (mEventManager != null) {
+            mEventManager.onAdRecordAdClose();
         }
     }
 }

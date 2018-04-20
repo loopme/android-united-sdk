@@ -110,4 +110,13 @@
     <string name="landscape_interstitial">Landscape interstitial</string>
     <string name="portrait_interstitial">Portrait interstitial</string>
     <string name="enable_auto_loading">Enable auto loading</string>
+
+    <string name="native_video">Native Video Interstitial</string>
+    <string name="html_none_gwd">HTML non GWD Interstitial</string>
+    <string name="html_gwd">HTML GWD Interstitial</string>
+
+    <string name="html_banner_expand">HTML Banner</string>
+    <string name="native_video_banner">Native Video Banner</string>
+    <string name="image_fullscreen">Image Interstitial</string>
+    <string name="image_banner">Image Banner</string>
 </resources>

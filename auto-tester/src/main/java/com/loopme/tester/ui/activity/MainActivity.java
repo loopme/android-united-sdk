@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.loopme.tester.BuildConfig;
+import com.loopme.tester.Integration;
 import com.loopme.tester.R;
 import com.loopme.tester.db.contracts.AdContract;
 import com.loopme.tester.enums.LoadType;
@@ -93,6 +94,7 @@ public class MainActivity extends BaseActivity implements
             mScreenStack.push(new ScreenStackModel(SCREEN_HOME, null, ViewMode.INFO));
             fragmentTransaction.commit();
         }
+        Integration.insertIasKeys(this);
     }
 
     @Override

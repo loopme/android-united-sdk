@@ -8,6 +8,8 @@ import com.loopme.utils.Utils;
  */
 
 public class Constants {
+    public static final int DEFAULT_WIDTH = 350;
+    public static final int DEFAULT_HEIGHT = 250;
     public static final String UTF_8 = "UTF-8";
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String USER_AGENT = "User-Agent";

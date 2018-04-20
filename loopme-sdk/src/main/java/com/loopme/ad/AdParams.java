@@ -102,6 +102,10 @@ public class AdParams implements Serializable {
         return mHtml;
     }
 
+    public void setHtml(String html) {
+        this.mHtml = html;
+    }
+
     public String getAdFormat() {
         return mFormat;
     }

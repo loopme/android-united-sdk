@@ -18,7 +18,7 @@ import com.loopme.tracker.partners.LoopMeTracker;
 import java.util.Observable;
 import java.util.Observer;
 
-public abstract class VastVpaidBaseDisplayController extends BaseDisplayController
+public abstract class VastVpaidBaseDisplayController extends BaseTrackableController
         implements VastVpaidDisplayController, Observer {
     protected String mVideoUri;
     protected String mImageUri;

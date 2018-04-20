@@ -1,6 +1,6 @@
 package com.loopme.tracker.constants;
 
-public enum TrackerType {
+public enum Partner {
     MOAT,
     DV,
     IAS,

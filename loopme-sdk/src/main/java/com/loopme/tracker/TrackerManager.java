@@ -1,16 +1,15 @@
-package com.loopme.tracker.viewability;
+package com.loopme.tracker;
 
 import android.text.TextUtils;
 
 import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.tracker.constants.Event;
-import com.loopme.tracker.interfaces.Tracker;
 import com.loopme.tracker.partners.DvTracker;
-import com.loopme.tracker.partners.IasTracker;
-import com.loopme.tracker.partners.MoatTracker;
+import com.loopme.tracker.partners.ias.IasTracker;
+import com.loopme.tracker.partners.moat.MoatTracker;
 import com.loopme.tracker.constants.AdType;
-import com.loopme.tracker.constants.TrackerType;
+import com.loopme.tracker.constants.Partner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,14 +46,15 @@ public class TrackerManager {
             Tracker tracker = null;
 
             if (isMoat(name)) {
-                tracker = initTracker(TrackerType.MOAT, adType);
+                tracker = initTracker(Partner.MOAT, adType);
             } else if (isIas(name)) {
-                tracker = initTracker(TrackerType.IAS, adType);
+                tracker = initTracker(Partner.IAS, adType);
             } else if (isDv(name)) {
-                tracker = initTracker(TrackerType.DV, adType);
+                tracker = initTracker(Partner.DV, adType);
             }
-
-            addTrackerToList(tracker);
+            if (tracker != null) {
+                addTrackerToList(tracker);
+            }
         }
     }
 
@@ -64,9 +64,9 @@ public class TrackerManager {
         }
     }
 
-    private Tracker initTracker(TrackerType trackerType, AdType adType) {
+    private Tracker initTracker(Partner partner, AdType adType) {
         Tracker tracker = null;
-        switch (trackerType) {
+        switch (partner) {
             case MOAT: {
                 tracker = new MoatTracker(mLoopMeAd, adType);
                 break;
@@ -84,15 +84,15 @@ public class TrackerManager {
     }
 
     private boolean isDv(String name) {
-        return !TextUtils.isEmpty(name) && name.equalsIgnoreCase(TrackerType.DV.name());
+        return !TextUtils.isEmpty(name) && name.equalsIgnoreCase(Partner.DV.name());
     }
 
     private boolean isIas(String name) {
-        return !TextUtils.isEmpty(name) && name.equalsIgnoreCase(TrackerType.IAS.name());
+        return !TextUtils.isEmpty(name) && name.equalsIgnoreCase(Partner.IAS.name());
     }
 
     private boolean isMoat(String name) {
-        return !TextUtils.isEmpty(name) && name.equalsIgnoreCase(TrackerType.MOAT.name());
+        return !TextUtils.isEmpty(name) && name.equalsIgnoreCase(Partner.MOAT.name());
     }
 
     private void addTrackerToList(Tracker tracker) {

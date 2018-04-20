@@ -779,4 +779,15 @@ public class Utils {
         int event75 = adDuration * 3 / 4;
         return currentPosition >= event75;
     }
+
+    public static boolean hasFloat(Object[] args) {
+        if (isNotNull(args)) {
+            for (Object object : args) {
+                if (!(object instanceof Float)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }

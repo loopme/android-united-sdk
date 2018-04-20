@@ -5,9 +5,9 @@ import com.doubleverify.dvsdk.DVSDK;
 import com.loopme.BuildConfig;
 import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
-import com.loopme.tracker.interfaces.Tracker;
+import com.loopme.tracker.Tracker;
 import com.loopme.tracker.constants.AdType;
-import com.loopme.tracker.constants.TrackerType;
+import com.loopme.tracker.constants.Partner;
 import com.loopme.tracker.constants.Event;
 
 public class DvTracker implements Tracker {
@@ -24,7 +24,7 @@ public class DvTracker implements Tracker {
             return;
         }
         DVSDK.init(loopMeAd.getContext(), BuildConfig.DV_TOKEN);
-        Logging.out(LOG_TAG, "Sdk started: " + TrackerType.DV.name());
+        Logging.out(LOG_TAG, "Sdk started: " + Partner.DV.name());
     }
 
     @Override

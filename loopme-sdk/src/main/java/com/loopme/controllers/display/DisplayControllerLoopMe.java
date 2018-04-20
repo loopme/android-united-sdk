@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
@@ -37,7 +36,7 @@ import com.loopme.views.AdView;
 import com.loopme.views.LoopMeWebView;
 import com.loopme.views.MraidView;
 
-public class DisplayControllerLoopMe extends BaseDisplayController implements LoopMeDisplayController {
+public class DisplayControllerLoopMe extends BaseTrackableController implements LoopMeDisplayController {
 
     private static final int MRAID_WIDTH = 400;
     private static final int MRAID_HEIGHT = 600;

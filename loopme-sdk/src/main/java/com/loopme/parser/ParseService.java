@@ -15,7 +15,6 @@ import com.loopme.models.response.Ext;
 import com.loopme.models.response.ResponseJsonModel;
 import com.loopme.utils.ValidationHelper;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;

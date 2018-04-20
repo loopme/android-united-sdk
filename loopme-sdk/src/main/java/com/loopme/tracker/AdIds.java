@@ -3,12 +3,12 @@ package com.loopme.tracker;
 import android.text.TextUtils;
 
 public class AdIds {
-    private String mAdvertiserId;
-    private String mPlacementId;
-    private String mCampaignId;
-    private String mLineItemId;
-    private String mCreativeId;
-    private String mAppId;
+    private String mAdvertiserId = "";
+    private String mPlacementId = "";
+    private String mCampaignId = "";
+    private String mLineItemId = "";
+    private String mCreativeId = "";
+    private String mAppId = "";
 
     public void setAdvertiserId(String advertiserId) {
         this.mAdvertiserId = TextUtils.isEmpty(advertiserId) ? "" : advertiserId;

@@ -97,8 +97,11 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     public void onPlay(int position) {
-        onAdRecordReady();
-
+        if (mLoopMeAd.isInterstitial()) {
+            onAdRecordReady();
+            onAdLoadedEvent();
+            onAdImpressionEvent();
+        }
 
 //        onAdResumedEvent();
 //        postDelayed(new Runnable() {
@@ -115,7 +118,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     @Override
     public void onAdRegisterView(Activity activity, View view) {
         super.onAdRegisterView(activity, mWebView);
-        onInject();
+        onAdInject();
         onAdResumedEvent();
         postDelayed(new Runnable() {
             @Override

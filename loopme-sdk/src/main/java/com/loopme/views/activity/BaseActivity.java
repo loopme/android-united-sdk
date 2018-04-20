@@ -16,7 +16,7 @@ import com.loopme.R;
 import com.loopme.SensorManagerExtension;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.ad.LoopMeAdHolder;
-import com.loopme.controllers.display.BaseDisplayController;
+import com.loopme.controllers.display.BaseTrackableController;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
 import com.loopme.controllers.display.DisplayControllerVast;
 import com.loopme.controllers.interfaces.DisplayController;
@@ -47,7 +47,6 @@ public final class BaseActivity extends Activity
     private CloseButton mMraidCloseButton;
     private MraidAdCloseButtonReceiver mMraidCloseButtonReceiver;
     private boolean mIsDestroyBroadcastReceived;
-
 
     @Override
     public final void onCreate(Bundle savedInstanceState) {
@@ -82,7 +81,13 @@ public final class BaseActivity extends Activity
     protected void onResume() {
         super.onResume();
         resumeAd();
-        mSensorManager.registerListener();
+        registerListener();
+    }
+
+    private void registerListener() {
+        if (mSensorManager != null) {
+            mSensorManager.registerListener();
+        }
     }
 
     @Override
@@ -162,7 +167,7 @@ public final class BaseActivity extends Activity
             mLoopMeAd.bindView(mLoopMeContainerView);
         } else {
             mLoopMeAd.rebuildView(mLoopMeContainerView);
-            ((BaseDisplayController) mDisplayController).onAdEnteredFullScreenEvent();
+            ((BaseTrackableController) mDisplayController).onAdEnteredFullScreenEvent();
         }
     }
 
@@ -228,7 +233,6 @@ public final class BaseActivity extends Activity
     private void resumeAd() {
         if (mFirstLaunch) {
             startPlayInterstitial();
-
             resumeLoopMeController();
             mFirstLaunch = false;
         } else {
@@ -244,16 +248,16 @@ public final class BaseActivity extends Activity
 
     private void startPlayInterstitial() {
         if (mLoopMeAd.isInterstitial()) {
-            play();
+            playInterstitial();
         }
     }
 
-    private void play() {
+    private void playInterstitial() {
         if (mDisplayController != null) {
             mDisplayController.onPlay(START_DEFAULT_POSITION);
 
             if (mDisplayController instanceof DisplayControllerVast) {
-                ( (DisplayControllerVast)mDisplayController).onAdRegisterView(this, mLoopMeContainerView);
+                ((DisplayControllerVast) mDisplayController).onAdRegisterView(this, mLoopMeContainerView);
             }
         }
     }
@@ -262,7 +266,7 @@ public final class BaseActivity extends Activity
     public void onBackPressed() {
         if (isBanner()) {
             switchLoopMeBannerToPreviousMode();
-            ((BaseDisplayController) mDisplayController).onAdExitedFullScreenEvent();
+            ((BaseTrackableController) mDisplayController).onAdExitedFullScreenEvent();
             super.onBackPressed();
         }
     }
