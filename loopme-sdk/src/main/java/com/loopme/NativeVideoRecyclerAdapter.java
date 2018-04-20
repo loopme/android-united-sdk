@@ -142,7 +142,9 @@ public class NativeVideoRecyclerAdapter extends RecyclerView.Adapter
      * @param position - position in list
      */
     public void putAdWithAppKeyToPosition(String appKey, int position) {
-        if (position < mOriginAdapter.getItemCount()) {
+        if (position < 0) {
+            mNativeVideoController.putAdWithAppKeyToPosition(appKey, 0);
+        } else if (position < mOriginAdapter.getItemCount()) {
             mNativeVideoController.putAdWithAppKeyToPosition(appKey, position);
         } else {
             mNativeVideoController.putAdWithAppKeyToPosition(appKey, mOriginAdapter.getItemCount());

@@ -14,8 +14,8 @@
         android:id="@+id/scrollview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/actionbar_root"
         android:layout_alignParentBottom="true"
+        android:layout_below="@id/actionbar_root"
         android:fillViewport="true">
 
 
@@ -262,13 +262,6 @@
                     android:layout_height="@dimen/loopme_banner_view_hight"
                     android:layout_centerHorizontal="true"
                     android:visibility="gone" />
-
-                <FrameLayout
-                    android:id="@+id/loopme_vpaid_banner"
-                    android:layout_width="@dimen/vpaid_loopme_banner_view_width"
-                    android:layout_height="@dimen/vpaid_loopme_banner_view_height"
-                    android:layout_centerHorizontal="true"
-                    android:visibility="gone" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -284,6 +277,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentStart="true"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:padding="@dimen/text_size_15sp"
                     android:text="@string/load_textview_manual"
                     android:textColor="@color/red"
@@ -305,12 +299,23 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentEnd="true"
+                    android:background="?android:attr/selectableItemBackground"
                     android:enabled="false"
                     android:padding="@dimen/text_size_15sp"
                     android:text="@string/show"
                     android:textColor="@color/red"
                     android:textSize="@dimen/text_size_20sp" />
+
+                <Spinner
+                    android:id="@+id/ad_type_spinner"
+                    android:layout_width="@dimen/fragment_ad_spot_ad_type_spinner_width"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="@dimen/fragment_ad_spot_ad_type_spinner_margin" />
             </RelativeLayout>
         </RelativeLayout>
     </ScrollView>
+
+
 </RelativeLayout>

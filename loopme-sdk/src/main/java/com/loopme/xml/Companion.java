@@ -6,6 +6,7 @@ import com.loopme.xml.vast4.AltText;
 import com.loopme.xml.vast4.HTMLResource;
 import com.loopme.xml.vast4.IFrameResource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Companion {
@@ -138,5 +139,25 @@ public class Companion {
 
     public String getPxration() {
         return pxration;
+    }
+
+    public List<String> getCompanionTrackingEvents() {
+        List<String> trackingEventsList = new ArrayList<>();
+        if (trackingEvents != null ) {
+            trackingEventsList.addAll(trackingEvents.getCompanionTrackingEvents());
+        }
+        return trackingEventsList;
+    }
+
+    public List<String> getCompanionClickTrackingList() {
+        List<String> clickTrackingList = new ArrayList<>();
+        if (companionClickTracking != null) {
+            for (CompanionClickTracking clickTracking : companionClickTracking) {
+                if (clickTracking.hasText()) {
+                    clickTrackingList.add(clickTracking.getText());
+                }
+            }
+        }
+        return clickTrackingList;
     }
 }

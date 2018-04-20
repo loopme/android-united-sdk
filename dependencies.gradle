@@ -1,0 +1,18 @@
+ext {
+    supportLibraryVersion = '27.1.1'
+    multidexLibraryVersion = '1.0.3'
+    guavaVersion = '18.0'
+    junitVersion = '4.12'
+    mockitoVersion = '1.10.19'
+    powerMockito = '1.6.2'
+    hamcrestVersion = '1.3'
+    runnerVersion = '1.0.1'
+    rulesVersion = '1.0.1'
+    espressoVersion = '3.0.1'
+    roomVersion = "1.0.0"
+    playServicesVersion = '15.0.0'
+    constraintLayout = '1.0.2'
+    okHttpVersion = '3.10.0'
+    retrofitVersion = '2.4.0'
+    moatVersion = '2.1.0'
+}

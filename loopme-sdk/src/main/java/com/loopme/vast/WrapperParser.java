@@ -15,16 +15,19 @@ import java.util.List;
 import java.util.Map;
 
 public class WrapperParser {
-    private List<Wrapper> mWrapperList;
-    private List<String> mErrorUrlList = new ArrayList<>();
-    private List<Tracking> mTrackingList = new ArrayList<>();
-    private ArrayList<String> mSimpleImpressionList = new ArrayList<>();
-    private Map<String, ArrayList<String>> mViewableImpressionMap = new HashMap<>();
-    private ArrayList<String> mAdVerificationJavaScriptUrlList = new ArrayList<>();
-    private List<String> mVideoClicksList = new ArrayList<>();
+    private List<Wrapper> mWrapperList = new ArrayList<Wrapper>();
+    private List<String> mErrorUrlList = new ArrayList<String>();
+    private List<Tracking> mTrackingList = new ArrayList<Tracking>();
+    private ArrayList<String> mSimpleImpressionList = new ArrayList<String>();
+    private Map<String, ArrayList<String>> mViewableImpressionMap = new HashMap<String, ArrayList<String>>();
+    private ArrayList<String> mAdVerificationJavaScriptUrlList = new ArrayList<String>();
+    private List<String> mVideoClicksList = new ArrayList<String>();
+
+    private List<String> mCompanionCreativeViewEventsList = new ArrayList<String>();
+    private List<String> mCompanionClickTrackingList = new ArrayList<String>();
 
     public WrapperParser(List<Wrapper> wrapperList) {
-        mWrapperList = wrapperList;
+        mWrapperList.addAll(wrapperList);
         parse();
     }
 
@@ -35,13 +38,19 @@ public class WrapperParser {
         setErrorUrlList();
         setAdVerificationJavaScriptUrlList();
         setVideoClicksList();
+        setCompanionAdsTrackingDetails();
+    }
+
+    private void setCompanionAdsTrackingDetails() {
+        for (Wrapper wrapper : mWrapperList) {
+            mCompanionCreativeViewEventsList.addAll(wrapper.getCompanionTrackingEvents());
+            mCompanionClickTrackingList.addAll(wrapper.getCompanionClickTrackingList());
+        }
     }
 
     private void setVideoClicksList() {
-        if (mWrapperList != null) {
-            for (Wrapper wrapper : mWrapperList) {
-                addVideoClicksList(wrapper.getVideoClicksList());
-            }
+        for (Wrapper wrapper : mWrapperList) {
+            mVideoClicksList.addAll(wrapper.getVideoClicksList());
         }
     }
 
@@ -49,25 +58,15 @@ public class WrapperParser {
         return mVideoClicksList;
     }
 
-    private void addVideoClicksList(List<String> videoClicks) {
-        for (String videoClickUrl : videoClicks) {
-            mVideoClicksList.add(videoClickUrl);
-        }
-    }
-
     private void setViewableImpressions() {
-        if (mWrapperList != null) {
-            for (Wrapper wrapper : mWrapperList) {
-                addViewableImpressions(wrapper.getViewableImpression());
-            }
+        for (Wrapper wrapper : mWrapperList) {
+            addViewableImpressions(wrapper.getViewableImpression());
         }
     }
 
     private void setSimpleImpressionsList() {
-        if (mWrapperList != null) {
-            for (Wrapper wrapper : mWrapperList) {
-                addSimpleImpressions(wrapper.getImpressions());
-            }
+        for (Wrapper wrapper : mWrapperList) {
+            addSimpleImpressions(wrapper.getImpressions());
         }
     }
 
@@ -86,26 +85,20 @@ public class WrapperParser {
     }
 
     private void setTrackingEvents() {
-        if (mWrapperList != null) {
-            for (Wrapper wrapper : mWrapperList) {
-                addTrackingEvents(wrapper);
-            }
+        for (Wrapper wrapper : mWrapperList) {
+            addTrackingEvents(wrapper);
         }
     }
 
     private void setErrorUrlList() {
-        if (mWrapperList != null) {
-            for (Wrapper wrapper : mWrapperList) {
-                addErrorUrl(wrapper);
-            }
+        for (Wrapper wrapper : mWrapperList) {
+            addErrorUrl(wrapper);
         }
     }
 
     private void setAdVerificationJavaScriptUrlList() {
-        if (mWrapperList != null) {
-            for (Wrapper wrapper : mWrapperList) {
-                addAdVerificationJavaScriptUrl(wrapper);
-            }
+        for (Wrapper wrapper : mWrapperList) {
+            addAdVerificationJavaScriptUrl(wrapper);
         }
     }
 
@@ -198,5 +191,11 @@ public class WrapperParser {
         return !TextUtils.isEmpty(eventType) && !TextUtils.isEmpty(eventUrl);
     }
 
+    public List<String> getCompanionCreativeViewList() {
+        return mCompanionCreativeViewEventsList;
+    }
 
+    public List<String> getCompanionClickTrackingList() {
+        return mCompanionClickTrackingList;
+    }
 }

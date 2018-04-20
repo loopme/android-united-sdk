@@ -2,11 +2,11 @@ package com.loopme.tester.ads;
 
 import android.app.Activity;
 
+import com.loopme.ad.LoopMeAd;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
 
-public class AdMopubInterstitial implements MoPubInterstitial.InterstitialAdListener,
-        Ad {
+public class AdMopubInterstitial implements MoPubInterstitial.InterstitialAdListener, Ad {
 
     private MoPubInterstitial mInterstitial;
     private String mAdUnitId;
@@ -28,6 +28,10 @@ public class AdMopubInterstitial implements MoPubInterstitial.InterstitialAdList
     @Override
     public boolean isShowing() {
         return false;
+    }
+
+    @Override
+    public void setPreferredAd(LoopMeAd.Type type) {
     }
 
     @Override

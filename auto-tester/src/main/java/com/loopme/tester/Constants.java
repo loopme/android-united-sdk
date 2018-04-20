@@ -4,13 +4,14 @@ public class Constants {
 
     public static final String PREFIX = "new-tester.";
 
-    public static final String TESTFAIRY_URL = "https://tsfr.io/ocvcek";
+    public static final String TESTFAIRY_URL = "https://tsfr.io/l1hXJjGT";
     public static final String INITIAL_VERSION_NAME = "1.9";
     //Please update this number every time making build for testing
     public static final int BASE_REVISION_CODE = 15;
     public static final CharSequence MANUFACTURER_LGE = "LGE";
     public static final CharSequence MANUFACTURER_LG = "LG";
     public static final int ONE_SECOND_IN_MILLIS = 1000;
+    public static final long AD_SPOT_DOES_NOT_EXIST_ID = -666;
 
     public class Keys {
         public static final String KEY_DV = "606a600593";

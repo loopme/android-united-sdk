@@ -50,7 +50,6 @@ public class XmlParseService {
             return null;
         }
         sAdParams = adParams;
-        setExpiredDate();
         String xml = bidObject.getAdm();
         Logging.out(LOG_TAG, xml);
         return parseResponse(xml);
@@ -106,7 +105,7 @@ public class XmlParseService {
         if (linear == null) {
             throw new IllegalArgumentException("NonLinear AD is not supported");
         }
-
+        setExpiredDate();
         setParamId(vast);
         setParamImpressions(inLine);
         setErrorUrl(inLine.getError());
@@ -384,7 +383,8 @@ public class XmlParseService {
     }
 
     private static boolean isSupportedFormat(MediaFile mediaFile) {
-        return mediaFile != null && (mediaFile.getText().contains(Constants.MP4_FORMAT_EXT));
+        return mediaFile != null && (mediaFile.getText().contains(Constants.MP4_FORMAT_EXT)
+                || mediaFile.getText().contains(Constants.WEBM_FORMAT_EXT));
     }
 
     private static void sortList(List<MediaFile> supportedMediaFilesList) {

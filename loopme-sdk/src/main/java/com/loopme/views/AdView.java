@@ -15,7 +15,6 @@ public class AdView extends LoopMeWebView implements BridgeInterface, Bridge.Lis
 
     private static final String LOG_TAG = AdView.class.getSimpleName();
     private Constants.VideoState mCurrentVideoState = Constants.VideoState.IDLE;
-    private Constants.WebviewState mViewState = Constants.WebviewState.CLOSED;
     private boolean mCurrentFullScreenState;
     private Bridge.Listener mBridgeListener;
     private volatile Bridge mBridge;
@@ -37,10 +36,6 @@ public class AdView extends LoopMeWebView implements BridgeInterface, Bridge.Lis
         return mCurrentVideoState;
     }
 
-    public Constants.WebviewState getCurrentWebViewState() {
-        return mViewState;
-    }
-
     private void modifyUserAgentForKrPano() {
         String userString = WebSettings.getDefaultUserAgent(getContext());
         String modifiedUserString = Utils.makeChromeShortCut(userString);
@@ -49,7 +44,7 @@ public class AdView extends LoopMeWebView implements BridgeInterface, Bridge.Lis
 
     @Override
     public void setWebViewState(Constants.WebviewState state) {
-        super.setWebViewState(BridgeCommandBuilder.LOOPME_PREFIX, state);
+        super.setWebViewState(state);
     }
 
     @Override

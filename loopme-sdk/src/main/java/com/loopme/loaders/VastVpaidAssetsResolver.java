@@ -44,12 +44,8 @@ public class VastVpaidAssetsResolver {
     public void stop() {
         mListener = null;
         mIsStopped = true;
-        if (mVideoLoader != null) {
-            mVideoLoader.stop();
-        }
-        if (mFileLoader != null) {
-            mFileLoader.stop();
-        }
+        stopLoader(mVideoLoader);
+        stopLoader(mFileLoader);
     }
 
     private void loadVideoAndEndCard() {
@@ -107,10 +103,14 @@ public class VastVpaidAssetsResolver {
     }
 
     private void onCompanionTimeout() {
-        if (mFileLoader != null) {
-            mFileLoader.stop();
+        stopLoader(mFileLoader);
+        handleVpaidError(Errors.COMPANION_ERROR);
+    }
+
+    private void stopLoader(Loader loader) {
+        if (loader != null) {
+            loader.stop();
         }
-        handleVpaidError(Errors.UNABLE_TO_FETCH_COMPANION);
     }
 
     private FileLoaderNewImpl.Callback initVpaidFileLoaderCallback() {

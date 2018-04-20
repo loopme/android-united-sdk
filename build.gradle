@@ -1,14 +1,22 @@
 buildscript {
     repositories {
+        mavenCentral()
         jcenter()
+        google()
     }
+
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
-
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
-
+        classpath 'com.android.tools.build:gradle:3.1.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         classpath 'de.mobilej.unmock:UnMockPlugin:0.5.0'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        google()
     }
 }
 
@@ -16,8 +24,21 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-allprojects {
-    repositories {
-        jcenter()
-    }
+ext {
+    // Sdk and tools
+    minSdkVersion = 21
+    targetSdkVersion = 27
+    compileSdkVersion = 27
+    buildToolsVersion = '27.0.3'
+
+    // Project
+    versionCode = 2
+    versionName = '6.0'
+    versionFull = '6.0.2'
+    organization = 'com.loopme'
+    projectName = 'loopme-united-sdk'
+    description = 'Please meet our New United SDK. It combines multiple premium ads technologies with the highest performance and lean resource consumption.'
+    websiteUrl = 'https://github.com/loopme/android-united-sdk'
+    vcsUrl = 'https://github.com/loopme/android-united-sdk.git'
 }
+

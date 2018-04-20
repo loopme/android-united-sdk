@@ -24,7 +24,7 @@ If you have questions please contact us at support@loopmemedia.com.
 ## Features ##
 
 * Interstitial, banner, native video ad formats
-* Image / Rich media / Video / 360 video
+* Image / Rich media / Video / 360 video / VAST/ VPAID
 * Preloaded video ads
 * Minimized video mode
 * Expand to fullscreen mode
@@ -51,13 +51,13 @@ dependencies {
 }
 ```
 <br>2. LoopMe SDK is available as an AAR via jCenter; to use it, add the following to your `build.gradle`:
-```
+```java
 repositories {
     jcenter()
 }
 
 dependencies {
-    compile 'com.loopme:loopme-sdk:6.0.0@aar'
+    compile 'com.loopme:loopme-sdk:6.0.2@aar'
 }
 ```
 
@@ -304,12 +304,14 @@ They will be added in ad request.
 
 * <b>Config minimized mode</b><br>
 Minimized mode can be configured only for native video ads.
+
 ```java
 // root_view - the root view in layout
 RelativeLayout root = (RelativeLayout) findViewById(R.id.root_view);
 MinimizedMode mode = new MinimizedMode(root);
 mNativeVideoAdapter.setMinimizedMode(mode);
 ```
+
 <img src="screenshots/normal.png" alt="Native video" width="128">
 <img src="screenshots/shrink.png" alt="Minimized mode" width="128">
 
@@ -326,7 +328,6 @@ For banner nad native video - `onLoopMeBannerVideoDidReachEnd()` notification.
 Please meet our New United SDK. It combines multiple premium ads technologies with the highest performance and lean resource consumption.
 
 **Version 6.0.1**
-
 1. Support interstitial and banner ads of the following formats:
 - VAST 2.0, 3.0, 4.0
 - VPAID 2.0
@@ -334,6 +335,18 @@ Please meet our New United SDK. It combines multiple premium ads technologies wi
 2. Ads Smart Loading feature
 3. Highly Reduced resource consumption
 4. Supports MOAT Viewability measurement
+
+**Version 6.0.2**
+- Added unsupported file format detection fro VPAID creatives
+- Multiformat ad spots - combine several ad formats in a single spot to increase fill rate. 
+- VAST 4.0 support
+- Expandable banner ad format support
+- Updated list view ad unit
+- Updated samples 
+- Debugging reporting improvements
+- Access to read cookies for better HTML ads compliancy
+- A minimum API level supported increased to 21 (Android 5.0)
+
 
 See [Changelog](CHANGELOG.md)
 

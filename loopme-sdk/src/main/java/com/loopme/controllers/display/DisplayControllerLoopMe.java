@@ -1,25 +1,29 @@
 package com.loopme.controllers.display;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.LoopMeBannerGeneral;
 import com.loopme.MinimizedMode;
 import com.loopme.MoatViewAbilityUtils;
-import com.loopme.SwipeListener;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.bridges.Bridge;
+import com.loopme.common.LoopMeError;
 import com.loopme.controllers.MraidController;
 import com.loopme.controllers.VideoController;
 import com.loopme.controllers.interfaces.LoopMeDisplayController;
@@ -29,9 +33,9 @@ import com.loopme.controllers.view.ViewControllerLoopMe;
 import com.loopme.loaders.FileLoaderNewImpl;
 import com.loopme.loaders.Loader;
 import com.loopme.models.Errors;
-import com.loopme.common.LoopMeError;
 import com.loopme.models.Message;
 import com.loopme.utils.UiUtils;
+import com.loopme.utils.Utils;
 import com.loopme.views.AdView;
 import com.loopme.views.LoopMeWebView;
 import com.loopme.views.MraidView;
@@ -71,9 +75,9 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
             initMraidControllers();
         } else {
             initLoopMeControllers();
+            initVideoController();
+            initViewController();
         }
-        initVideoController();
-        initViewController();
     }
 
     private void initLoopMeControllers() {
@@ -93,7 +97,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
 
     public void initVideoController() {
         VideoController.Callback callback = initVideoControllerCallback();
-        mVideoController = new VideoController(mAdView, callback);
+        mVideoController = new VideoController(mAdView, callback, mLoopMeAd.getAdFormat());
     }
 
     public void initViewController() {
@@ -106,20 +110,25 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
         }
     }
 
-
-    public void setMraidWebViewState(Constants.WebviewState state) {
-        if (mMraidView != null) {
-            mMraidView.setWebViewState(state);
+    private void buildMraidContainer(FrameLayout containerView) {
+        if (mMraidController != null) {
+            mMraidController.buildMraidContainer(containerView);
         }
     }
 
-    private void buildMraidContainer(FrameLayout containerView) {
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT);
-        containerView.addView(mMraidView, layoutParams);
+    public void collapseMraidBanner() {
+        if (mLoopMeAd instanceof LoopMeBannerGeneral && isMraidAd()) {
+            LoopMeBannerGeneral banner = (LoopMeBannerGeneral) mLoopMeAd;
+            buildMraidContainer(banner.getBannerView());
+            onCollapseBanner();
+        }
     }
 
+    private void onCollapseBanner() {
+        if (mMraidController != null) {
+            mMraidController.onCollapseBanner();
+        }
+    }
 
     private void preloadMraidAd() {
         if (mAdParams.isMraidAd()) {
@@ -265,10 +274,10 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     }
 
     private void resumeInterstitial() {
-        resumeVideoController();
-        resumeViewController();
         resumeMraid();
         if (isInterstitial()) {
+            resumeViewController();
+            resumeVideoController();
             setWebViewState(Constants.WebviewState.VISIBLE);
         }
     }
@@ -276,8 +285,8 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     private void pauseControllers() {
         pauseViewController();
         pauseMraid();
-        pauseVideoController();
         if (isInterstitial()) {
+            pauseVideoController(false);
             setWebViewState(Constants.WebviewState.HIDDEN);
         }
     }
@@ -286,9 +295,6 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
         if (mMraidView != null) {
             mMraidView.notifySizeChangeEvent(MRAID_WIDTH, MRAID_HEIGHT);
             mMraidView.setIsViewable(true);
-            if (isBanner()) {
-                mMraidView.setState(Constants.MraidState.EXPANDED);
-            }
         }
     }
 
@@ -316,9 +322,9 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
         }
     }
 
-    private void pauseVideoController() {
+    private void pauseVideoController(boolean isSkip) {
         if (mVideoController != null) {
-            mVideoController.pauseVideo();
+            mVideoController.pauseVideo(isSkip);
         }
     }
 
@@ -341,8 +347,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
 
     @Override
     public void onDestroy() {
-        setMraidWebViewState(Constants.WebviewState.CLOSED);
-        setWebViewState(Constants.WebviewState.CLOSED);
+        destroyMraidController();
         destroyVideoController();
         stopVideoLoader();
         clearWebView(mAdView);
@@ -356,6 +361,12 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
         super.onDestroy();
     }
 
+    private void destroyMraidController() {
+        if (mMraidController != null) {
+            mMraidController.destroyExpandedView();
+        }
+    }
+
     public void destroyMinimizedView() {
         if (mDisplayModeResolver != null) {
             mDisplayModeResolver.destroy();
@@ -363,14 +374,10 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     }
 
     @Override
-    public boolean onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
+    public void onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
         UiUtils.broadcastIntent(mLoopMeAd.getContext(), Constants.CLICK_INTENT);
         onAdClicked();
-        if (super.onRedirect(url, loopMeAd)) {
-            setWebViewState(Constants.WebviewState.HIDDEN);
-            return true;
-        }
-        return false;
+        super.onRedirect(url, loopMeAd);
     }
 
     @Override
@@ -404,8 +411,14 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
 
     @Override
     public void onRebuildView(FrameLayout containerView) {
-        if (mViewController != null) {
-            mViewController.rebuildView(containerView, mAdView);
+        if (isMraidAd()) {
+            if (mMraidController != null) {
+                mMraidController.onRebuildView(containerView);
+            }
+        } else {
+            if (mViewController != null) {
+                mViewController.rebuildView(containerView, mAdView, Constants.DisplayMode.NORMAL);
+            }
         }
     }
 
@@ -431,7 +444,15 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
 
     @Override
     public boolean isFullScreen() {
-        return mDisplayModeResolver != null && mDisplayModeResolver.isFullScreenMode();
+        return (mDisplayModeResolver != null && mDisplayModeResolver.isFullScreenMode()) || isMraidExpandMode();
+    }
+
+    private boolean isMraidExpandMode() {
+        return mMraidController != null && mMraidController.isExpanded();
+    }
+
+    public void setFullScreen(boolean isFullScreen) {
+        mDisplayModeResolver.switchToFullScreenMode(isFullScreen);
     }
 
     private void handleVideoStretch(boolean videoStretch) {
@@ -490,7 +511,8 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
 
             @Override
             public void onJsVideoPause(final int time) {
-                onPause();
+                pauseViewController();
+                pauseVideoController(true);
             }
 
             @Override
@@ -709,15 +731,9 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
         }
     }
 
-    public void rebuildView(FrameLayout view) {
+    public void rebuildView(FrameLayout view, Constants.DisplayMode displayMode) {
         if (mVideoController != null) {
-            mViewController.rebuildView(view, mAdView);
-        }
-    }
-
-    public void setOnTouchListener(SwipeListener swipeListener) {
-        if (mAdView != null) {
-            mAdView.setOnTouchListener(swipeListener);
+            mViewController.rebuildView(view, mAdView, displayMode);
         }
     }
 
@@ -757,4 +773,20 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
         return getCurrentVideoState() == Constants.VideoState.PAUSED;
     }
 
+
+    public int getMraidOrientation() {
+        if (mMraidController != null) {
+            return mMraidController.getForceOrientation();
+        } else {
+            return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+        }
+    }
+
+    public void dismiss() {
+        setWebViewState(Constants.WebviewState.CLOSED);
+    }
+
+    private boolean isMraidAd() {
+        return mLoopMeAd != null && mLoopMeAd.isMraidAd();
+    }
 }

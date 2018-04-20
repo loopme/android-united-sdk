@@ -21,7 +21,11 @@ import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.tracker.AdEvents;
 import com.loopme.tracker.EventManager;
 import com.loopme.utils.InternetUtils;
+import com.loopme.tracker.interfaces.AdEvents;
+import com.loopme.tracker.partners.LoopMeTracker;
+import com.loopme.tracker.viewability.EventManager;
 import com.loopme.utils.UiUtils;
+import com.loopme.utils.Utils;
 import com.loopme.vast.VastVpaidEventTracker;
 
 public abstract class BaseTrackableController implements DisplayController, AdEvents {
@@ -78,7 +82,7 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
             @Override
             public void run() {
                 if (mLoopMeAd != null) {
-                    mLoopMeAd.onPostWarning(error);
+                    mLoopMeAd.onSendPostWarning(error);
                 }
             }
         });
@@ -109,7 +113,6 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     @Override
     public void onDestroy() {
         onAdDestroyedEvent();
-        VastVpaidEventTracker.clear();
     }
 
     @Override
@@ -120,10 +123,6 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
                 onAdErrorEvent(message);
                 break;
             }
-            case EVENT: {
-                VastVpaidEventTracker.postEvent(message);
-                break;
-            }
             case LOG: {
                 Logging.out(mLogTag, message);
                 break;
@@ -132,26 +131,16 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     }
 
     @Override
-    public boolean onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
+    public void onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
         onAdClickedEvent();
-        if (TextUtils.isEmpty(url)) {
-            return false;
-        }
-        onMessage(Message.LOG, "Handle none LoopMe url");
-        if (InternetUtils.isOnline(loopMeAd.getContext())) {
-            LoopMeAdHolder.putAd(loopMeAd);
-            Intent intent = UiUtils.createRedirectIntent(url, loopMeAd);
-            try {
-                loopMeAd.getContext().startActivity(intent);
-            } catch (ActivityNotFoundException e) {
-                e.printStackTrace();
-                return false;
-            }
+        onMessage(Message.LOG, "Handle url");
+        LoopMeAdHolder.putAd(loopMeAd);
+        Intent intent = UiUtils.createRedirectIntent(url, loopMeAd);
+        if (Utils.isActivityResolved(intent, loopMeAd.getContext())) {
+            loopMeAd.getContext().startActivity(intent);
         } else {
-            onMessage(Message.LOG, "No internet connection");
-            return false;
+            Logging.out(mLogTag, "Warning url = " + url);
         }
-        return true;
     }
 
     // events region

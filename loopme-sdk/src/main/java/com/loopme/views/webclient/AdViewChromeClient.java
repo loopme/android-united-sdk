@@ -1,5 +1,6 @@
 package com.loopme.views.webclient;
 
+import android.text.TextUtils;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -7,10 +8,13 @@ import android.webkit.WebView;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.tracker.partners.LoopMeTracker;
+import com.loopme.utils.Utils;
 
 public class AdViewChromeClient extends WebChromeClient {
     private OnErrorFromJsCallback mCallback;
+    private String mPrevErrorMessage = "";
     private static final String UNCAUGHT_ERROR = "Uncaught";
+    private static final String VIDEO_SOURCE = "VIDEO_SOURCE";
 
     public AdViewChromeClient() {
     }
@@ -28,10 +32,17 @@ public class AdViewChromeClient extends WebChromeClient {
             Logging.out(LOG_TAG, "Console Message: " + consoleMessage.message() + " " + consoleMessage.sourceId());
         }
         if (consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
-            LoopMeTracker.post("Error from js console: " + consoleMessage.message() + " " + consoleMessage.sourceId(), Constants.ErrorType.JS);
-            onErrorFromJs(consoleMessage.message() + " " + consoleMessage.sourceId());
+            onErrorFromJs(consoleMessage.message() + ". Source: " + consoleMessage.sourceId());
+        }
+        if (isVideoSourceEvent(consoleMessage.message())) {
+            onVideoSource(Utils.getSourceUrl(consoleMessage.message()));
         }
         return super.onConsoleMessage(consoleMessage);
+    }
+
+    private boolean isVideoSourceEvent(String message) {
+        String[] tokens = message.split(":");
+        return TextUtils.equals(tokens[0], VIDEO_SOURCE);
     }
 
     @Override
@@ -40,12 +51,34 @@ public class AdViewChromeClient extends WebChromeClient {
     }
 
     private void onErrorFromJs(String message) {
-        if (mCallback != null && message != null && message.contains(UNCAUGHT_ERROR)) {
+        if (mCallback != null && message != null && message.contains(UNCAUGHT_ERROR) && isNewError(message)) {
             mCallback.onErrorFromJs(message);
+        } else if (mCallback == null) {
+            LoopMeTracker.post("Error from js console: " + message, Constants.ErrorType.JS);
+        }
+    }
+
+    private boolean isNewError(String newErrorMessage) {
+        if ((!TextUtils.equals(newErrorMessage, mPrevErrorMessage))) {
+            mPrevErrorMessage = newErrorMessage;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void onVideoSource(String source) {
+        if (mCallback != null && mCallback instanceof OnErrorFromJsCallbackVpaid) {
+            ((OnErrorFromJsCallbackVpaid) mCallback).onVideoSource(source);
         }
     }
 
     public interface OnErrorFromJsCallback {
         void onErrorFromJs(String message);
+
+    }
+
+    public interface OnErrorFromJsCallbackVpaid extends OnErrorFromJsCallback {
+        void onVideoSource(String source);
     }
 }

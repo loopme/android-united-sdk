@@ -9,9 +9,8 @@ import android.widget.FrameLayout;
 import com.loopme.AdTargeting;
 import com.loopme.AdTargetingData;
 import com.loopme.Constants;
-import com.loopme.IdGenerator;
-import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.Helpers;
+import com.loopme.IdGenerator;
 import com.loopme.IntegrationType;
 import com.loopme.Logging;
 import com.loopme.common.LoopMeError;
@@ -22,8 +21,10 @@ import com.loopme.controllers.interfaces.DisplayController;
 import com.loopme.debugging.LiveDebug;
 import com.loopme.loaders.AdFetchTask;
 import com.loopme.models.Errors;
+import com.loopme.request.RequestParamsUtils;
 import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
+import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.Utils;
 import com.loopme.utils.ValidationHelper;
 
@@ -43,21 +44,21 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     private AdParams mAdParams;
     private Activity mContext;
-    private AdType mAdType;
+    private Type mPreferredAdType = Type.ALL;
     private Timers mTimers;
     private AdFetchTask mAdFetchTask;
 
     protected long mStartLoadingTime;
-    protected int mAdState;
+    protected Constants.AdState mAdState = Constants.AdState.NONE;
     private String mAppKey;
     protected boolean mIsReady;
     private int mAdId;
+    private volatile boolean mIsReverseOrientationRequest;
 
     public LoopMeAd(Activity context, String appKey) {
         if (context == null || TextUtils.isEmpty(appKey)) {
             throw new IllegalArgumentException(WRONG_PARAMETERS);
         }
-        setAdState(Constants.AdState.NONE);
         mContext = context;
         mAppKey = appKey;
         mTimers = new Timers(this);
@@ -74,7 +75,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         return getAdFormat() == Constants.AdFormat.INTERSTITIAL;
     }
 
-    public abstract int getAdFormat();
+    public abstract Constants.AdFormat getAdFormat();
 
     public abstract AdSpotDimensions getAdSpotDimensions();
 
@@ -153,11 +154,17 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     }
 
     protected void destroyDisplayController() {
-        if (mDisplayController != null) {
-            Logging.out(LOG_TAG, "Release " + mDisplayController.toString());
-            mDisplayController.onDestroy();
-            mDisplayController = null;
-        }
+        // we need delay destroy view to let little bit time for previous commands to complete
+        runOnUiThreadDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mDisplayController != null) {
+                    Logging.out(LOG_TAG, "Release " + mDisplayController.toString());
+                    mDisplayController.onDestroy();
+                    mDisplayController = null;
+                }
+            }
+        }, Constants.DESTROY_TIME_DELAY);
     }
 
     /**
@@ -205,6 +212,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         } else {
             onInternalLoadFail(Errors.DOWNLOAD_ERROR);
         }
+        mIsReverseOrientationRequest = false;
     }
 
     private void proceedPrepareAd(AdParams adParam) {
@@ -215,27 +223,13 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         setLiveDebug(adParam);
     }
 
-    protected void postError(String errorMessage) {
-        LoopMeTracker.post(errorMessage);
-    }
-
     public void onInternalLoadFail(LoopMeError error) {
         onAdLoadFail(error);
-        onPostWarning(error);
+        onSendPostWarning(error);
     }
 
-    public void onPostWarning(LoopMeError error) {
-        if (error != null) {
-            LoopMeTracker.post(error.getMessage(), error.getErrorType());
-            if (isVastError(error)) {
-                LoopMeTracker.postVastError(String.valueOf(error.getErrorCode()));
-            }
-        }
-    }
-
-    private boolean isVastError(LoopMeError error) {
-        return TextUtils.equals(error.getErrorType(), Constants.ErrorType.VAST) ||
-                TextUtils.equals(error.getErrorType(), Constants.ErrorType.VPAID);
+    public void onSendPostWarning(LoopMeError error) {
+        LoopMeTracker.post(error);
     }
 
     private void setLiveDebug(AdParams adParams) {
@@ -331,7 +325,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     private void proceedFetchAd() {
         setAdState(Constants.AdState.LOADING);
         startTimer(TimersType.FETCHER_TIMER, null);
-        Constants.setAdSpotDimensions(getAdSpotDimensions());
         mAdFetchTask = new AdFetchTask(this, initAdFetcherListener());
         mAdFetchTask.fetch();
     }
@@ -356,6 +349,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
             error.setErrorMessage(String.valueOf(error.getErrorCode()));
         }
         onInternalLoadFail(error);
+        mIsReverseOrientationRequest = false;
     }
 
     @Override
@@ -402,12 +396,14 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         this.mAdParams = mAdParams;
     }
 
-    public AdType getAdType() {
-        return mAdType;
+    public Type getPreferredAdType() {
+        return mPreferredAdType;
     }
 
-    public void setAdType(AdType mAdType) {
-        this.mAdType = mAdType;
+    public void setPreferredAdType(Type preferredAdType) {
+        if (preferredAdType != null) {
+            mPreferredAdType = preferredAdType;
+        }
     }
 
     public Activity getContext() {
@@ -454,11 +450,11 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         }
     }
 
-    public int getAdState() {
+    public Constants.AdState getAdState() {
         return mAdState;
     }
 
-    public void setAdState(int adState) {
+    public void setAdState(Constants.AdState adState) {
         this.mAdState = adState;
     }
 
@@ -468,6 +464,10 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     public boolean isFullScreen() {
         return mDisplayController != null && mDisplayController.isFullScreen();
+    }
+
+    public void setFullScreen(boolean isFullScreen) {
+        mDisplayController.setFullScreen(isFullScreen);
     }
 
     public FrameLayout getContainerView() {
@@ -482,5 +482,54 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     public int getAdId() {
         return mAdId;
+    }
+
+    public void setReversOrientationRequest() {
+        mIsReverseOrientationRequest = true;
+    }
+
+    public boolean isReverseOrientationRequest() {
+        return mIsReverseOrientationRequest;
+    }
+
+    public enum Type {
+        HTML,
+        VIDEO,
+        ALL;
+
+        public static Type fromString(String type) {
+            if (TextUtils.isEmpty(type)) {
+                return ALL;
+            }
+            if (HTML.name().equalsIgnoreCase(type)) {
+                return HTML;
+            } else if (VIDEO.name().equalsIgnoreCase(type)) {
+                return VIDEO;
+            } else {
+                return ALL;
+            }
+        }
+    }
+
+    public boolean isCustomBannerHtml() {
+        return isCustomBanner() && mPreferredAdType == Type.HTML;
+    }
+
+    public boolean isCustomBanner() {
+        int[] adSize = RequestParamsUtils.getAdSize(mContext, this);
+        int width = adSize[0];
+        int height = adSize[1];
+        return isBanner() && Utils.isCustomBannerSize(width, height);
+    }
+
+    public boolean isExpandBannerVideo() {
+        return isExpandBanner() && mPreferredAdType == Type.VIDEO;
+    }
+
+    public boolean isExpandBanner() {
+        int[] adSize = RequestParamsUtils.getAdSize(mContext, this);
+        int width = adSize[0];
+        int height = adSize[1];
+        return isBanner() && Utils.isExpandBanner(width, height);
     }
 }

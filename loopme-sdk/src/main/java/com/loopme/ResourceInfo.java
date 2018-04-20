@@ -1,9 +1,5 @@
 package com.loopme;
 
-/**
- * Created by vynnykiakiv on 8/4/17.
- */
-
 public class ResourceInfo {
     private String mUrl;
     private String mResourceName;
@@ -30,5 +26,24 @@ public class ResourceInfo {
 
     public void setResourceName(String mResourceName) {
         this.mResourceName = mResourceName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ResourceInfo that = (ResourceInfo) o;
+
+        if (!mUrl.equals(that.mUrl)) return false;
+        return mResourceName.equals(that.mResourceName);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = mUrl.hashCode();
+        result = 31 * result + mResourceName.hashCode();
+        return result;
     }
 }

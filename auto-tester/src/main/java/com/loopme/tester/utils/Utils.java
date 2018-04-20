@@ -5,9 +5,14 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.Loader;
 import android.text.TextUtils;
 
 import com.loopme.tester.Constants;
+import com.loopme.tester.loaders.AdSpotCursorLoader;
+import com.loopme.tester.model.AdSpot;
+
+import java.util.ArrayList;
 
 
 public class Utils {
@@ -45,10 +50,16 @@ public class Utils {
     }
 
     public static long getTimeDelay() {
-        if (isLg()) {
-            return TIME_DELAY_LG;
-        } else {
-            return TIME_DELAY;
+        return TIME_DELAY_LG;
+    }
+
+    public static long getAdSpotId(Loader loader) {
+        if (loader instanceof AdSpotCursorLoader) {
+            ArrayList<AdSpot> adSpotList = ((AdSpotCursorLoader) loader).getAdSpotModelList();
+            if (adSpotList.size() > 0) {
+                return adSpotList.get(0).getAdSpotId();
+            }
         }
+        return Constants.AD_SPOT_DOES_NOT_EXIST_ID;
     }
 }

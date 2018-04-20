@@ -124,7 +124,7 @@ public class View360Controller implements IViewController {
     }
 
     @Override
-    public void rebuildView(ViewGroup bannerView, AdView adView) {
+    public void rebuildView(ViewGroup bannerView, AdView adView, Constants.DisplayMode displayMode) {
         Logging.out(LOG_TAG, "rebuildView");
         if (bannerView == null || adView == null || mGLSurfaceView == null) {
             return;

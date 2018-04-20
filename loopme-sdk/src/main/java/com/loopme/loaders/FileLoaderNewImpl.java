@@ -39,14 +39,13 @@ public class FileLoaderNewImpl implements Loader {
     private static final int CONNECT_TIMEOUT = 10000;
     private String mFileUrl;
 
-    private String mShortFileName;
+    private String mFileName;
     private volatile boolean mIsStopped;
     private volatile boolean mIsFileFullyDownloaded;
 
     private Callback mCallback;
     private Context mContext;
     private File mLoadingFile;
-    private ExecutorService mExecutor;
     private Handler mHandler;
     private volatile HttpURLConnection mConnection;
     private volatile FileOutputStream mOutputStream;
@@ -55,7 +54,6 @@ public class FileLoaderNewImpl implements Loader {
         mFileUrl = fileUrl;
         mContext = context;
         mCallback = callback;
-        mExecutor = ExecutorHelper.getExecutor();
         mHandler = new Handler(Looper.getMainLooper());
         FileUtils.deleteExpiredFiles(mContext);
     }
@@ -65,8 +63,8 @@ public class FileLoaderNewImpl implements Loader {
         Logging.out(LOG_TAG, "start()");
         Logging.out(LOG_TAG, "Use mobile network for caching: " + Constants.USE_MOBILE_NETWORK_FOR_CACHING);
 
-        mShortFileName = FileUtils.detectFileName(mFileUrl) + Constants.MP4_FORMAT;
-        File file = FileUtils.checkIfFileExists(mShortFileName, mContext);
+        mFileName = FileUtils.getFileName(mFileUrl);
+        File file = FileUtils.checkIfFileExists(mFileName, mContext);
 
         if (file != null) {
             handleFileExists();
@@ -153,7 +151,7 @@ public class FileLoaderNewImpl implements Loader {
 
     private void handleFileExists() {
         Logging.out(LOG_TAG, "File already exists");
-        String filePath = FileUtils.getExternalFilesDir(mContext).getAbsolutePath() + SLASH + mShortFileName;
+        String filePath = FileUtils.getExternalFilesDir(mContext).getAbsolutePath() + SLASH + mFileName;
         onFileFullLoaded(filePath);
     }
 
@@ -165,8 +163,8 @@ public class FileLoaderNewImpl implements Loader {
     }
 
     private FileOutputStream createFileOutputStream(String filename) throws FileNotFoundException {
-        mShortFileName = FileUtils.getExternalFilesDir(mContext).getAbsolutePath() + SLASH + filename;
-        mLoadingFile = new File(mShortFileName);
+        mFileName = FileUtils.getExternalFilesDir(mContext).getAbsolutePath() + SLASH + filename;
+        mLoadingFile = new File(mFileName);
         mOutputStream = new FileOutputStream(mLoadingFile);
         return mOutputStream;
     }
@@ -175,7 +173,7 @@ public class FileLoaderNewImpl implements Loader {
         runInBackgroundThread(new Runnable() {
             @Override
             public void run() {
-                load(mShortFileName);
+                load(mFileName);
             }
         });
     }
@@ -201,13 +199,11 @@ public class FileLoaderNewImpl implements Loader {
 
     private void handleFileFullDownloaded() {
         mIsFileFullyDownloaded = true;
-        onFileFullLoaded(mShortFileName);
+        onFileFullLoaded(mFileName);
     }
 
     private void runInBackgroundThread(Runnable runnable) {
-        if (mExecutor != null) {
-            mExecutor.submit(runnable);
-        }
+        ExecutorHelper.getExecutor().submit(runnable);
     }
 
     private void runOnUiThread(Runnable runnable) {

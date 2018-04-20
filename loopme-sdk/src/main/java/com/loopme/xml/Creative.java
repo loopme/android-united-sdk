@@ -98,4 +98,28 @@ public class Creative {
         }
         return new ArrayList<>();
     }
+
+    public boolean hasCompanionAds() {
+        return companionAds != null;
+    }
+
+    public List<String> getCompanionTrackingEvents() {
+        List<String> trackingEvents = new ArrayList<>();
+        if (companionAds != null && companionAds.hasCompanionList()) {
+            for (Companion companion : companionAds.getCompanionList()) {
+                trackingEvents.addAll(companion.getCompanionTrackingEvents());
+            }
+        }
+        return trackingEvents;
+    }
+
+    public List<String> getCompanionClickTrackingList() {
+        List<String> clickTrackingList = new ArrayList<>();
+        if (companionAds != null && companionAds.hasCompanionList()) {
+            for (Companion companion : companionAds.getCompanionList()) {
+                clickTrackingList.addAll(companion.getCompanionClickTrackingList());
+            }
+        }
+        return clickTrackingList;
+    }
 }

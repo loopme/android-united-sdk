@@ -20,11 +20,13 @@ public class RequestConstants {
     public static final int MIN_BITRATE_DEFAULT_VALUE = 5;
     public static final int SEQUENCE_DEFAULT_VALUE = 1;
     public static final int START_DELAY_DEFAULT_VALUE = 1;
-    public static final int FRAMEWORK_VIPAID_2_0 = 3;
+    public static final int FRAMEWORK_VIPAID_2_0 = 2;
     public static final int FRAMEWORK_MRAID_2 = 5;
     public static final int DELIVERY_METHOD_PROGRESSIVE = 2;
     public static final int PROTOCOLS_VAST_2_0 = 2;
     public static final int PROTOCOLS_VAST_3_0 = 3;
+    public static final int PROTOCOLS_VAST_4_0 = 7;
+    public static final int PROTOCOLS_VAST_4_0_WRAPPER = 8;
     public static final int LINEAR_IN_STREAM = 1;
     public static final float BID_FLOOR_DEFAULT_VALUE = 0;
 

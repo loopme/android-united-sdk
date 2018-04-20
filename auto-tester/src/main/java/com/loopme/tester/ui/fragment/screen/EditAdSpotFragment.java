@@ -22,14 +22,11 @@ import com.loopme.tester.ui.fragment.ActionBarFragment;
 import com.loopme.tester.ui.fragment.AppkeyEditorFragment;
 import com.loopme.tester.ui.fragment.BaseFragment;
 
-/**
- * Created by katerina on 2/13/17.
- */
-
 public class EditAdSpotFragment extends BaseFragment {
 
     private static final String ARG_VIEW_MODE = "ARG_VIEW_MODE";
     public static final String ARG_AD_SPOT = "ARG_AD_SPOT";
+    public static final String SHORT_APP_KEY = "test_mpu";
 
     private RadioGroup mSdkGroup;
     private RadioGroup mAdTypeGroup;
@@ -38,6 +35,7 @@ public class EditAdSpotFragment extends BaseFragment {
     private Context mContext;
     private View mRootView;
     private OnEditAdFragmentListener mOnEditAdFragmentListener;
+    private AdSpot mAdSpotToUpdate;
 
     public static EditAdSpotFragment newInstance(Bundle args) {
         EditAdSpotFragment editAdSpotFragment = new EditAdSpotFragment();
@@ -134,14 +132,29 @@ public class EditAdSpotFragment extends BaseFragment {
     }
 
     public void onSave() {
-        AdSpot adSpot = createNewItem();
-        if (adSpot != null) {
-            if (mViewMode == ViewMode.EDIT) {
-                onEditAdSpot(adSpot);
-            } else {
-                onCreateAdSpot(adSpot);
+        if (isDataValid()) {
+            AdSpot adSpot = createNewItem();
+            if (adSpot != null) {
+                mAdSpotToUpdate = adSpot;
+                onCheckAdSpot(adSpot);
             }
         }
+    }
+
+    private boolean isDataValid() {
+        if (TextUtils.isEmpty(getAdSpotName())) {
+            Toast.makeText(mContext, mContext.getString(R.string.empty_ad_spot_name), Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        AdSdk sdk = getSelectedSdk();
+        String appkey = getAppKey(sdk);
+
+        if (!isValidAppkey(appkey)) {
+            Toast.makeText(mContext, getString(R.string.appkey_is_to_short), Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
     }
 
     private void onEditAdSpot(AdSpot adSpot) {
@@ -156,6 +169,12 @@ public class EditAdSpotFragment extends BaseFragment {
         }
     }
 
+    private void onCheckAdSpot(AdSpot adSpot) {
+        if (mOnEditAdFragmentListener != null) {
+            mOnEditAdFragmentListener.onCheckAdSpot(adSpot);
+        }
+    }
+
     private void onCancel() {
         if (mOnEditAdFragmentListener != null) {
             mOnEditAdFragmentListener.onClose();
@@ -165,32 +184,30 @@ public class EditAdSpotFragment extends BaseFragment {
     private AdSpot createNewItem() {
         AdSpot newAdSpot = new AdSpot();
         AdSdk sdk = getSelectedSdk();
+        String adSpotName = getAdSpotName();
 
-        EditText adSpotNameEditText = (EditText) mRootView.findViewById(R.id.name_value);
-        String adSpotName = adSpotNameEditText.getText().toString();
-
-        if (TextUtils.isEmpty(adSpotName)) {
-            Toast.makeText(mContext, mContext.getString(R.string.empty_ad_spot_name), Toast.LENGTH_LONG).show();
-            return null;
-        }
         if (mCurrentAdSpot != null) {
             newAdSpot.setAdSpotId(mCurrentAdSpot.getAdSpotId());
         }
         newAdSpot.setSdk(sdk);
         newAdSpot.setType(getSelectedAdType());
         newAdSpot.setName(adSpotName);
-        String appkey = getAppKey(sdk);
         String baseUrl = getBaseUrl(sdk);
         newAdSpot.setBaseUrl(baseUrl);
+        String appkey = getAppKey(sdk);
 
-        if (!TextUtils.isEmpty(appkey) && !TextUtils.isEmpty(baseUrl)) {
-            newAdSpot.setAppKey(appkey);
-            newAdSpot.setTime(System.currentTimeMillis());
-            return newAdSpot;
-        } else {
-            Toast.makeText(mContext, getString(R.string.to_save_adspot_fill_fields), Toast.LENGTH_LONG).show();
-        }
-        return null;
+        newAdSpot.setAppKey(appkey);
+        newAdSpot.setTime(System.currentTimeMillis());
+        return newAdSpot;
+    }
+
+    private String getAdSpotName() {
+        EditText adSpotNameEditText = (EditText) mRootView.findViewById(R.id.name_value);
+        return adSpotNameEditText.getText().toString();
+    }
+
+    private boolean isValidAppkey(String appkey) {
+        return TextUtils.equals(appkey, SHORT_APP_KEY) || (!TextUtils.isEmpty(appkey) && appkey.length() > 9);
     }
 
     private String getBaseUrl(AdSdk sdk) {
@@ -267,17 +284,54 @@ public class EditAdSpotFragment extends BaseFragment {
         super.onDetach();
     }
 
+    public void onCheckAdSpotResult(boolean isExist, long existedAdSpotId) {
+        if (isCreateMode()) {
+            handleCreateMode(isExist);
+        } else if (isEditMode()) {
+            handleEditMode(isExist, existedAdSpotId);
+        }
+    }
+
+    private void handleEditMode(boolean isExist, long existedAdSpotId) {
+        if (isExist && isTheSame(existedAdSpotId)) {
+            onEditAdSpot(mAdSpotToUpdate);
+        } else {
+            Toast.makeText(mContext, R.string.adspot_already_exists, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean isTheSame(long existedAdSpotId) {
+        return mCurrentAdSpot != null && mCurrentAdSpot.getAdSpotId() == existedAdSpotId;
+    }
+
+    private void handleCreateMode(boolean isExist) {
+        if (isExist) {
+            Toast.makeText(mContext, R.string.adspot_already_exists, Toast.LENGTH_SHORT).show();
+        } else {
+            onCreateAdSpot(mAdSpotToUpdate);
+        }
+    }
+
+    private boolean isEditMode() {
+        return mViewMode == ViewMode.EDIT;
+    }
+
+    private boolean isCreateMode() {
+        return mViewMode == ViewMode.CREATE;
+    }
+
     public interface OnEditAdFragmentListener {
         void onCreate(AdSpot adSpot);
 
         void onEdit(AdSpot adSpot);
 
         void onClose();
+
+        void onCheckAdSpot(AdSpot adSpot);
     }
 
     @Override
     public boolean processBackPress() {
         return true;
     }
-
 }

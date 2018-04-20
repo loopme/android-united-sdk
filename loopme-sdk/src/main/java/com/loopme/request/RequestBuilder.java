@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.stream.Stream;
 
 /**
  * Created by katerina on 6/11/17.
@@ -70,6 +71,8 @@ public class RequestBuilder implements Serializable {
     private static final String TRACKERS = "trackers";
     private static final String INSTL = "instl";
     private static final String SUPPORTED_TECS = "supported_techs";
+    private static final String METRIC = "metric";
+    private static final String SKIP = "skip";
 
     public static JSONObject buildRequestJson(Context context, LoopMeAd loopMeAd) {
         RequestUtils requestUtils = new RequestUtils(context, loopMeAd);
@@ -123,57 +126,93 @@ public class RequestBuilder implements Serializable {
             impObj.put(DISPLAY_MANAGER_VERSION, requestUtils.getDisplayManagerVersion());
             impObj.put(ID, requestUtils.getImpId());
 
-            JSONObject bannerObj = new JSONObject();
-            JSONArray apiArray = new JSONArray(requestUtils.getApi());
-            bannerObj.put(API, apiArray);
-            bannerObj.put(WIDTH, requestUtils.getWidth());
-            bannerObj.put(ID, 1);
+            JSONObject bannerObj = createBannerObject(requestUtils);
+            JSONObject videoObj = createVideoObject(requestUtils);
 
-            JSONArray battrArray = new JSONArray(requestUtils.getBattery());
-            bannerObj.put(BATTR, battrArray);
-            bannerObj.put(HEIGHT, requestUtils.getHeight());
-
-            impObj.put(BANNER, bannerObj);
+            switch (loopMeAd.getPreferredAdType()) {
+                case ALL: {
+                    impObj.put(BANNER, bannerObj);
+                    impObj.put(VIDEO, videoObj);
+                    break;
+                }
+                case HTML: {
+                    impObj.put(BANNER, bannerObj);
+                    break;
+                }
+                case VIDEO: {
+                    impObj.put(VIDEO, videoObj);
+                    break;
+                }
+            }
 
             JSONObject extImpObj = new JSONObject();
             extImpObj.put(IT, requestUtils.getIt());
             JSONArray supportedTechsArray = new JSONArray(requestUtils.getSupportedTechs());
             extImpObj.put(SUPPORTED_TECS, supportedTechsArray);
 
+            JSONArray trackersArray = new JSONArray().put(requestUtils.getTrackersSupported());
+            impObj.put(METRIC, trackersArray);
+
+
             impObj.put(EXT, extImpObj);
             impObj.put(BID_FLOOR, requestUtils.getBidFloor());
 
-            JSONObject videoObj = new JSONObject();
-            videoObj.put(MAX_DURATION, requestUtils.getMaxDuration());
 
-            JSONArray protocolsArray = new JSONArray(requestUtils.getProtocols());
-            videoObj.put(PROTOCOLS, protocolsArray);
-            videoObj.put(BATTR, battrArray);
-            videoObj.put(WIDTH, requestUtils.getWidth());
-            videoObj.put(LINEARITY, requestUtils.getLinearity());
-            videoObj.put(BOXING_ALLOWED, requestUtils.getBoxingAllowed());
-            videoObj.put(HEIGHT, requestUtils.getHeight());
-
-            JSONArray mimeArray = new JSONArray(requestUtils.getMimeTypes());
-            videoObj.put(MIME_TYPE, mimeArray);
-            videoObj.put(START_DELAY, requestUtils.getStartDelay());
-
-            JSONArray deliveryArray = new JSONArray(requestUtils.getDelivery());
-            videoObj.put(DELIVERY, deliveryArray);
-            videoObj.put(SEQUENCE, requestUtils.getSequence());
-            videoObj.put(MIN_DURATION, requestUtils.getMinDuration());
-            videoObj.put(MAX_BITRATE, requestUtils.getMaxBitrate());
-
-            impObj.put(VIDEO, videoObj);
             impObj.put(DISPLAY_MANAGER, requestUtils.getDisplayManager());
             impObj.put(INSTL, requestUtils.getInstl());
-            impObj.put(TRACKERS, requestUtils.getTrackersSupported());
 
             impArray.put(impObj);
             requestObj.put(IMP, impArray);
-        } catch (JSONException jsonException){
+        } catch (JSONException jsonException) {
             jsonException.printStackTrace();
         }
         return requestObj;
+    }
+
+    private static JSONObject createBannerObject(RequestUtils requestUtils) throws JSONException {
+        JSONObject bannerObj = new JSONObject();
+
+        JSONArray apiArray = new JSONArray(requestUtils.getApi());
+        bannerObj.put(API, apiArray);
+
+        bannerObj.put(WIDTH, requestUtils.getWidth());
+        bannerObj.put(HEIGHT, requestUtils.getHeight());
+        bannerObj.put(ID, 1);
+
+        JSONArray battrArray = new JSONArray(requestUtils.getBattery());
+        bannerObj.put(BATTR, battrArray);
+        return bannerObj;
+    }
+
+    private static JSONObject createVideoObject(RequestUtils requestUtils) throws JSONException {
+        JSONObject videoObj = new JSONObject();
+
+        JSONArray apiArray = new JSONArray(requestUtils.getApi());
+        videoObj.put(API, apiArray);
+
+        videoObj.put(SKIP, requestUtils.getSkippable());
+
+        JSONArray protocolsArray = new JSONArray(requestUtils.getProtocols());
+        videoObj.put(PROTOCOLS, protocolsArray);
+
+        videoObj.put(MAX_DURATION, requestUtils.getMaxDuration());
+
+        JSONArray battrArray = new JSONArray(requestUtils.getBattery());
+        videoObj.put(BATTR, battrArray);
+        videoObj.put(WIDTH, requestUtils.getWidth());
+        videoObj.put(HEIGHT, requestUtils.getHeight());
+        videoObj.put(LINEARITY, requestUtils.getLinearity());
+        videoObj.put(BOXING_ALLOWED, requestUtils.getBoxingAllowed());
+
+        JSONArray mimeArray = new JSONArray(requestUtils.getMimeTypes());
+        videoObj.put(MIME_TYPE, mimeArray);
+        videoObj.put(START_DELAY, requestUtils.getStartDelay());
+
+        JSONArray deliveryArray = new JSONArray(requestUtils.getDelivery());
+        videoObj.put(DELIVERY, deliveryArray);
+        videoObj.put(SEQUENCE, requestUtils.getSequence());
+        videoObj.put(MIN_DURATION, requestUtils.getMinDuration());
+        videoObj.put(MAX_BITRATE, requestUtils.getMaxBitrate());
+        return videoObj;
     }
 }

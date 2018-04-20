@@ -10,7 +10,6 @@ import com.loopme.common.LoopMeError;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
 import com.loopme.time.TimersType;
 import com.loopme.tracker.partners.LoopMeTracker;
-import com.loopme.utils.UiUtils;
 
 /**
  * The `LoopMeBanner` class provides facilities to display a custom size ads
@@ -125,7 +124,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
     public void show() {
         if (isPrepared()) {
             showInternal();
-            if (isLoopMeAd()) {
+            if (isLoopMeAd() || isMraidAd()) {
                 resume();
             } else if (isVastAd() || isVpaidAd() && mDisplayController != null) {
                 getDisplayController().onPlay(0);
@@ -147,7 +146,6 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         buildAdView();
         mBannerView.setVisibility(View.VISIBLE);
         onLoopMeBannerShow();
-//        getDisplayController().onPlay(0);
     }
 
     @Override
@@ -193,7 +191,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
     }
 
     @Override
-    public int getAdFormat() {
+    public Constants.AdFormat getAdFormat() {
         return Constants.AdFormat.BANNER;
     }
 
@@ -217,6 +215,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         stopTimer(TimersType.FETCHER_TIMER);
         setReady(false);
         setAdState(Constants.AdState.NONE);
+        destroyDisplayController();
         if (mAdListener != null) {
             mAdListener.onLoopMeBannerLoadFail(this, error);
         } else {
@@ -296,7 +295,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
      */
     private void onLoopMeBannerVideoDidReachEnd() {
         mIsVideoFinished = true;
-        destroyMinimizedViewDelayed();
+        switchToNormalMode();
         if (mAdListener != null) {
             mAdListener.onLoopMeBannerVideoDidReachEnd(this);
         }
@@ -367,6 +366,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
     public void dismiss() {
         Logging.out(LOG_TAG, "Banner will be dismissed");
         if (isShowing() || isNoneState()) {
+            dismissController();
             destroyBannerView();
             onLoopMeBannerHide();
         } else {
@@ -374,15 +374,10 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         }
     }
 
-    private void destroyMinimizedViewDelayed() {
-        runOnUiThreadDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isLoopMeController()) {
-                    ((DisplayControllerLoopMe) mDisplayController).destroyMinimizedView();
-                }
-            }
-        }, Constants.SHRINK_MODE_KEEP_AFTER_FINISH_TIME);
+    private void dismissController() {
+        if (mDisplayController instanceof DisplayControllerLoopMe) {
+            ((DisplayControllerLoopMe) mDisplayController).dismiss();
+        }
     }
 
     private void destroyBannerView() {

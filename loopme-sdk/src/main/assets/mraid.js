@@ -81,6 +81,7 @@
       call += encodeURIComponent(key) + '=' + encodeURIComponent(value);
     }
 
+    console.log('mraid url ' + call);
     if (this.nativeCallInFlight) {
       this.nativeCallQueue.push(call);
     } else {
@@ -109,7 +110,7 @@
     };
     broadcastEvent(EVENTS.INFO, 'Set default position to ' + stringify(defaultPosition));
   };
-  
+
   bridge.setMaxSize = function(width, height) {
     maxSize = {
       width: width,
@@ -245,9 +246,9 @@
   };
 
   var resizeProperties = {
-    width: false, 
+    width: false,
     height: false,
-    offsetX: false, 
+    offsetX: false,
     offsetY: false,
     customClosePosition: 'top-right',
     allowOffscreen: true

@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.loopme.LoopMeBanner;
+import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 
 public class AdLoopMeBanner implements LoopMeBanner.Listener, Ad {
@@ -80,6 +81,13 @@ public class AdLoopMeBanner implements LoopMeBanner.Listener, Ad {
     @Override
     public boolean isShowing() {
         return mBanner != null && mBanner.isShowing();
+    }
+
+    @Override
+    public void setPreferredAd(LoopMeAd.Type type) {
+        if (mBanner != null) {
+            mBanner.setPreferredAd(type);
+        }
     }
 
     @Override

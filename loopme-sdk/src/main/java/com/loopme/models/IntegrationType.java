@@ -20,7 +20,7 @@
 //        this.mType = type;
 //    }
 //
-//    public int getId(){
+//    public int getFormatInt(){
 //        return this.mId;
 //    }
 //

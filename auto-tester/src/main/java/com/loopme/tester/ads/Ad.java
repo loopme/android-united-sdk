@@ -1,5 +1,7 @@
 package com.loopme.tester.ads;
 
+import com.loopme.ad.LoopMeAd;
+
 public interface Ad {
 
     void loadAd();
@@ -17,4 +19,6 @@ public interface Ad {
     boolean isReady();
 
     boolean isShowing();
+
+    void setPreferredAd(LoopMeAd.Type type);
 }

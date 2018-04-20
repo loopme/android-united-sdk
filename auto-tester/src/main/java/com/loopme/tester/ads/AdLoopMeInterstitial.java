@@ -3,6 +3,7 @@ package com.loopme.tester.ads;
 import android.app.Activity;
 
 import com.loopme.LoopMeInterstitial;
+import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 
 public class AdLoopMeInterstitial implements LoopMeInterstitial.Listener, Ad {
@@ -68,6 +69,12 @@ public class AdLoopMeInterstitial implements LoopMeInterstitial.Listener, Ad {
         return mInterstitial != null && mInterstitial.isShowing();
     }
 
+    @Override
+    public void setPreferredAd(LoopMeAd.Type type) {
+        if (mInterstitial != null) {
+            mInterstitial.setPreferredAd(type);
+        }
+    }
 
     @Override
     public void onLoopMeInterstitialLoadSuccess(LoopMeInterstitial interstitial) {

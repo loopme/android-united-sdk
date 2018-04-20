@@ -14,6 +14,9 @@ public class Params {
     public static final String EVENT_TYPE = "et";
     public static final String R = "r";
     public static final String ID = "id";
+    public static final String SDK_READY = "sdk_ready";
+    public static final String SDK_SHOW = "sdk_show";
+    public static final String SDK_MISSED = "sdk_missed";
 
     //Live Debug
     public static final String DEBUG_LOGS = "debug_logs";// example: "ui: Debug.LoopMe.BaseAd: Start fetcher timeout timer, ui: Debug.LoopMe.FileUtils: In cache 2 file(s)..."

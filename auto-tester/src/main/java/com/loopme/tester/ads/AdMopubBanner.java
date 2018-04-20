@@ -3,6 +3,7 @@ package com.loopme.tester.ads;
 import android.view.View;
 
 import com.loopme.Logging;
+import com.loopme.ad.LoopMeAd;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubView;
 
@@ -35,6 +36,10 @@ public class AdMopubBanner implements Ad, MoPubView.BannerAdListener {
     @Override
     public boolean isShowing() {
         return mMoPubView != null && mMoPubView.isShown();
+    }
+
+    @Override
+    public void setPreferredAd(LoopMeAd.Type type) {
     }
 
     @Override

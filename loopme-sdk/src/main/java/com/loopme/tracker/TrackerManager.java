@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
+import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.constants.Event;
 import com.loopme.tracker.partners.DvTracker;
 import com.loopme.tracker.partners.ias.IasTracker;
@@ -33,8 +34,7 @@ public class TrackerManager {
             if (isMoat(name)) {
                 MoatTracker.startSdk(mLoopMeAd);
             } else if (isIas(name)) {
-//                IasTracker.startSdk(mLoopMeAd);
-                //there is no need to start sdk
+                IasTracker.startSdk(mLoopMeAd);
             } else if (isDv(name)) {
                 DvTracker.startSdk(mLoopMeAd);
             }

@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.loopme.tester.BuildConfig;
 import com.loopme.tester.Integration;
+import com.loopme.tester.Constants;
 import com.loopme.tester.R;
 import com.loopme.tester.db.contracts.AdContract;
 import com.loopme.tester.enums.LoadType;
@@ -73,7 +74,6 @@ public class MainActivity extends BaseActivity implements
     private FileLoaderManager mFileLoaderManager;
     private boolean mIsNeedExport;
     private File mExportedFile;
-    private AdSpot mAdSpotToCreate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -190,12 +190,10 @@ public class MainActivity extends BaseActivity implements
     }
 
     @Override
-    public void onCreate(AdSpot adSpot) {
-        mAdSpotToCreate = adSpot;
-        Bundle args = new Bundle();
-        args.putString(SEARCH_NAME, adSpot.getName());
-        args.putString(SEARCH_APPKEY, adSpot.getAppKey());
-        restartLoader(SEARCH_BEFORE_CREATE_LOADER_ID, args);
+    public void onCreate(final AdSpot adSpot) {
+        insertAdSpot(adSpot);
+        restartLoader(ADSPOT_LOADER_ID);
+        closeCurrentScreen();
     }
 
     @Override
@@ -232,6 +230,14 @@ public class MainActivity extends BaseActivity implements
             ((AdSpotCardFragment) fragment).cancelTasks();
         }
         closeCurrentScreen();
+    }
+
+    @Override
+    public void onCheckAdSpot(AdSpot adSpot) {
+        Bundle args = new Bundle();
+        args.putString(SEARCH_NAME, adSpot.getName());
+        args.putString(SEARCH_APPKEY, adSpot.getAppKey());
+        restartLoader(SEARCH_BEFORE_CREATE_LOADER_ID, args);
     }
 
     @Override
@@ -369,9 +375,9 @@ public class MainActivity extends BaseActivity implements
             }
             case SEARCH_BEFORE_CREATE_LOADER_ID: {
                 if (cursor != null && !cursor.isClosed() && cursor.getCount() >= 0 && cursor.moveToFirst()) {
-                    Toast.makeText(this, R.string.adspot_already_exists, Toast.LENGTH_SHORT).show();
+                    onCheckAdSpotResult(true, Utils.getAdSpotId(loader));
                 } else {
-                    createNewAdSpotRunnable();
+                    onCheckAdSpotResult(false, Constants.AD_SPOT_DOES_NOT_EXIST_ID);
                 }
                 break;
             }
@@ -379,21 +385,6 @@ public class MainActivity extends BaseActivity implements
         if (cursor != null) {
             cursor.close();
         }
-    }
-
-    private void createNewAdSpotRunnable() {
-        postRunnable(new Runnable() {
-            @Override
-            public void run() {
-                createNewAdSpot();
-                closeCurrentScreen();
-            }
-        });
-    }
-
-    private void createNewAdSpot() {
-        insertAdSpot(mAdSpotToCreate);
-        restartLoader(ADSPOT_LOADER_ID);
     }
 
     private void clearSearchText() {
@@ -505,5 +496,17 @@ public class MainActivity extends BaseActivity implements
 
     public void requestPermission(String permissionType, int requestCode) {
         Utils.requestPermission(this, permissionType, requestCode);
+    }
+
+    private void onCheckAdSpotResult(final boolean isAdSpotAlreadyExist, final long existedAdSpotId) {
+        postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.root);
+                if (fragment instanceof EditAdSpotFragment) {
+                    ((EditAdSpotFragment) fragment).onCheckAdSpotResult(isAdSpotAlreadyExist, existedAdSpotId);
+                }
+            }
+        });
     }
 }

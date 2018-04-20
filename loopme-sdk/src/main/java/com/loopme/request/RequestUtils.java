@@ -18,8 +18,10 @@ import com.loopme.BuildConfig;
 import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.R;
 import com.loopme.ad.LoopMeAd;
-import com.loopme.LoopMeInterstitial;
 import com.loopme.utils.StringUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -31,6 +33,11 @@ import static android.content.Context.WIFI_SERVICE;
 
 public class RequestUtils {
 
+    private static final String VIEWABILITY_VENDOR = "viewability";
+    private static final String MOAT = "moat";
+    private static final String IAS = "ias";
+    private static final String TYPE_KEY = "type";
+    private static final String VENDOR_KEY = "vendor";
     private static final String VIDEO = "HTML - for usual MP4 video";
     private static final String VAST2 = "VAST2";
     private static final String VAST3 = "VAST3";
@@ -55,11 +62,13 @@ public class RequestUtils {
     private int mDeviceWidthPx;
     private int mDeviceHeightPx;
     private int mDeviceType;
-    private int mJs;
+    private int mJs = 1;
     private int mWidth;
     private int mHeight;
 
     private LoopMeAd mLoopMeAd;
+    private int mSkippable;
+    private int[] mApi;
 
     public RequestUtils(Context context, LoopMeAd loopMeAd) {
         if (loopMeAd != null) {
@@ -81,7 +90,7 @@ public class RequestUtils {
         setDeviceHeightPx(context);
         setDeviceWidthPx(context);
         setConnectionType(context);
-        setJs(context);
+        setJs(true);
         setUa(context);
         setWn(context);
         setOr(context);
@@ -89,6 +98,8 @@ public class RequestUtils {
         setInstl();
         setIp(context);
         setPn(context);
+        setSkippable();
+        setApi();
     }
 
     public String getAppBundle() {
@@ -173,16 +184,9 @@ public class RequestUtils {
         return mJs;
     }
 
-    public void setJs(Context context) {
-        if (context != null && context instanceof Activity) {
-            final Activity activity = (Activity) context;
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    boolean javaScriptEnabled = new WebView(activity).getSettings().getJavaScriptEnabled();
-                    mJs = javaScriptEnabled ? 1 : 0;
-                }
-            });
+    public void setJs(boolean enabled) {
+        if (enabled) {
+            mJs = 1;
         }
     }
 
@@ -275,12 +279,12 @@ public class RequestUtils {
             mOr = "p";
             return;
         }
-        int orientation = context.getResources().getConfiguration().orientation;
-        if (Configuration.ORIENTATION_LANDSCAPE == orientation) {
-            mOr = "l";
-        } else {
-            mOr = "p";
-        }
+        boolean isLandscape = Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation;
+        mOr = isLandscape ? "p" : "l";
+    }
+
+    private boolean isReverseOrientation() {
+        return mLoopMeAd != null && mLoopMeAd.isReverseOrientationRequest();
     }
 
     public String getChargeLevel(Context context) {
@@ -326,8 +330,26 @@ public class RequestUtils {
         return String.valueOf(System.currentTimeMillis());
     }
 
+
+    private void setApi() {
+        LoopMeAd.Type adType = mLoopMeAd.getPreferredAdType();
+        switch (adType) {
+            case ALL: {
+                mApi = new int[]{RequestConstants.FRAMEWORK_MRAID_2, RequestConstants.FRAMEWORK_VIPAID_2_0};
+                break;
+            }
+            case HTML: {
+                mApi = new int[]{RequestConstants.FRAMEWORK_MRAID_2};
+                break;
+            }
+            case VIDEO: {
+                mApi = new int[]{RequestConstants.FRAMEWORK_VIPAID_2_0};
+            }
+        }
+    }
+
     public int[] getApi() {
-        return new int[]{RequestConstants.FRAMEWORK_MRAID_2, RequestConstants.FRAMEWORK_VIPAID_2_0};
+        return mApi;
     }
 
     public int getWidth() {
@@ -361,7 +383,10 @@ public class RequestUtils {
     }
 
     public int[] getProtocols() {
-        return new int[]{RequestConstants.PROTOCOLS_VAST_2_0, RequestConstants.PROTOCOLS_VAST_3_0};
+        return new int[]{RequestConstants.PROTOCOLS_VAST_2_0,
+                RequestConstants.PROTOCOLS_VAST_3_0,
+                RequestConstants.PROTOCOLS_VAST_4_0,
+                RequestConstants.PROTOCOLS_VAST_4_0_WRAPPER};
     }
 
 
@@ -419,8 +444,13 @@ public class RequestUtils {
 
     private void setAdSize(Context context) {
         int[] adSize = RequestParamsUtils.getAdSize(context, mLoopMeAd);
-        mWidth = adSize[0];
-        mHeight = adSize[1];
+        if (isReverseOrientation()) {
+            mWidth = adSize[1];
+            mHeight = adSize[0];
+        } else {
+            mWidth = adSize[0];
+            mHeight = adSize[1];
+        }
     }
 
     public static String getAdvertisingIdInfo(Context context) {
@@ -452,7 +482,28 @@ public class RequestUtils {
         return techsList;
     }
 
-    public String getTrackersSupported() {
-        return "[" + BuildConfig.SUPPORTED_TRACKERS + "]";
+    public JSONObject getTrackersSupported() {
+        JSONObject object = new JSONObject();
+        try {
+            object.put(TYPE_KEY, VIEWABILITY_VENDOR).put(VENDOR_KEY, MOAT);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return object;
+    }
+
+    public int getSkippable() {
+        return mSkippable;
+    }
+
+    private void setSkippable() {
+        LoopMeAd.Type adType = mLoopMeAd.getPreferredAdType();
+        switch (adType) {
+            case ALL:
+            case VIDEO: {
+                mSkippable = 1;
+                break;
+            }
+        }
     }
 }

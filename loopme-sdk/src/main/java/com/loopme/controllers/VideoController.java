@@ -36,6 +36,7 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
     private Surface mSurface;
     private Runnable mCurrentTimePoster;
     private Callback mCallback;
+    private Constants.AdFormat mAdFormat;
     private CountDownTimer mBufferingTimer;
     private volatile LoopMeMediaPlayer mLoopMePlayer;
     private Map<String, Integer> mQuartileEventsMap;
@@ -54,15 +55,16 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
     private boolean mMuteState = false;
     private boolean mIsSurfaceTextureAvailable;
 
-    public VideoController(AdView adView, Callback callback) {
+    public VideoController(AdView adView, Callback callback, Constants.AdFormat adFormat) {
         mAdView = adView;
         mCallback = callback;
+        mAdFormat = adFormat;
         initCurrentTimePoster();
         mQuartileEventsMap = new HashMap<>();
     }
 
     public void playVideo(int time) {
-        if (isReadyToStartPlay() || isVideoStateComplete()) {
+        if (isReadyToStartPlay() || isVideoStateComplete() || isVideoStateIdle()) {
             playVideoInternal(time);
         } else if (isVideoStatePaused()) {
             resumeVideoInternal(time);
@@ -84,11 +86,27 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
         }
     }
 
-    public void pauseVideo() {
+    public void pauseVideo(boolean isSkip) {
         if (isPlaying()) {
             pauseVideoInternal();
+            setVideoState(isSkip);
+        }
+    }
+
+    private void setVideoState(boolean isSkip) {
+        if (isInterstitial()) {
+            if (isSkip) {
+                setVideoState(Constants.VideoState.IDLE);
+            } else {
+                setVideoState(Constants.VideoState.PAUSED);
+            }
+        } else {
             setVideoState(Constants.VideoState.PAUSED);
         }
+    }
+
+    private boolean isInterstitial() {
+        return mAdFormat == Constants.AdFormat.INTERSTITIAL;
     }
 
     public void destroy() {
@@ -145,10 +163,6 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
         setVideoState(Constants.VideoState.PLAYING);
         startCurrentTimePoster();
         Logging.out(LOG_TAG, "waitForVideo mHandler.startCurrentTimePoster");
-    }
-
-    private boolean isAdViewVisible() {
-        return mAdView != null && mAdView.getCurrentWebViewState() == Constants.WebviewState.VISIBLE;
     }
 
     public void initPlayerFromFile(String filePath) {
@@ -391,7 +405,7 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
     }
 
     private void startMediaPlayer() {
-        if (mLoopMePlayer != null){
+        if (mLoopMePlayer != null) {
             mLoopMePlayer.start();
         }
     }

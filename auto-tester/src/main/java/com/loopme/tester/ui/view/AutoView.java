@@ -260,7 +260,6 @@ public class AutoView implements View.OnClickListener, AdListener,
 
             case R.id.stop_ad_auto:
                 onStopRun();
-                resetCountersViews();
                 break;
 
             default:
@@ -309,7 +308,7 @@ public class AutoView implements View.OnClickListener, AdListener,
     private void startAd() {
         mIsBulkTestStopped = false;
         setLoadingLabelVisibility(true);
-        resetCounters();
+        resetCountersViews();
         readEditTextValues();
         loadAd();
     }

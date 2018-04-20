@@ -27,13 +27,19 @@
             android:text="@string/name"
             android:textSize="@dimen/text_size_16sp" />
 
-        <EditText
-            android:id="@+id/name_value"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="@dimen/fragment_edit_name_value_width"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_weight="3"
-            android:hint="@string/name" />
+            android:layout_weight="3">
+
+            <EditText
+                android:id="@+id/name_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/name" />
+
+        </android.support.design.widget.TextInputLayout>
 
     </LinearLayout>
 
@@ -133,6 +139,7 @@
                 android:gravity="center"
                 android:text="@string/banner"
                 android:textColor="@color/color_selector" />
+
         </RadioGroup>
 
     </LinearLayout>

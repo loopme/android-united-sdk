@@ -52,7 +52,7 @@ public class RecyclerViewShrinkFragment extends Fragment implements LoopMeBanner
 
         //Configure minimized mode (Optional)
         RelativeLayout root = (RelativeLayout) view.findViewById(R.id.recycler_root_view);
-        MinimizedMode mode = new MinimizedMode(root);
+        MinimizedMode mode = new MinimizedMode(root, recyclerView);
         mNativeVideoRecyclerAdapter.setMinimizedMode(mode);
         recyclerView.setAdapter(mNativeVideoRecyclerAdapter);
         mNativeVideoRecyclerAdapter.setListener(this);

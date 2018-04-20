@@ -20,10 +20,11 @@ public class VpaidBridgeImpl implements VpaidBridge {
             "videoSlotCanAutoPlay: true }";
     private final BridgeEventHandler mBridge;
     private final CreativeParams mCreativeParams;
+    private volatile int mPreviousValue;
 
-    public VpaidBridgeImpl(BridgeEventHandler eventHandler, AdParams adParams) {
+    public VpaidBridgeImpl(BridgeEventHandler eventHandler, AdParams adParams, AdSpotDimensions dimensions) {
         mBridge = eventHandler;
-        mCreativeParams = createCreativeParams(adParams);
+        mCreativeParams = createCreativeParams(adParams, dimensions);
     }
 
     //region VpaidBridge methods
@@ -254,6 +255,10 @@ public class VpaidBridgeImpl implements VpaidBridge {
 
     @JavascriptInterface
     public void getAdRemainingTimeResult(int value) {
+        if (value == mPreviousValue && value != 0) {
+            return;
+        }
+        mPreviousValue = value;
         if (value == 0) {
             mBridge.postEvent(EventConstants.COMPLETE);
         } else {
@@ -316,9 +321,9 @@ public class VpaidBridgeImpl implements VpaidBridge {
         Logging.out(LOG_TAG, "JS: getAdVolumeResult");
     }
 
-    private CreativeParams createCreativeParams(AdParams adParams) {
-        int width = Constants.getAdSpotDimensions().getWidth();
-        int height = Constants.getAdSpotDimensions().getHeight();
+    private CreativeParams createCreativeParams(AdParams adParams, AdSpotDimensions dimensions) {
+        int width = dimensions.getWidth();
+        int height = dimensions.getHeight();
         CreativeParams result = new CreativeParams(width, height, "normal", 720);
         result.setAdParameters("{'AdParameters':'" + adParams.getAdParams() + "'}");
         result.setEnvironmentVars(ENVIRONMENT_VARS);

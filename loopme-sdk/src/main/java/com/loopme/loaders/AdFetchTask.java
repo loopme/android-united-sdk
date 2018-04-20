@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.text.TextUtils;
 
 import com.loopme.Constants;
+import com.loopme.Logging;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.AdType;
 import com.loopme.ad.LoopMeAd;
@@ -32,6 +33,7 @@ import retrofit2.Response;
 
 public class AdFetchTask implements Runnable, Observer {
 
+    private static final String LOG_TAG = AdFetchTask.class.getSimpleName();
     private static final int RESPONSE_NO_ADS = 204;
 
     private AdType mAdType;
@@ -46,6 +48,7 @@ public class AdFetchTask implements Runnable, Observer {
     private static final String UNEXPECTED = "Unexpected";
     private boolean mIsVastVpaidAd;
     private Timers mTimers;
+    private volatile boolean mFirstRequest = true;
 
     public AdFetchTask(LoopMeAd loopMeAd, AdFetcherListener adFetcherListener) {
         mLoopMeAd = loopMeAd;
@@ -57,6 +60,10 @@ public class AdFetchTask implements Runnable, Observer {
 
     public void fetch() {
         startRequestTimer();
+        runFetchTask();
+    }
+
+    private void runFetchTask() {
         mFetchTask = mExecutorService.submit(this);
     }
 
@@ -76,11 +83,26 @@ public class AdFetchTask implements Runnable, Observer {
         }
     }
 
+    private void handleNoAds() {
+        if (mFirstRequest && isInterstitial()) {
+            mFirstRequest = false;
+            mLoopMeAd.setReversOrientationRequest();
+            runFetchTask();
+        } else {
+            onErrorResult(Errors.NO_ADS_FOUND);
+        }
+    }
+
+    private boolean isInterstitial() {
+        return mLoopMeAd != null && mLoopMeAd.isInterstitial();
+    }
+
     @Override
     public void run() {
         try {
             JSONObject data = RequestBuilder.buildRequestJson(mLoopMeAd.getContext(), mLoopMeAd);
             Response<ResponseJsonModel> response = mHttpService.fetchAdSync(data);
+            Logging.out(LOG_TAG, "response received");
             stopRequestTimer();
             parseResponse(response);
         } catch (IOException e) {
@@ -188,7 +210,7 @@ public class AdFetchTask implements Runnable, Observer {
         if (response == null) {
             onErrorResult(Errors.NO_CONTENT);
         } else if (response.code() == RESPONSE_NO_ADS) {
-            onErrorResult(new LoopMeError(response.code(), Errors.NO_ADS_FOUND.getMessage()));
+            handleNoAds();
         } else {
             onErrorResult(new LoopMeError(Constants.BAD_SERVERS_CODE + response.code()));
         }
