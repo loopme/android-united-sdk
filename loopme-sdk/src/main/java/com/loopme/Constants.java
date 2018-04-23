@@ -4,8 +4,6 @@ import com.loopme.ad.AdSpotDimensions;
 import com.loopme.utils.Utils;
 
 public class Constants {
-    public static final int DEFAULT_WIDTH = 350;
-    public static final int DEFAULT_HEIGHT = 250;
     public static final String UTF_8 = "UTF-8";
     public static final String MIME_TYPE_TEXT_HTML = "text/html";
     public static final String MRAID_ANDROID_ASSET = "file:///android_asset/";

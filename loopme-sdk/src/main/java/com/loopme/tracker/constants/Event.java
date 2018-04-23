@@ -1,31 +1,30 @@
 package com.loopme.tracker.constants;
 
 public enum Event {
-
-    REGISTER, //done
+    REGISTER,
     LOADED,
-    REGISTER_FRIENDLY_VIEW,//----
-    RECORD_READY,//done
-    IMPRESSION,//done
-    PLAYING,//done
-    PAUSED,//done
-    CLICKED,//done,
-    FIRST_QUARTILE, ////done
-    MIDPOINT,////done
-    THIRD_QUARTILE,////done
-    COMPLETE,//done
-    STOPPED,//done
-    USER_CLOSE,//done
+    REGISTER_FRIENDLY_VIEW,
+    RECORD_READY,
+    IMPRESSION,
+    PLAYING,
+    PAUSED,
+    CLICKED,
+    FIRST_QUARTILE,
+    MIDPOINT,
+    THIRD_QUARTILE,
+    COMPLETE,
+    STOPPED,
+    USER_CLOSE,
     CLOSE,
-    SKIPPED, //----
-    VOLUME_CHANGE,//done
-    ENTERED_FULLSCREEN,//done
-    EXITED_FULLSCREEN,//done
-    EXPANDED_CHANGE,//done
-    DURATION_CHANGED,//done
-    END_SESSION,//done
-    ERROR,//done
-    INJECT_JS,
+    SKIPPED,
+    VOLUME_CHANGE,
+    ENTERED_FULLSCREEN,
+    EXITED_FULLSCREEN,
+    EXPANDED_CHANGE,
+    DURATION_CHANGED,
+    END_SESSION,
+    ERROR,
+    INJECT_JS_WEB,
 
 
     //MOAT
@@ -44,5 +43,4 @@ public enum Event {
     RESUMED,
     VIDEO_EVENT,
     LINEAR_CHANGED
-
 }

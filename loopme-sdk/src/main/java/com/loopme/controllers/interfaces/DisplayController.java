@@ -34,4 +34,8 @@ public interface DisplayController {
     void onAdShake();
 
     void setFullScreen(boolean isFullScreen);
+
+    void postImpression();
+
+    int getOrientation();
 }

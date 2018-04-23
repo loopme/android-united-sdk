@@ -15,18 +15,18 @@
         android:id="@+id/log_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
     <FrameLayout
         android:id="@+id/info_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
     <FrameLayout
         android:id="@+id/import_export_root_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
 </RelativeLayout>

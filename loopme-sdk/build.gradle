@@ -101,6 +101,7 @@ dependencies {
     api "com.google.android.gms:play-services-ads:$playServicesVersion"
     api "com.android.support:multidex:$multidexLibraryVersion"
     testImplementation "junit:junit:$junitVersion"
+}
 
 task clearJar(type: Delete) {
     delete 'build/outputs/loopme-sdk-6.0.1.jar'

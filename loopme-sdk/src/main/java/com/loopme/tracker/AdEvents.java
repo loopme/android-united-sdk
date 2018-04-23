@@ -5,6 +5,7 @@ import android.media.MediaPlayer;
 import android.view.View;
 import android.webkit.WebView;
 
+import com.loopme.ad.LoopMeAd;
 import com.loopme.tracker.constants.AdType;
 
 public interface AdEvents {
@@ -30,7 +31,7 @@ public interface AdEvents {
 
     void onAdCompleteEvent();
 
-    void onAdVolumeChangedEvent(double volume, int currentPosition);
+    void onAdVolumeChangedEvent(float volume, int currentPosition);
 
     void onAdUserMinimizeEvent();
 
@@ -56,7 +57,7 @@ public interface AdEvents {
 
     void onAdRegisterView(Activity activity, View view);
 
-    void onAdInject();
+    void onAdInjectJsWeb(LoopMeAd loopMeAd);
 
     void onAdRecordAdLoaded();
 

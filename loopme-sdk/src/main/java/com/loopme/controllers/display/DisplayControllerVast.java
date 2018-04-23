@@ -109,7 +109,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     @Override
     public void onAdRegisterView(Activity activity, View view) {
         super.onAdRegisterView(activity, mWebView);
-        onAdInject();
+//        onAdInjectJsWeb(); // TODO: 4/20/18  IAS  it is native ad do I should inject something?
         onAdResumedEvent();
         postDelayed(new Runnable() {
             @Override
@@ -376,7 +376,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     @Override
-    public void onVolumeChanged(double volume, int currentPosition) {
+    public void onVolumeChanged(float volume, int currentPosition) {
         onAdVolumeChangedEvent(volume, currentPosition);
     }
 

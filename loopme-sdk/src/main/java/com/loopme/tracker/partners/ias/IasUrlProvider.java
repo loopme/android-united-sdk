@@ -32,8 +32,6 @@ public class IasUrlProvider {
     public IasUrlProvider(AdIds adIds) {
         populateData(adIds);
         build();
-        Logging.out("--- CM tag", mCmTagUrl);
-        Logging.out("--- Logging tag", mLoggingTagUrl);
     }
 
     private void build() {

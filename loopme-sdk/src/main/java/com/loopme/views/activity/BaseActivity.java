@@ -18,11 +18,9 @@ import com.loopme.ad.LoopMeAd;
 import com.loopme.ad.LoopMeAdHolder;
 import com.loopme.controllers.display.BaseTrackableController;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
-import com.loopme.controllers.display.DisplayControllerVast;
 import com.loopme.controllers.interfaces.DisplayController;
 import com.loopme.receiver.AdReceiver;
 import com.loopme.receiver.MraidAdCloseButtonReceiver;
-import com.loopme.utils.Utils;
 import com.loopme.views.CloseButton;
 import com.loopme.views.MraidView;
 
@@ -41,7 +39,6 @@ public final class BaseActivity extends Activity
     private LoopMeAd mLoopMeAd;
     private boolean mIs360;
 
-    private int mInitialOrientation;
     private FrameLayout mLoopMeContainerView;
     private boolean mFirstLaunch = true;
     //mraid
@@ -65,13 +62,21 @@ public final class BaseActivity extends Activity
         if (mLoopMeAd != null && mLoopMeAd.getAdParams() != null) {
             retrieveParams();
             setContentView();
-            initOrientation();
-            initSensorManager();
+            setOrientation();
+            initSensorManager(mLoopMeAd.getContext());
             initDestroyReceiver();
             setMraidSettings();
         } else {
             finish();
         }
+    }
+
+    private void setContentView() {
+        setContentView(R.layout.base_activity_main);
+        mLoopMeContainerView = (FrameLayout) findViewById(R.id.loopme_container_view);
+        mLoopMeAd.onNewContainer(mLoopMeContainerView);
+        ((BaseTrackableController) mDisplayController).onAdRegisterView(this, mDisplayController.getWebView());
+        ((BaseTrackableController) mDisplayController).onAdEnteredFullScreenEvent();
     }
 
     private void setMraidSettings() {
@@ -109,6 +114,7 @@ public final class BaseActivity extends Activity
 
     @Override
     protected void onDestroy() {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         clearLayout();
         destroyReceivers();
         super.onDestroy();
@@ -150,44 +156,15 @@ public final class BaseActivity extends Activity
         return mLoopMeAd != null && mLoopMeAd.getAdParams() != null && mLoopMeAd.getAdParams().isVideo360();
     }
 
-    private void initOrientation() {
-        mInitialOrientation = Utils.getScreenOrientation();
-        if (mLoopMeAd.isMraidAd()) {
-            applyMraidOrientation();
-        } else {
-            applyLoopMeOrientation();
+    private void setOrientation() {
+        if (mDisplayController != null) {
+            setRequestedOrientation(mDisplayController.getOrientation());
         }
     }
 
-    private void applyLoopMeOrientation() {
-        if (isInterstitial() && !mIs360) {
-            applyOrientationFromAdParams();
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-        }
-    }
-
-    private void applyMraidOrientation() {
-        if (mLoopMeAd.isMraidAd() && mDisplayController instanceof DisplayControllerLoopMe) {
-            int orientation = ((DisplayControllerLoopMe) mDisplayController).getMraidOrientation();
-            setRequestedOrientation(orientation);
-        }
-    }
-
-    private void setContentView() {
-        setContentView(R.layout.base_activity_main);
-        mLoopMeContainerView = (FrameLayout) findViewById(R.id.loopme_container_view);
-        if (mLoopMeAd.isInterstitial()) {
-            mLoopMeAd.bindView(mLoopMeContainerView);
-        } else {
-            mLoopMeAd.rebuildView(mLoopMeContainerView);
-            ((BaseTrackableController) mDisplayController).onAdEnteredFullScreenEvent();
-        }
-    }
-
-    private void initSensorManager() {
-        if (mLoopMeAd != null) {
-            mSensorManager = new SensorManagerExtension().initSensor(mLoopMeAd.getContext(), this);
+    private void initSensorManager(Activity activity) {
+        if (activity != null) {
+            mSensorManager = new SensorManagerExtension().initSensor(activity, this);
         }
     }
 
@@ -197,22 +174,6 @@ public final class BaseActivity extends Activity
         filter.addAction(Constants.CLICK_INTENT);
         mAdReceiver = new AdReceiver(this, mLoopMeAd.getAdId());
         registerReceiver(mAdReceiver, filter);
-    }
-
-    /**
-     * Apply orientation from AdParams.
-     * Do nothing if orientation parameter absent in AdParams.
-     */
-    private void applyOrientationFromAdParams() {
-        String orientation = mLoopMeAd.getAdParams().getAdOrientation();
-        if (orientation == null) {
-            return;
-        }
-        if (orientation.equalsIgnoreCase(Constants.ORIENTATION_PORT)) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
-        } else if (orientation.equalsIgnoreCase(Constants.ORIENTATION_LAND)) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-        }
     }
 
     private boolean isInterstitial() {
@@ -247,10 +208,17 @@ public final class BaseActivity extends Activity
     private void resumeAd() {
         if (mFirstLaunch) {
             startPlayNoneLoopMeInterstitial();
+            postImpression();
             resumeLoopMeController();
             mFirstLaunch = false;
         } else {
             mLoopMeAd.resume();
+        }
+    }
+
+    private void postImpression() {
+        if (mDisplayController != null) {
+            mDisplayController.postImpression();
         }
     }
 
@@ -270,9 +238,9 @@ public final class BaseActivity extends Activity
         if (mDisplayController != null) {
             mDisplayController.onPlay(START_DEFAULT_POSITION);
 
-            if (mDisplayController instanceof DisplayControllerVast) {
-                ((DisplayControllerVast) mDisplayController).onAdRegisterView(this, mLoopMeContainerView);
-            }
+//            if (mDisplayController instanceof DisplayControllerVast) {
+//                ((DisplayControllerVast) mDisplayController).onAdRegisterView(this, mLoopMeContainerView);
+//            }
         }
     }
 
@@ -291,7 +259,6 @@ public final class BaseActivity extends Activity
         Logging.out(LOG_TAG, "onDestroyBroadcast");
         mIsDestroyBroadcastReceived = true;
         if (isBanner()) {
-            setRequestedOrientation(mInitialOrientation);
             switchLoopMeBannerToPreviousMode();
         }
         unregisterAdReceiver();

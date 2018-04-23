@@ -474,7 +474,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         return mContainerView;
     }
 
-    public void rebuildView(FrameLayout loopMeContainerView) {
+    private void rebuildView(FrameLayout loopMeContainerView) {
         if (mDisplayController != null && mDisplayController instanceof DisplayControllerLoopMe) {
             ((DisplayControllerLoopMe) mDisplayController).onRebuildView(loopMeContainerView);
         }
@@ -490,6 +490,14 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     public boolean isReverseOrientationRequest() {
         return mIsReverseOrientationRequest;
+    }
+
+    public void onNewContainer(FrameLayout newContainerView) {
+        if (isInterstitial()) {
+            bindView(newContainerView);
+        } else {
+            rebuildView(newContainerView);
+        }
     }
 
     public enum Type {

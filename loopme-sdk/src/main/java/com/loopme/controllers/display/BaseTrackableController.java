@@ -1,14 +1,15 @@
 package com.loopme.controllers.display;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.webkit.WebView;
 
+import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.LoopMeAd;
@@ -20,13 +21,8 @@ import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.tracker.AdEvents;
 import com.loopme.tracker.EventManager;
-import com.loopme.utils.InternetUtils;
-import com.loopme.tracker.interfaces.AdEvents;
-import com.loopme.tracker.partners.LoopMeTracker;
-import com.loopme.tracker.viewability.EventManager;
 import com.loopme.utils.UiUtils;
 import com.loopme.utils.Utils;
-import com.loopme.vast.VastVpaidEventTracker;
 
 public abstract class BaseTrackableController implements DisplayController, AdEvents {
 
@@ -34,9 +30,18 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     protected String mLogTag;
     private EventManager mEventManager;
     private LoopMeAd mLoopMeAd;
+    private boolean mIsImpressionTracked;
+    private String mOrientation;
 
     public BaseTrackableController(LoopMeAd loopMeAd) {
         mLoopMeAd = loopMeAd;
+        setOrientation();
+    }
+
+    private void setOrientation() {
+        if (mLoopMeAd != null) {
+            mOrientation = mLoopMeAd.getAdParams().getAdOrientation();
+        }
     }
 
     @Override
@@ -222,7 +227,7 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     }
 
     @Override
-    public void onAdVolumeChangedEvent(double volume, int currentPosition) {
+    public void onAdVolumeChangedEvent(float volume, int currentPosition) {
         if (mEventManager != null) {
             mEventManager.onAdVolumeChangedEvent(volume, currentPosition);
         }
@@ -318,9 +323,9 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     }
 
     @Override
-    public void onAdInject() {
+    public void onAdInjectJsWeb(LoopMeAd loopMeAd) {
         if (mEventManager != null) {
-            mEventManager.onAdInject();
+            mEventManager.onAdInjectJsWeb(loopMeAd);
         }
     }
 
@@ -335,6 +340,31 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     public void onAdRecordAdClose() {
         if (mEventManager != null) {
             mEventManager.onAdRecordAdClose();
+        }
+    }
+
+    @Override
+    public void postImpression() {
+        if (!mIsImpressionTracked) {
+            onAdRecordReady();
+            onAdLoadedEvent();
+            onAdImpressionEvent();
+            mIsImpressionTracked = true;
+        }
+    }
+
+    @Override
+    public int getOrientation() {
+        return getOrientationFromAdParams();
+    }
+
+    protected int getOrientationFromAdParams() {
+        if (TextUtils.equals(mOrientation, Constants.ORIENTATION_PORT)) {
+            return ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
+        } else if (TextUtils.equals(mOrientation, Constants.ORIENTATION_LAND)) {
+            return ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+        } else {
+            return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
         }
     }
 }

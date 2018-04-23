@@ -40,8 +40,8 @@ public class EventManager implements AdEvents {
     @Override
     public void onAdDestroyedEvent() {
         if (mTrackerManager != null) {
-            mTrackerManager.track(Event.END_SESSION);
             mTrackerManager.track(Event.STOP);
+            mTrackerManager.track(Event.END_SESSION);
         }
     }
 
@@ -111,7 +111,7 @@ public class EventManager implements AdEvents {
     }
 
     @Override
-    public void onAdVolumeChangedEvent(double volume, int currentPosition) {
+    public void onAdVolumeChangedEvent(float volume, int currentPosition) {
         if (mTrackerManager != null) {
             mTrackerManager.track(Event.VOLUME_CHANGE, volume, currentPosition);
         }
@@ -195,9 +195,9 @@ public class EventManager implements AdEvents {
     }
 
     @Override
-    public void onAdInject() {
+    public void onAdInjectJsWeb(LoopMeAd loopMeAd) {
         if (mTrackerManager != null) {
-            mTrackerManager.track(Event.INJECT_JS);
+            mTrackerManager.track(Event.INJECT_JS_WEB, loopMeAd);
         }
     }
 

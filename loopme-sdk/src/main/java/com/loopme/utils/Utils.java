@@ -398,7 +398,7 @@ public class Utils {
         return new ResourceInfo();
     }
 
-    // TODO: ------------------------------------ do not test --------------------------------------------
+    // : ------------------------------------ do not test --------------------------------------------
     public static String readAssets(AssetManager assetManager, String filename) {
         try {
             return getStringFromStream(assetManager.open(filename));
@@ -756,5 +756,9 @@ public class Utils {
             }
         }
         return true;
+    }
+
+    public static boolean isFloat(Object obj) {
+        return obj instanceof Float;
     }
 }

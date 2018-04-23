@@ -237,15 +237,6 @@ public class Integration {
         expBanner.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
         activity.insertAdSpot(expBanner);
 
-        AdSpot bannerNative = new AdSpot();
-        bannerNative.setName(activity.getString(R.string.native_video_banner));
-        bannerNative.setAppKey(Constants.Keys.KEY_TEST_MPU);
-        bannerNative.setTime(System.currentTimeMillis());
-        bannerNative.setSdk(AdSdk.LOOPME);
-        bannerNative.setType(AdType.BANNER);
-        bannerNative.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
-        activity.insertAdSpot(bannerNative);
-
         AdSpot imageInter = new AdSpot();
         imageInter.setName(activity.getString(R.string.image_fullscreen));
         imageInter.setAppKey(Constants.Keys.KEY_IMG_INTER);
