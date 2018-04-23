@@ -14,6 +14,7 @@ import com.loopme.IdGenerator;
 import com.loopme.IntegrationType;
 import com.loopme.Logging;
 import com.loopme.common.LoopMeError;
+import com.loopme.controllers.display.BaseTrackableController;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
 import com.loopme.controllers.display.DisplayControllerVast;
 import com.loopme.controllers.display.DisplayControllerVpaid;
@@ -39,7 +40,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     protected Handler mHandler = new Handler(Looper.getMainLooper());
     private IntegrationType mIntegrationType = IntegrationType.NORMAL;
     private AdTargetingData mAdTargetingData = new AdTargetingData();
-    protected DisplayController mDisplayController;
+    protected BaseTrackableController mDisplayController;
     protected volatile FrameLayout mContainerView;
 
     private AdParams mAdParams;
@@ -380,11 +381,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         this.mIntegrationType = mIntegrationType != null ? mIntegrationType : IntegrationType.NORMAL;
     }
 
-    public void setAdController(DisplayController displayController) {
-        this.mDisplayController = displayController;
-    }
-
-    public DisplayController getDisplayController() {
+    public BaseTrackableController getDisplayController() {
         return mDisplayController;
     }
 

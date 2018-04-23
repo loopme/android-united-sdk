@@ -343,7 +343,6 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
         }
     }
 
-    @Override
     public void postImpression() {
         if (!mIsImpressionTracked) {
             onAdRecordReady();
@@ -366,5 +365,9 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
         } else {
             return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
         }
+    }
+
+    protected boolean isTrackerAvailable() {
+        return mEventManager != null;
     }
 }

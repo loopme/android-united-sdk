@@ -18,11 +18,9 @@ import com.loopme.ad.LoopMeAd;
 import com.loopme.ad.LoopMeAdHolder;
 import com.loopme.controllers.display.BaseTrackableController;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
-import com.loopme.controllers.interfaces.DisplayController;
 import com.loopme.receiver.AdReceiver;
 import com.loopme.receiver.MraidAdCloseButtonReceiver;
 import com.loopme.views.CloseButton;
-import com.loopme.views.MraidView;
 
 
 public final class BaseActivity extends Activity
@@ -33,11 +31,10 @@ public final class BaseActivity extends Activity
     private static final String LOG_TAG = BaseActivity.class.getSimpleName();
     private static final int START_DEFAULT_POSITION = 0;
     private SensorManagerExtension mSensorManager;
-    private DisplayController mDisplayController;
+    private BaseTrackableController mDisplayController;
 
     private AdReceiver mAdReceiver;
     private LoopMeAd mLoopMeAd;
-    private boolean mIs360;
 
     private FrameLayout mLoopMeContainerView;
     private boolean mFirstLaunch = true;
@@ -46,8 +43,6 @@ public final class BaseActivity extends Activity
     private CloseButton mMraidCloseButton;
     private MraidAdCloseButtonReceiver mMraidCloseButtonReceiver;
     private boolean mIsDestroyBroadcastReceived;
-
-    private MraidView mMraidView;
 
     @Override
     public final void onCreate(Bundle savedInstanceState) {
@@ -60,7 +55,7 @@ public final class BaseActivity extends Activity
         requestSystemFlags();
         retrieveLoopMeAdOrFinish();
         if (mLoopMeAd != null && mLoopMeAd.getAdParams() != null) {
-            retrieveParams();
+            setDisplayController();
             setContentView();
             setOrientation();
             initSensorManager(mLoopMeAd.getContext());
@@ -75,8 +70,9 @@ public final class BaseActivity extends Activity
         setContentView(R.layout.base_activity_main);
         mLoopMeContainerView = (FrameLayout) findViewById(R.id.loopme_container_view);
         mLoopMeAd.onNewContainer(mLoopMeContainerView);
-        ((BaseTrackableController) mDisplayController).onAdRegisterView(this, mDisplayController.getWebView());
-        ((BaseTrackableController) mDisplayController).onAdEnteredFullScreenEvent();
+        mDisplayController.onAdRegisterView(this, mDisplayController.getWebView());
+        mDisplayController.postImpression();
+        mDisplayController.onAdEnteredFullScreenEvent();
     }
 
     private void setMraidSettings() {
@@ -144,16 +140,11 @@ public final class BaseActivity extends Activity
         }
     }
 
-    private void retrieveParams() {
-        mIs360 = is360Video();
+    private void setDisplayController() {
         if (mLoopMeAd != null) {
             mDisplayController = mLoopMeAd.getDisplayController();
             finishIfNull(mDisplayController);
         }
-    }
-
-    private boolean is360Video() {
-        return mLoopMeAd != null && mLoopMeAd.getAdParams() != null && mLoopMeAd.getAdParams().isVideo360();
     }
 
     private void setOrientation() {
@@ -208,17 +199,10 @@ public final class BaseActivity extends Activity
     private void resumeAd() {
         if (mFirstLaunch) {
             startPlayNoneLoopMeInterstitial();
-            postImpression();
             resumeLoopMeController();
             mFirstLaunch = false;
         } else {
             mLoopMeAd.resume();
-        }
-    }
-
-    private void postImpression() {
-        if (mDisplayController != null) {
-            mDisplayController.postImpression();
         }
     }
 
@@ -230,17 +214,9 @@ public final class BaseActivity extends Activity
 
     private void startPlayNoneLoopMeInterstitial() {
         if (mLoopMeAd.isInterstitial() && !(mDisplayController instanceof DisplayControllerLoopMe)) {
-            playInterstitial();
-        }
-    }
-
-    private void playInterstitial() {
-        if (mDisplayController != null) {
-            mDisplayController.onPlay(START_DEFAULT_POSITION);
-
-//            if (mDisplayController instanceof DisplayControllerVast) {
-//                ((DisplayControllerVast) mDisplayController).onAdRegisterView(this, mLoopMeContainerView);
-//            }
+            if (mDisplayController != null) {
+                mDisplayController.onPlay(START_DEFAULT_POSITION);
+            }
         }
     }
 

@@ -35,7 +35,5 @@ public interface DisplayController {
 
     void setFullScreen(boolean isFullScreen);
 
-    void postImpression();
-
     int getOrientation();
 }

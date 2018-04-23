@@ -1,6 +1,5 @@
 package com.loopme.controllers.display;
 
-import android.app.Activity;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.support.annotation.Nullable;
@@ -66,14 +65,25 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     public void prepare() {
+        initWebView();
+        onAdRegisterView(mLoopMeAd.getContext(), mWebView);
         if (isVast4VerificationNeeded()) {
-            mWebView = new VastWebView(mLoopMeAd.getContext(), this);
             initVast4Tracker(mWebView);
             setScriptNumber();
             vast4Verification();
         } else {
             onAdReady();
         }
+    }
+
+    private void initWebView() {
+        if (isNeedInitWebView()) {
+            mWebView = new VastWebView(mLoopMeAd.getContext(), this);
+        }
+    }
+
+    private boolean isNeedInitWebView() {
+        return isVast4VerificationNeeded() || isTrackerAvailable();
     }
 
     private void setScriptNumber() {
@@ -99,28 +109,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
             }
         }, DELAY_UNTIL_EXECUTE);
 
-        if (mLoopMeAd.isInterstitial()) {
-            onAdRecordReady();
-            onAdLoadedEvent();
-            onAdImpressionEvent();
-        }
-    }
-
-    @Override
-    public void onAdRegisterView(Activity activity, View view) {
-        super.onAdRegisterView(activity, mWebView);
-//        onAdInjectJsWeb(); // TODO: 4/20/18  IAS  it is native ad do I should inject something?
         onAdResumedEvent();
-        postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                destroyMediaPlayer();
-                startMediaPlayer();
-            }
-        }, DELAY_UNTIL_EXECUTE);
-
-        onAdStartedEvent();
-
     }
 
     private void startMediaPlayer() {
@@ -250,6 +239,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     public void closeSelf() {
+        onAdUserCloseEvent();
         postVideoEvent(EventConstants.CLOSE, getCurrentPositionAsString());
         dismissAd();
     }
