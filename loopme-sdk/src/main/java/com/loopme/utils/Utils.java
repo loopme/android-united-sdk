@@ -179,12 +179,17 @@ public class Utils {
     }
 
     public static String getStringFromStream(InputStream inputStream) {
+        return getStringBuilderFromStream(inputStream).toString();
+    }
+
+
+    public static StringBuilder getStringBuilderFromStream(InputStream inputStream) {
         int numberBytesRead;
         StringBuilder out = new StringBuilder();
         byte[] bytes = new byte[4096];
 
         if (inputStream == null) {
-            return "";
+            return out;
         }
         try {
             while ((numberBytesRead = inputStream.read(bytes)) != -1) {
@@ -195,7 +200,7 @@ public class Utils {
         } finally {
             IOUtils.closeQuietly(inputStream);
         }
-        return out.toString();
+        return out;
     }
 
     public static boolean isPackageInstalled(List<String> packageIds, List<String> installedList) {
@@ -399,13 +404,13 @@ public class Utils {
     }
 
     // : ------------------------------------ do not test --------------------------------------------
-    public static String readAssets(AssetManager assetManager, String filename) {
+    public static StringBuilder readAssets(AssetManager assetManager, String filename) {
         try {
-            return getStringFromStream(assetManager.open(filename));
+            return getStringBuilderFromStream(assetManager.open(filename));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return "";
+        return new StringBuilder();
     }
 
     private static String getEncryptedString(String stringToEncrypt) {

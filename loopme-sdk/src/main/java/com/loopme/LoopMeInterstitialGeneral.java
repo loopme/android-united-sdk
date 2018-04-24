@@ -186,6 +186,7 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
         if (mAdListener != null) {
             mAdListener.onLoopMeInterstitialExpired(this);
         }
+
         Logging.out(LOG_TAG, "Ads content expired");
     }
 

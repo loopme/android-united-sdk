@@ -108,8 +108,10 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
         }
     }
 
-    protected String addVerificationScripts(String html) {
-        return mVast4Tracker != null ? mVast4Tracker.addVerificationScripts(html) : html;
+    protected void addVerificationScripts(StringBuilder html) {
+        if (mVast4Tracker != null) {
+            mVast4Tracker.addVerificationScripts(html);
+        }
     }
 
     protected void setVerificationView(View view) {

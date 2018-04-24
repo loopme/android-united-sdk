@@ -60,7 +60,7 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     }
 
     private boolean isNativeAd() {
-        return mLoopMeAd != null && (mLoopMeAd.isVideo360() || mLoopMeAd.isVastAd());
+        return mLoopMeAd != null && !mLoopMeAd.isMraidAd() && !mLoopMeAd.isVpaidAd() && (mLoopMeAd.isVideo360() || mLoopMeAd.isVastAd());
     }
 
     private boolean isEventManagerNeeded() {
@@ -323,9 +323,16 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     }
 
     @Override
-    public void onAdInjectJsWeb(LoopMeAd loopMeAd) {
+    public void onAdInjectJs(LoopMeAd loopMeAd) {
         if (mEventManager != null) {
-            mEventManager.onAdInjectJsWeb(loopMeAd);
+            mEventManager.onAdInjectJs(loopMeAd);
+        }
+    }
+
+   @Override
+    public void onAdInjectJsVpaid(StringBuilder html) {
+        if (mEventManager != null) {
+            mEventManager.onAdInjectJsVpaid(html);
         }
     }
 

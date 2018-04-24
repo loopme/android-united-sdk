@@ -162,7 +162,7 @@ public class AdParams implements Serializable {
     }
 
     public boolean isVastAd() {
-        return getAdType() == AdType.VAST;
+        return getAdType() == AdType.VAST && !mIsVpaid;
     }
 
     public boolean getAutoLoading() {

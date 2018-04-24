@@ -5,7 +5,6 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
@@ -240,7 +239,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
 
     private void injectTrackingJsForWeb() {
         if (!isVideo360()) {
-            onAdInjectJsWeb(mLoopMeAd);
+            onAdInjectJs(mLoopMeAd);
         }
     }
 

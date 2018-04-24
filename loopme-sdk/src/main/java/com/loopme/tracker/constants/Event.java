@@ -25,6 +25,7 @@ public enum Event {
     END_SESSION,
     ERROR,
     INJECT_JS_WEB,
+    INJECT_JS_VPAID,
 
 
     //MOAT

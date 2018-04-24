@@ -195,9 +195,16 @@ public class EventManager implements AdEvents {
     }
 
     @Override
-    public void onAdInjectJsWeb(LoopMeAd loopMeAd) {
+    public void onAdInjectJs(LoopMeAd loopMeAd) {
         if (mTrackerManager != null) {
             mTrackerManager.track(Event.INJECT_JS_WEB, loopMeAd);
+        }
+    }
+
+    @Override
+    public void onAdInjectJsVpaid(StringBuilder html) {
+        if (mTrackerManager != null) {
+            mTrackerManager.track(Event.INJECT_JS_VPAID, html);
         }
     }
 

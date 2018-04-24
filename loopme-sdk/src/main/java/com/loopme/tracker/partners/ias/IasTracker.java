@@ -24,7 +24,7 @@ import com.moat.analytics.mobile.loo.NativeVideoTracker;
 
 public class IasTracker implements Tracker {
     private static String sLOG_TAG;
-    private static final boolean FIX_GWD_HACK = true;
+    private static final boolean FIX_GWD_HACK = false;
     private Tracker mTracker;
     private boolean mDeferred;
     private boolean mIsInFullScreenMode;
@@ -424,6 +424,7 @@ public class IasTracker implements Tracker {
     }
 
     private class IasWebTracker extends IasBaseTracker {
+        private static final int VPAID_IAS_SCRIPTS_PLACEHOLDER = 62;
 
         private IasWebTracker(Context context) {
             sLOG_TAG = IasWebTracker.class.getSimpleName();
@@ -439,6 +440,25 @@ public class IasTracker implements Tracker {
             AvidDisplayAdSession avidDisplayAdSession = AvidAdSessionManager.startAvidDisplayAdSession(context, mAdSessionContext);
             setAbstractAvidAdSession(avidDisplayAdSession);
             Logging.out(sLOG_TAG, "init " + avidDisplayAdSession.getClass().getSimpleName());
+        }
+
+        @Override
+        public void track(Event event, Object... args) {
+            super.track(event, args);
+            switch (event) {
+                case INJECT_JS_VPAID: {
+                    injectJsToVpaid(args);
+                    break;
+                }
+            }
+        }
+
+        private void injectJsToVpaid(Object[] args) {
+            if (Utils.isNotNull(args) && args[0] instanceof StringBuilder) {
+                StringBuilder html = (StringBuilder) args[0];
+                String scripts = mUrlProvider.getCmTagScript() + mUrlProvider.getLoggingTagScript();
+                html.insert(VPAID_IAS_SCRIPTS_PLACEHOLDER, scripts);
+            }
         }
     }
 
@@ -537,7 +557,7 @@ public class IasTracker implements Tracker {
                 Activity activity = (Activity) args[0];
                 mView = (View) args[1];
                 mAbstractAvidAdSession.registerAdView(mView, activity);
-                Logging.out(sLOG_TAG, "register view " + mView);
+                Logging.out(sLOG_TAG, "register view " + mView.getClass().getSimpleName());
             }
         }
 

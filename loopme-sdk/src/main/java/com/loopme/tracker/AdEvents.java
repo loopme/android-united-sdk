@@ -57,7 +57,9 @@ public interface AdEvents {
 
     void onAdRegisterView(Activity activity, View view);
 
-    void onAdInjectJsWeb(LoopMeAd loopMeAd);
+    void onAdInjectJs(LoopMeAd loopMeAd);
+
+    void onAdInjectJsVpaid(StringBuilder html);
 
     void onAdRecordAdLoaded();
 

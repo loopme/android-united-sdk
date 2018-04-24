@@ -273,7 +273,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         return mAdParams != null && mAdParams.isVastAd();
     }
 
-    protected boolean isVpaidAd() {
+    public boolean isVpaidAd() {
         return mAdParams != null && mAdParams.isVpaidAd();
     }
 
