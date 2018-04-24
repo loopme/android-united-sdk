@@ -24,7 +24,6 @@ import com.moat.analytics.mobile.loo.NativeVideoTracker;
 
 public class IasTracker implements Tracker {
     private static String sLOG_TAG;
-    private static final boolean FIX_GWD_HACK = false;
     private Tracker mTracker;
     private boolean mDeferred;
     private boolean mIsInFullScreenMode;
@@ -516,17 +515,7 @@ public class IasTracker implements Tracker {
             String firstPart = html.substring(0, 173);
             String secondPart = html.substring(173);
             String finalHtml = firstPart + mUrlProvider.getCmTagScript() + mUrlProvider.getLoggingTagScript();
-
-            String fullHtml = finalHtml + secondPart;
-
-            // todo REMOVE IT IN BEFORE PULL REQUEST
-            if (FIX_GWD_HACK) {
-                String OLD_WIDGET = "id=\"LOOPME_widget\"";
-                String NEW_WIDGET = "id=\"LOOPME_widget\"style=\"height:100%;\"";
-                fullHtml = fullHtml.replace(OLD_WIDGET, NEW_WIDGET);
-            }
-
-            return fullHtml;
+            return finalHtml + secondPart;
         }
 
         private boolean isNativeTracker() {
