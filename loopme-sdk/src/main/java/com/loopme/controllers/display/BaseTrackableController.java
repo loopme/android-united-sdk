@@ -337,13 +337,6 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     }
 
     @Override
-    public void onAdRecordAdLoaded() {
-        if (mEventManager != null) {
-            mEventManager.onAdRecordAdLoaded();
-        }
-    }
-
-    @Override
     public void onAdRecordAdClose() {
         if (mEventManager != null) {
             mEventManager.onAdRecordAdClose();

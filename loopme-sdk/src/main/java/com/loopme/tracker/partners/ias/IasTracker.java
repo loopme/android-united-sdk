@@ -122,10 +122,10 @@ public class IasTracker implements Tracker {
                     injectJsResForNative();
                     break;
                 }
-//                case IMPRESSION: {
-//                    recordAdImpressionEvent();
-//                    break;
-//                }
+                case IMPRESSION: {
+                    recordAdImpressionEvent();
+                    break;
+                }
                 case STOPPED: {
                     recordAdStoppedEvent();
                     break;

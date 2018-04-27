@@ -84,7 +84,7 @@ public class EventManager implements AdEvents {
     @Override
     public void onAdLoadedEvent() {
         if (mTrackerManager != null) {
-//            mTrackerManager.track(Event.LOADED);
+            mTrackerManager.track(Event.LOADED);
         }
     }
 
@@ -105,9 +105,11 @@ public class EventManager implements AdEvents {
 
     @Override
     public void onAdCompleteEvent() {
-        mTrackerManager.track(Event.COMPLETE);
-        mTrackerManager.track(Event.VIDEO_COMPLETE);
-        mTrackerManager.track(Event.VIDEO_STOPPED);
+        if (mTrackerManager != null) {
+            mTrackerManager.track(Event.COMPLETE);
+            mTrackerManager.track(Event.VIDEO_COMPLETE);
+            mTrackerManager.track(Event.VIDEO_STOPPED);
+        }
     }
 
     @Override
@@ -120,7 +122,7 @@ public class EventManager implements AdEvents {
     @Override
     public void onAdUserMinimizeEvent() {
         if (mTrackerManager != null) {
-//            mTrackerManager.track(Event.USER_MINIMIZE);
+            mTrackerManager.track(Event.USER_MINIMIZE);
         }
     }
 
@@ -155,7 +157,7 @@ public class EventManager implements AdEvents {
     @Override
     public void onAdUserAcceptInvitationEvent() {
         if (mTrackerManager != null) {
-//            mTrackerManager.track(Event.USER_ACCEPT_INVITATION);
+            mTrackerManager.track(Event.USER_ACCEPT_INVITATION);
         }
     }
 
@@ -205,13 +207,6 @@ public class EventManager implements AdEvents {
     public void onAdInjectJsVpaid(StringBuilder html) {
         if (mTrackerManager != null) {
             mTrackerManager.track(Event.INJECT_JS_VPAID, html);
-        }
-    }
-
-    @Override
-    public void onAdRecordAdLoaded() {
-        if (mTrackerManager != null) {
-            mTrackerManager.track(Event.LOADED);
         }
     }
 

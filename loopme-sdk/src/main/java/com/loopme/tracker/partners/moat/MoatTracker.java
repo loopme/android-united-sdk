@@ -36,7 +36,7 @@ public class MoatTracker implements Tracker {
 
     private WebTracker mMoatWebTracker;
     private NativeTracker mMoatNativeTracker;
-    private double mPreviousVolume;
+    private float mPreviousVolume;
 
     public MoatTracker(LoopMeAd loopMeAd, AdType adType) {
         if (loopMeAd == null) {
@@ -145,12 +145,12 @@ public class MoatTracker implements Tracker {
 
     private void nativeTrackerVolumeChange(Object[] args) {
         if (ArrayUtils.isArrayValid(args) && args.length >= ARGUMENTS_COUNT_2) {
-            double volume = (double) args[FIRST_ARGUMENT];
+            float volume = (float) args[FIRST_ARGUMENT];
             int currentPosition = (int) args[SECOND_ARGUMENT];
             if (!isVolumeChanged(volume)) {
                 return;
             }
-            MoatAdEvent event = new MoatAdEvent(MoatAdEventType.AD_EVT_VOLUME_CHANGE, currentPosition, volume);
+            MoatAdEvent event = new MoatAdEvent(MoatAdEventType.AD_EVT_VOLUME_CHANGE, currentPosition, (double)volume);
 
             if (mMoatNativeTracker != null) {
                 mMoatNativeTracker.dispatchEvent(event);
@@ -159,7 +159,7 @@ public class MoatTracker implements Tracker {
         }
     }
 
-    private boolean isVolumeChanged(double currentVolume) {
+    private boolean isVolumeChanged(float currentVolume) {
         if (mPreviousVolume != currentVolume) {
             mPreviousVolume = currentVolume;
             return true;

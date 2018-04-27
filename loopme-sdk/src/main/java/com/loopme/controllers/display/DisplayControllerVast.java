@@ -355,7 +355,6 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     private void postEvents(MediaPlayer mediaPlayer) {
         onAdPreparedEvent(mediaPlayer, mViewControllerVast.getPlayerView());
-        onAdImpressionEvent();
         onAdStartedEvent();
     }
 
