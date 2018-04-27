@@ -458,4 +458,14 @@ public class BaseActivity extends AppCompatActivity implements Observer {
     public void hideSoftKeyBoard() {
         UiUtils.hideSoftKeyboard(getWindow().getDecorView().getRootView(), this);
     }
+
+    public void setGdprIntegrationCase(InfoFragment.GdprIntegrationCase gdprCase) {
+        mPrefs.setGdprIntegrationCase(gdprCase);
+    }
+
+    public InfoFragment.GdprIntegrationCase getGdprIntegrationCase() {
+        return mPrefs.getGdprIntegrationCase();
+    }
+
+
 }

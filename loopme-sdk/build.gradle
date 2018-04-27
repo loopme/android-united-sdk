@@ -39,6 +39,7 @@ android {
             buildConfigField "String", "SDK_TYPE", SDK_TYPE
             buildConfigField "String", "SUPPORTED_TRACKERS", SUPPORTED_TRACKERS
             buildConfigField "String", "OPEN_RTB_VERSION", OPEN_RTB_VERSION
+            buildConfigField "String", "LOOPME_GDPR_URL", LOOPME_GDPR_URL
             buildConfigField "Boolean", "DEBUG_MODE", "true"
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release

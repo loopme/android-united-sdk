@@ -10,7 +10,10 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,7 +29,7 @@ import com.mopub.common.MoPub;
  * Created by katerina on 2/15/17.
  */
 
-public class InfoFragment extends BaseFragment implements View.OnClickListener {
+public class InfoFragment extends BaseFragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
 
     private OnInfoFragmentListener mOnInfoFragmentListener;
@@ -58,12 +61,48 @@ public class InfoFragment extends BaseFragment implements View.OnClickListener {
         view.findViewById(R.id.fragment_info_clear_cache_button).setOnClickListener(this);
         view.findViewById(R.id.fragment_info_import_button).setOnClickListener(this);
         view.findViewById(R.id.fragment_info_export_button).setOnClickListener(this);
+        initGdprIntegrationSpinner(view);
     }
 
     private void configureAutoLoadingState(View view) {
-        Switch enableAutoLoading = (Switch) view.findViewById(R.id.enable_auoloading_checkbox);
+        Switch enableAutoLoading = view.findViewById(R.id.enable_auoloading_checkbox);
         enableAutoLoading.setChecked(getAutoLoadingState());
         enableAutoLoading.setOnCheckedChangeListener(mOnCheckeChangeListener);
+    }
+
+    private void initGdprIntegrationSpinner(View view) {
+        Spinner spinner = view.findViewById(R.id.integration_type_spinner);
+        spinner.setOnItemSelectedListener(this);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(mContext, R.array.integration_type, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        GdprIntegrationCase gdprCase = GdprIntegrationCase.IGNORE;
+        if (mContext instanceof BaseActivity) {
+            gdprCase = ((BaseActivity) mContext).getGdprIntegrationCase();
+        }
+        spinner.setSelection(gdprCase.ordinal());
+        spinner.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                int position = ((Spinner) v).getSelectedItemPosition();
+                String description = GdprIntegrationCase.getDescription(position);
+                Toast.makeText(mContext, description, Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        GdprIntegrationCase gdprCase = GdprIntegrationCase.valueOf((String) parent.getItemAtPosition(position));
+        if (mContext instanceof BaseActivity)
+            ((BaseActivity) mContext).setGdprIntegrationCase(gdprCase);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 
     private boolean getAutoLoadingState() {
@@ -200,5 +239,26 @@ public class InfoFragment extends BaseFragment implements View.OnClickListener {
     @Override
     public boolean processBackPress() {
         return true;
+    }
+
+    public enum GdprIntegrationCase {
+        IGNORE("Means Publisher ignore LoopMe SDK integration advices, and did nothing"),
+        INIT("Means Publisher call LoopMeSdk.init(activity) method. Sdk should ask user about consent"),
+        CONSENT_TRUE("Publisher explicitly passes user consent value  as true to sdk"),
+        CONSENT_FALSE("Publisher explicitly passes user consent  value as false to sdk");
+
+        private String mDesc;
+
+        GdprIntegrationCase(String desc) {
+            mDesc = desc;
+        }
+
+        public String getDesc() {
+            return mDesc;
+        }
+
+        public static String getDescription(int position) {
+            return values()[position].getDesc();
+        }
     }
 }

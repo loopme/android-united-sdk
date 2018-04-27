@@ -128,6 +128,14 @@
                     android:textSize="@dimen/text_size_16sp"
                     android:layout_margin="@dimen/about_dialog_mopub_sdk_version_padding_bottom"
                     android:paddingLeft="@dimen/enable_auoloading_checkbox_padding_left" />
+
+                <Spinner
+                    android:id="@+id/integration_type_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:paddingBottom="10dp" />
+
             </LinearLayout>
 
         </LinearLayout>
