@@ -204,7 +204,7 @@ public class MraidBridge extends WebViewClient {
     }
 
     private void handleExpand() {
-        boolean useCustomClose = detectBooleanQueryParameter(mCommandUri, USE_CUSTOM_CLOSE);
+        boolean useCustomClose = detectBooleanQueryParameter(mCommandUri, QUERY_PARAMETER_CUSTOM_CLOSE);
         onExpand(useCustomClose);
     }
 

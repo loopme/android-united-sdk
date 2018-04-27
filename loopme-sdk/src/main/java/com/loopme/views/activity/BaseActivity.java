@@ -345,9 +345,9 @@ public final class BaseActivity extends Activity
     @Override
     public void onCloseButtonVisibilityChanged(boolean customCloseButton) {
         if (customCloseButton) {
-            mMraidCloseButton.setVisibility(View.GONE);
+            mMraidCloseButton.setAlpha(0);
         } else {
-            mMraidCloseButton.setVisibility(View.VISIBLE);
+            mMraidCloseButton.setAlpha(1);
         }
     }
 
