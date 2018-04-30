@@ -8,13 +8,11 @@ import android.webkit.WebView;
 import com.loopme.BuildConfig;
 import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
-import com.loopme.tracker.AdIds;
 import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.constants.Event;
 import com.loopme.tracker.constants.Partner;
 import com.loopme.tracker.Tracker;
 import com.loopme.utils.ArrayUtils;
-import com.loopme.utils.Utils;
 import com.moat.analytics.mobile.loo.MoatAdEvent;
 import com.moat.analytics.mobile.loo.MoatAdEventType;
 import com.moat.analytics.mobile.loo.MoatAnalytics;
@@ -23,275 +21,279 @@ import com.moat.analytics.mobile.loo.MoatOptions;
 import com.moat.analytics.mobile.loo.NativeVideoTracker;
 import com.moat.analytics.mobile.loo.WebAdTracker;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class MoatTracker implements Tracker {
-
-    private static final String LOG_TAG = MoatTracker.class.getSimpleName();
-    private static final String MOAT_TRACKER_LOG_PREFIX = "Moat call event: ";
-    private static final int ARGUMENTS_COUNT_2 = 2;
-    private static final int FIRST_ARGUMENT = 0;
-    private static final int SECOND_ARGUMENT = 1;
-
-    private WebTracker mMoatWebTracker;
-    private NativeTracker mMoatNativeTracker;
-    private float mPreviousVolume;
+    private static String sLOG_TAG = MoatTracker.class.getSimpleName();
+    private MoatBaseTracker mMoatTracker;
 
     public MoatTracker(LoopMeAd loopMeAd, AdType adType) {
-        if (loopMeAd == null) {
-            Logging.out(LOG_TAG, "LoopMeAd should not be null");
-            return;
-        }
-        if (adType == AdType.NATIVE) {
-            mMoatNativeTracker = new NativeTracker(loopMeAd);
-        } else {
-            mMoatWebTracker = new WebTracker(loopMeAd);
+        switch (adType) {
+            case NATIVE: {
+                mMoatTracker = new MoatNativeTracker(loopMeAd);
+                break;
+            }
+            case WEB: {
+                mMoatTracker = new MoatWebTracker(loopMeAd);
+                break;
+            }
         }
     }
 
     public static void startSdk(LoopMeAd loopMeAd) {
         if (loopMeAd == null) {
-            Logging.out(LOG_TAG, "loopMeAd should not be null");
+            Logging.out(sLOG_TAG, "loopMeAd should not be null");
             return;
         }
         MoatOptions options = new MoatOptions();
         options.disableAdIdCollection = true;
         MoatAnalytics.getInstance().start(options, loopMeAd.getContext().getApplication());
-        Logging.out(LOG_TAG, "Sdk started: " + Partner.MOAT.name());
+        Logging.out(sLOG_TAG, "Sdk started: " + Partner.MOAT.name());
     }
 
 
     @Override
     public void track(Event event, Object... args) {
-        switch (event) {
-            case START_MEASURING: {
-                webTrackerStartTracking();
-                break;
-            }
-            case STOP: {
-                stopTracker();
-                break;
-            }
-
-            case PREPARE: {
-                nativeTrackerStartTracking(args);
-                break;
-            }
-            case VIDEO_STARTED: {
-                nativeTrackerDispatchEvent(MoatAdEventType.AD_EVT_START);
-                break;
-            }
-            case FIRST_QUARTILE: {
-                nativeTrackerDispatchEvent(MoatAdEventType.AD_EVT_FIRST_QUARTILE);
-                break;
-            }
-
-            case MIDPOINT: {
-                nativeTrackerDispatchEvent(MoatAdEventType.AD_EVT_MID_POINT);
-                break;
-            }
-            case THIRD_QUARTILE: {
-                nativeTrackerDispatchEvent(MoatAdEventType.AD_EVT_THIRD_QUARTILE);
-                break;
-            }
-            case VIDEO_COMPLETE: {
-                nativeTrackerDispatchEvent(MoatAdEventType.AD_EVT_COMPLETE);
-                break;
-            }
-            case PAUSED: {
-                nativeTrackerDispatchEvent(MoatAdEventType.AD_EVT_PAUSED);
-                break;
-            }
-            case PLAYING: {
-                nativeTrackerDispatchEvent(MoatAdEventType.AD_EVT_PLAYING);
-                break;
-            }
-            case VIDEO_STOPPED: {
-                nativeTrackerDispatchEvent(MoatAdEventType.AD_EVT_STOPPED);
-                break;
-            }
-            case SKIPPED: {
-                nativeTrackerDispatchEvent(MoatAdEventType.AD_EVT_SKIPPED);
-                break;
-            }
-            case VOLUME_CHANGE: {
-                nativeTrackerVolumeChange(args);
-                break;
-            }
-            case ENTERED_FULLSCREEN: {
-                nativeTrackerDispatchEvent(MoatAdEventType.AD_EVT_ENTER_FULLSCREEN);
-                break;
-            }
-            case EXITED_FULLSCREEN: {
-                nativeTrackerDispatchEvent(MoatAdEventType.AD_EVT_EXIT_FULLSCREEN);
-                break;
-            }
+        if (mMoatTracker != null) {
+            mMoatTracker.track(event, args);
         }
     }
 
-    private void nativeTrackerStartTracking(Object[] args) {
-        if (ArrayUtils.isArgumentsValid(args) && args.length >= ARGUMENTS_COUNT_2) {
 
-            MediaPlayer mediaPlayer = Utils.convertToMediaPlayer(args[FIRST_ARGUMENT]);
-            View playerView = Utils.convertToView(args[SECOND_ARGUMENT]);
+    private class MoatNativeTracker extends MoatBaseTracker {
+        private NativeVideoTracker mTracker;
+        private static final int FIRST_ARGUMENT = 0;
+        private static final int SECOND_ARGUMENT = 1;
+        private float mPreviousVolume;
+        private Map<String, String> mAdIds;
 
-            if (ArrayUtils.isArgumentsValid(mediaPlayer, playerView, mMoatNativeTracker)) {
-                mMoatNativeTracker.changeTargetView(playerView);
-                mMoatNativeTracker.trackVideoAd(mediaPlayer, playerView);
+        protected MoatNativeTracker(LoopMeAd loopMeAd) {
+            super(loopMeAd);
+            mAdIds = loopMeAd.getAdParams().getAdIds().toHashMap();
+            sLOG_TAG = MoatNativeTracker.class.getSimpleName();
+        }
+
+        protected void init(LoopMeAd loopMeAd) {
+            mTracker = createNativeVideoTracker();
+            mTracker.setActivity(loopMeAd.getContext());
+            Logging.out(sLOG_TAG, "created native tracker");
+        }
+
+        @Override
+        public void track(Event event, Object... args) {
+            switch (event) {
+                case STOP: {
+                    stopTracking();
+                    break;
+                }
+                case PREPARE: {
+                    startTracking(args);
+                    break;
+                }
+                case VIDEO_STARTED: {
+                    dispatchEvent(MoatAdEventType.AD_EVT_START);
+                    break;
+                }
+                case FIRST_QUARTILE: {
+                    dispatchEvent(MoatAdEventType.AD_EVT_FIRST_QUARTILE);
+                    break;
+                }
+                case MIDPOINT: {
+                    dispatchEvent(MoatAdEventType.AD_EVT_MID_POINT);
+                    break;
+                }
+                case THIRD_QUARTILE: {
+                    dispatchEvent(MoatAdEventType.AD_EVT_THIRD_QUARTILE);
+                    break;
+                }
+                case VIDEO_COMPLETE: {
+                    dispatchEvent(MoatAdEventType.AD_EVT_COMPLETE);
+                    break;
+                }
+                case PAUSED: {
+                    dispatchEvent(MoatAdEventType.AD_EVT_PAUSED);
+                    break;
+                }
+                case PLAYING: {
+                    dispatchEvent(MoatAdEventType.AD_EVT_PLAYING);
+                    break;
+                }
+                case VIDEO_STOPPED: {
+                    dispatchEvent(MoatAdEventType.AD_EVT_STOPPED);
+                    break;
+                }
+                case SKIPPED: {
+                    dispatchEvent(MoatAdEventType.AD_EVT_SKIPPED);
+                    break;
+                }
+                case VOLUME_CHANGE: {
+                    onVolumeChange(args);
+                    break;
+                }
+                case ENTERED_FULLSCREEN: {
+                    dispatchEvent(MoatAdEventType.AD_EVT_ENTER_FULLSCREEN);
+                    break;
+                }
+                case EXITED_FULLSCREEN: {
+                    dispatchEvent(MoatAdEventType.AD_EVT_EXIT_FULLSCREEN);
+                    break;
+                }
             }
         }
-    }
 
-    private void nativeTrackerVolumeChange(Object[] args) {
-        if (ArrayUtils.isArrayValid(args) && args.length >= ARGUMENTS_COUNT_2) {
-            float volume = (float) args[FIRST_ARGUMENT];
-            int currentPosition = (int) args[SECOND_ARGUMENT];
-            if (!isVolumeChanged(volume)) {
-                return;
+
+        private void startTracking(Object[] args) {
+            if (ArrayUtils.isArgumentsValid(args)
+                    && args.length >= 2
+                    && args[FIRST_ARGUMENT] instanceof MediaPlayer
+                    && args[SECOND_ARGUMENT] instanceof View) {
+
+                MediaPlayer mediaPlayer = (MediaPlayer) args[FIRST_ARGUMENT];
+                View playerView = (View) args[SECOND_ARGUMENT];
+
+                changeTargetView(playerView);
+                trackVideoAd(mediaPlayer, playerView);
             }
-            MoatAdEvent event = new MoatAdEvent(MoatAdEventType.AD_EVT_VOLUME_CHANGE, currentPosition, (double)volume);
-
-            if (mMoatNativeTracker != null) {
-                mMoatNativeTracker.dispatchEvent(event);
-                Logging.out(LOG_TAG, MOAT_TRACKER_LOG_PREFIX + MoatAdEventType.AD_EVT_VOLUME_CHANGE.name());
-            }
-        }
-    }
-
-    private boolean isVolumeChanged(float currentVolume) {
-        if (mPreviousVolume != currentVolume) {
-            mPreviousVolume = currentVolume;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private void stopTracker() {
-        if (mMoatNativeTracker != null) {
-            mMoatNativeTracker.stopTracking();
-            mMoatNativeTracker = null;
-        }
-        if (mMoatWebTracker != null) {
-            mMoatWebTracker.stopTracking();
-            mMoatWebTracker = null;
-        }
-    }
-
-    private void webTrackerStartTracking() {
-        if (mMoatWebTracker != null) {
-            mMoatWebTracker.startTracking();
-        }
-    }
-
-    private void nativeTrackerDispatchEvent(MoatAdEventType eventType) {
-        if (mMoatNativeTracker != null) {
-            mMoatNativeTracker.dispatchEvent(eventType);
-        }
-    }
-
-    private class NativeTracker {
-        private NativeVideoTracker mNativeTracker;
-        private Map<String, String> mAdIds = new HashMap<>();
-        private static final String LEVEL1 = "level1";
-        private static final String LEVEL2 = "level2";
-        private static final String LEVEL3 = "level3";
-        private static final String LEVEL4 = "level4";
-        private static final String SLICER1 = "slicer1";
-        private static final String SLICER2 = "slicer2";
-
-
-        private NativeTracker(LoopMeAd loopMeAd) {
-            init(loopMeAd);
-            setAdIds(loopMeAd.getAdParams().getAdIds());
-        }
-
-        private void init(LoopMeAd loopMeAd) {
-            MoatFactory factory = MoatFactory.create();
-            mNativeTracker = factory.createNativeVideoTracker(BuildConfig.MOAT_TOKEN);
-            mNativeTracker.setActivity(loopMeAd.getContext());
-            Logging.out(LOG_TAG, MOAT_TRACKER_LOG_PREFIX + "created native tracker");
         }
 
         private void stopTracking() {
-            if (mNativeTracker != null) {
-                mNativeTracker.stopTracking();
-                mNativeTracker = null;
-                Logging.out(LOG_TAG, MOAT_TRACKER_LOG_PREFIX + " onStopMoatTracking");
+            if (mTracker != null) {
+                mTracker.stopTracking();
+                mTracker = null;
+                Logging.out(sLOG_TAG, "stopTracking");
             }
         }
 
         private void dispatchEvent(MoatAdEventType eventType) {
-            if (mNativeTracker != null) {
-                mNativeTracker.dispatchEvent(new MoatAdEvent(eventType));
-                Logging.out(LOG_TAG, MOAT_TRACKER_LOG_PREFIX + eventType.name());
-            }
-        }
-
-        private void dispatchEvent(MoatAdEvent event) {
-            if (mNativeTracker != null) {
-                mNativeTracker.dispatchEvent(event);
+            if (mTracker != null) {
+                mTracker.dispatchEvent(new MoatAdEvent(eventType));
+                Logging.out(sLOG_TAG, eventType.name());
             }
         }
 
         private void changeTargetView(View view) {
-            if (mNativeTracker != null) {
-                mNativeTracker.changeTargetView(view);
-                Logging.out(LOG_TAG, MOAT_TRACKER_LOG_PREFIX + "changeTargetView");
+            if (mTracker != null) {
+                mTracker.changeTargetView(view);
+                Logging.out(sLOG_TAG, "changeTargetView");
             }
         }
 
         private void trackVideoAd(MediaPlayer mediaPlayer, View playerView) {
-            if (mNativeTracker != null) {
-                mNativeTracker.trackVideoAd(mAdIds, mediaPlayer, playerView);
-                Logging.out(LOG_TAG, MOAT_TRACKER_LOG_PREFIX + "trackVideoAd");
+            if (mTracker != null) {
+                mTracker.trackVideoAd(mAdIds, mediaPlayer, playerView);
+                Logging.out(sLOG_TAG, "trackVideoAd");
             }
         }
 
-        private void setAdIds(AdIds adIds) {
-            HashMap<String, String> dataMap = new HashMap<>();
-            dataMap.put(LEVEL1, adIds.getAdvertiserId());
-            dataMap.put(LEVEL2, adIds.getCampaignId());
-            dataMap.put(LEVEL3, adIds.getLineItemId());
-            dataMap.put(LEVEL4, adIds.getCreativeId());
-            dataMap.put(SLICER1, adIds.getAppId());
-            dataMap.put(SLICER2, adIds.getPlacementId());
-            mAdIds.putAll(dataMap);
+        private void onVolumeChange(Object[] args) {
+            if (ArrayUtils.isArrayValid(args)
+                    && args.length >= 2
+                    && args[FIRST_ARGUMENT] instanceof Float
+                    && args[SECOND_ARGUMENT] instanceof Integer) {
+
+                float volume = (float) args[FIRST_ARGUMENT];
+                int currentPosition = (int) args[SECOND_ARGUMENT];
+
+                if (isVolumeChanged(volume)) {
+                    MoatAdEvent event = new MoatAdEvent(MoatAdEventType.AD_EVT_VOLUME_CHANGE, currentPosition, (double) volume);
+                    if (mTracker != null) {
+                        mTracker.dispatchEvent(event);
+                    }
+                    Logging.out(sLOG_TAG, "onVolumeChange " + volume);
+                }
+            }
+        }
+
+        private boolean isVolumeChanged(float currentVolume) {
+            if (mPreviousVolume != currentVolume) {
+                mPreviousVolume = currentVolume;
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
-    private class WebTracker {
-        private WebAdTracker mWebTracker;
+    private class MoatWebTracker extends MoatBaseTracker {
+        private WebAdTracker mTracker;
 
-        WebTracker(LoopMeAd loopMeAd) {
-            init(loopMeAd.getDisplayController().getWebView(), loopMeAd.getContext());
+        protected MoatWebTracker(LoopMeAd loopMeAd) {
+            super(loopMeAd);
+            sLOG_TAG = MoatWebTracker.class.getSimpleName();
         }
 
-        private void init(WebView webView, Activity activity) {
-            if (webView == null || activity == null) {
-                Logging.out(LOG_TAG, "WebView or activity is null");
-                return;
+        @Override
+        protected void init(LoopMeAd loopMeAd) {
+            mTracker = createWebAdTracker();
+            mTracker.setActivity(loopMeAd.getContext());
+            Logging.out(sLOG_TAG, "created web tracker");
+        }
+
+        @Override
+        public void track(Event event, Object... args) {
+            switch (event) {
+                case NEW_ACTIVITY: {
+                    onNewActivity(args);
+                    break;
+                }
+                case START_MEASURING: {
+                    startTracking();
+                    break;
+                }
+                case STOP: {
+                    stopTracking();
+                    break;
+                }
             }
-            MoatFactory factory = MoatFactory.create();
-            mWebTracker = factory.createWebAdTracker(webView);
-            mWebTracker.setActivity(activity);
-            Logging.out(LOG_TAG, MOAT_TRACKER_LOG_PREFIX + "created web tracker");
         }
 
         private void startTracking() {
-            if (mWebTracker != null) {
-                mWebTracker.startTracking();
-                Logging.out(LOG_TAG, MOAT_TRACKER_LOG_PREFIX + "webTrackerStartTracking");
+            if (mTracker != null) {
+                mTracker.startTracking();
+                Logging.out(sLOG_TAG, "startTracking");
             }
         }
 
         private void stopTracking() {
-            if (mWebTracker != null) {
-                mWebTracker.stopTracking();
-                mWebTracker = null;
-                Logging.out(LOG_TAG, MOAT_TRACKER_LOG_PREFIX + "onStopMoatWebTracking");
+            if (mTracker != null) {
+                mTracker.stopTracking();
+                mTracker = null;
+                Logging.out(sLOG_TAG, "stopTracking");
             }
+        }
+
+        private void onNewActivity(Object[] args) {
+            if (ArrayUtils.isArgumentsValid(args) && args[0] instanceof Activity) {
+                onNewActivity((Activity) args[0]);
+            }
+        }
+
+        public void onNewActivity(Activity activity) {
+            if (mTracker != null) {
+                mTracker.setActivity(activity);
+                Logging.out(sLOG_TAG, "onNewActivity");
+            }
+        }
+    }
+
+    private abstract class MoatBaseTracker implements Tracker {
+        private final WebView mWebView;
+        private MoatFactory mFactory;
+
+        protected MoatBaseTracker(LoopMeAd loopMeAd) {
+            mFactory = MoatFactory.create();
+            mWebView = loopMeAd.getDisplayController().getWebView();
+            init(loopMeAd);
+        }
+
+        protected abstract void init(LoopMeAd loopMeAd);
+
+        protected WebAdTracker createWebAdTracker() {
+            return mFactory.createWebAdTracker(mWebView);
+        }
+
+        protected NativeVideoTracker createNativeVideoTracker() {
+            return mFactory.createNativeVideoTracker(BuildConfig.MOAT_TOKEN);
         }
     }
 }

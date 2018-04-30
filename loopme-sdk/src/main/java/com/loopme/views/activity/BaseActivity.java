@@ -73,6 +73,7 @@ public final class BaseActivity extends Activity
         mDisplayController.onAdRegisterView(this, mDisplayController.getWebView());
         mDisplayController.postImpression();
         mDisplayController.onAdEnteredFullScreenEvent();
+        mDisplayController.onNewActivity(this);
     }
 
     private void setMraidSettings() {
@@ -213,7 +214,7 @@ public final class BaseActivity extends Activity
     }
 
     private void startPlayNoneLoopMeInterstitial() {
-        if (mLoopMeAd.isInterstitial() && !(mDisplayController instanceof DisplayControllerLoopMe)) {
+        if (mLoopMeAd.isInterstitial()) {
             if (mDisplayController != null) {
                 mDisplayController.onPlay(START_DEFAULT_POSITION);
             }

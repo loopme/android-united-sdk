@@ -62,4 +62,6 @@ public interface AdEvents {
     void onAdInjectJsVpaid(StringBuilder html);
 
     void onAdRecordAdClose();
+
+    void onNewActivity(Activity activity);
 }

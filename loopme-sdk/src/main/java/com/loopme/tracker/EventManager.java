@@ -265,4 +265,11 @@ public class EventManager implements AdEvents {
             mTrackerManager.track(Event.CLOSE);
         }
     }
+
+    @Override
+    public void onNewActivity(Activity activity) {
+        if (mTrackerManager != null) {
+            mTrackerManager.track(Event.NEW_ACTIVITY, activity);
+        }
+    }
 }

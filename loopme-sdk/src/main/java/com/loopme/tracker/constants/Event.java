@@ -35,6 +35,7 @@ public enum Event {
     CHANGE_TARGET_VIEW,
     PREPARE,
     VIDEO_STARTED,
+    NEW_ACTIVITY,
 
     //DV
     START_MEASURING,

@@ -370,4 +370,11 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     protected boolean isTrackerAvailable() {
         return mEventManager != null;
     }
+
+    @Override
+    public void onNewActivity(Activity activity) {
+        if (mEventManager != null) {
+            mEventManager.onNewActivity(activity);
+        }
+    }
 }

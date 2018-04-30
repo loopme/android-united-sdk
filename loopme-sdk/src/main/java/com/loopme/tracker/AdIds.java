@@ -2,6 +2,8 @@ package com.loopme.tracker;
 
 import android.text.TextUtils;
 
+import java.util.HashMap;
+
 public class AdIds {
     private String mAdvertiserId = "";
     private String mPlacementId = "";
@@ -9,6 +11,13 @@ public class AdIds {
     private String mLineItemId = "";
     private String mCreativeId = "";
     private String mAppId = "";
+
+    private static final String LEVEL1 = "level1";
+    private static final String LEVEL2 = "level2";
+    private static final String LEVEL3 = "level3";
+    private static final String LEVEL4 = "level4";
+    private static final String SLICER1 = "slicer1";
+    private static final String SLICER2 = "slicer2";
 
     public void setAdvertiserId(String advertiserId) {
         this.mAdvertiserId = TextUtils.isEmpty(advertiserId) ? "" : advertiserId;
@@ -56,5 +65,16 @@ public class AdIds {
 
     public String getCreativeId() {
         return mCreativeId;
+    }
+
+    public HashMap<String, String> toHashMap() {
+        HashMap<String, String> dataMap = new HashMap<>();
+        dataMap.put(LEVEL1, getAdvertiserId());
+        dataMap.put(LEVEL2, getCampaignId());
+        dataMap.put(LEVEL3, getLineItemId());
+        dataMap.put(LEVEL4, getCreativeId());
+        dataMap.put(SLICER1, getAppId());
+        dataMap.put(SLICER2, getPlacementId());
+        return dataMap;
     }
 }

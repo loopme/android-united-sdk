@@ -25,7 +25,7 @@ public class TrackerManager {
     public TrackerManager(LoopMeAd loopmeAd) {
         if (loopmeAd != null) {
             mLoopMeAd = loopmeAd;
-            setTrackersList(mLoopMeAd.getAdParams().getTrackers());
+            mTrackersNamesList.addAll(mLoopMeAd.getAdParams().getTrackers());
         }
     }
 
@@ -53,7 +53,7 @@ public class TrackerManager {
                 tracker = initTracker(Partner.DV, adType);
             }
             if (tracker != null) {
-                addTrackerToList(tracker);
+                mTrackers.add(tracker);
             }
         }
     }
@@ -93,19 +93,5 @@ public class TrackerManager {
 
     private boolean isMoat(String name) {
         return !TextUtils.isEmpty(name) && name.equalsIgnoreCase(Partner.MOAT.name());
-    }
-
-    private void addTrackerToList(Tracker tracker) {
-        if (tracker != null) {
-            mTrackers.add(tracker);
-        }
-    }
-
-    private void setTrackersList(List<String> trackers) {
-        if (trackers != null && !trackers.isEmpty()) {
-            mTrackersNamesList = trackers;
-        } else {
-            Logging.out(LOG_TAG, "trackers list is null or empty");
-        }
     }
 }
