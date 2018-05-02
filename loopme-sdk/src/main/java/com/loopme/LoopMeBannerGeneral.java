@@ -124,6 +124,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
     public void show() {
         if (isPrepared()) {
             showInternal();
+            getDisplayController().postImpression();
             if (isLoopMeAd() || isMraidAd()) {
                 resume();
             } else if (isVastAd() || isVpaidAd() && mDisplayController != null) {

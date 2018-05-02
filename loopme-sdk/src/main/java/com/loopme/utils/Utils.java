@@ -179,12 +179,17 @@ public class Utils {
     }
 
     public static String getStringFromStream(InputStream inputStream) {
+        return getStringBuilderFromStream(inputStream).toString();
+    }
+
+
+    public static StringBuilder getStringBuilderFromStream(InputStream inputStream) {
         int numberBytesRead;
         StringBuilder out = new StringBuilder();
         byte[] bytes = new byte[4096];
 
         if (inputStream == null) {
-            return "";
+            return out;
         }
         try {
             while ((numberBytesRead = inputStream.read(bytes)) != -1) {
@@ -195,7 +200,7 @@ public class Utils {
         } finally {
             IOUtils.closeQuietly(inputStream);
         }
-        return out.toString();
+        return out;
     }
 
     public static boolean isPackageInstalled(List<String> packageIds, List<String> installedList) {
@@ -398,14 +403,14 @@ public class Utils {
         return new ResourceInfo();
     }
 
-    // TODO: ------------------------------------ do not test --------------------------------------------
-    public static String readAssets(AssetManager assetManager, String filename) {
+    // : ------------------------------------ do not test --------------------------------------------
+    public static StringBuilder readAssets(AssetManager assetManager, String filename) {
         try {
-            return getStringFromStream(assetManager.open(filename));
+            return getStringBuilderFromStream(assetManager.open(filename));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return "";
+        return new StringBuilder();
     }
 
     private static String getEncryptedString(String stringToEncrypt) {
@@ -697,5 +702,68 @@ public class Utils {
     public static void adjustLayoutParams(ViewGroup.LayoutParams paramFrom, ViewGroup.LayoutParams paramTo) {
         paramTo.width = paramFrom.width;
         paramTo.height = paramFrom.height;
+    }
+
+    public static boolean isNotNull(Object[] args) {
+        if (args != null && args.length >= 1) {
+            for (Object object : args) {
+                if (object == null) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean hasInteger(Object[] args) {
+        if (isNotNull(args)) {
+            for (Object object : args) {
+                if (!(object instanceof Integer)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean hasStrings(Object[] args) {
+        if (isNotNull(args)) {
+            for (Object object : args) {
+                if (!(object instanceof String)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean isFirstQuartile(int adDuration, int currentPosition) {
+        int event25 = adDuration / 4;
+        return currentPosition >= event25;
+    }
+
+    public static boolean isMidpoint(int adDuration, int currentPosition) {
+        int event50 = adDuration / 2;
+        return currentPosition >= event50;
+    }
+
+    public static boolean isThirdQuartile(int adDuration, int currentPosition) {
+        int event75 = adDuration * 3 / 4;
+        return currentPosition >= event75;
+    }
+
+    public static boolean hasFloat(Object[] args) {
+        if (isNotNull(args)) {
+            for (Object object : args) {
+                if (!(object instanceof Float)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean isFloat(Object obj) {
+        return obj instanceof Float;
     }
 }

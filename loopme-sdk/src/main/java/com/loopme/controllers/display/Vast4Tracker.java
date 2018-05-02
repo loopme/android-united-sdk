@@ -86,11 +86,9 @@ public class Vast4Tracker {
         mWebView = webView;
     }
 
-    public String addVerificationScripts(String html) {
-        String script = getAdVerificationScript();
-        StringBuilder builder = new StringBuilder(html);
-        builder.insert(BODY_TAG_INDEX, script);
-        return builder.toString();
+    public void addVerificationScripts(StringBuilder html) {
+        String scripts = getAdVerificationScript();
+        html.insert(BODY_TAG_INDEX, scripts);
     }
 
     public interface OnAdVerificationListener {

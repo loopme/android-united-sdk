@@ -26,7 +26,6 @@
     <uses-permission android:name="android.permission.CLEAR_APP_CACHE" />
 
     <application
-        android:name="android.support.multidex.MultiDexApplication"
         android:banner="@drawable/ic_action_new"
         android:networkSecurityConfig="@xml/network_security_config"
         android:icon="@drawable/launchericon"

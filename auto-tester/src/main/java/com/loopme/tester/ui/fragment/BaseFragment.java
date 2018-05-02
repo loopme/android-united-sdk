@@ -23,6 +23,7 @@ public class BaseFragment extends Fragment {
     private boolean mChildFragmentsCreated;
     private boolean mHasLandscapeView;
     private List<ChildFragmentModel> mChildFragments = new ArrayList<>();
+    private View mRootView;
 
     private void setActivity(Activity activity) {
 
@@ -177,6 +178,24 @@ public class BaseFragment extends Fragment {
     public void showSoftKeyboard(View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.showSoftInput(view, 0);
+    }
+
+
+
+    public void setRootView(View mRootView) {
+        this.mRootView = mRootView;
+        setRootVisible(true);
+    }
+
+
+    private void setRootVisible(boolean visible) {
+        if (mRootView != null) {
+            if (visible) {
+                mRootView.setVisibility(View.VISIBLE);
+            } else {
+                mRootView.setVisibility(View.GONE);
+            }
+        }
     }
 
 }

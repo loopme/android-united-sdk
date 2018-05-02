@@ -8,11 +8,8 @@ import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
@@ -35,12 +32,11 @@ import com.loopme.loaders.Loader;
 import com.loopme.models.Errors;
 import com.loopme.models.Message;
 import com.loopme.utils.UiUtils;
-import com.loopme.utils.Utils;
 import com.loopme.views.AdView;
 import com.loopme.views.LoopMeWebView;
 import com.loopme.views.MraidView;
 
-public class DisplayControllerLoopMe extends BaseDisplayController implements LoopMeDisplayController {
+public class DisplayControllerLoopMe extends BaseTrackableController implements LoopMeDisplayController {
 
     private static final int MRAID_WIDTH = 400;
     private static final int MRAID_HEIGHT = 600;
@@ -138,8 +134,7 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
 
     private void preloadLoopMeAd() {
         if (!mAdParams.isMraidAd()) {
-            String html = mAdParams.getHtml();
-            loadHtml(html);
+            loadHtml(mAdParams.getHtml());
         }
     }
 
@@ -233,11 +228,23 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
     }
 
     private void preloadHtml() {
-        if (mAdParams.isMraidAd()) {
+        onAdRegisterView(mLoopMeAd.getContext(), getWebView());
+        injectTrackingJsForWeb();
+        if (isMraidAd()) {
             preloadMraidAd();
         } else {
             preloadLoopMeAd();
         }
+    }
+
+    private void injectTrackingJsForWeb() {
+        if (!isVideo360()) {
+            onAdInjectJs(mLoopMeAd);
+        }
+    }
+
+    private boolean isVideo360() {
+        return mLoopMeAd != null && mLoopMeAd.isVideo360();
     }
 
     @Override
@@ -251,12 +258,12 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
 
     @Override
     public void onResume() {
-        super.onResume();
         if (isBanner()) {
             resumeBanner();
         } else {
             resumeInterstitial();
         }
+        super.onResume();
     }
 
     private void resumeBanner() {
@@ -347,6 +354,7 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         destroyMraidController();
         destroyVideoController();
         stopVideoLoader();
@@ -358,7 +366,6 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
         mBridgeListener = null;
         mOnTouchListener = null;
         mDisplayModeResolver.destroy();
-        super.onDestroy();
     }
 
     private void destroyMraidController() {
@@ -455,6 +462,17 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
         mDisplayModeResolver.switchToFullScreenMode(isFullScreen);
     }
 
+    @Override
+    public int getOrientation() {
+        if (isMraidAd()) {
+            return getMraidOrientation();
+        } else if (isInterstitial()) {
+            return getOrientationFromAdParams();
+        } else {
+            return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+        }
+    }
+
     private void handleVideoStretch(boolean videoStretch) {
         onMessage(Message.LOG, "JS command: stretch video ");
         Constants.StretchOption stretch = videoStretch ?
@@ -467,8 +485,6 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
     private void loadHtml(String html) {
         if (mAdView != null) {
             mAdView.loadHtml(html);
-        } else {
-            onAdLoadFail(Errors.HTML_LOADING_ERROR);
         }
     }
 
@@ -513,6 +529,7 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
             public void onJsVideoPause(final int time) {
                 pauseViewController();
                 pauseVideoController(true);
+                onAdSkippedEvent();
             }
 
             @Override
@@ -532,6 +549,7 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
 
             @Override
             public void onJsClose() {
+                onAdUserCloseEvent();
                 destroyLoopMeAd();
             }
 
@@ -569,7 +587,7 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
     }
 
     public void switchToPreviousMode() {
-        if (mLoopMeAd.isBanner() && mDisplayModeResolver != null) {
+        if (isBanner() && mDisplayModeResolver != null) {
             mDisplayModeResolver.switchToPreviousMode();
         }
     }
@@ -640,6 +658,7 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
         return new VideoController.Callback() {
             @Override
             public void onVideoReachEnd() {
+                onAdCompleteEvent();
                 onAdVideoDidReachEnd();
             }
 
@@ -659,8 +678,13 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
             }
 
             @Override
-            public void onVolumeChangedEvent(double volume, int currentPosition) {
+            public void onVolumeChangedEvent(float volume, int currentPosition) {
                 onAdVolumeChangedEvent(volume, currentPosition);
+            }
+
+            @Override
+            public void onDurationChangedEvent(int currentPosition, int adDuration) {
+                onAdDurationEvents(currentPosition, adDuration);
             }
         };
     }
@@ -718,10 +742,10 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
 
     @Override
     public WebView getWebView() {
-        if (mAdView != null) {
-            return mAdView;
-        } else {
+        if (isMraidAd()) {
             return mMraidView;
+        } else {
+            return mAdView;
         }
     }
 
@@ -772,7 +796,6 @@ public class DisplayControllerLoopMe extends BaseDisplayController implements Lo
     public boolean isVideoPaused() {
         return getCurrentVideoState() == Constants.VideoState.PAUSED;
     }
-
 
     public int getMraidOrientation() {
         if (mMraidController != null) {

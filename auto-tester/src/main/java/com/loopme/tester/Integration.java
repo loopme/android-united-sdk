@@ -6,6 +6,7 @@ import com.loopme.tester.enums.AdSdk;
 import com.loopme.tester.enums.AdType;
 import com.loopme.tester.model.AdSpot;
 import com.loopme.tester.ui.activity.BaseActivity;
+import com.loopme.tester.ui.activity.MainActivity;
 
 /**
  * Created by katerina on 6/23/17.
@@ -197,6 +198,62 @@ public class Integration {
         adSpot.setType(AdType.INTERSTITIAL);
         adSpot.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
         return adSpot;
+    }
+
+    public static void insertIasKeys(BaseActivity activity) {
+        AdSpot nativeKey = new AdSpot();
+        nativeKey.setName(activity.getString(R.string.native_video));
+        nativeKey.setAppKey(Constants.Keys.KEY_TEST_INTERSTITIAL_P);
+        nativeKey.setTime(System.currentTimeMillis());
+        nativeKey.setSdk(AdSdk.LOOPME);
+        nativeKey.setType(AdType.INTERSTITIAL);
+        nativeKey.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(nativeKey);
+
+        AdSpot htmlGwd = new AdSpot();
+        htmlGwd.setName(activity.getString(R.string.html_gwd));
+        htmlGwd.setAppKey(Constants.Keys.KEY_HTML_GWD);
+        htmlGwd.setTime(System.currentTimeMillis());
+        htmlGwd.setSdk(AdSdk.LOOPME);
+        htmlGwd.setType(AdType.INTERSTITIAL);
+        htmlGwd.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(htmlGwd);
+
+        AdSpot htmNoneGwd = new AdSpot();
+        htmNoneGwd.setName(activity.getString(R.string.html_none_gwd));
+        htmNoneGwd.setAppKey(Constants.Keys.KEY_HTML_NONE_GWD);
+        htmNoneGwd.setTime(System.currentTimeMillis());
+        htmNoneGwd.setSdk(AdSdk.LOOPME);
+        htmNoneGwd.setType(AdType.INTERSTITIAL);
+        htmNoneGwd.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(htmNoneGwd);
+
+        AdSpot expBanner = new AdSpot();
+        expBanner.setName(activity.getString(R.string.html_banner_expand));
+        expBanner.setAppKey(Constants.Keys.KEY_MRAID_EXP_BANNER);
+        expBanner.setTime(System.currentTimeMillis());
+        expBanner.setSdk(AdSdk.LOOPME);
+        expBanner.setType(AdType.BANNER);
+        expBanner.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(expBanner);
+
+        AdSpot imageInter = new AdSpot();
+        imageInter.setName(activity.getString(R.string.image_fullscreen));
+        imageInter.setAppKey(Constants.Keys.KEY_IMG_INTER);
+        imageInter.setTime(System.currentTimeMillis());
+        imageInter.setSdk(AdSdk.LOOPME);
+        imageInter.setType(AdType.INTERSTITIAL);
+        imageInter.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(imageInter);
+
+        AdSpot imageBanner = new AdSpot();
+        imageBanner.setName(activity.getString(R.string.image_banner));
+        imageBanner.setAppKey(Constants.Keys.KEY_IMG_BANNER);
+        imageBanner.setTime(System.currentTimeMillis());
+        imageBanner.setSdk(AdSdk.LOOPME);
+        imageBanner.setType(AdType.BANNER);
+        imageBanner.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(imageBanner);
     }
 
 }

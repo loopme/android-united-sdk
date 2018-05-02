@@ -1,5 +1,6 @@
-package com.loopme.tracker.viewability;
+package com.loopme.tracker;
 
+import android.app.Activity;
 import android.media.MediaPlayer;
 import android.view.View;
 import android.webkit.WebView;
@@ -8,7 +9,6 @@ import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.constants.Event;
-import com.loopme.tracker.interfaces.AdEvents;
 
 public class EventManager implements AdEvents {
     private static final String LOG_TAG = EventManager.class.getSimpleName();
@@ -40,8 +40,8 @@ public class EventManager implements AdEvents {
     @Override
     public void onAdDestroyedEvent() {
         if (mTrackerManager != null) {
-            mTrackerManager.track(Event.END_SESSION);
             mTrackerManager.track(Event.STOP);
+            mTrackerManager.track(Event.END_SESSION);
         }
     }
 
@@ -55,7 +55,7 @@ public class EventManager implements AdEvents {
     @Override
     public void onAdStartedEvent() {
         if (mTrackerManager != null) {
-            mTrackerManager.track(Event.STARTED);
+            mTrackerManager.track(Event.START);
             mTrackerManager.track(Event.VIDEO_STARTED);
         }
     }
@@ -105,13 +105,15 @@ public class EventManager implements AdEvents {
 
     @Override
     public void onAdCompleteEvent() {
-        mTrackerManager.track(Event.COMPLETE);
-        mTrackerManager.track(Event.VIDEO_COMPLETE);
-        mTrackerManager.track(Event.VIDEO_STOPPED);
+        if (mTrackerManager != null) {
+            mTrackerManager.track(Event.COMPLETE);
+            mTrackerManager.track(Event.VIDEO_COMPLETE);
+            mTrackerManager.track(Event.VIDEO_STOPPED);
+        }
     }
 
     @Override
-    public void onAdVolumeChangedEvent(double volume, int currentPosition) {
+    public void onAdVolumeChangedEvent(float volume, int currentPosition) {
         if (mTrackerManager != null) {
             mTrackerManager.track(Event.VOLUME_CHANGE, volume, currentPosition);
         }
@@ -181,6 +183,34 @@ public class EventManager implements AdEvents {
     }
 
     @Override
+    public void onAdRecordReady() {
+        if (mTrackerManager != null) {
+            mTrackerManager.track(Event.RECORD_READY);
+        }
+    }
+
+    @Override
+    public void onAdRegisterView(Activity activity, View view) {
+        if (mTrackerManager != null) {
+            mTrackerManager.track(Event.REGISTER, activity, view);
+        }
+    }
+
+    @Override
+    public void onAdInjectJs(LoopMeAd loopMeAd) {
+        if (mTrackerManager != null) {
+            mTrackerManager.track(Event.INJECT_JS_WEB, loopMeAd);
+        }
+    }
+
+    @Override
+    public void onAdInjectJsVpaid(StringBuilder html) {
+        if (mTrackerManager != null) {
+            mTrackerManager.track(Event.INJECT_JS_VPAID, html);
+        }
+    }
+
+    @Override
     public void onAdDurationEvents(int position, int videoDuration) {
         onAdDurationChangedEvent(position, videoDuration);
         handleProgressDurationEvents(position, videoDuration);
@@ -226,6 +256,20 @@ public class EventManager implements AdEvents {
         } else if (position > quarter75 && !mQuarter75Tracked) {
             mQuarter75Tracked = true;
             onAdVideoThirdQuartileEvent();
+        }
+    }
+
+    @Override
+    public void onAdRecordAdClose() {
+        if (mTrackerManager != null) {
+            mTrackerManager.track(Event.CLOSE);
+        }
+    }
+
+    @Override
+    public void onNewActivity(Activity activity) {
+        if (mTrackerManager != null) {
+            mTrackerManager.track(Event.NEW_ACTIVITY, activity);
         }
     }
 }

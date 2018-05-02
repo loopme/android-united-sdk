@@ -30,5 +30,13 @@ public class Constants {
         public static final String KEY_TEST_360 = "video_360";
         public static final String KEY_TEST_VPAID = "d360f7a4ae";
 
+        public static final String KEY_HTML_VIDEO = "d61b35970e";
+        public static final String KEY_MRAID_EXP_BANNER = "568dbc4fa1";
+        public static final String KEY_HTML_IMAGE = "74e0b90345";
+        public static final String KEY_HTML_GWD = "1f4c1721d1";
+        public static final String KEY_HTML_NONE_GWD = "cf3774483d";
+        public static final String KEY_IMG_INTER = "74e0b90345";
+        public static final String KEY_IMG_BANNER = "3ba34e8f85";
+
     }
 }

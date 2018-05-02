@@ -171,7 +171,7 @@ public class LoopMeMediaPlayer {
         }
     }
 
-    private void onVolumeChanged(double volume, int currentPosition) {
+    private void onVolumeChanged(float volume, int currentPosition) {
         if (mListener != null) {
             mListener.onVolumeChanged(volume, currentPosition);
         }
@@ -183,6 +183,6 @@ public class LoopMeMediaPlayer {
             MediaPlayer.OnErrorListener {
 
         void onErrorOccurred(Exception e);
-        void onVolumeChanged(double volume, int currentPosition);
+        void onVolumeChanged(float volume, int currentPosition);
     }
 }

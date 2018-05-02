@@ -24,7 +24,6 @@ import com.loopme.models.BridgeMethods;
 import com.loopme.models.Errors;
 import com.loopme.models.Message;
 import com.loopme.utils.Utils;
-import com.loopme.vast.TrackingEvent;
 import com.loopme.views.LoopMeWebView;
 import com.loopme.views.webclient.AdViewChromeClient;
 import com.loopme.xml.Tracking;
@@ -78,14 +77,16 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     @Override
     public void prepare() {
         initWebView();
+        onAdRegisterView(mLoopMeAd.getContext(), mWebView);
         initVast4Tracker(mWebView);
         loadHtml(prepareHtml());
     }
 
     private String prepareHtml() {
-        String html = Utils.readAssets(getAssetsManager(), HTML_SOURCE_FILE);
-        html = addVerificationScripts(html);
-        return html.replace(VPAID_CREATIVE_URL_STRING, mAdParams.getVpaidJsUrl());
+        StringBuilder htmlBuilder = Utils.readAssets(getAssetsManager(), HTML_SOURCE_FILE);
+        addVerificationScripts(htmlBuilder);
+        onAdInjectJsVpaid(htmlBuilder);
+        return htmlBuilder.toString().replace(VPAID_CREATIVE_URL_STRING, mAdParams.getVpaidJsUrl());
     }
 
     @Override
@@ -98,6 +99,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         mIsStarted = true;
         callBridgeMethod(BridgeMethods.VPAID_START_AD);
         onStartWebMeasuringDelayed();
+        onAdResumedEvent();
     }
 
     @Override
@@ -168,6 +170,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     @Override
     public void skipVideo() {
+        onAdSkipped();
         mIsStarted = false;
         runOnUiThread(new Runnable() {
             @Override
@@ -244,7 +247,13 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
             url = mAdParams.getVideoRedirectUrl();
         }
         onAdClicked();
-        super.onRedirect(url, mLoopMeAd);
+        final String finalUrl = url;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                DisplayControllerVpaid.super.onRedirect(finalUrl, mLoopMeAd);
+            }
+        });
     }
 
     @Override

@@ -37,9 +37,12 @@ android {
             buildConfigField "String", "MOAT_TOKEN", MOAT_TOKEN
             buildConfigField "String", "DV_TOKEN", DV_TOKEN
             buildConfigField "String", "SDK_TYPE", SDK_TYPE
+            buildConfigField "Boolean", "DEBUG_MODE", "true"
             buildConfigField "String", "SUPPORTED_TRACKERS", SUPPORTED_TRACKERS
             buildConfigField "String", "OPEN_RTB_VERSION", OPEN_RTB_VERSION
-            buildConfigField "Boolean", "DEBUG_MODE", "true"
+            buildConfigField "String", "IAS_LOOPME_PARTNER_ID", IAS_LOOPME_PARTNER_ID
+            buildConfigField "String", "IAS_CM_TAG_URL", IAS_CM_TAG_URL
+            buildConfigField "String", "IAS_LOGGING_TAG_URL", IAS_LOGGING_TAG_URL
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             minifyEnabled false
