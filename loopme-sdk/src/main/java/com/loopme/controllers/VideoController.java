@@ -421,7 +421,9 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
 
             @Override
             public void run() {
-                postVideoCurrentTimeToWebView(getCurrentPosition());
+                int currentPosition = getCurrentPosition();
+                postVideoCurrentTimeToWebView(currentPosition);
+                onDurationChangedEvent(currentPosition, mVideoDuration);
                 updateCurrentVolume();
                 runProgressAgain();
             }
@@ -465,11 +467,11 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
     }
 
     @Override
-    public void onVolumeChanged(double volume, int currentPosition) {
+    public void onVolumeChanged(float volume, int currentPosition) {
         onVolumeChangedEvent(volume, currentPosition);
     }
 
-    private void onVolumeChangedEvent(double volume, int currentPosition) {
+    private void onVolumeChangedEvent(float volume, int currentPosition) {
         if (mCallback != null) {
             mCallback.onVolumeChangedEvent(volume, currentPosition);
         }
@@ -499,6 +501,12 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
         }
     }
 
+    private void onDurationChangedEvent(int currentPosition, int adDuration) {
+        if (mCallback != null) {
+            mCallback.onDurationChangedEvent(currentPosition, adDuration);
+        }
+    }
+
     public interface Callback {
         void onVideoReachEnd();
 
@@ -508,7 +516,9 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
 
         void onPlaybackFinishedWithError();
 
-        void onVolumeChangedEvent(double volume, int currentPosition);
+        void onVolumeChangedEvent(float volume, int currentPosition);
+
+        void onDurationChangedEvent(int currentPosition, int adDuration);
     }
 
 }

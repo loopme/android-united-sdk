@@ -22,7 +22,7 @@ import com.loopme.vast.VastVpaidEventTracker;
 import java.util.Observable;
 import java.util.Observer;
 
-public abstract class VastVpaidBaseDisplayController extends BaseDisplayController
+public abstract class VastVpaidBaseDisplayController extends BaseTrackableController
         implements VastVpaidDisplayController, Observer {
     private static final String LOG_TAG = VastVpaidBaseDisplayController.class.getSimpleName();
     protected String mVideoUri;
@@ -108,8 +108,10 @@ public abstract class VastVpaidBaseDisplayController extends BaseDisplayControll
         }
     }
 
-    protected String addVerificationScripts(String html) {
-        return mVast4Tracker != null ? mVast4Tracker.addVerificationScripts(html) : html;
+    protected void addVerificationScripts(StringBuilder html) {
+        if (mVast4Tracker != null) {
+            mVast4Tracker.addVerificationScripts(html);
+        }
     }
 
     protected void setVerificationView(View view) {

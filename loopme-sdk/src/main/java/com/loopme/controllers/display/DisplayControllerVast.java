@@ -65,14 +65,25 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     public void prepare() {
+        initWebView();
+        onAdRegisterView(mLoopMeAd.getContext(), mWebView);
         if (isVast4VerificationNeeded()) {
-            mWebView = new VastWebView(mLoopMeAd.getContext(), this);
             initVast4Tracker(mWebView);
             setScriptNumber();
             vast4Verification();
         } else {
             onAdReady();
         }
+    }
+
+    private void initWebView() {
+        if (isNeedInitWebView()) {
+            mWebView = new VastWebView(mLoopMeAd.getContext(), this);
+        }
+    }
+
+    private boolean isNeedInitWebView() {
+        return isVast4VerificationNeeded() || isTrackerAvailable();
     }
 
     private void setScriptNumber() {
@@ -97,6 +108,8 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
                 startMediaPlayer();
             }
         }, DELAY_UNTIL_EXECUTE);
+
+        onAdResumedEvent();
     }
 
     private void startMediaPlayer() {
@@ -226,6 +239,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     public void closeSelf() {
+        onAdUserCloseEvent();
         postVideoEvent(EventConstants.CLOSE, getCurrentPositionAsString());
         dismissAd();
     }
@@ -341,7 +355,6 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     private void postEvents(MediaPlayer mediaPlayer) {
         onAdPreparedEvent(mediaPlayer, mViewControllerVast.getPlayerView());
-        onAdImpressionEvent();
         onAdStartedEvent();
     }
 
@@ -352,7 +365,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     @Override
-    public void onVolumeChanged(double volume, int currentPosition) {
+    public void onVolumeChanged(float volume, int currentPosition) {
         onAdVolumeChangedEvent(volume, currentPosition);
     }
 

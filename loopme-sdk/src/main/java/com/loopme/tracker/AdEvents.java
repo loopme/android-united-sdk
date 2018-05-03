@@ -1,9 +1,11 @@
-package com.loopme.tracker.interfaces;
+package com.loopme.tracker;
 
+import android.app.Activity;
 import android.media.MediaPlayer;
 import android.view.View;
 import android.webkit.WebView;
 
+import com.loopme.ad.LoopMeAd;
 import com.loopme.tracker.constants.AdType;
 
 public interface AdEvents {
@@ -29,7 +31,7 @@ public interface AdEvents {
 
     void onAdCompleteEvent();
 
-    void onAdVolumeChangedEvent(double volume, int currentPosition);
+    void onAdVolumeChangedEvent(float volume, int currentPosition);
 
     void onAdUserMinimizeEvent();
 
@@ -50,4 +52,16 @@ public interface AdEvents {
     void onInitTracker(AdType type);
 
     void onStartWebMeasuringDelayed();
+
+    void onAdRecordReady();
+
+    void onAdRegisterView(Activity activity, View view);
+
+    void onAdInjectJs(LoopMeAd loopMeAd);
+
+    void onAdInjectJsVpaid(StringBuilder html);
+
+    void onAdRecordAdClose();
+
+    void onNewActivity(Activity activity);
 }

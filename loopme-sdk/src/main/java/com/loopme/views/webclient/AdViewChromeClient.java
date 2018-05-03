@@ -29,7 +29,7 @@ public class AdViewChromeClient extends WebChromeClient {
     public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
         if (consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.ERROR ||
                 consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.WARNING) {
-            Logging.out(LOG_TAG, "Console Message: " + consoleMessage.message());
+            Logging.out(LOG_TAG, "Console Message: " + consoleMessage.message() + " " + consoleMessage.sourceId());
         }
         if (consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
             onErrorFromJs(consoleMessage.message() + ". Source: " + consoleMessage.sourceId());

@@ -1,6 +1,5 @@
 package com.loopme;
 
-import com.loopme.ad.AdSpotDimensions;
 import com.loopme.utils.Utils;
 
 public class Constants {
@@ -19,7 +18,7 @@ public class Constants {
     public static final String SDK_ERROR_MSG = "sdk_error";
     public static final String BAD_SERVERS_CODE = "Bad servers response code ";
     public static final String AD_ID_TAG = "adIdTag";
-    public static final int MAX_FAIL_COUNT = 5;
+    public static final int MAX_FAIL_COUNT = 3;
     public static final int ONE_MINUTE_IN_MILLIS = 1000 * 60;
     public static final int SLEEP_TIME = ONE_MINUTE_IN_MILLIS * 15;
     public static final int DEFAULT_AD_ID = -1;

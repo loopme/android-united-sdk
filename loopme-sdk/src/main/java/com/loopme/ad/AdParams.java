@@ -109,6 +109,10 @@ public class AdParams implements Serializable {
         return mHtml;
     }
 
+    public void setHtml(String html) {
+        this.mHtml = html;
+    }
+
     public String getAdFormat() {
         return mFormat;
     }
@@ -158,7 +162,7 @@ public class AdParams implements Serializable {
     }
 
     public boolean isVastAd() {
-        return getAdType() == AdType.VAST;
+        return getAdType() == AdType.VAST && !mIsVpaid;
     }
 
     public boolean getAutoLoading() {

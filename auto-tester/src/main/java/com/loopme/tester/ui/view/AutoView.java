@@ -4,6 +4,7 @@ import android.Manifest;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -68,6 +69,7 @@ public class AutoView implements View.OnClickListener, AdListener,
         mAutoCloseRunnable = initAutoCloseRunnable();
         mShowAdRunnable = initShowAdRunnable();
         mStopAdRunnable = initStopAdRunnable();
+        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     public void initView() {

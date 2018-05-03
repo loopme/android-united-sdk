@@ -1,67 +1,74 @@
 package com.loopme.controllers.display;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.View;
 import android.webkit.WebView;
 
+import com.loopme.Constants;
 import com.loopme.Logging;
+import com.loopme.ad.AdParams;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.ad.LoopMeAdHolder;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.interfaces.DisplayController;
 import com.loopme.models.Message;
 import com.loopme.tracker.constants.AdType;
-import com.loopme.tracker.interfaces.AdEvents;
 import com.loopme.tracker.partners.LoopMeTracker;
-import com.loopme.tracker.viewability.EventManager;
+import com.loopme.tracker.AdEvents;
+import com.loopme.tracker.EventManager;
 import com.loopme.utils.UiUtils;
 import com.loopme.utils.Utils;
-import com.loopme.vast.VastVpaidEventTracker;
 
-public abstract class BaseDisplayController implements DisplayController, AdEvents {
+public abstract class BaseTrackableController implements DisplayController, AdEvents {
 
     private static final long DELAY_UNTIL_EXECUTE = 100;
     protected String mLogTag;
     private EventManager mEventManager;
     private LoopMeAd mLoopMeAd;
+    private boolean mIsImpressionTracked;
+    private String mOrientation;
 
-
-    public BaseDisplayController(LoopMeAd loopMeAd) {
+    public BaseTrackableController(LoopMeAd loopMeAd) {
         mLoopMeAd = loopMeAd;
+        setOrientation();
+    }
+
+    private void setOrientation() {
+        if (mLoopMeAd != null) {
+            mOrientation = mLoopMeAd.getAdParams().getAdOrientation();
+        }
     }
 
     @Override
     public void onStartLoad() {
-        initEventManager();
+        if (isEventManagerNeeded()) {
+            mEventManager = new EventManager(mLoopMeAd);
+        }
     }
 
     protected void initTrackers() {
-        if (mEventManager == null) {
-            return;
-        }
-        if (isNativeTrackerNeeded()) {
+        if (isNativeAd()) {
             onInitTracker(AdType.NATIVE);
         } else {
             onInitTracker(AdType.WEB);
         }
     }
 
-    private boolean isNativeTrackerNeeded() {
-        return mLoopMeAd.isVideo360() || mLoopMeAd.getDisplayController() instanceof DisplayControllerVast;
+    private boolean isNativeAd() {
+        return mLoopMeAd != null && !mLoopMeAd.isMraidAd() && !mLoopMeAd.isVpaidAd() && (mLoopMeAd.isVideo360() || mLoopMeAd.isVastAd());
     }
 
-    protected void initEventManager() {
-        if (isTrackerNeeded()) {
-            mEventManager = new EventManager(mLoopMeAd);
+    private boolean isEventManagerNeeded() {
+        if (mLoopMeAd == null) {
+            return false;
         }
-    }
-
-    private boolean isTrackerNeeded() {
-        return mLoopMeAd != null
-                && mLoopMeAd.getAdParams() != null
-                && !mLoopMeAd.getAdParams().getTrackers().isEmpty();
+        AdParams adParams = mLoopMeAd.getAdParams();
+        return adParams != null && !adParams.getTrackers().isEmpty();
     }
 
     protected void onInternalLoadFail(final LoopMeError error) {
@@ -220,7 +227,7 @@ public abstract class BaseDisplayController implements DisplayController, AdEven
     }
 
     @Override
-    public void onAdVolumeChangedEvent(double volume, int currentPosition) {
+    public void onAdVolumeChangedEvent(float volume, int currentPosition) {
         if (mEventManager != null) {
             mEventManager.onAdVolumeChangedEvent(volume, currentPosition);
         }
@@ -299,5 +306,75 @@ public abstract class BaseDisplayController implements DisplayController, AdEven
                 }
             }
         }, DELAY_UNTIL_EXECUTE);
+    }
+
+    @Override
+    public void onAdRecordReady() {
+        if (mEventManager != null) {
+            mEventManager.onAdRecordReady();
+        }
+    }
+
+    @Override
+    public void onAdRegisterView(Activity activity, View view) {
+        if (mEventManager != null) {
+            mEventManager.onAdRegisterView(activity, view);
+        }
+    }
+
+    @Override
+    public void onAdInjectJs(LoopMeAd loopMeAd) {
+        if (mEventManager != null) {
+            mEventManager.onAdInjectJs(loopMeAd);
+        }
+    }
+
+   @Override
+    public void onAdInjectJsVpaid(StringBuilder html) {
+        if (mEventManager != null) {
+            mEventManager.onAdInjectJsVpaid(html);
+        }
+    }
+
+    @Override
+    public void onAdRecordAdClose() {
+        if (mEventManager != null) {
+            mEventManager.onAdRecordAdClose();
+        }
+    }
+
+    public void postImpression() {
+        if (!mIsImpressionTracked) {
+            onAdRecordReady();
+            onAdLoadedEvent();
+            onAdImpressionEvent();
+            mIsImpressionTracked = true;
+        }
+    }
+
+    @Override
+    public int getOrientation() {
+        return getOrientationFromAdParams();
+    }
+
+    protected int getOrientationFromAdParams() {
+        if (TextUtils.equals(mOrientation, Constants.ORIENTATION_PORT)) {
+            return ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
+        } else if (TextUtils.equals(mOrientation, Constants.ORIENTATION_LAND)) {
+            return ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+        } else {
+            return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+        }
+    }
+
+    protected boolean isTrackerAvailable() {
+        return mEventManager != null;
+    }
+
+    @Override
+    public void onNewActivity(Activity activity) {
+        if (mEventManager != null) {
+            mEventManager.onNewActivity(activity);
+        }
     }
 }

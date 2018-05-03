@@ -38,6 +38,7 @@ public class ExportFragment extends BaseFragment implements
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        setRootView(container);
         return inflater.inflate(R.layout.fragment_export, container, false);
     }
 
