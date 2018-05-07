@@ -1,12 +1,10 @@
 package com.loopme.gdpr;
 
-import android.app.Activity;
-import android.content.DialogInterface;
-import android.graphics.Color;
+import android.content.Context;
 import android.support.v7.app.AlertDialog;
-import android.text.method.LinkMovementMethod;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.ProgressBar;
 
 import com.loopme.R;
 
@@ -14,73 +12,64 @@ import com.loopme.R;
  * Created by katerina on 4/27/18.
  */
 
-public class GdprDialog {
+public class GdprDialog implements GdprView.GdprViewListener {
 
+    private GdprView mGdprView;
+    private final AlertDialog mDialog;
+    private OnGdprDialogListener mGdprDialogListener;
 
-    private static final int PADDING = 30;
-    private static final float TEXT_16_DP = 16;
-
-
-    public void show(final Activity activity, final OnGdprDialogListener onGdprDialogListener) {
-        new AlertDialog.Builder(activity)
-                .setTitle(activity.getString(R.string.gdpr_personalize_your_experience))
-                .setView(initCustomMessageView(activity, R.string.gdpr_terms_of_service))
+    public GdprDialog(Context context, OnGdprDialogListener onGdprDialogListener) {
+        mGdprDialogListener = onGdprDialogListener;
+        View view = buildView(context);
+        mDialog = new AlertDialog.Builder(context)
+                .setView(view)
                 .setCancelable(false)
-                .setPositiveButton(activity.getString(R.string.gdpr_accept), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        showThankYouPage(activity);
-                        if (onGdprDialogListener != null) {
-                            onGdprDialogListener.onGotGdprConsent(true);
-                        }
-                    }
-                })
-                .setNegativeButton(activity.getString(R.string.gdpr_reject), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        showRefusePage(activity);
-                        if (onGdprDialogListener != null) {
-                            onGdprDialogListener.onGotGdprConsent(false);
-                        }
-                    }
-                }).show();
+                .create();
     }
 
-    private View initCustomMessageView(Activity activity, int resource) {
-        TextView message = new TextView(activity);
-        message.setMovementMethod(LinkMovementMethod.getInstance());
-        message.setText(resource);
-        message.setTextSize(TEXT_16_DP);
-        message.setTextColor(Color.BLACK);
-        message.setLinkTextColor(Color.BLUE);
-        message.setPadding(PADDING, PADDING, PADDING, PADDING);
-        return message;
+    private View buildView(Context context) {
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.dialog_gdpr_layout, null, false);
+        mGdprView = (GdprView) view.findViewById(R.id.dialog_gdpr_view);
+        mGdprView.setListener(this);
+        mGdprView.setProgressbar((ProgressBar) view.findViewById(R.id.dialog_progress_bar));
+        return view;
     }
 
-    private void showRefusePage(Activity activity) {
-        new AlertDialog.Builder(activity)
-                .setTitle(R.string.gdpr_personalize_you_experience)
-                .setView(initCustomMessageView(activity, R.string.gdpr_no_problem))
-                .setCancelable(false)
-                .setPositiveButton(activity.getString(R.string.gdpr_close), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .show();
+    public void show(String url) {
+        if (mGdprView != null) {
+            mGdprView.loadPage(url);
+        }
     }
 
-    private void showThankYouPage(Activity activity) {
-        new AlertDialog.Builder(activity)
-                .setTitle(R.string.gdpr_personalize_you_experience)
-                .setView(initCustomMessageView(activity, R.string.gdpr_thank_you_page_text))
-                .setCancelable(false)
-                .setPositiveButton(activity.getString(R.string.gdpr_close), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .show();
+    @Override
+    public void onPageLoaded(Context context) {
+        showDialog();
+    }
+
+    private void showDialog() {
+        if (mDialog != null) {
+            mDialog.show();
+        }
+    }
+
+    @Override
+    public void onAnswer(boolean isGdprAccepted) {
+        dismissDialog();
+        if (mGdprDialogListener != null) {
+            mGdprDialogListener.onGotGdprConsent(isGdprAccepted);
+        }
+    }
+
+    @Override
+    public void onClose() {
+        dismissDialog();
+    }
+
+    private void dismissDialog() {
+        if (mDialog != null) {
+            mDialog.dismiss();
+        }
     }
 
     public interface OnGdprDialogListener {

@@ -20,17 +20,21 @@ import java.util.Map;
 })
 public class GdprResponse {
     @JsonProperty("need_consent")
-    private Integer needConsent;
+    private int needConsent;
+
+    @JsonProperty("consentUrl")
+    private String consentUrl;
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("need_consent")
-    public Integer getNeedConsent() {
+    public int getNeedConsent() {
         return needConsent;
     }
 
     @JsonProperty("need_consent")
-    public void setNeedConsent(Integer needConsent) {
+    public void setNeedConsent(int needConsent) {
         this.needConsent = needConsent;
     }
 
@@ -46,5 +50,15 @@ public class GdprResponse {
 
     public boolean needShowDialog() {
         return needConsent == 1;
+    }
+
+    @JsonProperty("consentUrl")
+    public String getConsentUrl() {
+        return consentUrl;
+    }
+
+    @JsonProperty("consentUrl")
+    public void setConsentUrl(String consentUrl) {
+        this.consentUrl = consentUrl;
     }
 }

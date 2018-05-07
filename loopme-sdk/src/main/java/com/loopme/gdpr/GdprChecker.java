@@ -35,7 +35,7 @@ public class GdprChecker implements GdprDialog.OnGdprDialogListener, DntFetcher.
     @Override
     public void onSuccess(GdprResponse response) {
         if (response.needShowDialog()) {
-            new GdprDialog().show(mActivity, this);
+            new GdprDialog(mActivity, this).show(response.getConsentUrl());
         } else {
             onComplete();
         }
