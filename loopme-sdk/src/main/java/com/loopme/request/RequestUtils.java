@@ -1,6 +1,5 @@
 package com.loopme.request;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -12,12 +11,13 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.webkit.WebSettings;
-import android.webkit.WebView;
 
 import com.loopme.BuildConfig;
 import com.loopme.LoopMeInterstitialGeneral;
+import com.loopme.Preferences;
 import com.loopme.R;
 import com.loopme.ad.LoopMeAd;
+import com.loopme.gdpr.ConsentType;
 import com.loopme.utils.StringUtils;
 
 import org.json.JSONException;
@@ -25,6 +25,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -453,13 +454,20 @@ public class RequestUtils {
         }
     }
 
-    public static String getAdvertisingIdInfo(Context context) {
+    public static String getAdvertisingIdInfo(final Context context) {
         RequestParamsUtils.getAdvertisingIdInfo(context, new AdvIdFetcher.Listener() {
 
             @Override
             public void onComplete(String googleAdId, boolean isDnt) {
                 mDnt = isDnt ? "1" : "0";
                 mIfa = googleAdId;
+                setGdprIfRestrictedByDeviceSettings();
+            }
+
+            private void setGdprIfRestrictedByDeviceSettings() {
+                if (Objects.equals(mDnt, "1")) {
+                    Preferences.getInstance(context).setGdprState(false, ConsentType.USER_RESTRICTED);
+                }
             }
         });
         return mIfa;
@@ -505,5 +513,15 @@ public class RequestUtils {
                 break;
             }
         }
+    }
+
+    public String getUserConsent(Context context) {
+        boolean gdprState = Preferences.getInstance(context).getGdprState();
+        return gdprState ? "1" : "0";
+    }
+
+
+    public String getConsentType(Context context) {
+        return Preferences.getInstance(context).getConsentType();
     }
 }

@@ -9,7 +9,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.stream.Stream;
 
 /**
  * Created by katerina on 6/11/17.
@@ -73,6 +72,8 @@ public class RequestBuilder implements Serializable {
     private static final String SUPPORTED_TECS = "supported_techs";
     private static final String METRIC = "metric";
     private static final String SKIP = "skip";
+    private static final String PARAM_USER_CONSENT = "user_consent";
+    private static final String PARAM_CONSENT_TYPE = "consent_type";
 
     public static JSONObject buildRequestJson(Context context, LoopMeAd loopMeAd) {
         RequestUtils requestUtils = new RequestUtils(context, loopMeAd);
@@ -149,6 +150,9 @@ public class RequestBuilder implements Serializable {
             extImpObj.put(IT, requestUtils.getIt());
             JSONArray supportedTechsArray = new JSONArray(requestUtils.getSupportedTechs());
             extImpObj.put(SUPPORTED_TECS, supportedTechsArray);
+
+            extImpObj.put(PARAM_CONSENT_TYPE, requestUtils.getConsentType(context));
+            extImpObj.put(PARAM_USER_CONSENT, requestUtils.getUserConsent(context));
 
             JSONArray trackersArray = new JSONArray().put(requestUtils.getTrackersSupported());
             impObj.put(METRIC, trackersArray);

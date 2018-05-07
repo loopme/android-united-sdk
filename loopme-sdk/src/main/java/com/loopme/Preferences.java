@@ -1,6 +1,5 @@
 package com.loopme;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -24,9 +23,9 @@ public class Preferences {
         mPrefs = getPrefs(context);
     }
 
-    public static Preferences getInstance(Activity activity) {
+    public static Preferences getInstance(Context context) {
         if (mInstance == null) {
-            mInstance = new Preferences(activity);
+            mInstance = new Preferences(context);
         }
         return mInstance;
     }

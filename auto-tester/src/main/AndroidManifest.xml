@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.loopme.tester">
 
-    <uses-sdk tools:overrideLibrary="com.loopme, com.loopme.vpaid" />
+    <uses-sdk tools:overrideLibrary="com.loopme" />
 
     <uses-feature
         android:name="android.software.leanback"
