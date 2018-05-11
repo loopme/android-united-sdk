@@ -324,7 +324,7 @@ public class RequestUtils {
 
 
     public String getDisplayManagerVersion() {
-        return String.valueOf(BuildConfig.VERSION_CODE);
+        return String.valueOf(BuildConfig.VERSION_CODE) + String.valueOf(BuildConfig.VERSION_NAME);
     }
 
     public String getImpId() {
