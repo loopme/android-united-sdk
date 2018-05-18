@@ -47,6 +47,7 @@ public class RequestUtils {
     private static final String VPAID2 = "VPAID2";
     private static final String MRAID2 = "MRAID2";
     private static final String V360 = "V360";
+    private static final int[] EXPANDABLE_DIRECTION_FULLSCREEN = new int[]{5};
     private int[] mBattr;
     private String mAppBundle;
     private String mAppName;
@@ -523,5 +524,9 @@ public class RequestUtils {
 
     public String getConsentType(Context context) {
         return Preferences.getInstance(context).getConsentType();
+    }
+
+    public int[] getExpDir() {
+        return EXPANDABLE_DIRECTION_FULLSCREEN;
     }
 }

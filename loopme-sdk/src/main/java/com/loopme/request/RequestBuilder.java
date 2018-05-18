@@ -74,6 +74,7 @@ public class RequestBuilder implements Serializable {
     private static final String SKIP = "skip";
     private static final String PARAM_USER_CONSENT = "user_consent";
     private static final String PARAM_CONSENT_TYPE = "consent_type";
+    private static final String EXP_DIR = "expdir";
 
     public static JSONObject buildRequestJson(Context context, LoopMeAd loopMeAd) {
         RequestUtils requestUtils = new RequestUtils(context, loopMeAd);
@@ -185,6 +186,9 @@ public class RequestBuilder implements Serializable {
 
         JSONArray battrArray = new JSONArray(requestUtils.getBattery());
         bannerObj.put(BATTR, battrArray);
+
+        JSONArray expDirArray = new JSONArray(requestUtils.getExpDir());
+        bannerObj.put(EXP_DIR, expDirArray);
         return bannerObj;
     }
 

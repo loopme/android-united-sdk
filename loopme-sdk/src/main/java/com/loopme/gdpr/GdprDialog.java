@@ -19,7 +19,6 @@ public class GdprDialog implements GdprWebView.GdprViewListener {
     private final AlertDialog mDialog;
     private OnGdprDialogListener mGdprDialogListener;
     private Context mContext;
-    String advId;
 
     public GdprDialog(Context context, OnGdprDialogListener onGdprDialogListener) {
         mGdprDialogListener = onGdprDialogListener;

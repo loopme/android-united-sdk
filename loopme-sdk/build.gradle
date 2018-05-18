@@ -117,7 +117,7 @@ task makeJar(type: Copy) {
     from('build/intermediates/classes/release/')
     into('build/outputs/')
     include('classes.jar')
-    rename('classes.jar', 'loopme-sdk-6.0.2.jar')
+    rename('classes.jar', 'loopme-sdk-6.0..jar')
 }
 
 task wrapper(type: Wrapper) {

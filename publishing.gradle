@@ -7,7 +7,7 @@ def deployArtifact = new Properties()
 deployArtifact.load(new FileInputStream("deploy.settings"))
 
 group = 'com.loopme'
-version = '6.0.2'
+version = '6.0.3'
 
 bintray {
     user = BINTRAY_USER
