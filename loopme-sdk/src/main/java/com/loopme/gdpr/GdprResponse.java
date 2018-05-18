@@ -22,11 +22,14 @@ public class GdprResponse {
     @JsonProperty("need_consent")
     private int needConsent;
 
+    @JsonProperty("user_consent")
+    private int userConsent;
+
     @JsonProperty("consentUrl")
     private String consentUrl;
 
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     @JsonProperty("need_consent")
     public int getNeedConsent() {
@@ -60,5 +63,15 @@ public class GdprResponse {
     @JsonProperty("consentUrl")
     public void setConsentUrl(String consentUrl) {
         this.consentUrl = consentUrl;
+    }
+
+    @JsonProperty("user_consent")
+    public int getUserConsent() {
+        return userConsent;
+    }
+
+    @JsonProperty("user_consent")
+    public void setUserConsent(int userConsent) {
+        this.userConsent = userConsent;
     }
 }

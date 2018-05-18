@@ -1,6 +1,7 @@
 package com.loopme.gdpr;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,27 +13,39 @@ import com.loopme.R;
  * Created by katerina on 4/27/18.
  */
 
-public class GdprDialog implements GdprView.GdprViewListener {
+public class GdprDialog implements GdprWebView.GdprViewListener {
 
-    private GdprView mGdprView;
+    private GdprWebView mGdprView;
     private final AlertDialog mDialog;
     private OnGdprDialogListener mGdprDialogListener;
+    private Context mContext;
+    String advId;
 
     public GdprDialog(Context context, OnGdprDialogListener onGdprDialogListener) {
         mGdprDialogListener = onGdprDialogListener;
+        mContext = context;
         View view = buildView(context);
         mDialog = new AlertDialog.Builder(context)
-                .setView(view)
                 .setCancelable(false)
+                .setOnDismissListener(mOnDismissListener)
+                .setView(view)
                 .create();
     }
+
+    private DialogInterface.OnDismissListener mOnDismissListener = new DialogInterface.OnDismissListener() {
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            onClose();
+        }
+    };
 
     private View buildView(Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.dialog_gdpr_layout, null, false);
-        mGdprView = (GdprView) view.findViewById(R.id.dialog_gdpr_view);
+        mGdprView = (GdprWebView) view.findViewById(R.id.dialog_gdpr_view);
         mGdprView.setListener(this);
         mGdprView.setProgressbar((ProgressBar) view.findViewById(R.id.dialog_progress_bar));
+
         return view;
     }
 
@@ -53,16 +66,10 @@ public class GdprDialog implements GdprView.GdprViewListener {
         }
     }
 
-    @Override
-    public void onAnswer(boolean isGdprAccepted) {
-        dismissDialog();
-        if (mGdprDialogListener != null) {
-            mGdprDialogListener.onGotGdprConsent(isGdprAccepted);
-        }
-    }
-
-    @Override
     public void onClose() {
+        if (mGdprDialogListener != null) {
+            mGdprDialogListener.onCloseDialog();
+        }
         dismissDialog();
     }
 
@@ -73,6 +80,7 @@ public class GdprDialog implements GdprView.GdprViewListener {
     }
 
     public interface OnGdprDialogListener {
-        void onGotGdprConsent(boolean isAccepted);
+        void onCloseDialog();
     }
+
 }

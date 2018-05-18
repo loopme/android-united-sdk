@@ -10,7 +10,8 @@ public enum TimersType {
     PREPARE_VPAID_JS_TIMER(2),
     EXPIRATION_TIMER(3),
     REQUEST_TIMER(4),
-    PREPARE_ASSETS_TIMER(5);
+    PREPARE_ASSETS_TIMER(5),
+    GDPR_PAGE_LOADED_TIMER(6);
 
     private int mId;
 

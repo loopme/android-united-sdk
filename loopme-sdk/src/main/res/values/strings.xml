@@ -3,7 +3,7 @@
     <string name="webservice_internet_unavailable">Internet unavailable</string>
 
     <string name="gdpr.webservice_internet_unavailable">Internet unavailable</string>
-    <string name="webservice_unavailable">Web service unavailbale</string>
+    <string name="webservice_unavailable">Web service unavailable</string>
     <string name="start_time">00:00</string>
     <string name="com.appsee.apikey" translatable="false">efc32bcc05064235aa794e09267436d1</string>
     <string name="gdpr.terms_of_service">This app personalizes your advertising experience through LoopMe LTD. By consenting to this enhanced ad experience, you\'ll see ads that LoopMe believe are more relevant to you. Depending on your privacy settings, LoopMe may collect and process personal data such as device identifiers, locations data, and other demographic and interest data about you to provide this personalized advertising experience. <a href="https://loopme.com/privacy/">Learn more.</a> By agreeing, you are confirming that you are over the age of 16 and would like a personalized ad experience.</string>

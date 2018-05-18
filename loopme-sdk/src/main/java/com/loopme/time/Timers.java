@@ -18,11 +18,13 @@ public class Timers extends Observable {
     private AdTimer mRequestTimer;
     private AdTimer mPrepareAssetsTimer;
     private AdTimer mPrepareVpaidJsTimer;
+    private AdTimer mGdprPageReadyTimer;
     private AdTimer.Listener mPrepareAssetsTimerListener;
     private AdTimer.Listener mPrepareVpaidJsTimerListener;
     private AdTimer.Listener mFetcherTimerListener;
     private AdTimer.Listener mExpirationListener;
     private AdTimer.Listener mRequestTimerListener;
+    private AdTimer.Listener mGdprPageReadyTimerListener;
     private int mValidExpirationTime;
 
     public Timers(Observer observer) {
@@ -98,8 +100,33 @@ public class Timers extends Observable {
                     startPrepareVpaidJsTimer();
                     break;
                 }
+                case GDPR_PAGE_LOADED_TIMER: {
+                    startGdprPageLoadedTimer();
+                    break;
+                }
             }
         }
+    }
+
+    private void startGdprPageLoadedTimer() {
+        if (mGdprPageReadyTimer == null) {
+            initGdprPageReadyTimer();
+            mGdprPageReadyTimer.start();
+            Logging.out(LOG_TAG, "Gdpr page ready timer starts");
+
+        }
+    }
+
+    private void initGdprPageReadyTimer() {
+        mGdprPageReadyTimerListener = new AdTimer.Listener() {
+            @Override
+            public void onTimeout() {
+                notifyTimeout(TimersType.GDPR_PAGE_LOADED_TIMER);
+            }
+        };
+        mGdprPageReadyTimer = new AdTimer(Constants.GDPR_PAGE_READY_TIMEOUT, mGdprPageReadyTimerListener);
+        Logging.out(LOG_TAG, "Gdpr page loaded timeout: " + Constants.GDPR_PAGE_READY_TIMEOUT / 1000 + " seconds");
+
     }
 
     private void startPrepareVpaidJsTimer() {
@@ -202,12 +229,14 @@ public class Timers extends Observable {
         stopExpirationTimer();
         stopPrepareAssetsTimer();
         stopPrepareVpaidJsTimer();
+        stopGdprPageReadyTimer();
 
         mRequestTimer = null;
         mFetcherTimer = null;
         mExpirationTimer = null;
         mPrepareVpaidJsTimer = null;
         mPrepareAssetsTimer = null;
+        mGdprPageReadyTimer = null;
     }
 
     public void stopTimer(TimersType timersType) {
@@ -233,8 +262,20 @@ public class Timers extends Observable {
                     stopPrepareVpaidJsTimer();
                     break;
                 }
+                case GDPR_PAGE_LOADED_TIMER: {
+                    stopGdprPageReadyTimer();
+                    break;
+                }
             }
         }
+    }
+
+    private void stopGdprPageReadyTimer() {
+        if (mGdprPageReadyTimer != null) {
+            stopTimer(mGdprPageReadyTimer);
+            Logging.out(LOG_TAG, "Stop gdpr page loaded timer");
+        }
+        mPrepareVpaidJsTimerListener = null;
     }
 
     private void stopPrepareVpaidJsTimer() {

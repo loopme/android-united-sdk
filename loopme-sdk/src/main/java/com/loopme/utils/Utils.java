@@ -766,4 +766,5 @@ public class Utils {
     public static boolean isFloat(Object obj) {
         return obj instanceof Float;
     }
+
 }

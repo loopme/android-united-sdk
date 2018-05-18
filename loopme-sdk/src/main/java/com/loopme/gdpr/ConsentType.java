@@ -7,7 +7,8 @@ package com.loopme.gdpr;
 public enum ConsentType {
     LOOPME("0"),
     PUBLISHER("1"),
-    USER_RESTRICTED("2");
+    USER_RESTRICTED("2"),
+    FAILED_SERVICE("3");
 
     private String mType;
 

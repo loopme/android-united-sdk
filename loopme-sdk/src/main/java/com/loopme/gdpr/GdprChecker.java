@@ -2,21 +2,29 @@ package com.loopme.gdpr;
 
 import android.app.Activity;
 
+import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.Preferences;
+import com.loopme.request.RequestUtils;
 
 /**
  * Created by katerina on 4/27/18.
  */
 
-public class GdprChecker implements GdprDialog.OnGdprDialogListener, DntFetcher.OnDntFetcherListener, GdprHttpUtils.Callback {
+public class GdprChecker implements
+        GdprDialog.OnGdprDialogListener,
+        DntFetcher.OnDntFetcherListener,
+        GdprHttpUtils.Callback {
     private Activity mActivity;
     private OnConsentListener mListener;
+    private static boolean sIsNeedCheckUserConsent = true;
+    private static boolean sIsDialogWasShown = false;
     private static final String LOG_TAG = GdprChecker.class.getSimpleName();
 
     public GdprChecker(Activity activity, OnConsentListener listener) {
         this.mActivity = activity;
         mListener = listener;
+        RequestUtils.getAdvertisingIdInfo(activity);
     }
 
     public void check() {
@@ -35,23 +43,51 @@ public class GdprChecker implements GdprDialog.OnGdprDialogListener, DntFetcher.
     @Override
     public void onSuccess(GdprResponse response) {
         if (response.needShowDialog()) {
-            new GdprDialog(mActivity, this).show(response.getConsentUrl());
+            showDialogOnlyFirstTime(response);
         } else {
+            saveUserConsent(response.getUserConsent());
             onComplete();
         }
         Logging.out(LOG_TAG, "need consent: " + response.getNeedConsent());
     }
 
-    @Override
-    public void onFail(String message) {
-        Logging.out(LOG_TAG, message);
-        onComplete();
+    private void showDialogOnlyFirstTime(GdprResponse response) {
+        if (!sIsDialogWasShown) {
+            new GdprDialog(mActivity, this).show(buildConsentUrl(response));
+            sIsNeedCheckUserConsent = true;
+        } else {
+            setGdprState(false, ConsentType.FAILED_SERVICE);
+        }
+    }
+
+    private String buildConsentUrl(GdprResponse response) {
+        return Constants.GDPR_URL + "?device_id=" + RequestUtils.getIfa() + "&is_sdk=true";
+//        return response.getConsentUrl() +
+    }
+
+    private void saveUserConsent(int userConsent) {
+        boolean isAccepted = userConsent == 1;
+        setGdprState(isAccepted, ConsentType.LOOPME);
     }
 
     @Override
-    public void onGotGdprConsent(boolean isAccepted) {
-        Preferences.getInstance(mActivity).setGdprState(isAccepted, ConsentType.LOOPME);
+    public void onFail(String message) {
+        Logging.out(LOG_TAG, message);
+        setGdprState(false, ConsentType.FAILED_SERVICE);
         onComplete();
+    }
+
+    private void setGdprState(boolean isAccepted, ConsentType consentType) {
+        Preferences.getInstance(mActivity).setGdprState(isAccepted, consentType);
+    }
+
+    @Override
+    public void onCloseDialog() {
+        if (sIsNeedCheckUserConsent) {
+            sIsNeedCheckUserConsent = false;
+            sIsDialogWasShown = true;
+            check();
+        }
     }
 
     private void onComplete() {

@@ -2,6 +2,8 @@ package com.loopme.request;
 
 import android.content.Context;
 
+import com.loopme.Logging;
+
 public class AdvIdFetcher implements Runnable {
 
     private static final String LOG_TAG = AdvIdFetcher.class.getSimpleName();
@@ -29,7 +31,7 @@ public class AdvIdFetcher implements Runnable {
             mAdvertisingId = adInfo.getId();
             isLimited = adInfo.isLimitAdTrackingEnabled();
         } catch (Exception e) {
-//            Logging.out(LOG_TAG, "Exception: " + e.getMessage());
+            Logging.out(LOG_TAG, "Exception: " + e.getMessage());
         }
 
         if (mListener != null) {

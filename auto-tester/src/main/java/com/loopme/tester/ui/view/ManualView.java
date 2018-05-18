@@ -27,7 +27,6 @@ import com.loopme.tester.enums.AdSdk;
 import com.loopme.tester.enums.AdType;
 import com.loopme.tester.model.AdSpot;
 import com.loopme.tester.ui.activity.BaseActivity;
-import com.loopme.tester.ui.fragment.screen.InfoFragment;
 import com.loopme.utils.Utils;
 import com.mopub.mobileads.MoPubView;
 
@@ -58,29 +57,9 @@ public class ManualView implements View.OnClickListener, AdListener, AdapterView
                 return true;
             }
         });
-        setGdprIntegrationCase();
+        LoopMeSdk.init(mActivity);
     }
 
-    private void setGdprIntegrationCase() {
-        final InfoFragment.GdprIntegrationCase gdprCase = ((BaseActivity) mActivity).getGdprIntegrationCase();
-        switch (gdprCase) {
-            case IGNORE: {
-                break;
-            }
-            case CONSENT_TRUE: {
-                LoopMeSdk.setGdprConsent(mActivity, true);
-                break;
-            }
-            case CONSENT_FALSE: {
-                LoopMeSdk.setGdprConsent(mActivity, false);
-                break;
-            }
-            case INIT: {
-                LoopMeSdk.init(mActivity);
-                break;
-            }
-        }
-    }
     private void callDialog() {
         ViewGroup.LayoutParams layoutParams = mBanner.getLayoutParams();
         final int widthDp = RequestParamsUtils.convertPixelToDp(mActivity, layoutParams.width);

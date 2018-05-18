@@ -13,7 +13,7 @@
         android:max="100"
         android:visibility="gone" />
 
-    <com.loopme.gdpr.GdprView
+    <com.loopme.gdpr.GdprWebView
         android:id="@+id/dialog_gdpr_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

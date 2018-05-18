@@ -3,6 +3,8 @@ package com.loopme.gdpr;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -12,36 +14,49 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
+import com.loopme.request.RequestUtils;
+import com.loopme.time.Timers;
+import com.loopme.time.TimersType;
 import com.loopme.utils.AnimationUtils;
+
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Created by katerina on 5/7/18.
  */
 
-public class GdprView extends WebView {
+public class GdprWebView extends WebView implements Observer {
+
     private static final String BRIDGE = "GdprBridge";
+    private static final String LOOPME_SCHEMA = "loopme://popup/";
+    private static final String READY_EVENT = "ready";
+    private static final String CLOSE_EVENT = "close";
     private GdprViewListener mPageLoadedListener;
     private static final String PRIVACY_PAGE = "privacy";
     private ProgressBar mProgressBar;
+    private Context mContext;
+    private Timers mTimers;
+    private Handler mHandler = new Handler((Looper.getMainLooper()));
 
-    public GdprView(Context context) {
+    public GdprWebView(Context context) {
         super(context);
-        configure();
+        configure(context);
     }
 
-    public GdprView(Context context, AttributeSet attrs) {
+    public GdprWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        configure();
+        configure(context);
     }
 
-    public GdprView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public GdprWebView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        configure();
+        configure(context);
     }
 
-    public GdprView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public GdprWebView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        configure();
+        configure(context);
     }
 
 
@@ -51,7 +66,10 @@ public class GdprView extends WebView {
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private void configure() {
+    private void configure(Context context) {
+        mContext = context;
+
+        RequestUtils.getAdvertisingIdInfo(context);
         WebSettings webSettings = getSettings();
         webSettings.setMediaPlaybackRequiresUserGesture(false);
         webSettings.setJavaScriptEnabled(true);
@@ -64,18 +82,29 @@ public class GdprView extends WebView {
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
         setWebContentsDebuggingEnabled(true);
+        configureChromeClient();
+        configureWebClient();
+        allowMixedContent();
+    }
+
+    private void configureWebClient() {
         setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                if (mPageLoadedListener != null) {
-                    mPageLoadedListener.onPageLoaded(GdprView.this.getContext());
-                }
+                startGdprPageLoadedTimer();
+                onPageLoaded();
                 enableProgressBar(AnimationUtils.AnimationType.OUT);
             }
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url.equalsIgnoreCase(LOOPME_SCHEMA + CLOSE_EVENT)) {
+                    onClose();
+                }
+                if (url.equalsIgnoreCase(LOOPME_SCHEMA + READY_EVENT)) {
+                    stopGdprPageLoadedTimer();
+                }
                 if (!TextUtils.isEmpty(url) && url.contains(PRIVACY_PAGE)) {
                     enableProgressBar(AnimationUtils.AnimationType.IN);
                     return super.shouldOverrideUrlLoading(view, url);
@@ -84,7 +113,9 @@ public class GdprView extends WebView {
                 }
             }
         });
+    }
 
+    private void configureChromeClient() {
         setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
@@ -94,7 +125,41 @@ public class GdprView extends WebView {
                 }
             }
         });
-        allowMixedContent();
+    }
+
+    private void startGdprPageLoadedTimer() {
+        mTimers = new Timers(this);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mTimers.startTimer(TimersType.REQUEST_TIMER);
+            }
+        });
+    }
+
+    protected void stopGdprPageLoadedTimer() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mTimers != null) {
+                    mTimers.stopTimer(TimersType.GDPR_PAGE_LOADED_TIMER);
+                }
+            }
+        });
+    }
+
+    private void onPageLoaded() {
+        if (mPageLoadedListener != null) {
+            mPageLoadedListener.onPageLoaded(mContext);
+        }
+    }
+
+    private void onClose() {
+        stopGdprPageLoadedTimer();
+        if (mPageLoadedListener != null) {
+            mPageLoadedListener.onClose();
+        }
+
     }
 
     private void enableProgressBar(AnimationUtils.AnimationType type) {
@@ -110,7 +175,7 @@ public class GdprView extends WebView {
     }
 
     public void loadPage(String url) {
-        loadUrl(url, null);
+        loadUrl(url);
     }
 
     @Override
@@ -133,7 +198,24 @@ public class GdprView extends WebView {
         mProgressBar = progressBar;
     }
 
-    public interface GdprViewListener extends GdprBridge.OnAnswerListener {
-        void onPageLoaded(Context context);
+    @Override
+    public void update(Observable observable, Object arg) {
+        if (observable != null && observable instanceof Timers
+                && arg != null && arg instanceof TimersType) {
+            if ((arg == TimersType.GDPR_PAGE_LOADED_TIMER)) {
+                onRequestTimeout();
+            }
+        }
     }
+
+    private void onRequestTimeout() {
+        onClose();
+    }
+
+    public interface GdprViewListener extends GdprBridge.OnCloseListener {
+        void onPageLoaded(Context context);
+
+        void onClose();
+    }
+
 }

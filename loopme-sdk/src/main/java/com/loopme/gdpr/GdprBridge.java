@@ -11,26 +11,14 @@ import android.webkit.JavascriptInterface;
 public class GdprBridge {
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
-    private OnAnswerListener mListener;
+    private OnCloseListener mListener;
 
-    public GdprBridge(OnAnswerListener listener) {
+    public GdprBridge(OnCloseListener listener) {
         mListener = listener;
     }
 
     @JavascriptInterface
-    public void onConsentReceived(final boolean isGdprAccepted) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (mListener != null) {
-                    mListener.onAnswer(isGdprAccepted);
-                }
-            }
-        });
-    }
-
-    @JavascriptInterface
-    public void onClose() {
+    public void close() {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -41,9 +29,7 @@ public class GdprBridge {
         });
     }
 
-    public interface OnAnswerListener {
-        void onAnswer(boolean isGdprAccepted);
-
+    public interface OnCloseListener {
         void onClose();
     }
 }

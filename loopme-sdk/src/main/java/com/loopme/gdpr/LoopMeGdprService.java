@@ -9,6 +9,6 @@ import retrofit2.http.Query;
  */
 
 public interface LoopMeGdprService {
-    @GET("consent_check/")
+    @GET("consent_check")
     Call<GdprResponse> checkUserConsent(@Query("device_id") String advId);
 }
