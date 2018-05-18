@@ -2,15 +2,12 @@ package com.loopme.tracker;
 
 import android.text.TextUtils;
 
-import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.constants.Event;
-import com.loopme.tracker.partners.DvTracker;
-import com.loopme.tracker.partners.ias.IasTracker;
-import com.loopme.tracker.partners.moat.MoatTracker;
-import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.constants.Partner;
+import com.loopme.tracker.partners.DvTracker;
+import com.loopme.tracker.partners.moat.MoatTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +31,7 @@ public class TrackerManager {
             if (isMoat(name)) {
                 MoatTracker.startSdk(mLoopMeAd);
             } else if (isIas(name)) {
-                IasTracker.startSdk(mLoopMeAd);
+//                IasTracker.startSdk(mLoopMeAd);
             } else if (isDv(name)) {
                 DvTracker.startSdk(mLoopMeAd);
             }
@@ -72,7 +69,7 @@ public class TrackerManager {
                 break;
             }
             case IAS: {
-                tracker = new IasTracker(mLoopMeAd, adType);
+//                tracker = new IasTracker(mLoopMeAd, adType);
                 break;
             }
             case DV: {

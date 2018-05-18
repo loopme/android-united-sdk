@@ -57,7 +57,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.loopme:loopme-sdk:6.0.2@aar'
+    compile 'com.loopme:loopme-sdk:6.1.0@aar'
 }
 ```
 
@@ -346,6 +346,10 @@ Please meet our New United SDK. It combines multiple premium ads technologies wi
 - Debugging reporting improvements
 - Access to read cookies for better HTML ads compliancy
 - A minimum API level supported increased to 21 (Android 5.0)
+
+**Version 6.1.0**
+- Added GDPR support
+- removed enableAapt options(as deprecated)
 
 
 See [Changelog](CHANGELOG.md)

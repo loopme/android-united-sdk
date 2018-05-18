@@ -110,14 +110,14 @@ dependencies {
 }
 
 task clearJar(type: Delete) {
-    delete 'build/outputs/loopme-sdk-6.0.1.jar'
+    delete 'build/outputs/loopme-sdk-6.0.2.jar'
 }
 
 task makeJar(type: Copy) {
     from('build/intermediates/classes/release/')
     into('build/outputs/')
     include('classes.jar')
-    rename('classes.jar', 'loopme-sdk-6.0..jar')
+    rename('classes.jar', 'loopme-sdk-6.1.0.jar')
 }
 
 task wrapper(type: Wrapper) {

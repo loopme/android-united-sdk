@@ -1,4 +1,8 @@
-## Version 6.0.2 (19 of April, 2017)
+## Version 6.1.0 (18 of May, 2018)
+- Added GDPR support
+- removed enableAapt options(as deprecated)
+
+## Version 6.0.2 (19 of April, 2018)
 - Added unsupported file format detection fro VPAID creatives
 - Multiformat ad spots - combine several ad formats in a single spot to increase fill rate. 
 - VAST 4.0 support

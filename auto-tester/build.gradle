@@ -54,8 +54,8 @@ android {
 
 }
 dependencies {
-//    api 'com.loopme:loopme-sdk:6.0.2'
-    api project(':loopme-sdk')
+    api 'com.loopme:loopme-sdk:6.1.0'
+//    api project(':loopme-sdk')
     api 'com.android.volley:volley:1.0.0'
     api 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:customtabs:27.1.1'

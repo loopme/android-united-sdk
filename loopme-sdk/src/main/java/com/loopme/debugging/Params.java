@@ -5,7 +5,7 @@ public class Params {
     //common
     public static final String DEVICE_OS = "device_os";//const ["ios"|"android"]
     public static final String SDK_TYPE = "sdk_type";//const ["loopme"|"vast"]
-    public static final String SDK_VERSION = "sdk_version";//example: "6.0.1"
+    public static final String SDK_VERSION = "sdk_version";//example: "6.1.0"
     public static final String DEVICE_ID = "device_id";//example: "ae98582a-a9f2-4caa-8c20-f4e3ab37d001"
     public static final String PACKAGE_ID = "package";// example: "com.loopme.tester"
     public static final String APP_KEY = "app_key";// example: "c693a45a79"
