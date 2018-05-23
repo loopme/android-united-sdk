@@ -84,7 +84,7 @@ public class Constants {
     public static final String EXTRAS_ALLOW_ORIENTATION_CHANGE = "allowOrientationChange";
     public static final String EXTRAS_FORCE_ORIENTATION = "forceOrientation";
 
-    public static final String GDPR_URL = "https://i.loopme.me/html/gdpr_page/gdpr_page.html";
+    public static final String GDPR_PAGE_URL = "https://i.loopme.me/html/gdpr_page/gdpr_page.html";
 
 
     public enum AdFormat {

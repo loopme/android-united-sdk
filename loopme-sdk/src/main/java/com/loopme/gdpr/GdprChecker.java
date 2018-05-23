@@ -2,7 +2,6 @@ package com.loopme.gdpr;
 
 import android.app.Activity;
 
-import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.Preferences;
 import com.loopme.request.RequestUtils;
@@ -61,8 +60,7 @@ public class GdprChecker implements
     }
 
     private String buildConsentUrl(GdprResponse response) {
-        return Constants.GDPR_URL + "?device_id=" + RequestUtils.getIfa() + "&is_sdk=true";
-//        return response.getConsentUrl() +
+        return response.getConsentUrl() + "?device_id=" + RequestUtils.getIfa() + "&is_sdk=true";
     }
 
     private void saveUserConsent(int userConsent) {

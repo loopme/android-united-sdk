@@ -1,3 +1,6 @@
+## Version 6.1.1 (23 of May, 2018)
+- Changed gradle dependencies
+
 ## Version 6.1.0 (18 of May, 2018)
 - Added GDPR support
 - removed enableAapt options(as deprecated)

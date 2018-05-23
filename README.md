@@ -57,7 +57,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.loopme:loopme-sdk:6.1.0@aar'
+    compile 'com.loopme:loopme-sdk:6.1.1@aar'
 }
 ```
 
@@ -275,6 +275,9 @@ If everything done correctly you will get loadSuccess() notification and see ads
 <br>If something wrong check LogCat.
 In case of "No ads found" error - contact to your LoopMe manager (it is about campaign configuration).
 
+
+## GDPR ##
+
 ## Sample projects ##
 
 Check out our project samples:
@@ -351,6 +354,8 @@ Please meet our New United SDK. It combines multiple premium ads technologies wi
 - Added GDPR support
 - removed enableAapt options(as deprecated)
 
+**Version 6.1.1**
+- Changed gradle dependencies
 
 See [Changelog](CHANGELOG.md)
 

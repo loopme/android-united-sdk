@@ -158,10 +158,8 @@ public class RequestBuilder implements Serializable {
             JSONArray trackersArray = new JSONArray().put(requestUtils.getTrackersSupported());
             impObj.put(METRIC, trackersArray);
 
-
             impObj.put(EXT, extImpObj);
             impObj.put(BID_FLOOR, requestUtils.getBidFloor());
-
 
             impObj.put(DISPLAY_MANAGER, requestUtils.getDisplayManager());
             impObj.put(INSTL, requestUtils.getInstl());
