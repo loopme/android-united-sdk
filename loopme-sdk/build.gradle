@@ -120,5 +120,10 @@ task makeJar(type: Copy) {
 task wrapper(type: Wrapper) {
     gradleVersion = '2.4'
 }
+configurations.all {
+    resolutionStrategy {
+        force 'org.ow2.asm:asm:5.0.4'
+    }
+}
 
 apply from: '../publishing.gradle'
