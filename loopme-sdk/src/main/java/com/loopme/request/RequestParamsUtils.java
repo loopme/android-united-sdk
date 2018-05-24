@@ -42,6 +42,9 @@ public class RequestParamsUtils {
     public static String getWifiName(Context context) {
         try {
             WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            if (wifiManager == null) {
+                return "";
+            }
             if (!wifiManager.isWifiEnabled()) {
                 return "";
             }
@@ -183,6 +186,9 @@ public class RequestParamsUtils {
         WindowManager windowManager;
         if (context != null) {
             windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            if (windowManager == null) {
+                return 0;
+            }
             Display display = windowManager.getDefaultDisplay();
             Point size = new Point();
             display.getSize(size);
@@ -196,6 +202,9 @@ public class RequestParamsUtils {
         WindowManager windowManager;
         if (context != null) {
             windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            if (windowManager == null) {
+                return 0;
+            }
             Display display = windowManager.getDefaultDisplay();
             Point size = new Point();
             display.getSize(size);

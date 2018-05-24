@@ -212,7 +212,7 @@ public class RequestUtils {
 
     public void setIp(Context context) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(WIFI_SERVICE);
-        mIp = Formatter.formatIpAddress(wifiManager.getConnectionInfo().getIpAddress());
+//        mIp = Formatter.formatIpAddress(wifiManager.getConnectionInfo().getIpAddress());
     }
 
     public String getLanguage() {
@@ -286,7 +286,10 @@ public class RequestUtils {
     public String getChargeLevel(Context context) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             BatteryManager bm = (BatteryManager) context.getSystemService(BATTERY_SERVICE);
-            int level = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+            int level = 1;
+            if (bm != null) {
+                level = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+            }
             return String.valueOf(level);
         } else {
             String[] batteryInfo = RequestParamsUtils.getBatteryInfo(context);

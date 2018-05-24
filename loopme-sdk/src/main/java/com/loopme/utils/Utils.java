@@ -549,6 +549,8 @@ public class Utils {
         }
 
         for (Tracking tracking : adParams.getTrackingEventsList()) {
+            if (tracking == null) continue;
+
             TrackingEvent event = new TrackingEvent(tracking.getText());
             if (tracking.getEvent().equalsIgnoreCase(EventConstants.CREATIVE_VIEW)) {
                 event.timeMillis = 0;

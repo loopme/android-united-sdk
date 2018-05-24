@@ -32,10 +32,6 @@ public class LoopMeWebView extends WebView {
 
     public LoopMeWebView(Context context) {
         super(context);
-        if (!sDeadlockCleared) {
-            resolveWebViewDeadlock(getContext());
-            sDeadlockCleared = true;
-        }
         configureWebSettings();
     }
 
@@ -130,26 +126,5 @@ public class LoopMeWebView extends WebView {
     protected void loadCommand(String command) {
         Logging.out(LOG_TAG, command);
         loadUrl(command);
-    }
-
-    private void resolveWebViewDeadlock(@NonNull final Context context) {
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
-            final WebView webView = new WebView(context.getApplicationContext());
-            webView.setBackgroundColor(Color.TRANSPARENT);
-            webView.loadDataWithBaseURL(null, "", "text/html", Constants.UTF_8, null);
-
-            final WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-            params.width = 1;
-            params.height = 1;
-            params.type = WindowManager.LayoutParams.TYPE_TOAST;
-            params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                    | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-                    | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;
-            params.format = PixelFormat.TRANSPARENT;
-            params.gravity = Gravity.START | Gravity.TOP;
-
-            final WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-            windowManager.addView(webView, params);
-        }
     }
 }

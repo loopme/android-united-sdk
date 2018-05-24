@@ -39,7 +39,7 @@ public class MotionStrategy extends AbsInteractiveStrategy implements SensorEven
     @Override
     public boolean handleTouchEvent(MotionEvent event) {
         boolean handled = false;
-        for (MD360Director director : getDirectorList()){
+        for (MD360Director director : getDirectorList()) {
             handled |= director.handleTouchEvent(event);
         }
         return handled;
@@ -48,7 +48,9 @@ public class MotionStrategy extends AbsInteractiveStrategy implements SensorEven
     @Override
     public void on(Context context) {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        mDeviceRotation = wm.getDefaultDisplay().getRotation();
+        if (wm != null) {
+            mDeviceRotation = wm.getDefaultDisplay().getRotation();
+        }
     }
 
     @Override
@@ -56,15 +58,18 @@ public class MotionStrategy extends AbsInteractiveStrategy implements SensorEven
         unregisterSensor(context);
     }
 
-    protected void registerSensor(Context context){
+    protected void registerSensor(Context context) {
         if (mRegistered) return;
 
         SensorManager mSensorManager = (SensorManager) context
                 .getSystemService(Context.SENSOR_SERVICE);
-        Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        Sensor sensor = null;
+        if (mSensorManager != null) {
+            sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        }
 
-        if (sensor == null){
-            Log.e(TAG,"TYPE_ROTATION_VECTOR sensor not support!");
+        if (sensor == null) {
+            Log.e(TAG, "TYPE_ROTATION_VECTOR sensor not support!");
             return;
         }
 
@@ -73,28 +78,30 @@ public class MotionStrategy extends AbsInteractiveStrategy implements SensorEven
         mRegistered = true;
     }
 
-    protected void unregisterSensor(Context context){
+    protected void unregisterSensor(Context context) {
         if (!mRegistered) return;
 
         SensorManager mSensorManager = (SensorManager) context
                 .getSystemService(Context.SENSOR_SERVICE);
-        mSensorManager.unregisterListener(this);
+        if (mSensorManager != null) {
+            mSensorManager.unregisterListener(this);
+        }
 
         mRegistered = false;
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.accuracy != 0){
+        if (event.accuracy != 0) {
             int type = event.sensor.getType();
-            switch (type){
+            switch (type) {
                 case Sensor.TYPE_ROTATION_VECTOR:
                     VRUtil.sensorRotationVector2Matrix(event, mDeviceRotation, mSensorMatrix);
 
                     float[] orientation = new float[3];
                     SensorManager.getOrientation(mSensorMatrix, orientation);
 
-                    for (MD360Director director : getDirectorList()){
+                    for (MD360Director director : getDirectorList()) {
                         director.updateSensorInfo(orientation);
                     }
                     break;
@@ -103,5 +110,6 @@ public class MotionStrategy extends AbsInteractiveStrategy implements SensorEven
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
 }
