@@ -33,12 +33,13 @@ ext {
 
     // Project
     versionCode = 6
-    versionName = '1.1'
-    versionFull = '6.1.1'
+    versionName = '1.2'
+    versionFull = '6.1.2'
     organization = 'com.loopme'
     projectName = 'loopme-united-sdk'
     description = 'Please meet our New United SDK. It combines multiple premium ads technologies with the highest performance and lean resource consumption.'
     websiteUrl = 'https://github.com/loopme/android-united-sdk'
     vcsUrl = 'https://github.com/loopme/android-united-sdk.git'
 }
+
 
