@@ -3,7 +3,6 @@ package com.loopme.tracker.partners.ias;
 import android.net.Uri;
 
 import com.loopme.BuildConfig;
-import com.loopme.Logging;
 import com.loopme.tracker.AdIds;
 
 import java.util.HashMap;
@@ -29,8 +28,8 @@ public class IasUrlProvider {
 
     private HashMap<String, String> mValuesMap;
 
-    public IasUrlProvider(AdIds adIds) {
-        populateData(adIds);
+    public IasUrlProvider(AdIds adIds, String appKey) {
+        populateData(adIds, appKey);
         build();
     }
 
@@ -62,14 +61,14 @@ public class IasUrlProvider {
         mLoggingTagUrl = loggingTagBuilder.build().toString();
     }
 
-    private void populateData(AdIds adIds) {
+    private void populateData(AdIds adIds, String appKey) {
         mValuesMap = new HashMap<>();
         mValuesMap.put(PARAM_ADV_ID, adIds.getAdvertiserId());
         mValuesMap.put(PARAM_CAMP_ID, adIds.getCampaignId());
-        mValuesMap.put(PARAM_PUB_ID, "testPub"); // getPublisherName()
-        mValuesMap.put(PARAM_CHAN_ID, adIds.getLineItemId()); // getBundleDomain()
-        mValuesMap.put(PARAM_PLACEMENT_ID, adIds.getPlacementId() + "_" + adIds.getAppId()); //need adIds.getAppName() + "_" + adIds.getAppId());
-        mValuesMap.put(PARAM_BUNDLE_ID, adIds.getCreativeId()); //getBundleDomain()
+        mValuesMap.put(PARAM_PUB_ID, adIds.getCompany() + "_" + adIds.getDeveloper());
+        mValuesMap.put(PARAM_CHAN_ID, adIds.getBundleDomain());
+        mValuesMap.put(PARAM_PLACEMENT_ID, adIds.getAppName() + "_" + appKey);
+        mValuesMap.put(PARAM_BUNDLE_ID, adIds.getBundleDomain());
         mValuesMap.put(PARAM_ADSAFE_PAR, ADSAFE_PAR);
     }
 

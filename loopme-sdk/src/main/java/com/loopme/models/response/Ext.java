@@ -31,7 +31,9 @@ import java.util.Map;
         "campaign",
         "measure_partners",
         "autoloading",
-        "package_ids"
+        "package_ids",
+        "developer",
+        "company"
 })
 public class Ext implements Serializable, Parcelable {
 
@@ -59,6 +61,10 @@ public class Ext implements Serializable, Parcelable {
     private long autoLoading = Constants.AUTO_LOADING_ABSENCE;
     @JsonProperty("package_ids")
     private List<String> packageIds = new ArrayList<String>();
+    @JsonProperty("developer")
+    private String developer = "";
+    @JsonProperty("company")
+    private String company = "";
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -80,6 +86,8 @@ public class Ext implements Serializable, Parcelable {
             in.readList(instance.packageIds, (String.class.getClassLoader()));
             instance.additionalProperties = ((Map<String, Object>) in.readValue((Map.class.getClassLoader())));
             instance.autoLoading = ((long) in.readValue((long.class.getClassLoader())));
+            instance.developer = ((String) in.readValue((String.class.getClassLoader())));
+            instance.company = ((String) in.readValue((String.class.getClassLoader())));
             return instance;
         }
 
@@ -316,10 +324,41 @@ public class Ext implements Serializable, Parcelable {
         dest.writeList(packageIds);
         dest.writeValue(additionalProperties);
         dest.writeValue(autoLoading);
+        dest.writeValue(developer);
+        dest.writeValue(company);
     }
 
     public int describeContents() {
         return 0;
     }
 
+    @JsonProperty("company")
+    public String getCompany() {
+        return company;
+    }
+
+    @JsonProperty("developer")
+    public String getDeveloper() {
+        return developer;
+    }
+
+    @JsonProperty("developer")
+    public void setDeveloper(String developer) {
+        this.developer = developer;
+    }
+
+    public Ext withDeveloper(String developer) {
+        this.developer = developer;
+        return this;
+    }
+
+    @JsonProperty("company")
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public Ext withCompany(String company) {
+        this.company = company;
+        return this;
+    }
 }

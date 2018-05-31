@@ -37,7 +37,7 @@ public class IasTracker implements Tracker {
             Logging.out(sLOG_TAG, "LoopMeAd should not be null!");
             return;
         }
-        mUrlProvider = new IasUrlProvider(loopMeAd.getAdParams().getAdIds());
+        mUrlProvider = new IasUrlProvider(loopMeAd.getAdParams().getAdIds(), loopMeAd.getAppKey());
         mAdFormat = loopMeAd.getAdFormat();
         mDeferred = true;
         mAdSessionContext = createAvidAdSessionContext();
@@ -206,10 +206,8 @@ public class IasTracker implements Tracker {
         private void injectJsResForNative() {
             if (mVideoAdSession != null && !mIsInjected) {
                 mVideoAdSession.injectJavaScriptResource(mUrlProvider.getCmTagUrl());
-                mVideoAdSession.injectJavaScriptResource(mUrlProvider.getLoggingTagUrl());
                 mIsInjected = true;
                 Logging.out(sLOG_TAG, "Ias js injected: " + mUrlProvider.getCmTagUrl());
-                Logging.out(sLOG_TAG, "Ias js injected: " + mUrlProvider.getLoggingTagUrl());
             }
         }
 
@@ -455,7 +453,7 @@ public class IasTracker implements Tracker {
         private void injectJsToVpaid(Object[] args) {
             if (Utils.isNotNull(args) && args[0] instanceof StringBuilder) {
                 StringBuilder html = (StringBuilder) args[0];
-                String scripts = mUrlProvider.getCmTagScript() + mUrlProvider.getLoggingTagScript();
+                String scripts = mUrlProvider.getCmTagScript();
                 html.insert(VPAID_IAS_SCRIPTS_PLACEHOLDER, scripts);
             }
         }
@@ -514,7 +512,7 @@ public class IasTracker implements Tracker {
         private String putJsToCreative(String html) {
             String firstPart = html.substring(0, 173);
             String secondPart = html.substring(173);
-            String finalHtml = firstPart + mUrlProvider.getCmTagScript() + mUrlProvider.getLoggingTagScript();
+            String finalHtml = firstPart + mUrlProvider.getCmTagScript();
             return finalHtml + secondPart;
         }
 
