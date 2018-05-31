@@ -198,4 +198,9 @@ public class BaseFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        setRootVisible(false);
+        super.onDestroyView();
+    }
 }

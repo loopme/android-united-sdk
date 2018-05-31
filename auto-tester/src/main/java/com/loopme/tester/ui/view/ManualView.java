@@ -27,7 +27,7 @@ import com.loopme.tester.enums.AdSdk;
 import com.loopme.tester.enums.AdType;
 import com.loopme.tester.model.AdSpot;
 import com.loopme.tester.ui.activity.BaseActivity;
-import com.loopme.utils.Utils;
+import com.loopme.tester.utils.Utils;
 import com.mopub.mobileads.MoPubView;
 
 public class ManualView implements View.OnClickListener, AdListener, AdapterView.OnItemSelectedListener, SizeDialog.Listener {
@@ -71,8 +71,8 @@ public class ManualView implements View.OnClickListener, AdListener, AdapterView
 
     @Override
     public void onNewBannerSize(int width, int height) {
-        int widthDp = Utils.convertDpToPixel(width);
-        int heightDp = Utils.convertDpToPixel(height);
+        int widthDp = Utils.convertDpToPixel(width, mActivity);
+        int heightDp = Utils.convertDpToPixel(height, mActivity);
         mBanner.setLayoutParams(new RelativeLayout.LayoutParams(widthDp, heightDp));
     }
 

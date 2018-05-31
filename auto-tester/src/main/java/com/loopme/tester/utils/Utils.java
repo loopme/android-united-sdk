@@ -1,12 +1,15 @@
 package com.loopme.tester.utils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
+import android.util.TypedValue;
 
 import com.loopme.tester.Constants;
 import com.loopme.tester.loaders.AdSpotCursorLoader;
@@ -62,4 +65,14 @@ public class Utils {
         }
         return Constants.AD_SPOT_DOES_NOT_EXIST_ID;
     }
+
+    public static int convertDpToPixel(float dp, Context context) {
+        Resources resources = context.getResources();
+        return resources != null ? (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.getDisplayMetrics()) : 0;
+    }
+
+    public static boolean isApi19() {
+        return Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT;
+    }
+
 }
