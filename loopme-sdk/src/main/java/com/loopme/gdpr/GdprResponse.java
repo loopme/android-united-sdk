@@ -25,7 +25,7 @@ public class GdprResponse {
     @JsonProperty("user_consent")
     private int userConsent;
 
-    @JsonProperty("consentUrl")
+    @JsonProperty("consent_url")
     private String consentUrl;
 
     @JsonIgnore
@@ -55,12 +55,12 @@ public class GdprResponse {
         return needConsent == 1;
     }
 
-    @JsonProperty("consentUrl")
+    @JsonProperty("consent_url")
     public String getConsentUrl() {
         return consentUrl;
     }
 
-    @JsonProperty("consentUrl")
+    @JsonProperty("consent_url")
     public void setConsentUrl(String consentUrl) {
         this.consentUrl = consentUrl;
     }
