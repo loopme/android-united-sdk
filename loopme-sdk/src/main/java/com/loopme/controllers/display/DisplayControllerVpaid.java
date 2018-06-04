@@ -54,9 +54,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     private volatile String mCurrentVideoTime;
     private int mVideoDuration;
     private boolean mIsFirstLaunch = true;
-    private volatile boolean mIsFirstQuartilePosted;
     private CreativeType mCreativeType = CreativeType.NONE_VIDEO;
-    private boolean mIsVpaidEventTracked;
 
     public DisplayControllerVpaid(LoopMeAd loopMeAd) {
         super(loopMeAd);
@@ -298,21 +296,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     @Override
     public void postEvent(String eventType) {
         postVideoEvent(eventType);
-        if (TextUtils.equals(eventType, EventConstants.FIRST_QUARTILE)) {
-            mIsFirstQuartilePosted = true;
-        }
-        startCheckTimer(eventType);
-    }
-
-    private void startCheckTimer(final String eventType) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (TextUtils.equals(eventType, EventConstants.START) && mCreativeType == CreativeType.VIDEO) {
-                    startVideoEventCheckTimer();
-                }
-            }
-        });
+        cancelExtraCloseButtonIfFirstQuartile(eventType);
     }
     //endregion
 
@@ -422,16 +406,18 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     }
 
     private void startCloseButtonTimerOnUiThread() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                int duration = mVideoDuration * 1000;
-                Logging.out(LOG_TAG, "mVideoDuration " + duration);
-                if (mViewControllerVpaid != null) {
-                    mViewControllerVpaid.startCloseButtonTimer(duration);
+        if (mCreativeType == CreativeType.UNUSUAL_VIDEO) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    int duration = mVideoDuration * 1000;
+                    Logging.out(LOG_TAG, "mVideoDuration " + duration);
+                    if (mViewControllerVpaid != null) {
+                        mViewControllerVpaid.startCloseButtonTimer(duration);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override
@@ -506,7 +492,6 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     private void videoSourceEventOccurred(String source) {
         Logging.out(LOG_TAG, "Video source event received");
-        mCreativeType = CreativeType.VIDEO;
         hideCloseButtonOnce();
         checkVideoFormat(source);
     }
@@ -521,38 +506,19 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     private void checkVideoFormat(String source) {
         if (Utils.isUsualFormat(source)) {
             cancelExtraCloseButton();
+            mCreativeType = CreativeType.USUAL_VIDEO;
         } else {
+            mCreativeType = CreativeType.UNUSUAL_VIDEO;
             LoopMeError error = new LoopMeError(Errors.UNUSUAL_VIDEO_FORMAT);
             error.addToMessage(source);
             onPostWarning(error);
         }
     }
 
-    private void startVideoEventCheckTimer() {
-        Logging.out(LOG_TAG, "startVideoEventCheckTimer");
-        SimpleTimer videoEventCheckTimer = initCheckVideoEventTimer(getDurationWithSpareTime());
-        videoEventCheckTimer.start();
-    }
-
-    private long getDurationWithSpareTime() {
-        return (long) (mVideoDuration * 1000 * VIDEO_25_WITH_SPARE_TIME_COEFFICIENT);
-    }
-
-    private SimpleTimer initCheckVideoEventTimer(long durationWithSpareTime) {
-        return new SimpleTimer(durationWithSpareTime, new SimpleTimer.Listener() {
-            @Override
-            public void onFinish() {
-                checkEvent25();
-            }
-        });
-    }
-
-    private void checkEvent25() {
-        if (mIsFirstQuartilePosted) {
-            Logging.out(LOG_TAG, "Unusual video format. Event video 25%.");
+    private void cancelExtraCloseButtonIfFirstQuartile(String eventType) {
+        if (TextUtils.equals(eventType, EventConstants.FIRST_QUARTILE) && mCreativeType == CreativeType.UNUSUAL_VIDEO) {
+            Logging.out(LOG_TAG, "Event video 25% is posted. Dismiss extra close button timer");
             cancelExtraCloseButton();
-        } else {
-            Logging.out(LOG_TAG, "Video creative does not send event video 25%.");
         }
     }
 
@@ -564,7 +530,6 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     }
 
     private enum CreativeType {
-        VIDEO,
-        NONE_VIDEO;
+        USUAL_VIDEO, UNUSUAL_VIDEO, NONE_VIDEO
     }
 }

@@ -181,7 +181,6 @@ public class VpaidBridgeImpl implements VpaidBridge {
 
     @JavascriptInterface
     public void vpaidAdDurationChange() {
-        Logging.out(LOG_TAG, "JS: vpaidAdDurationChange");
         callWrapper("getAdDurationResult");
         mBridge.onDurationChanged();
     }

@@ -309,7 +309,9 @@ public class XmlParseService {
         }
         List<String> impressions = new ArrayList<>();
         for (Impression impression : inLine.getImpressionList()) {
-            impressions.add(impression.getText());
+            if (!TextUtils.isEmpty(impression.getText())) {
+                impressions.add(impression.getText());
+            }
         }
         sAdParams.setImpressionsList(impressions);
     }
