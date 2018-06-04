@@ -1,5 +1,6 @@
 package com.loopme.parser;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import com.loopme.Constants;
@@ -74,7 +75,7 @@ public class ParseService extends JsonParser {
         boolean v360 = retrieveV360(bidObject);
         boolean debug = retrieveDebug(bidObject);
         List<String> measurePartners = retrieveMeasurePartners(bidObject);
-        AdIds adIds = parseAdIds(bidObject);
+        AdIds adIds = parseAdIds(bidObject, loopMeAd.getContext());
         boolean autoLoadingValue = retrieveAutoLoadingWithDefaultTrue(bidObject);
         List<String> packageIds = retrievePackageIds(bidObject.getExt());
         AdSpotDimensions adSpotDimensions = retrieveAdDimensionsForNoneVastOrDefault(bidObject);
@@ -135,7 +136,7 @@ public class ParseService extends JsonParser {
         return autoLoadingValue == 1;
     }
 
-    private static AdIds parseAdIds(Bid bid) {
+    private static AdIds parseAdIds(Bid bid, Context context) {
         AdIds adIds = new AdIds();
 
         if (bid == null || bid.getExt() == null) {
@@ -149,6 +150,10 @@ public class ParseService extends JsonParser {
         adIds.setAppId(ext.getAppname());
         adIds.setCreativeId(bid.getCrid());
         adIds.setPlacementId(bid.getAdid());
+        adIds.setCompany(ext.getCompany());
+        adIds.setDeveloper(ext.getDeveloper());
+        adIds.setAppName(ext.getAppname());
+        adIds.setAppBundle(context.getPackageName());
 
         return adIds;
     }
