@@ -30,6 +30,7 @@ public class View360Controller implements IViewController {
 
     public interface Callback {
         void onSurfaceReady(Surface surface);
+
         void onEvent(String event);
     }
 
@@ -82,6 +83,9 @@ public class View360Controller implements IViewController {
 
     private void checkIsAccelGyroPresented(Context context) {
         SensorManager mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        if (mSensorManager == null) {
+            return;
+        }
         List<Sensor> mSensorList = mSensorManager.getSensorList(Sensor.TYPE_ALL);
         for (Sensor s : mSensorList) {
             if (s.getName().contains(ACCEL)) {

@@ -28,11 +28,14 @@ public class AdReceiver extends BroadcastReceiver {
             return;
         }
         if (getAdId(intent) == mAdId) {
-            if (intent.getAction().equalsIgnoreCase(Constants.DESTROY_INTENT)) {
-                mListener.onDestroyBroadcast();
+            String action = intent.getAction();
+            if (action != null) {
+                if (action.equalsIgnoreCase(Constants.DESTROY_INTENT)) {
+                    mListener.onDestroyBroadcast();
 
-            } else if (intent.getAction().equalsIgnoreCase(Constants.CLICK_INTENT)) {
-                mListener.onClickBroadcast();
+                } else if (action.equalsIgnoreCase(Constants.CLICK_INTENT)) {
+                    mListener.onClickBroadcast();
+                }
             }
         }
     }

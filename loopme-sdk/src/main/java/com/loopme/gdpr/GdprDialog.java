@@ -39,7 +39,7 @@ public class GdprDialog implements GdprWebView.GdprViewListener {
     };
 
     private View buildView(Context context) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.dialog_gdpr_layout, null, false);
         mGdprView = (GdprWebView) view.findViewById(R.id.dialog_gdpr_view);
         mGdprView.setListener(this);
