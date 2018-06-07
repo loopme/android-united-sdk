@@ -130,6 +130,7 @@
                     android:paddingLeft="@dimen/enable_auoloading_checkbox_padding_left" />
 
                 <Spinner
+                    android:visibility="gone"
                     android:id="@+id/integration_type_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
