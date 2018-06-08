@@ -64,7 +64,7 @@ repositories {
 
 
 dependencies {
-    implementation ('com.loopme:loopme-sdk:6.1.1@aar'){
+    implementation ('com.loopme:loopme-sdk:6.1.2@aar'){
         transitive=true
     }
     implementation 'com.squareup.retrofit2:converter-jackson:2.4.0'
@@ -380,6 +380,10 @@ Please meet our New United SDK. It combines multiple premium ads technologies wi
 
 **Version 6.1.1**
 - Changed gradle dependencies
+
+**Version 6.1.2**
+- Fixed NPE due parsing xml.
+
 
 See [Changelog](CHANGELOG.md)
 

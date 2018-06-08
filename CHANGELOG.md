@@ -1,3 +1,6 @@
+## Version 6.1.2 (08 of June, 2018)
+- Fixed NPE due parsing xml.
+
 ## Version 6.1.1 (23 of May, 2018)
 - Changed gradle dependencies
 
