@@ -302,6 +302,8 @@ In case of "No ads found" error - contact to your LoopMe manager (it is about ca
 If you get a user consent in your code, please pass the value received via this method to LoopMe SDK. In this case we will not request consent from the user.
 If you want the SDK to take care of it don't call this method and for EU users it will request it when it is needed.
 
+`LoopMeSdk.setGdprConsent(Activity activity, boolean userConsent)`
+
 ## Sample projects ##
 
 Check out our project samples:
