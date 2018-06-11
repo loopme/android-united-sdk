@@ -34,22 +34,7 @@ If you have questions please contact us at support@loopmemedia.com.
 
 Requires `Android` 5.1 and up
 
-## SDK Integration ##
-
-<h3>Download</h3>
-There are 2 ways:<br>
-1. Download latest version of SDK (`loopme-sdk-[version].aar` file) and put it in folder `libs` <br>
-Add dependency to `loopme-sdk` in your project (`build.gradle` file):
-```java
-repositories {
-    flatDir {
-        dirs 'libs'
-    }
-}
-dependencies {
-    compile(name:'loopme-sdk-[version]', ext:'aar')
-}
-```
+## Changelog ##
 
 See [Changelog](CHANGELOG.md)
 
