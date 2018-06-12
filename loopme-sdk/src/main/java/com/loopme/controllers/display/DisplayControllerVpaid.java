@@ -406,7 +406,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     }
 
     private void startCloseButtonTimerOnUiThread() {
-        if (mCreativeType == CreativeType.UNUSUAL_VIDEO) {
+        if (mCreativeType == CreativeType.VIDEO_OTHER_TYPE) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -506,9 +506,9 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     private void checkVideoFormat(String source) {
         if (Utils.isUsualFormat(source)) {
             cancelExtraCloseButton();
-            mCreativeType = CreativeType.USUAL_VIDEO;
+            mCreativeType = CreativeType.VIDEO_MP4_WEBM;
         } else {
-            mCreativeType = CreativeType.UNUSUAL_VIDEO;
+            mCreativeType = CreativeType.VIDEO_OTHER_TYPE;
             LoopMeError error = new LoopMeError(Errors.UNUSUAL_VIDEO_FORMAT);
             error.addToMessage(source);
             onPostWarning(error);
@@ -516,7 +516,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     }
 
     private void cancelExtraCloseButtonIfFirstQuartile(String eventType) {
-        if (TextUtils.equals(eventType, EventConstants.FIRST_QUARTILE) && mCreativeType == CreativeType.UNUSUAL_VIDEO) {
+        if (TextUtils.equals(eventType, EventConstants.FIRST_QUARTILE) && mCreativeType == CreativeType.VIDEO_OTHER_TYPE) {
             Logging.out(LOG_TAG, "Event video 25% is posted. Dismiss extra close button timer");
             cancelExtraCloseButton();
         }
@@ -530,6 +530,6 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     }
 
     private enum CreativeType {
-        USUAL_VIDEO, UNUSUAL_VIDEO, NONE_VIDEO
+        VIDEO_MP4_WEBM, VIDEO_OTHER_TYPE, NONE_VIDEO
     }
 }
