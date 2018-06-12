@@ -26,7 +26,8 @@ If you have questions please contact us at support@loopmemedia.com.
 ## Requirements ##
 
 Requires `Android` 5.0(API level 21) and above.
-<br/>In case if your application supports API version <21, please add next line to your AndroidManifets.xml file:
+
+<br/>In case if your application supports API version <21, please add next line to your `AndroidManifets.xml` file:
 <br/>      `<uses-sdk tools:overrideLibrary="com.loopme"/>`
 
 ## Changelog ##
