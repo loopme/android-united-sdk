@@ -25,7 +25,7 @@ If you have questions please contact us at support@loopmemedia.com.
 
 ## Requirements ##
 
-Requires `Android` 5.1 and up
+Requires `Android` 5.0 and above
 
 ## Changelog ##
 
