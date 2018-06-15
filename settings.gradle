@@ -1,1 +1,3 @@
-include ':loopme-sdk', ':auto-tester'
+include ':loopme-sdk',':viewability-app'
+
+//':auto-tester',

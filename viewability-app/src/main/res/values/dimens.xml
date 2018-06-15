@@ -1,0 +1,54 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">10dp</dimen>
+
+    <dimen name="background_bordered_shadow_right">3dp</dimen>
+    <dimen name="background_bordered_shadow_top">5dp</dimen>
+    <dimen name="background_bordered_shadow_corners_radius">3dp</dimen>
+    <dimen name="background_bordered_bottom">2dp</dimen>
+    <dimen name="background_bordered_corners_radius">5dp</dimen>
+    <dimen name="background_buttons_bottom">2dp</dimen>
+    <dimen name="background_buttons_corners_radius">5dp</dimen>
+    <dimen name="background_buttons_padding_bottom">13dp</dimen>
+    <dimen name="background_buttons_padding_left">10dp</dimen>
+    <dimen name="background_buttons_padding_right">10dp</dimen>
+    <dimen name="background_buttons_padding_top">13dp</dimen>
+    <dimen name="text_size_20sp">20sp</dimen>
+    <dimen name="loading_text_margin_top">80dp</dimen>
+    <dimen name="show_ad_button_margin_left">10dp</dimen>
+    <dimen name="load_ad_button_margin_right">10dp</dimen>
+    <dimen name="buttons_margin_top">20dp</dimen>
+    <dimen name="checkbox_margin_left">10dp</dimen>
+    <dimen name="checkbox_margin_right">10dp</dimen>
+    <dimen name="right_shift">130dp</dimen>
+    <dimen name="loopme_banner_view_width">250dp</dimen>
+    <dimen name="loopme_banner_view_height">200dp</dimen>
+    <dimen name="loopme_banner_view_margin_top">10dp</dimen>
+    <dimen name="status_button_width">30dp</dimen>
+    <dimen name="status_button_height">30dp</dimen>
+    <dimen name="status_button_margin_left">10dp</dimen>
+    <dimen name="fullscreen_button_margin_left">40dp</dimen>
+    <dimen name="round_button_radius">30dp</dimen>
+    <dimen name="visibility_textview_margin_right">5dp</dimen>
+    <dimen name="button_width">250dp</dimen>
+    <dimen name="visibility_controls_linearlayout_margin_bottom">10dp</dimen>
+    <dimen name="interstitial_controls_leinearlayout_margin_bottom">10dp</dimen>
+    <dimen name="screen_size_title_width">140dp</dimen>
+    <dimen name="screen_size_title_height">35dp</dimen>
+    <dimen name="text_18sp">18sp</dimen>
+    <dimen name="screen_size_text_width">140dp</dimen>
+    <dimen name="set_app_key_text_width">140dp</dimen>
+    <dimen name="text_14sp">14sp</dimen>
+    <dimen name="loopme_banner_view_margin_bottom">10dp</dimen>
+    <dimen name="move_left_imageview_margin_left">30dp</dimen>
+    <dimen name="move_left_imageview_height">55dp</dimen>
+    <dimen name="move_left_imageview_width">55dp</dimen>
+    <dimen name="checkboxes_linearlayout_margin_left">25dp</dimen>
+    <dimen name="screen_size_linearlayout_margin_left">25dp</dimen>
+    <dimen name="interstitial_controls_leinearlayout_margin_right">25dp</dimen>
+    <dimen name="interstitial_controls_leinearlayout_margin_left">25dp</dimen>
+    <dimen name="visibility_controls_linearlayout_width">200dp</dimen>
+    <dimen name="loading_textview_margin_bottom">10dp</dimen>
+    <dimen name="shifting_linearlayout_margin_right">25dp</dimen>
+</resources>
