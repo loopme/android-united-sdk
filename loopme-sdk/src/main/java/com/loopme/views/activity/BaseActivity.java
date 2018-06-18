@@ -6,8 +6,10 @@ import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
 
 import com.loopme.Constants;
@@ -43,6 +45,8 @@ public final class BaseActivity extends Activity
     private CloseButton mMraidCloseButton;
     private MraidAdCloseButtonReceiver mMraidCloseButtonReceiver;
     private boolean mIsDestroyBroadcastReceived;
+    private boolean mIsPlaying = true;
+    private Button mPlayPauseButton;
 
     @Override
     public final void onCreate(Bundle savedInstanceState) {
@@ -74,6 +78,27 @@ public final class BaseActivity extends Activity
         mDisplayController.postImpression();
         mDisplayController.onAdEnteredFullScreenEvent();
         mDisplayController.onNewActivity(this);
+
+
+        mPlayPauseButton = new Button(this);
+        mPlayPauseButton.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        mPlayPauseButton.setText("Pause");
+        mPlayPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mIsPlaying) {
+                    mLoopMeAd.pause();
+                    mIsPlaying = false;
+                    mPlayPauseButton.setText("Play");
+                } else {
+                    mLoopMeAd.resume();
+                    mIsPlaying = true;
+                    mPlayPauseButton.setText("Pause");
+
+                }
+            }
+        });
+        mLoopMeContainerView.addView(mPlayPauseButton, 1);
     }
 
     private void setMraidSettings() {

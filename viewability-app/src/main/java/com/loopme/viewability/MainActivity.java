@@ -14,7 +14,8 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.loopme.*;
+import com.loopme.LoopMeBanner;
+import com.loopme.LoopMeInterstitial;
 import com.loopme.common.LoopMeError;
 import com.loopme.utils.Utils;
 
@@ -201,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements
 
         mShiftValueEdit = (EditText) findViewById(R.id.set_shifting_edit);
         mSetAppKeyEdit = (EditText) findViewById(R.id.set_app_key_edit);
-        mSetAppKeyEdit.setText(LoopMeBanner.TEST_MPU_BANNER);
+        mSetAppKeyEdit.setText("c86c5dc282");
         mLoadingTextView = (TextView) findViewById(R.id.loading_textview);
         mVisibilityTextView = (TextView) findViewById(R.id.visibility_status_textview);
 
@@ -319,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements
     private void showInterstitial() {
         if (mInterstitial != null && mInterstitial.isReady()) {
             setNewShiftValue();
-//            mInterstitial.show(getRightShift(), getLeftShift(), getTopShift(), getBottomShift(), mLargeAdButton.isChecked(), mSmallAdButton.isChecked());
+            mInterstitial.show(getRightShift(), getLeftShift(), getTopShift(), getBottomShift(), mLargeAdButton.isChecked(), mSmallAdButton.isChecked());
         } else {
             Toast.makeText(this, "Interstitial is not ready", Toast.LENGTH_LONG).show();
         }
@@ -344,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements
         }
         setNewShiftValue();
 
-        int mShift;
+        int mShift = 0;
         switch (direction) {
             case MOVE_LEFT: {
                 mShift = (int) mLoopMeBannerView.getX() - mShiftValue;
@@ -353,9 +354,6 @@ public class MainActivity extends AppCompatActivity implements
             case MOVE_RIGHT: {
                 mShift = (int) mLoopMeBannerView.getX() + mShiftValue;
                 break;
-            }
-            default: {
-                return;
             }
         }
         mLoopMeBannerView.setX(mShift);
@@ -476,6 +474,7 @@ public class MainActivity extends AppCompatActivity implements
                 @Override
                 public void run() {
                     countAndShowVisibility();
+                    setBannerSize();
                 }
             }, TIME_DELAY);
         }
@@ -596,5 +595,14 @@ public class MainActivity extends AppCompatActivity implements
 
     private boolean isBannerLoading() {
         return mBanner != null && mBanner.isLoading();
+    }
+
+    private void setBannerSize() {
+        findViewById(R.id.banner_size_linearlayout).setVisibility(View.VISIBLE);
+        ((TextView) findViewById(R.id.banner_size_text)).setText(getBannerSize());
+    }
+
+    private String getBannerSize() {
+        return String.valueOf(mLoopMeBannerView.getWidth() + "x" + mLoopMeBannerView.getHeight());
     }
 }

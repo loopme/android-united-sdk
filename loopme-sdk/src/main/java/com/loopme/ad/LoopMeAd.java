@@ -13,6 +13,7 @@ import com.loopme.Helpers;
 import com.loopme.IdGenerator;
 import com.loopme.IntegrationType;
 import com.loopme.Logging;
+import com.loopme.ShiftedValues;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.display.BaseTrackableController;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
@@ -56,6 +57,8 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     protected boolean mIsReady;
     private int mAdId;
     private volatile boolean mIsReverseOrientationRequest;
+    private ShiftedValues mShiftedValues;
+
 
     public LoopMeAd(Activity context, String appKey) {
         if (context == null || TextUtils.isEmpty(appKey)) {
@@ -500,6 +503,14 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         } else {
             rebuildView(newContainerView);
         }
+    }
+
+    public ShiftedValues getShiftedValues() {
+        return mShiftedValues;
+    }
+
+    public void setShiftedValues(ShiftedValues shiftedValues) {
+        mShiftedValues = shiftedValues;
     }
 
     public enum Type {

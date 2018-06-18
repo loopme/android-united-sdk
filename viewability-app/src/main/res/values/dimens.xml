@@ -22,8 +22,8 @@
     <dimen name="checkbox_margin_left">10dp</dimen>
     <dimen name="checkbox_margin_right">10dp</dimen>
     <dimen name="right_shift">130dp</dimen>
-    <dimen name="loopme_banner_view_width">250dp</dimen>
-    <dimen name="loopme_banner_view_height">200dp</dimen>
+    <dimen name="loopme_banner_view_width">300dp</dimen>
+    <dimen name="loopme_banner_view_height">250dp</dimen>
     <dimen name="loopme_banner_view_margin_top">10dp</dimen>
     <dimen name="status_button_width">30dp</dimen>
     <dimen name="status_button_height">30dp</dimen>
