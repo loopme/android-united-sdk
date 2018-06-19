@@ -32,6 +32,7 @@ import com.loopme.loaders.Loader;
 import com.loopme.models.Errors;
 import com.loopme.models.Message;
 import com.loopme.utils.UiUtils;
+import com.loopme.utils.Utils;
 import com.loopme.views.AdView;
 import com.loopme.views.LoopMeWebView;
 import com.loopme.views.MraidView;
@@ -108,7 +109,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
 
     private void buildMraidContainer(FrameLayout containerView) {
         if (mMraidController != null) {
-            mMraidController.buildMraidContainer(containerView);
+            mMraidController.buildMraidContainer(containerView, mLoopMeAd.getShiftedValues());
         }
     }
 
@@ -348,7 +349,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     @Override
     public void onBuildVideoAdView(FrameLayout containerView) {
         if (mViewController != null) {
-            mViewController.buildVideoAdView(mLoopMeAd.getContext(), containerView, mAdView);
+            mViewController.buildVideoAdView(mLoopMeAd.getContext(), containerView, mAdView, mLoopMeAd.getShiftedValues(), mLoopMeAd.getAdFormat());
         }
     }
 
@@ -398,6 +399,11 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
             return;
         }
         mAdView.setBackgroundColor(Color.BLACK);
+        if (mLoopMeAd.getAdFormat() == Constants.AdFormat.INTERSTITIAL) {
+            FrameLayout.LayoutParams params = Utils.generateShiftedParams(Utils.getScreenWidth(), Utils.getScreenHeight(), mLoopMeAd.getShiftedValues());
+            mAdView.setLayoutParams(params);
+        }
+
         containerView.addView(mAdView);
     }
 

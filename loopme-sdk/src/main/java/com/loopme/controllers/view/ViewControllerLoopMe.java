@@ -14,6 +14,7 @@ import android.widget.FrameLayout;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
+import com.loopme.ShiftedValues;
 import com.loopme.utils.Utils;
 import com.loopme.views.AdView;
 
@@ -38,7 +39,7 @@ public class ViewControllerLoopMe implements TextureView.SurfaceTextureListener,
     }
 
     @Override
-    public void buildVideoAdView(Context context, ViewGroup bannerView, AdView adView) {
+    public void buildVideoAdView(Context context, ViewGroup bannerView, AdView adView, ShiftedValues shiftedValues, Constants.AdFormat adFormat) {
         if (context != null && bannerView != null && adView != null) {
             mTextureView = new TextureView(context);
             configureTextureView();
@@ -47,6 +48,13 @@ public class ViewControllerLoopMe implements TextureView.SurfaceTextureListener,
 
             bannerView.setBackgroundColor(Color.BLACK);
             bannerView.addView(mTextureView, CHILD_INDEX_0);
+
+
+            if (adFormat == Constants.AdFormat.INTERSTITIAL) {
+                FrameLayout.LayoutParams shiftedInterstitialParams = Utils.generateShiftedParams(Utils.getScreenWidth(), Utils.getScreenHeight(), shiftedValues);
+                adView.setLayoutParams(shiftedInterstitialParams);
+            }
+
             bannerView.addView(adView, CHILD_INDEX_1);
         }
     }

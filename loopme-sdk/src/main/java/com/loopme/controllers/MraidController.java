@@ -13,6 +13,7 @@ import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.LoopMeBannerGeneral;
 import com.loopme.MraidOrientation;
+import com.loopme.ShiftedValues;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.bridges.mraid.MraidBridge;
@@ -270,12 +271,20 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener, View.
         }
     }
 
-    public void buildMraidContainer(FrameLayout containerView) {
+    public void buildMraidContainer(FrameLayout containerView, ShiftedValues shiftedValues) {
         FrameLayout.LayoutParams mraidViewLayoutParams = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT);
         Utils.removeParent(mMraidView);
-        containerView.addView(mMraidView, mraidViewLayoutParams);
+
+
+        if (mLoopMeAd.getAdFormat() == Constants.AdFormat.INTERSTITIAL) {
+            FrameLayout.LayoutParams shiftedInterstitialParams = Utils.generateShiftedParams(Utils.getScreenWidth(), Utils.getScreenHeight(), shiftedValues);
+            mMraidView.setLayoutParams(shiftedInterstitialParams);
+            containerView.addView(mMraidView);
+        } else {
+            containerView.addView(mMraidView, mraidViewLayoutParams);
+        }
         if (mLoopMeAd.isBanner()) {
             initCloseButton(mLoopMeAd.getContext());
         }

@@ -9,9 +9,12 @@ import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.FrameLayout;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
+import com.loopme.ShiftedValues;
+import com.loopme.utils.Utils;
 import com.loopme.video360.MDVRLibrary;
 import com.loopme.views.AdView;
 
@@ -47,7 +50,7 @@ public class View360Controller implements IViewController {
     }
 
     @Override
-    public void buildVideoAdView(Context context, ViewGroup bannerView, AdView adView) {
+    public void buildVideoAdView(Context context, ViewGroup bannerView, AdView adView, ShiftedValues shiftedValues, Constants.AdFormat adFormat) {
         mGLSurfaceView = new GLSurfaceView(context);
         bannerView.addView(mGLSurfaceView, 0);
 
@@ -56,6 +59,10 @@ public class View360Controller implements IViewController {
             adView.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
             if (adView.getParent() != null) {
                 ((ViewGroup) adView.getParent()).removeView(adView);
+            }
+            if (adFormat == Constants.AdFormat.INTERSTITIAL) {
+                FrameLayout.LayoutParams shiftedInterstitialParams = Utils.generateShiftedParams(Utils.getScreenWidth(), Utils.getScreenHeight(), shiftedValues);
+                adView.setLayoutParams(shiftedInterstitialParams);
             }
             bannerView.addView(adView, 1);
         }

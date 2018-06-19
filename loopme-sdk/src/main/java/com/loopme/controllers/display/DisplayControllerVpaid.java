@@ -59,7 +59,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     public DisplayControllerVpaid(LoopMeAd loopMeAd) {
         super(loopMeAd);
         mVpaidBridge = new VpaidBridgeImpl(this, mLoopMeAd.getAdParams(), mLoopMeAd.getAdSpotDimensions());
-        mViewControllerVpaid = new ViewControllerVpaid(this);
+        mViewControllerVpaid = new ViewControllerVpaid(this, mLoopMeAd.getAdFormat());
         mVideoDuration = mAdParams.getDuration();
         mLogTag = DisplayControllerVast.class.getSimpleName();
         Logging.out(mLogTag);
@@ -89,7 +89,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     @Override
     public void onBuildVideoAdView(FrameLayout containerView) {
-        mViewControllerVpaid.buildVideoAdView(containerView, mWebView, mLoopMeAd.getContext());
+        mViewControllerVpaid.buildVideoAdView(containerView, mWebView, mLoopMeAd.getContext(), mLoopMeAd.getShiftedValues());
     }
 
     @Override
