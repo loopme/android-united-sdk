@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class Utils {
+    private static final int START_BODY_TAG = 173;
     private static final int ZERO = 0;
     private static final float DEFAULT_DENSITY = 1;
     private static final float DEFAULT_VOLUME = 1.0f;
@@ -770,4 +771,12 @@ public class Utils {
         return obj instanceof Float;
     }
 
+    public static String addMraidScript(String html) {
+        if (TextUtils.isEmpty(html)) {
+            return "";
+        }
+        String firstPart = html.substring(0, START_BODY_TAG);
+        String lastPart = html.substring(START_BODY_TAG);
+        return firstPart + Constants.MRAID_SCRIPT + lastPart;
+    }
 }

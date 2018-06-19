@@ -31,6 +31,7 @@ public class Constants {
     public static final long DESTROY_TIME_DELAY = 200;
 
     public static boolean sDebugMode = true;
+    public static final String MRAID_SCRIPT = "<script src=\"mraid.js\"></script>";
 
     private Constants() {
     }
