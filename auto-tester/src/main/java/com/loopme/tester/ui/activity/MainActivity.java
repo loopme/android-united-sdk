@@ -16,6 +16,7 @@ import com.loopme.tester.BuildConfig;
 import com.loopme.tester.Integration;
 import com.loopme.tester.Constants;
 import com.loopme.tester.R;
+import com.loopme.tester.AppUpdateChecker;
 import com.loopme.tester.db.contracts.AdContract;
 import com.loopme.tester.enums.LoadType;
 import com.loopme.tester.enums.ViewMode;
@@ -95,6 +96,7 @@ public class MainActivity extends BaseActivity implements
             fragmentTransaction.commit();
         }
         Integration.insertIasKeys(this);
+        new AppUpdateChecker(this).checkUpdate();
     }
 
     @Override
