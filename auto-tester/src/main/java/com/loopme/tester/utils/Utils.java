@@ -2,8 +2,10 @@ package com.loopme.tester.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -75,4 +77,10 @@ public class Utils {
         return Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT;
     }
 
+    public static void showUpdate(Context context) {
+        String url = Constants.TESTFAIRY_URL;
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
 }

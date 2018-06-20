@@ -25,7 +25,9 @@ android {
         multiDexEnabled true
         versionNameSuffix getDate()
         buildConfigField "String", "TESTFAIRY_APP_TOKEN", TESTFAIRY_TOKEN
-
+        buildConfigField "String", "TESTFAIRY_API_URL", TESTFAIRY_API_URL
+        buildConfigField "String", "TESTFAIRY_API_KEY", TESTFAIRY_API_KEY
+        buildConfigField "String", "TESTFAIRY_API_LOGIN", TESTFAIRY_API_LOGIN
     }
     dexOptions {
         javaMaxHeapSize "4g"
@@ -74,8 +76,6 @@ dependencies {
 }
 
 static def getDate() {
-    def date = new Date()
-    def formattedDate = date.format('.MMdd')
-    return formattedDate
+    return ".7000"
 }
 
