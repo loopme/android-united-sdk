@@ -14,8 +14,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.loopme.LoopMeBanner;
-import com.loopme.LoopMeInterstitial;
+import com.loopme.*;
 import com.loopme.common.LoopMeError;
 import com.loopme.utils.Utils;
 

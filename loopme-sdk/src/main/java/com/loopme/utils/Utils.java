@@ -73,6 +73,22 @@ public class Utils {
     private static int DEFAULT_WIDTH = 100;
     private static int DEFAULT_HEIGHT = 100;
 
+    private static final int RIGHT_SHIFT = 0;
+    private static final int LEFT_SHIFT = 1;
+    private static final int DOWN_SHIFT = 2;
+    private static final int UP_SHIFT = 3;
+
+    private static final int RIGHT_UP_SHIFT = 4;
+    private static final int RIGHT_DOWN_SHIFT = 5;
+
+    private static final int LEFT_UP_SHIFT = 6;
+    private static final int LEFT_DOWN_SHIFT = 7;
+
+    private static final int HORIZONTAL_COMPRESSION = 8;
+    private static final int VERTICAL_COMPRESSION = 9;
+    private static final int HORIZONTAL_AND_VERTICAL_COMPRESSION = 10;
+    private static final int SIMPLE_FULL_SCREEN = 11;
+
     public static void init(Context context) {
         if (context != null) {
             sUserAgent = WebSettings.getDefaultUserAgent(context);
@@ -779,115 +795,4 @@ public class Utils {
         String lastPart = html.substring(START_BODY_TAG);
         return firstPart + Constants.MRAID_SCRIPT + lastPart;
     }
-    public static FrameLayout.LayoutParams generateShiftedParams(int width, int height, ShiftedValues values) {
-        FrameLayout.LayoutParams shiftedParams = new FrameLayout.LayoutParams(width, height);
-        shiftedParams.gravity = Gravity.NO_GRAVITY;
-        if (values == null) {
-            return shiftedParams;
-        }
-
-        boolean small = values.isSmallAd();
-        boolean large = values.isLargeAd();
-
-        if (small) {
-            int smallWidth = (int) (width * 0.7);
-            int smallHeight = (int) (height * 0.7);
-            shiftedParams = new FrameLayout.LayoutParams(smallWidth, smallHeight);
-            return shiftedParams;
-        } else if (large) {
-            int largeWidth = (int) (width * 1.4);
-            int largeHeight = (int) (height * 1.4);
-            shiftedParams = new FrameLayout.LayoutParams(largeWidth, largeHeight);
-        }
-        setShiftedParams(shiftedParams, values);
-        return shiftedParams;
-    }
-
-    private static void setShiftedParams(FrameLayout.LayoutParams shiftedParams, ShiftedValues values) {
-        int toLeft = values.getLeft();
-        int toRight = values.getRight();
-        int toTop = values.getTop();
-        int toDown = values.getBottom();
-
-
-        switch (getTypeOfShifting(values)) {
-            case RIGHT_SHIFT: {
-                shiftView(toRight, 0, shiftedParams);
-                break;
-            }
-            case LEFT_SHIFT: {
-                shiftView(-1 * toLeft, 0, shiftedParams);
-                break;
-            }
-            case UP_SHIFT: {
-                shiftView(0, -1 * toTop, shiftedParams);
-                break;
-            }
-            case DOWN_SHIFT: {
-                shiftView(0, toDown, shiftedParams);
-                break;
-            }
-            case RIGHT_UP_SHIFT: {
-                shiftView(toRight, -1 * toTop, shiftedParams);
-                break;
-            }
-            case RIGHT_DOWN_SHIFT: {
-                shiftView(toRight, toDown, shiftedParams);
-                break;
-            }
-            case LEFT_UP_SHIFT: {
-                shiftView(-1 * toLeft, -1 * toTop, shiftedParams);
-                break;
-            }
-            case LEFT_DOWN_SHIFT: {
-                shiftView(-1 * toLeft, toDown, shiftedParams);
-                break;
-            }
-            case SIMPLE_FULL_SCREEN: {
-                shiftedParams.gravity = Gravity.CENTER;
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-    }
-
-    private static int getTypeOfShifting(ShiftedValues values) {
-        int left = values.getLeft();
-        int right = values.getRight();
-        int up = values.getTop();
-        int down = values.getBottom();
-
-        if (right != 0 && left == 0 && up == 0 && down == 0) {
-            return RIGHT_SHIFT;
-        } else if (right == 0 && left != 0 && up == 0 && down == 0) {
-            return LEFT_SHIFT;
-        } else if (right == 0 && left == 0 && up != 0 && down == 0) {
-            return UP_SHIFT;
-        } else if (right == 0 && left == 0 && up == 0 && down != 0) {
-            return DOWN_SHIFT;
-        } else if (right != 0 && left == 0 && up != 0 && down == 0) {
-            return RIGHT_UP_SHIFT;
-        } else if (right != 0 && left == 0 && up == 0 && down != 0) {
-            return RIGHT_DOWN_SHIFT;
-        } else if (right == 0 && left != 0 && up != 0 && down == 0) {
-            return LEFT_UP_SHIFT;
-        } else if (right == 0 && left != 0 && up == 0 && down != 0) {
-            return LEFT_DOWN_SHIFT;
-        } else if (right != 0 && left != 0 && up == 0 && down == 0) {
-            return HORIZONTAL_COMPRESSION;
-        } else if (right == 0 && left == 0 && up != 0 && down != 0) {
-            return VERTICAL_COMPRESSION;
-        } else if (right != 0 && left != 0 && up != 0 && down != 0) {
-            return HORIZONTAL_AND_VERTICAL_COMPRESSION;
-        } else {
-            return SIMPLE_FULL_SCREEN;
-        }
-    }
-
-    private static void shiftView(int toRight, int toDown, FrameLayout.LayoutParams params) {
-        params.setMargins(toRight, toDown, 0, 0);
-    }
-
 }
