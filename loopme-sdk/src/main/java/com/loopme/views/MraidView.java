@@ -8,6 +8,7 @@ import com.loopme.Logging;
 import com.loopme.bridges.BridgeCommandBuilder;
 import com.loopme.bridges.mraid.MraidBridge;
 import com.loopme.controllers.MraidController;
+import com.loopme.utils.Utils;
 
 
 public class MraidView extends LoopMeWebView {
@@ -24,6 +25,7 @@ public class MraidView extends LoopMeWebView {
     }
 
     public void loadData(String html) {
+        html = Utils.addMraidScript(html);
         loadDataWithBaseURL(Constants.MRAID_ANDROID_ASSET, html, Constants.MIME_TYPE_TEXT_HTML, Constants.UTF_8, null);
     }
 
