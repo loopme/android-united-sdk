@@ -10,19 +10,19 @@ import android.widget.FrameLayout;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
-import com.loopme.common.LoopMeError;
-import com.loopme.tracker.constants.EventConstants;
-import com.loopme.utils.UiUtils;
-import com.loopme.time.SimpleTimer;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.bridges.vpaid.BridgeEventHandler;
 import com.loopme.bridges.vpaid.VpaidBridge;
 import com.loopme.bridges.vpaid.VpaidBridgeImpl;
+import com.loopme.common.LoopMeError;
 import com.loopme.controllers.interfaces.VastVpaidDisplayController;
 import com.loopme.controllers.view.ViewControllerVpaid;
 import com.loopme.models.BridgeMethods;
 import com.loopme.models.Errors;
 import com.loopme.models.Message;
+import com.loopme.time.SimpleTimer;
+import com.loopme.tracker.constants.EventConstants;
+import com.loopme.utils.UiUtils;
 import com.loopme.utils.Utils;
 import com.loopme.views.LoopMeWebView;
 import com.loopme.views.webclient.AdViewChromeClient;
@@ -59,7 +59,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     public DisplayControllerVpaid(LoopMeAd loopMeAd) {
         super(loopMeAd);
         mVpaidBridge = new VpaidBridgeImpl(this, mLoopMeAd.getAdParams(), mLoopMeAd.getAdSpotDimensions());
-        mViewControllerVpaid = new ViewControllerVpaid(this, mLoopMeAd.getAdFormat());
+        mViewControllerVpaid = new ViewControllerVpaid(this);
         mVideoDuration = mAdParams.getDuration();
         mLogTag = DisplayControllerVast.class.getSimpleName();
         Logging.out(mLogTag);
@@ -89,7 +89,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     @Override
     public void onBuildVideoAdView(FrameLayout containerView) {
-        mViewControllerVpaid.buildVideoAdView(containerView, mWebView, mLoopMeAd.getContext(), mLoopMeAd.getShiftedValues());
+        mViewControllerVpaid.buildVideoAdView(containerView, mWebView, mLoopMeAd.getContext());
     }
 
     @Override

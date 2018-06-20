@@ -10,39 +10,33 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.R;
-import com.loopme.Constants;
-import com.loopme.ShiftedValues;
 import com.loopme.controllers.display.DisplayControllerVpaid;
 import com.loopme.time.TimerWithPause;
 import com.loopme.utils.ImageUtils;
-import com.loopme.utils.Utils;
 
 public class ViewControllerVpaid implements View.OnClickListener {
 
     private java.lang.String LOG_TAG = ViewControllerVpaid.class.getSimpleName();
     private static final int CLOSE_BUTTON_ID = View.generateViewId();
     private final DisplayControllerVpaid mDisplayControllerVpaid;
-    private final Constants.AdFormat mAdFormat;
 
     private WebView mWebView;
-    private ShiftedValues mShiftedValues;
     private View mEndCardLayout;
     private FrameLayout mContainerView;
     private ImageView mEndCardView;
     private TimerWithPause mCloseButtonTimer;
     private ImageView mCloseImageView;
 
-    public ViewControllerVpaid(DisplayControllerVpaid displayControllerVpaid, Constants.AdFormat adFormat) {
+    public ViewControllerVpaid(DisplayControllerVpaid displayControllerVpaid) {
         mDisplayControllerVpaid = displayControllerVpaid;
-        mAdFormat = adFormat;
     }
 
-    public void buildVideoAdView(FrameLayout containerView, WebView webView, Context context, ShiftedValues shiftedValues) {
+    public void buildVideoAdView(FrameLayout containerView, WebView webView, Context context) {
         mContainerView = containerView;
         mWebView = webView;
-        mShiftedValues = shiftedValues;
 
         clearViews();
         initViews(context);
@@ -54,13 +48,7 @@ public class ViewControllerVpaid implements View.OnClickListener {
     private void addViewsToContainer() {
         FrameLayout.LayoutParams params = createParams();
         mEndCardLayout.setLayoutParams(params);
-
-        if (mAdFormat == Constants.AdFormat.INTERSTITIAL) {
-            FrameLayout.LayoutParams shiftedInterstitialParams = Utils.generateShiftedParams(Utils.getScreenWidth(), Utils.getScreenHeight(), mShiftedValues);
-            mWebView.setLayoutParams(shiftedInterstitialParams);
-        } else {
-            mWebView.setLayoutParams(params);
-        }
+        mWebView.setLayoutParams(params);
         mContainerView.addView(mEndCardLayout, 0);
         mContainerView.addView(mWebView, 1);
         mContainerView.addView(mCloseImageView, 2);
@@ -95,7 +83,8 @@ public class ViewControllerVpaid implements View.OnClickListener {
     }
 
     private FrameLayout.LayoutParams createParams() {
-        return new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        return new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
     }
 
     private void clearViews() {

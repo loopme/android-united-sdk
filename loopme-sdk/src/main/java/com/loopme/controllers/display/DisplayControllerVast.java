@@ -47,7 +47,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     public DisplayControllerVast(LoopMeAd loopMeAd) {
         super(loopMeAd);
-        mViewControllerVast = new ViewControllerVast(this, this, mLoopMeAd.getAdFormat());
+        mViewControllerVast = new ViewControllerVast(this, this);
         mLogTag = DisplayControllerVast.class.getSimpleName();
         Logging.out(mLogTag);
     }
@@ -93,7 +93,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     public void onBuildVideoAdView(FrameLayout containerView) {
-        mViewControllerVast.buildVideoAdView(containerView, mLoopMeAd.getContext(), mWebView, mLoopMeAd.getShiftedValues());
+        mViewControllerVast.buildVideoAdView(containerView, mLoopMeAd.getContext(), mWebView);
         mAdView = containerView;
         setVerificationView(mAdView);
     }
@@ -156,9 +156,9 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     private void resumeSdk24AndAbove() {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !mViewControllerVast.isEndCard()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !mViewControllerVast.isEndCard()) {
             resumeMediaPlayer(getSurface());
-//        }
+        }
     }
 
     private void prepareControls(final int duration) {

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ViewAbility Tester</string>
+    <string name="app_name">ViewAbility test</string>
     <string name="set_sizes">Set size for webView</string>
     <string name="set_height">Set height:</string>
     <string name="set_width">Set width:</string>
@@ -17,7 +17,7 @@
     <string name="loading_text">Loading...</string>
     <string name="set_value">Set value</string>
     <string name="set_shifting_value">Shift on:  </string>
-    <string name="screen_size_is">Screen size(px):</string>
+    <string name="screen_size_is">Screen size:</string>
     <string name="large">Large Ad</string>
     <string name="small">Small Ad</string>
     <string name="load_banner">Load Banner</string>
@@ -35,5 +35,4 @@
     <string name="interstitial_is_ready">Interstitial is ready</string>
     <string name="overlapping">Overlapping</string>
     <string name="overlap">Overlap</string>
-    <string name="banner_size_title">Banner size (px):</string>
 </resources>

@@ -121,6 +121,4 @@ public abstract class AdConfig implements AdTargeting {
             mSecondLoopMeAd.setPreferredAdType(type);
         }
     }
-
-
 }

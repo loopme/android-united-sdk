@@ -9,7 +9,6 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 
 import com.loopme.Constants;
-import com.loopme.ShiftedValues;
 import com.loopme.controllers.display.DisplayControllerVast;
 import com.loopme.utils.Utils;
 
@@ -17,19 +16,17 @@ public class ViewControllerVast {
 
     private final DisplayControllerVast mDisplayControllerVast;
     private ViewControllerVastListener mListener;
-    private final Constants.AdFormat mAdFormat;
     private FrameLayout mContainerView;
     private PlayerLayout mPlayerLayout;
     private EndCardLayout mEndCardLayout;
     private FrameLayout mAdLayout;
 
-    public ViewControllerVast(DisplayControllerVast displayControllerVast, ViewControllerVastListener listener, Constants.AdFormat adFormat) {
+    public ViewControllerVast(DisplayControllerVast displayControllerVast, ViewControllerVastListener listener) {
         mDisplayControllerVast = displayControllerVast;
         mListener = listener;
-        mAdFormat = adFormat;
     }
 
-    public void buildVideoAdView(FrameLayout containerView, Context context, WebView webView, ShiftedValues shiftedValues) {
+    public void buildVideoAdView(FrameLayout containerView, Context context, WebView webView) {
         if (containerView != null && context != null) {
             mContainerView = containerView;
             mContainerView.removeAllViews();
@@ -39,11 +36,6 @@ public class ViewControllerVast {
 
             mAdLayout = new FrameLayout(containerView.getContext());
             mAdLayout.setLayoutParams(Utils.createMatchParentLayoutParams());
-
-            if (mAdFormat == Constants.AdFormat.INTERSTITIAL) {
-                FrameLayout.LayoutParams shiftedInterstitialParams = Utils.generateShiftedParams(Utils.getScreenWidth(), Utils.getScreenHeight(), shiftedValues);
-                mPlayerLayout.setLayoutParams(shiftedInterstitialParams);
-            }
 
             mAdLayout.addView(mPlayerLayout);
             mAdLayout.addView(mEndCardLayout);

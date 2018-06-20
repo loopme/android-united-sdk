@@ -23,7 +23,7 @@
 
             <TextView
                 android:id="@+id/screen_size_title"
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/screen_size_title_width"
                 android:layout_height="@dimen/screen_size_title_height"
                 android:text="@string/screen_size_is"
                 android:textColor="@color/black"
@@ -31,42 +31,18 @@
 
             <TextView
                 android:id="@+id/screen_size_text"
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/screen_size_text_width"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_18sp" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/banner_size_linearlayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/screen_size_linearlayout"
-            android:layout_marginLeft="@dimen/screen_size_linearlayout_margin_left"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/banner_size_title"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/screen_size_title_height"
-                android:text="@string/banner_size_title"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size_20sp" />
-
-            <TextView
-                android:id="@+id/banner_size_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_18sp" />
-        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/shifting_linearlayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/banner_size_linearlayout"
+            android:layout_below="@+id/screen_size_linearlayout"
             android:layout_marginLeft="@dimen/screen_size_linearlayout_margin_left"
             android:layout_marginRight="@dimen/shifting_linearlayout_margin_right"
             android:orientation="horizontal">
@@ -181,7 +157,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:enabled="false"
                     android:text="@string/large"
                     android:textColor="@color/black" />
 

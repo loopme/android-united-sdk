@@ -338,18 +338,4 @@ public abstract class AdWrapper extends AdConfig {
     private boolean isNeedSendShowEvent() {
         return mLoadingCounter != mShowCounter;
     }
-
-    public void show(int rightShift, int leftShift, int topShift, int bottomShift, boolean isLarge, boolean isSmall) {
-        setShiftedValues(new ShiftedValues(leftShift, rightShift, topShift, bottomShift, isLarge, isSmall));
-        show();
-    }
-
-    public void setShiftedValues(ShiftedValues shiftedValues) {
-        if (mFirstLoopMeAd != null) {
-            mFirstLoopMeAd.setShiftedValues(shiftedValues);
-        }
-        if (mSecondLoopMeAd != null) {
-            mSecondLoopMeAd.setShiftedValues(shiftedValues);
-        }
-    }
 }
