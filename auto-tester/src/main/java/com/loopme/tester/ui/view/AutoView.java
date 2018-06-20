@@ -98,17 +98,22 @@ public class AutoView implements View.OnClickListener, AdListener,
     }
 
     @Override
-    public void onLoadFail(String error) {
-        Logging.out(LOG_TAG, "onLoadFail: " + error);
-        if (mIsAutoLoadingEnabled) {
-            increaseRequestCounter();
-        }
-        mFailedCounter++;
-        updateResults();
-        if (!mIsAutoLoadingEnabled) {
-            loadAd();
-        }
-        Toast.makeText(mActivity, error, Toast.LENGTH_SHORT).show();
+    public void onLoadFail(final String error) {
+        postRunnableDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Logging.out(LOG_TAG, "onLoadFail: " + error);
+                if (mIsAutoLoadingEnabled) {
+                    increaseRequestCounter();
+                }
+                mFailedCounter++;
+                updateResults();
+                if (!mIsAutoLoadingEnabled) {
+                    loadAd();
+                }
+                Toast.makeText(mActivity, error, Toast.LENGTH_SHORT).show();
+            }
+        }, mTimeBetweenRequests * Constants.ONE_SECOND_IN_MILLIS);
     }
 
     private void setLoadedLabel() {
