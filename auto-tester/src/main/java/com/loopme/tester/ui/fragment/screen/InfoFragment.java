@@ -125,7 +125,8 @@ public class InfoFragment extends BaseFragment implements View.OnClickListener, 
         TextView testerVersionTextView = (TextView) view.findViewById(R.id.fragment_info_tester_version);
         testerVersionTextView.setText(testerVersion);
 
-        String loopmeVersion = getString(R.string.fragment_info_loopme_sdk_version, com.loopme.BuildConfig.VERSION_NAME);
+        String loopMeFullVersion = com.loopme.BuildConfig.VERSION_CODE + com.loopme.BuildConfig.VERSION_NAME;
+        String loopmeVersion = getString(R.string.fragment_info_loopme_sdk_version, loopMeFullVersion);
         TextView loopmeVersionTextView = (TextView) view.findViewById(R.id.fragment_info_loopme_sdk_version);
         loopmeVersionTextView.setText(loopmeVersion);
 
