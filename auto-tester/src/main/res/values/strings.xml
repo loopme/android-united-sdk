@@ -123,8 +123,10 @@
     <string name="image_banner">Image Banner</string>
     <string name="update_dialog_title">Update</string>
     <string name="update_dialog_message">There is a newer version of the tester. Would you like to update it now?</string>
-    <string name="update_dialog_ok_button">Update</string>
+    <string name="update_dialog_oupdate_button">Update</string>
     <string name="update_dialog_close_button">Close</string>
+    <string name="update_dialog_no_updates_messege">No updates available.</string>
+    <string name="update_dialog_ok_button">Ok</string>
     <string-array name="ad_types">
         <item>ALL</item>
         <item>HTML</item>
