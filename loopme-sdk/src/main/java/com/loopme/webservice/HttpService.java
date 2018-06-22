@@ -40,6 +40,14 @@ public class HttpService {
         return mFetchAdCall.execute();
     }
 
+
+    public Response<ResponseJsonModel> fetchAdSync(String url) throws IOException {
+        Retrofit retrofit = RetrofitFabric.getRetrofit(Constants.RetrofitType.FETCH_BY_URL, url);
+        ApiService service = retrofit.create(ApiService.class);
+        mFetchAdCall = service.fetchAd();
+        return mFetchAdCall.execute();
+    }
+
     public Response<String> downLoadSync(ResourceInfo resourceInfo) throws IOException {
         Retrofit retrofit = RetrofitFabric.getRetrofit(Constants.RetrofitType.DOWNLOAD, resourceInfo.getUrl());
         ApiService apiService = retrofit.create(ApiService.class);

@@ -10,9 +10,9 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.R;
-import com.loopme.Constants;
 import com.loopme.controllers.display.DisplayControllerVpaid;
 import com.loopme.time.TimerWithPause;
 import com.loopme.utils.ImageUtils;

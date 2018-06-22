@@ -81,6 +81,7 @@ public class ActionBarFragment extends BaseFragment implements
         view.findViewById(R.id.action_bar_add_button).setOnClickListener(this);
         view.findViewById(R.id.action_bar_back_to_adspots).setOnClickListener(this);
         view.findViewById(R.id.action_bar_edit_button).setOnClickListener(this);
+        view.findViewById(R.id.action_bar_qr_ad).setOnClickListener(this);
         mTitleTextView = (TextView) view.findViewById(R.id.action_bar_title);
 
         if (mViewMode != null) {
@@ -174,6 +175,16 @@ public class ActionBarFragment extends BaseFragment implements
                 openEditAdSpotFragment();
                 break;
             }
+            case R.id.action_bar_qr_ad: {
+                reedQrCode();
+                break;
+            }
+        }
+    }
+
+    private void reedQrCode() {
+        if (mOnActionBarFragmentListener != null) {
+            mOnActionBarFragmentListener.reedQrCode();
         }
     }
 
@@ -218,6 +229,8 @@ public class ActionBarFragment extends BaseFragment implements
         void onClose();
 
         void editAdSpot();
+
+        void reedQrCode();
     }
 
 

@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class Utils {
+    private static final int START_BODY_TAG = 173;
     private static final int ZERO = 0;
     private static final float DEFAULT_DENSITY = 1;
     private static final float DEFAULT_VOLUME = 1.0f;
@@ -71,6 +72,22 @@ public class Utils {
     public static String sUserAgent;
     private static int DEFAULT_WIDTH = 100;
     private static int DEFAULT_HEIGHT = 100;
+
+    private static final int RIGHT_SHIFT = 0;
+    private static final int LEFT_SHIFT = 1;
+    private static final int DOWN_SHIFT = 2;
+    private static final int UP_SHIFT = 3;
+
+    private static final int RIGHT_UP_SHIFT = 4;
+    private static final int RIGHT_DOWN_SHIFT = 5;
+
+    private static final int LEFT_UP_SHIFT = 6;
+    private static final int LEFT_DOWN_SHIFT = 7;
+
+    private static final int HORIZONTAL_COMPRESSION = 8;
+    private static final int VERTICAL_COMPRESSION = 9;
+    private static final int HORIZONTAL_AND_VERTICAL_COMPRESSION = 10;
+    private static final int SIMPLE_FULL_SCREEN = 11;
 
     public static void init(Context context) {
         if (context != null) {
@@ -770,4 +787,12 @@ public class Utils {
         return obj instanceof Float;
     }
 
+    public static String addMraidScript(String html) {
+        if (TextUtils.isEmpty(html)) {
+            return "";
+        }
+        String firstPart = html.substring(0, START_BODY_TAG);
+        String lastPart = html.substring(START_BODY_TAG);
+        return firstPart + Constants.MRAID_SCRIPT + lastPart;
+    }
 }

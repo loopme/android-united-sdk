@@ -30,6 +30,10 @@ public interface ApiService {
     @POST(Constants.ADS)
     Call<ResponseJsonModel> fetchAd(@Body RequestBody jsonObject);
 
+    @Headers({CONTENT_TYPE_DEFINITION, CACHE_CONTROL_DEFINITION})
+    @POST(".")
+    Call<ResponseJsonModel> fetchAd();
+
     @GET
     @Streaming
     Call<String> downloadFile(@Url String fileUrl);

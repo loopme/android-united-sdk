@@ -13,4 +13,5 @@
     <color name="background_buttons_center_red">#FF0000</color>
     <color name="white_transparent">#50ffffff</color>
     <color name="transparent">#00000000</color>
+    <drawable name="touchFeedback">#eabfbf</drawable>
 </resources>

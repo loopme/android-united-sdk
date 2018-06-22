@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_qr_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/shadow"
+    android:clickable="false"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/fragment_qr_replay"
+        android:layout_width="@dimen/fragment_qr_replay_width"
+        android:layout_height="@dimen/fragment_qr_replay_height"
+        android:layout_centerInParent="true"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:padding="@dimen/fragment_qr_replay_padding"
+        android:src="@drawable/icon_replay" />
+
+    <ProgressBar
+        android:id="@+id/fragment_qr_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+</RelativeLayout>

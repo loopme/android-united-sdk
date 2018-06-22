@@ -1,6 +1,7 @@
 package com.loopme.tester.ui.activity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -9,12 +10,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.loopme.tester.AppUpdateChecker;
 import com.loopme.tester.BuildConfig;
-import com.loopme.tester.Integration;
 import com.loopme.tester.Constants;
+import com.loopme.tester.Integration;
 import com.loopme.tester.R;
 import com.loopme.tester.db.contracts.AdContract;
 import com.loopme.tester.enums.LoadType;
@@ -74,6 +77,7 @@ public class MainActivity extends BaseActivity implements
     private FileLoaderManager mFileLoaderManager;
     private boolean mIsNeedExport;
     private File mExportedFile;
+    private static final int QR_ACTIVITY_REQUEST_CODE = 777;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +99,7 @@ public class MainActivity extends BaseActivity implements
             fragmentTransaction.commit();
         }
         Integration.insertIasKeys(this);
+        new AppUpdateChecker(this).checkUpdate();
     }
 
     @Override
@@ -508,5 +513,23 @@ public class MainActivity extends BaseActivity implements
                 }
             }
         });
+    }
+
+    @Override
+    public void reedQrCode() {
+        Intent intent = new Intent(this, QReaderActivity.class);
+        startActivityForResult(intent, MainActivity.QR_ACTIVITY_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == QR_ACTIVITY_REQUEST_CODE && resultCode == AppCompatActivity.RESULT_OK) {
+            String url = data.getStringExtra(QReaderActivity.ARG_AD_URL);
+            Bundle bundle = new Bundle();
+            bundle.putString(QReaderActivity.ARG_AD_URL, url);
+            openScreen(SCREEN_QR_AD, bundle);
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }

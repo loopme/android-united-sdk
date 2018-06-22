@@ -2,8 +2,6 @@ package com.loopme.tester.ui.fragment.screen;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,10 +16,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.loopme.tester.Constants;
 import com.loopme.tester.R;
 import com.loopme.tester.ui.activity.BaseActivity;
 import com.loopme.tester.ui.fragment.BaseFragment;
+import com.loopme.tester.utils.Utils;
 import com.loopme.utils.FileUtils;
 import com.mopub.common.MoPub;
 
@@ -37,11 +35,6 @@ public class InfoFragment extends BaseFragment implements View.OnClickListener, 
 
     public static InfoFragment newInstance() {
         return new InfoFragment();
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Nullable
@@ -132,7 +125,8 @@ public class InfoFragment extends BaseFragment implements View.OnClickListener, 
         TextView testerVersionTextView = (TextView) view.findViewById(R.id.fragment_info_tester_version);
         testerVersionTextView.setText(testerVersion);
 
-        String loopmeVersion = getString(R.string.fragment_info_loopme_sdk_version, com.loopme.BuildConfig.VERSION_NAME);
+        String loopMeFullVersion = com.loopme.BuildConfig.VERSION_CODE + com.loopme.BuildConfig.VERSION_NAME;
+        String loopmeVersion = getString(R.string.fragment_info_loopme_sdk_version, loopMeFullVersion);
         TextView loopmeVersionTextView = (TextView) view.findViewById(R.id.fragment_info_loopme_sdk_version);
         loopmeVersionTextView.setText(loopmeVersion);
 
@@ -175,17 +169,10 @@ public class InfoFragment extends BaseFragment implements View.OnClickListener, 
                 break;
             }
             case R.id.fragment_info_check_update_textview: {
-                checkUpdates();
+                Utils.showUpdate(mContext);
                 break;
             }
         }
-    }
-
-    private void checkUpdates() {
-        String url = Constants.TESTFAIRY_URL;
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
     }
 
     private void exportKeys() {

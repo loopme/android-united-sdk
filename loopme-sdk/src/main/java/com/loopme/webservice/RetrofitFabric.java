@@ -25,6 +25,10 @@ public class RetrofitFabric {
             case DOWNLOAD: {
                 return getDownloadRetrofit(baseUrl);
             }
+            case FETCH_BY_URL: {
+                return getFetchRetrofit(baseUrl);
+
+            }
             default: {
                 return getFetchRetrofit();
             }
@@ -32,32 +36,42 @@ public class RetrofitFabric {
     }
 
     private static Retrofit getDownloadRetrofit(String baseUrl) {
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
-                .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
-                .addNetworkInterceptor(new HeaderInterceptor())
-                .build();
+
         return new Retrofit
                 .Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(new ToStringConverterFactory())
-                .client(okHttpClient)
+                .client(getClient())
                 .build();
     }
 
     private static Retrofit getFetchRetrofit() {
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
-                .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
-                .addNetworkInterceptor(new HeaderInterceptor())
-                .build();
         return new Retrofit.Builder()
                 .baseUrl(Constants.OPEN_RTB_URL)
-                .client(okHttpClient)
+                .client(getClient())
                 .addConverterFactory(JacksonConverterFactory.create(
                         new ObjectMapper()
                                 .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
                                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)))
+                .build();
+    }
+
+    private static Retrofit getFetchRetrofit(String baseUrl) {
+        return new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .client(getClient())
+                .addConverterFactory(JacksonConverterFactory.create(
+                        new ObjectMapper()
+                                .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
+                                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)))
+                .build();
+    }
+
+    private static OkHttpClient getClient() {
+        return new OkHttpClient.Builder()
+                .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
+                .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
+                .addNetworkInterceptor(new HeaderInterceptor())
                 .build();
     }
 }
