@@ -14,13 +14,34 @@ public class InterstitialSampleActivity extends Activity implements
 
     private MoPubInterstitial mInterstitial;
     private static final String AD_UNIT_ID = "5f1b7dca09ac479c91d4ce1e1c25fb35";//Your mopub key
+    private PersonalInfoManager mPersonalInfoManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+
+        mPersonalInfoManager = MoPub.getPersonalInformationManager();
+        if(mPersonalInfoManager != null && mPersonalInfoManager.shouldShowConsentDialog()){
+            mPersonalInfoManager.loadConsentDialog(mConsentDialogListener);
+        }
     }
+
+    private ConsentDialogListener mConsentDialogListener = new ConsentDialogListener() {
+
+        @Override
+        public void onConsentDialogLoaded() {
+            if (mPersonalInfoManager != null) {
+                mPersonalInfoManager.showConsentDialog();
+            }
+        }
+
+        @Override
+        public void onConsentDialogLoadFailed(@NonNull MoPubErrorCode moPubErrorCode) {
+            MoPubLog.i("Consent dialog failed to load.");
+        }
+    };
 
     public void onShowClicked(View view){
         if (mInterstitial != null) {
@@ -29,6 +50,7 @@ public class InterstitialSampleActivity extends Activity implements
     }
 
     public void onLoadClicked(View view){
+        LoopMeSdk.setGdprConsent(this, MoPub.canCollectPersonalInformation());
         mInterstitial = new MoPubInterstitial(InterstitialSampleActivity.this, AD_UNIT_ID);
         mInterstitial.setInterstitialAdListener(InterstitialSampleActivity.this);
         mInterstitial.load();

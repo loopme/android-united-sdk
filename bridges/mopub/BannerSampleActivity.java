@@ -17,6 +17,7 @@ public class BannerSampleActivity extends Activity implements MoPubView.BannerAd
 
     private MoPubView mBanner;
     private static final String AD_UNIT_ID = "b4dc5fb8636645c08017780f6c0f0b71";//Your mopub key
+    private PersonalInfoManager mPersonalInfoManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +25,41 @@ public class BannerSampleActivity extends Activity implements MoPubView.BannerAd
         setContentView(R.layout.banner_activity_main);
 
         mBanner = (MoPubView) findViewById(R.id.mopub_banner_view);
+
+        mPersonalInfoManager = MoPub.getPersonalInformationManager();
+        if (mPersonalInfoManager != null && mPersonalInfoManager.shouldShowConsentDialog()) {
+            mPersonalInfoManager.loadConsentDialog(mConsentDialogListener);
+        }
     }
+
+    private ConsentDialogListener mConsentDialogListener = new ConsentDialogListener() {
+
+        @Override
+        public void onConsentDialogLoaded() {
+            if (mPersonalInfoManager != null) {
+                mPersonalInfoManager.showConsentDialog();
+            }
+        }
+
+        @Override
+        public void onConsentDialogLoadFailed(@NonNull MoPubErrorCode moPubErrorCode) {
+            MoPubLog.i("Consent dialog failed to load.");
+        }
+    };
+
+
+        @Override
+        public void onConsentDialogLoaded() {
+            if (mPersonalInfoManager != null) {
+                mPersonalInfoManager.showConsentDialog();
+            }
+        }
+
+        @Override
+        public void onConsentDialogLoadFailed(@NonNull MoPubErrorCode moPubErrorCode) {
+            MoPubLog.i("Consent dialog failed to load.");
+        }
+    };
 
     @Override
     protected void onPause() {
@@ -43,6 +78,8 @@ public class BannerSampleActivity extends Activity implements MoPubView.BannerAd
     }
 
     public void onLoadClicked(View view){
+        LoopMeSdk.setGdprConsent(this, MoPub.canCollectPersonalInformation());
+
         mBanner.setAdUnitId(AD_UNIT_ID);
         mBanner.setBannerAdListener(this);
         mBanner.loadAd();
