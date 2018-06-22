@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="ad_hidden_and_ready_to_load_again">Ad is hidden and ready to load again</string>
-    <string name="app_name">LoopMe Tester</string>
+    <string name="app_name">LoopMe X</string>
     <string name="about_dialog_import_button">Import</string>
     <string name="about_dialog_export_button">Export</string>
     <string name="fragment_export_title">Export file of AppKeys</string>
