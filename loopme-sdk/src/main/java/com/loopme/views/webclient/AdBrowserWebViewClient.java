@@ -162,6 +162,7 @@ public class AdBrowserWebViewClient extends WebViewClient {
                 url = Constants.PLAY_STORE_URL + id;
                 leaveApp(url);
             }
+            onMarketOpen();
         } catch (Exception e) {
             e.printStackTrace();
             onReceiveError();
@@ -251,6 +252,12 @@ public class AdBrowserWebViewClient extends WebViewClient {
         }
     }
 
+    private void onMarketOpen() {
+        if (mListener != null) {
+            mListener.onMarketVisit();
+        }
+    }
+
     public interface Listener {
         void onPageStarted();
 
@@ -259,6 +266,8 @@ public class AdBrowserWebViewClient extends WebViewClient {
         void onReceiveError();
 
         void onLeaveApp();
+
+        void onMarketVisit();
     }
 
 }
