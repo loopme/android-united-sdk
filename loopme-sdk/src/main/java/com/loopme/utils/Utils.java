@@ -30,7 +30,6 @@ import android.widget.FrameLayout;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
-import com.loopme.ResourceInfo;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.request.AES;
@@ -70,24 +69,6 @@ public class Utils {
     private static WindowManager sWindowManager;
     private static PackageManager sPackageManager;
     public static String sUserAgent;
-    private static int DEFAULT_WIDTH = 100;
-    private static int DEFAULT_HEIGHT = 100;
-
-    private static final int RIGHT_SHIFT = 0;
-    private static final int LEFT_SHIFT = 1;
-    private static final int DOWN_SHIFT = 2;
-    private static final int UP_SHIFT = 3;
-
-    private static final int RIGHT_UP_SHIFT = 4;
-    private static final int RIGHT_DOWN_SHIFT = 5;
-
-    private static final int LEFT_UP_SHIFT = 6;
-    private static final int LEFT_DOWN_SHIFT = 7;
-
-    private static final int HORIZONTAL_COMPRESSION = 8;
-    private static final int VERTICAL_COMPRESSION = 9;
-    private static final int HORIZONTAL_AND_VERTICAL_COMPRESSION = 10;
-    private static final int SIMPLE_FULL_SCREEN = 11;
 
     public static void init(Context context) {
         if (context != null) {
@@ -411,16 +392,6 @@ public class Utils {
             }
         }
         return 0;
-    }
-
-    public static ResourceInfo getResourceInfo(String url) {
-        if (!TextUtils.isEmpty(url)) {
-            int lastIndexOfSlash = url.lastIndexOf("/");
-            String baseUrl = url.substring(0, lastIndexOfSlash + 1);
-            String resourceName = url.substring(lastIndexOfSlash + 1, url.length());
-            return new ResourceInfo(baseUrl, resourceName);
-        }
-        return new ResourceInfo();
     }
 
     // : ------------------------------------ do not test --------------------------------------------
@@ -794,5 +765,9 @@ public class Utils {
         String firstPart = html.substring(0, START_BODY_TAG);
         String lastPart = html.substring(START_BODY_TAG);
         return firstPart + Constants.MRAID_SCRIPT + lastPart;
+    }
+
+    public static String getUserAgent() {
+        return sUserAgent;
     }
 }

@@ -13,7 +13,7 @@ import com.loopme.request.RequestUtils;
 public class GdprChecker implements
         GdprDialog.OnGdprDialogListener,
         DntFetcher.OnDntFetcherListener,
-        GdprHttpUtils.Callback {
+        LoopMeGdprServiceImpl.Callback {
     private Activity mActivity;
     private OnConsentListener mListener;
     private static boolean sIsNeedCheckUserConsent = true;
@@ -35,7 +35,7 @@ public class GdprChecker implements
         if (isLimited) {
             onComplete();
         } else {
-            GdprHttpUtils.getInstance().setListener(this).checkNeedConsent(advId);
+            new LoopMeGdprServiceImpl(advId, this).start();
         }
     }
 

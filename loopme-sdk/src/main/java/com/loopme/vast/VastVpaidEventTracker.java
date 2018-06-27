@@ -2,10 +2,10 @@ package com.loopme.vast;
 
 import android.webkit.URLUtil;
 
-import com.loopme.HttpUtil;
 import com.loopme.Logging;
+import com.loopme.network.HttpUtils;
 import com.loopme.utils.StringUtils;
-import com.loopme.webservice.ExecutorHelper;
+import com.loopme.utils.ExecutorHelper;
 import com.loopme.xml.Tracking;
 
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class VastVpaidEventTracker {
             @Override
             public void run() {
                 String completeUrl = StringUtils.setMessage(eventUrl, addMessage);
-                HttpUtil.sendRequest(completeUrl, null, null);
+                HttpUtils.doRequest(completeUrl, HttpUtils.Method.GET, null);
                 Logging.out(LOG_TAG, completeUrl);
             }
         });
