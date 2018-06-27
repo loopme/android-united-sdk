@@ -9,9 +9,11 @@ import com.loopme.tester.utils.Utils;
 
 public class AppUpdateChecker implements TestFairyServiceImpl.OnUpdateListener {
     private Activity mActivity;
+    private LaunchMode mMode = LaunchMode.START_UP;
 
-    public AppUpdateChecker(Activity activity) {
+    public AppUpdateChecker(Activity activity, LaunchMode mode) {
         mActivity = activity;
+        mMode = mode;
     }
 
     public void checkUpdate() {
@@ -19,11 +21,20 @@ public class AppUpdateChecker implements TestFairyServiceImpl.OnUpdateListener {
     }
 
     @Override
-    public void onUpdate() {
+    public void onUpdateAvailable() {
+        if (mMode == LaunchMode.START_UP) {
+            proposeToUpdate();
+        } else {
+            Utils.showUpdate(mActivity);
+            mActivity = null;
+        }
+    }
+
+    private void proposeToUpdate() {
         new AlertDialog.Builder(mActivity)
                 .setTitle(R.string.update_dialog_title)
                 .setMessage(R.string.update_dialog_message)
-                .setPositiveButton(R.string.update_dialog_ok_button, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.update_dialog_oupdate_button, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Utils.showUpdate(mActivity);
@@ -37,5 +48,29 @@ public class AppUpdateChecker implements TestFairyServiceImpl.OnUpdateListener {
                     }
                 })
                 .show();
+    }
+
+    @Override
+    public void onUpdateNotAvailable() {
+        if (mMode == LaunchMode.INFO) {
+            showNoUpdatesDialog();
+        }
+    }
+
+    private void showNoUpdatesDialog() {
+        new AlertDialog.Builder(mActivity)
+                .setTitle(R.string.update_dialog_title)
+                .setMessage(R.string.update_dialog_no_updates_messege)
+                .setPositiveButton(R.string.update_dialog_ok_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mActivity = null;
+                    }
+                })
+                .show();
+    }
+
+    public enum LaunchMode {
+        START_UP, INFO
     }
 }

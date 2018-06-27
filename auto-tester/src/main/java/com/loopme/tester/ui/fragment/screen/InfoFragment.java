@@ -16,10 +16,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.loopme.tester.AppUpdateChecker;
 import com.loopme.tester.R;
 import com.loopme.tester.ui.activity.BaseActivity;
 import com.loopme.tester.ui.fragment.BaseFragment;
-import com.loopme.tester.utils.Utils;
 import com.loopme.utils.FileUtils;
 import com.mopub.common.MoPub;
 
@@ -125,7 +125,7 @@ public class InfoFragment extends BaseFragment implements View.OnClickListener, 
         TextView testerVersionTextView = (TextView) view.findViewById(R.id.fragment_info_tester_version);
         testerVersionTextView.setText(testerVersion);
 
-        String loopMeFullVersion = com.loopme.BuildConfig.VERSION_CODE + com.loopme.BuildConfig.VERSION_NAME;
+        String loopMeFullVersion = com.loopme.BuildConfig.VERSION_CODE + "." + com.loopme.BuildConfig.VERSION_NAME;
         String loopmeVersion = getString(R.string.fragment_info_loopme_sdk_version, loopMeFullVersion);
         TextView loopmeVersionTextView = (TextView) view.findViewById(R.id.fragment_info_loopme_sdk_version);
         loopmeVersionTextView.setText(loopmeVersion);
@@ -169,7 +169,7 @@ public class InfoFragment extends BaseFragment implements View.OnClickListener, 
                 break;
             }
             case R.id.fragment_info_check_update_textview: {
-                Utils.showUpdate(mContext);
+                new AppUpdateChecker(getActivity(), AppUpdateChecker.LaunchMode.INFO).checkUpdate();
                 break;
             }
         }

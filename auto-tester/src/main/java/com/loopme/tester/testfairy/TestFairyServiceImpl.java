@@ -29,21 +29,29 @@ public class TestFairyServiceImpl {
             public void onResponse(Call<TestFairyResponse> call, Response<TestFairyResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().isNeedUpdate()) {
-                        onUpdate();
+                        onUpdateAvailable();
+                    } else {
+                        onUpdateNotAvailable();
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<TestFairyResponse> call, Throwable t) {
-                //do nothing
+                onUpdateNotAvailable();
             }
         });
     }
 
-    private void onUpdate() {
+    private void onUpdateAvailable() {
         if (mListener != null) {
-            mListener.onUpdate();
+            mListener.onUpdateAvailable();
+        }
+    }
+
+    private void onUpdateNotAvailable() {
+        if (mListener != null) {
+            mListener.onUpdateNotAvailable();
         }
     }
 
@@ -62,6 +70,8 @@ public class TestFairyServiceImpl {
     }
 
     public interface OnUpdateListener {
-        void onUpdate();
+        void onUpdateAvailable();
+
+        void onUpdateNotAvailable();
     }
 }
