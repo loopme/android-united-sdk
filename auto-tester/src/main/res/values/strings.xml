@@ -126,7 +126,7 @@
     <string name="update_dialog_oupdate_button">Update</string>
     <string name="update_dialog_close_button">Close</string>
     <string name="update_dialog_no_updates_messege">No updates available.</string>
-    <string name="update_dialog_ok_button">Update</string>
+    <string name="update_dialog_ok_button">OK</string>
     <string-array name="ad_types">
         <item>ALL</item>
         <item>HTML</item>

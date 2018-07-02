@@ -8,3 +8,5 @@
 /simple-app/build/
 /gradlew
 /gradlew.bat
+/gradle.properties
+/project.properties
