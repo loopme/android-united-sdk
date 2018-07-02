@@ -4,7 +4,6 @@ package com.loopme.tester.testfairy.model;
 import android.text.TextUtils;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -19,14 +18,18 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "id",
         "self",
         "appName",
-        "originalFilename",
-        "fileSize",
-        "uploadDate",
-        "comment",
-        "version",
+        "appVersion",
+        "appVersionCode",
+        "appDisplayName",
         "sessions",
         "crashes",
-        "activities"
+        "testers",
+        "feedbacks",
+        "uploadedAt",
+        "uploadedVia",
+        "hasTestFairySdk",
+        "insightsEnabled",
+        "videoEnabled"
 })
 public class Build {
 
@@ -36,22 +39,30 @@ public class Build {
     private String self;
     @JsonProperty("appName")
     private String appName;
-    @JsonProperty("originalFilename")
-    private String originalFilename;
-    @JsonProperty("fileSize")
-    private Integer fileSize;
-    @JsonProperty("uploadDate")
-    private String uploadDate;
-    @JsonProperty("comment")
-    private Object comment;
-    @JsonProperty("version")
-    private String version;
+    @JsonProperty("appVersion")
+    private String appVersion;
+    @JsonProperty("appVersionCode")
+    private String appVersionCode;
+    @JsonProperty("appDisplayName")
+    private String appDisplayName;
     @JsonProperty("sessions")
     private Integer sessions;
     @JsonProperty("crashes")
     private Integer crashes;
-    @JsonProperty("activities")
-    private List<String> activities = null;
+    @JsonProperty("testers")
+    private Integer testers;
+    @JsonProperty("feedbacks")
+    private Integer feedbacks;
+    @JsonProperty("uploadedAt")
+    private String uploadedAt;
+    @JsonProperty("uploadedVia")
+    private String uploadedVia;
+    @JsonProperty("hasTestFairySdk")
+    private Boolean hasTestFairySdk;
+    @JsonProperty("insightsEnabled")
+    private Boolean insightsEnabled;
+    @JsonProperty("videoEnabled")
+    private Boolean videoEnabled;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -85,54 +96,34 @@ public class Build {
         this.appName = appName;
     }
 
-    @JsonProperty("originalFilename")
-    public String getOriginalFilename() {
-        return originalFilename;
+    @JsonProperty("appVersion")
+    public String getAppVersion() {
+        return appVersion;
     }
 
-    @JsonProperty("originalFilename")
-    public void setOriginalFilename(String originalFilename) {
-        this.originalFilename = originalFilename;
+    @JsonProperty("appVersion")
+    public void setAppVersion(String appVersion) {
+        this.appVersion = appVersion;
     }
 
-    @JsonProperty("fileSize")
-    public Integer getFileSize() {
-        return fileSize;
+    @JsonProperty("appVersionCode")
+    public String getAppVersionCode() {
+        return appVersionCode;
     }
 
-    @JsonProperty("fileSize")
-    public void setFileSize(Integer fileSize) {
-        this.fileSize = fileSize;
+    @JsonProperty("appVersionCode")
+    public void setAppVersionCode(String appVersionCode) {
+        this.appVersionCode = appVersionCode;
     }
 
-    @JsonProperty("uploadDate")
-    public String getUploadDate() {
-        return uploadDate;
+    @JsonProperty("appDisplayName")
+    public String getAppDisplayName() {
+        return appDisplayName;
     }
 
-    @JsonProperty("uploadDate")
-    public void setUploadDate(String uploadDate) {
-        this.uploadDate = uploadDate;
-    }
-
-    @JsonProperty("comment")
-    public Object getComment() {
-        return comment;
-    }
-
-    @JsonProperty("comment")
-    public void setComment(Object comment) {
-        this.comment = comment;
-    }
-
-    @JsonProperty("version")
-    public String getVersion() {
-        return version;
-    }
-
-    @JsonProperty("version")
-    public void setVersion(String version) {
-        this.version = version;
+    @JsonProperty("appDisplayName")
+    public void setAppDisplayName(String appDisplayName) {
+        this.appDisplayName = appDisplayName;
     }
 
     @JsonProperty("sessions")
@@ -155,14 +146,74 @@ public class Build {
         this.crashes = crashes;
     }
 
-    @JsonProperty("activities")
-    public List<String> getActivities() {
-        return activities;
+    @JsonProperty("testers")
+    public Integer getTesters() {
+        return testers;
     }
 
-    @JsonProperty("activities")
-    public void setActivities(List<String> activities) {
-        this.activities = activities;
+    @JsonProperty("testers")
+    public void setTesters(Integer testers) {
+        this.testers = testers;
+    }
+
+    @JsonProperty("feedbacks")
+    public Integer getFeedbacks() {
+        return feedbacks;
+    }
+
+    @JsonProperty("feedbacks")
+    public void setFeedbacks(Integer feedbacks) {
+        this.feedbacks = feedbacks;
+    }
+
+    @JsonProperty("uploadedAt")
+    public String getUploadedAt() {
+        return uploadedAt;
+    }
+
+    @JsonProperty("uploadedAt")
+    public void setUploadedAt(String uploadedAt) {
+        this.uploadedAt = uploadedAt;
+    }
+
+    @JsonProperty("uploadedVia")
+    public String getUploadedVia() {
+        return uploadedVia;
+    }
+
+    @JsonProperty("uploadedVia")
+    public void setUploadedVia(String uploadedVia) {
+        this.uploadedVia = uploadedVia;
+    }
+
+    @JsonProperty("hasTestFairySdk")
+    public Boolean getHasTestFairySdk() {
+        return hasTestFairySdk;
+    }
+
+    @JsonProperty("hasTestFairySdk")
+    public void setHasTestFairySdk(Boolean hasTestFairySdk) {
+        this.hasTestFairySdk = hasTestFairySdk;
+    }
+
+    @JsonProperty("insightsEnabled")
+    public Boolean getInsightsEnabled() {
+        return insightsEnabled;
+    }
+
+    @JsonProperty("insightsEnabled")
+    public void setInsightsEnabled(Boolean insightsEnabled) {
+        this.insightsEnabled = insightsEnabled;
+    }
+
+    @JsonProperty("videoEnabled")
+    public Boolean getVideoEnabled() {
+        return videoEnabled;
+    }
+
+    @JsonProperty("videoEnabled")
+    public void setVideoEnabled(Boolean videoEnabled) {
+        this.videoEnabled = videoEnabled;
     }
 
     @JsonAnyGetter
@@ -176,6 +227,6 @@ public class Build {
     }
 
     public boolean isOlderThan(String currentVersionName) {
-        return !TextUtils.isEmpty(getVersion()) && getVersion().compareTo(currentVersionName) > 0;
+        return TextUtils.isEmpty(getAppVersion()) || getAppVersion().compareTo(currentVersionName) > 0;
     }
 }
