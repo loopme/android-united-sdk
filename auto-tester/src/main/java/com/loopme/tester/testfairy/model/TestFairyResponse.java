@@ -77,7 +77,7 @@ public class TestFairyResponse {
     private void leaveOnlyReleases() {
         List<Build> notReleasedList = new ArrayList<>();
         for (Build build : builds) {
-            if (TextUtils.isEmpty(build.getOriginalFilename())) {
+            if (TextUtils.isEmpty(build.getUploadedVia())) {
                 notReleasedList.add(build);
             }
         }
