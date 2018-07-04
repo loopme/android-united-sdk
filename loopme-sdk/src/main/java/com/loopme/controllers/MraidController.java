@@ -15,6 +15,7 @@ import com.loopme.LoopMeBannerGeneral;
 import com.loopme.MraidOrientation;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
+import com.loopme.ad.LoopMeAdHolder;
 import com.loopme.bridges.mraid.MraidBridge;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
@@ -92,6 +93,7 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener, View.
     @Override
     public void open(String url) {
         Logging.out(LOG_TAG, "open " + url);
+        LoopMeAdHolder.putAd(mLoopMeAd);
         Context context = mMraidView.getContext();
         if (InternetUtils.isOnline(context)) {
             Intent intent = new Intent(context, AdBrowserActivity.class);

@@ -29,7 +29,7 @@ public final class AdBrowserActivity extends Activity implements OnClickListener
 
     private static final String LOG_TAG = AdBrowserActivity.class.getSimpleName();
     private String mRedirectUrl;
-    private boolean isNativeBrowserVisited;
+    private boolean isNativeBrowserOrMarketVisited;
     private View mProgressBar;
     private LoopMeAd mLoopMeAd;
     private ImageView mBackButton;
@@ -54,7 +54,7 @@ public final class AdBrowserActivity extends Activity implements OnClickListener
     @Override
     protected void onResume() {
         super.onResume();
-        if (isNativeBrowserVisited) {
+        if (isNativeBrowserOrMarketVisited) {
             finish();
         }
         Logging.out(LOG_TAG, "resume");
@@ -158,7 +158,7 @@ public final class AdBrowserActivity extends Activity implements OnClickListener
         if (Utils.isActivityResolved(browserIntent, this)) {
             startActivity(browserIntent);
             onAdLeaveApp();
-            isNativeBrowserVisited = true;
+            isNativeBrowserOrMarketVisited = true;
         }
     }
 
@@ -242,6 +242,11 @@ public final class AdBrowserActivity extends Activity implements OnClickListener
             @Override
             public void onLeaveApp() {
                 onAdLeaveApp();
+            }
+
+            @Override
+            public void onMarketVisit() {
+                isNativeBrowserOrMarketVisited = true;
             }
         };
     }
