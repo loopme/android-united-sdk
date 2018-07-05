@@ -24,7 +24,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -55,9 +54,9 @@ public class RequestUtils {
     private String mPn;
     private String mWn;
     private String mOr;
-    private static String mIfa;
+    private static String mIfa = "";
     private String mIp;
-    private static String mDnt;
+    private static String mDnt = "0";
     private int mInstl;
     private int mConnectionType;
     private int mDeviceWidthPx;
@@ -82,7 +81,7 @@ public class RequestUtils {
         if (context == null) {
             return;
         }
-        getAdvertisingIdInfo(context);
+        setAdvertisingIdInfo(context);
         setBattery(context);
         setAppBundle(context);
         setAppName(context);
@@ -457,23 +456,13 @@ public class RequestUtils {
         }
     }
 
-    public static String getAdvertisingIdInfo(final Context context) {
-        RequestParamsUtils.getAdvertisingIdInfo(context, new AdvIdFetcher.Listener() {
-
-            @Override
-            public void onComplete(String googleAdId, boolean isDnt) {
-                mDnt = isDnt ? "1" : "0";
-                mIfa = googleAdId;
-                setGdprIfRestrictedByDeviceSettings();
-            }
-
-            private void setGdprIfRestrictedByDeviceSettings() {
-                if (Objects.equals(mDnt, "1")) {
-                    Preferences.getInstance(context).setGdprState(false, ConsentType.USER_RESTRICTED);
-                }
-            }
-        });
-        return mIfa;
+    private static void setAdvertisingIdInfo(final Context context) {
+        RequestParamsUtils.AdvAdInfo advAdInfo = RequestParamsUtils.getAdvertisingIdInfo(context);
+        mDnt = advAdInfo.getDoNotTrackAsString();
+        mIfa = advAdInfo.getAdvId();
+        if (advAdInfo.isUserSetDoNotTrack()) {
+            Preferences.getInstance(context).setGdprState(false, ConsentType.USER_RESTRICTED);
+        }
     }
 
     public String getDnt() {
