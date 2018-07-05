@@ -37,7 +37,7 @@ public class Preferences {
 
     public void setGdprState(boolean isAccepted, ConsentType consentType) {
         mPrefs.edit().putBoolean(FLAG_GDPR, isAccepted).apply();
-        mPrefs.edit().putString(FLAG_CONSENT_TYPE, consentType.getType()).apply();
+        mPrefs.edit().putInt(FLAG_CONSENT_TYPE, consentType.getType()).apply();
         mPrefs.edit().putBoolean(FLAG_GDPR_CONSENT_SET, true).apply();
         setGdprConsentString(null);
     }
@@ -46,8 +46,8 @@ public class Preferences {
         return mPrefs.getBoolean(FLAG_GDPR, true);
     }
 
-    public String getConsentType() {
-        return mPrefs.getString(FLAG_CONSENT_TYPE, ConsentType.LOOPME.getType());
+    public int getConsentType() {
+        return mPrefs.getInt(FLAG_CONSENT_TYPE, ConsentType.LOOPME.getType());
     }
 
     public boolean isConsentSet() {

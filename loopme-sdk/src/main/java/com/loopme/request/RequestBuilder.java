@@ -75,7 +75,6 @@ public class RequestBuilder implements Serializable {
     private static final String SUPPORTED_TECS = "supported_techs";
     private static final String METRIC = "metric";
     private static final String SKIP = "skip";
-    private static final String PARAM_USER_CONSENT = "user_consent";
     private static final String PARAM_CONSENT_TYPE = "consent_type";
     private static final String EXP_DIR = "expdir";
     private static final String USER = "user";

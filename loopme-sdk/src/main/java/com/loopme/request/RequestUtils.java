@@ -518,13 +518,13 @@ public class RequestUtils {
         }
     }
 
-    public String getUserConsent(Context context) {
+    public int getUserConsent(Context context) {
         boolean gdprState = Preferences.getInstance(context).getGdprState();
-        return gdprState ? "1" : "0";
+        return gdprState ? 1 : 0;
     }
 
 
-    public String getConsentType(Context context) {
+    public int getConsentType(Context context) {
         return Preferences.getInstance(context).getConsentType();
     }
 
