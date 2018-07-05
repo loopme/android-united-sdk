@@ -1,8 +1,8 @@
 package com.loopme;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.loopme.gdpr.ConsentType;
 
@@ -15,7 +15,11 @@ public class Preferences {
     private static final String FLAG_GDPR = "gdpr";
     private static final String FLAG_GDPR_CONSENT_SET = "flag_gdpr_consent_set";
     private static final String FLAG_CONSENT_TYPE = "FLAG_CONSENT_TYPE";
-    private static final String FLAG_GDPR_CONSENT_STRING = "FLAG_GDPR_CONSENT_STRING";
+
+    private static final String FLAG_IAB_CONSENT_CONSENT_STRING = "IABConsent_ConsentString";
+    private static final String FLAG_IAB_CONSENT_CMP_PRESENT = "IABConsent_CMPPresent";
+    private static final String FLAG_IAB_CONSENT_SUBJECT_TO_GDPR = "IABConsent_SubjectToGDPR";
+    private static final String FLAG_SUBJECT_TO_GDPR_UNSET = "subject_to_gdpr_unset";
 
     private final SharedPreferences mPrefs;
     private static Preferences mInstance;
@@ -32,14 +36,13 @@ public class Preferences {
     }
 
     private SharedPreferences getPrefs(Context context) {
-        return context.getSharedPreferences(Preferences.class.getName(), Application.MODE_PRIVATE);
+        return PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public void setGdprState(boolean isAccepted, ConsentType consentType) {
         mPrefs.edit().putBoolean(FLAG_GDPR, isAccepted).apply();
         mPrefs.edit().putInt(FLAG_CONSENT_TYPE, consentType.getType()).apply();
         mPrefs.edit().putBoolean(FLAG_GDPR_CONSENT_SET, true).apply();
-        setGdprConsentString(null);
     }
 
     public boolean getGdprState() {
@@ -54,15 +57,19 @@ public class Preferences {
         return mPrefs.getBoolean(FLAG_GDPR_CONSENT_SET, false);
     }
 
-    public void setGdprConsentString(String daisyBit) {
-        mPrefs.edit().putString(FLAG_GDPR_CONSENT_STRING, daisyBit).apply();
+    public String getIabConsentString() {
+        return mPrefs.getString(FLAG_IAB_CONSENT_CONSENT_STRING, "");
     }
 
-    public String getGdprConsentString() {
-        return mPrefs.getString(FLAG_GDPR_CONSENT_STRING, null);
+    public boolean isIabConsentCmpPresent() {
+        return mPrefs.getBoolean(FLAG_IAB_CONSENT_CMP_PRESENT, false);
     }
 
-    public boolean isGdprConsentStringSet() {
-        return mPrefs.getString(FLAG_GDPR_CONSENT_STRING, null) != null;
+    public String getIabConsentSubjectToGdpr() {
+        return mPrefs.getString(FLAG_IAB_CONSENT_SUBJECT_TO_GDPR, FLAG_SUBJECT_TO_GDPR_UNSET);
+    }
+
+    public boolean isSubjectToGdprPresent() {
+        return !mPrefs.getString(FLAG_IAB_CONSENT_SUBJECT_TO_GDPR, FLAG_SUBJECT_TO_GDPR_UNSET).equals(FLAG_SUBJECT_TO_GDPR_UNSET);
     }
 }

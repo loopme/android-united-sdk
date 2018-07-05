@@ -21,15 +21,6 @@ public class LoopMeSdk {
     }
 
     /**
-     * Set Publisher consent String, also known as DaisyBit
-     * @param activity
-     * @param daisyBit
-     */
-    public static void setGdprConsent(Activity activity, String daisyBit) {
-        Preferences.getInstance(activity).setGdprConsentString(daisyBit);
-    }
-
-    /**
      * Ask GDPR consent with LoopMe's SDK facilities, for internal use.
      */
     public static void askGdprConsent(Activity activity, GdprChecker.OnConsentListener listener) {
@@ -37,10 +28,6 @@ public class LoopMeSdk {
     }
 
     public static boolean isGdprConsentSet(Activity activity) {
-        return Preferences.getInstance(activity).isConsentSet();
-    }
-
-    public static void init(Activity activity) {
-        askGdprConsent(activity, null);
+        return Preferences.getInstance(activity).isIabConsentCmpPresent() || Preferences.getInstance(activity).isConsentSet();
     }
 }

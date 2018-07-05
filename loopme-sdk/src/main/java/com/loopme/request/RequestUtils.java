@@ -532,19 +532,24 @@ public class RequestUtils {
         return EXPANDABLE_DIRECTION_FULLSCREEN;
     }
 
-    public String getConsentString(Context context) {
-        return Preferences.getInstance(context).getGdprConsentString();
+    public String getIabConsentString(Context context) {
+        return Preferences.getInstance(context).getIabConsentString();
     }
 
-    public boolean isConsentStringSet(Context context) {
-        return Preferences.getInstance(context).isGdprConsentStringSet();
+    public boolean isIabConsentCmpPresent(Context context) {
+        return Preferences.getInstance(context).isIabConsentCmpPresent();
     }
 
-    public int getGdpr() {
-        return 1;
+    public int getIabConsentSubjectToGdpr(Context context) {
+        String gdprSubjectState = Preferences.getInstance(context).getIabConsentSubjectToGdpr();
+        return gdprSubjectState.equals("1") ? 1 : 0;
     }
 
     public int getCoppa() {
         return 0;
+    }
+
+    public boolean isSubjectToGdprPresent(Context context) {
+        return Preferences.getInstance(context).isSubjectToGdprPresent();
     }
 }

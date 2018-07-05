@@ -1,10 +1,8 @@
 package com.loopme.request;
 
 import android.content.Context;
-import android.text.TextUtils;
 
 import com.loopme.AdTargetingData;
-import com.loopme.CustomRequestParameter;
 import com.loopme.ad.LoopMeAd;
 
 import org.json.JSONArray;
@@ -173,31 +171,36 @@ public class RequestBuilder implements Serializable {
 
             impArray.put(impObj);
             requestObj.put(IMP, impArray);
-            requestObj.put(USER, createUserObj(loopMeAd, requestUtils));
-            requestObj.put(REGS, createRegsObj(requestUtils));
+            requestObj.put(USER, createUserObj(requestUtils, loopMeAd));
+            requestObj.put(REGS, createRegsObj(requestUtils, context));
         } catch (JSONException jsonException) {
             jsonException.printStackTrace();
+        } catch (ClassCastException ex) {
+            ex.printStackTrace();
         }
         return requestObj;
     }
 
-    private static JSONObject createRegsObj(RequestUtils requestUtils) throws JSONException {
-        JSONObject ext = new JSONObject();
-        ext.put(GDPR, requestUtils.getGdpr());
-
+    private static JSONObject createRegsObj(RequestUtils requestUtils, Context context) throws JSONException {
         JSONObject regs = new JSONObject();
+
+        if (requestUtils.isSubjectToGdprPresent(context)) {
+            JSONObject ext = new JSONObject();
+            ext.put(GDPR, requestUtils.getIabConsentSubjectToGdpr(context));
+            regs.put(EXT, ext);
+        }
+
         regs.put(COPPA, requestUtils.getCoppa());
-        regs.put(EXT, ext);
         return regs;
     }
 
-    private static JSONObject createUserObj(LoopMeAd loopMeAd, RequestUtils requestUtils) throws JSONException {
+    private static JSONObject createUserObj(RequestUtils requestUtils, LoopMeAd loopMeAd) throws JSONException {
         JSONObject userObj = new JSONObject();
 
-        AdTargetingData targetingData = loopMeAd.getAdTargetingData();
-        String gender = targetingData.getGender();
-        String keywords = targetingData.getKeywords();
-        int yob = targetingData.getYob();
+        AdTargetingData data = loopMeAd.getAdTargetingData();
+        String gender = data.getGender();
+        String keywords = data.getKeywords();
+        int yob = data.getYob();
 
         if (gender != null) {
             userObj.put(GENDER, gender);
@@ -210,8 +213,8 @@ public class RequestBuilder implements Serializable {
         }
 
         JSONObject ext = new JSONObject();
-        if (requestUtils.isConsentStringSet(loopMeAd.getContext())) {
-            ext.put(CONSENT, requestUtils.getConsentString(loopMeAd.getContext()));
+        if (requestUtils.isIabConsentCmpPresent(loopMeAd.getContext())) {
+            ext.put(CONSENT, requestUtils.getIabConsentString(loopMeAd.getContext()));
         } else {
             ext.put(PARAM_CONSENT_TYPE, requestUtils.getConsentType(loopMeAd.getContext()));
             ext.put(CONSENT, requestUtils.getUserConsent(loopMeAd.getContext()));
