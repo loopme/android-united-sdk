@@ -96,7 +96,7 @@ public class MainActivity extends BaseActivity implements
             fragmentTransaction.commit();
         }
         Integration.insertIasKeys(this);
-        new AppUpdateChecker(this).checkUpdate();
+        new AppUpdateChecker(this, AppUpdateChecker.LaunchMode.START_UP).checkUpdate();
     }
 
     @Override
