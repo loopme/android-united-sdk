@@ -541,4 +541,8 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         int height = adSize[1];
         return isBanner() && Utils.isExpandBanner(width, height);
     }
+
+    public AdTargetingData getAdTargetingData() {
+        return mAdTargetingData;
+    }
 }

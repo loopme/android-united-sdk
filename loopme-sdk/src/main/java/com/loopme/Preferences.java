@@ -15,6 +15,7 @@ public class Preferences {
     private static final String FLAG_GDPR = "gdpr";
     private static final String FLAG_GDPR_CONSENT_SET = "flag_gdpr_consent_set";
     private static final String FLAG_CONSENT_TYPE = "FLAG_CONSENT_TYPE";
+    private static final String FLAG_GDPR_CONSENT_STRING = "FLAG_GDPR_CONSENT_STRING";
 
     private final SharedPreferences mPrefs;
     private static Preferences mInstance;
@@ -38,6 +39,7 @@ public class Preferences {
         mPrefs.edit().putBoolean(FLAG_GDPR, isAccepted).apply();
         mPrefs.edit().putString(FLAG_CONSENT_TYPE, consentType.getType()).apply();
         mPrefs.edit().putBoolean(FLAG_GDPR_CONSENT_SET, true).apply();
+        setGdprConsentString(null);
     }
 
     public boolean getGdprState() {
@@ -50,5 +52,17 @@ public class Preferences {
 
     public boolean isConsentSet() {
         return mPrefs.getBoolean(FLAG_GDPR_CONSENT_SET, false);
+    }
+
+    public void setGdprConsentString(String daisyBit) {
+        mPrefs.edit().putString(FLAG_GDPR_CONSENT_STRING, daisyBit).apply();
+    }
+
+    public String getGdprConsentString() {
+        return mPrefs.getString(FLAG_GDPR_CONSENT_STRING, null);
+    }
+
+    public boolean isGdprConsentStringSet() {
+        return mPrefs.getString(FLAG_GDPR_CONSENT_STRING, null) != null;
     }
 }

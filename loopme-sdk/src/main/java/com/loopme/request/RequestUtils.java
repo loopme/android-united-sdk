@@ -9,7 +9,6 @@ import android.os.BatteryManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
-import android.text.format.Formatter;
 import android.webkit.WebSettings;
 
 import com.loopme.BuildConfig;
@@ -531,5 +530,21 @@ public class RequestUtils {
 
     public int[] getExpDir() {
         return EXPANDABLE_DIRECTION_FULLSCREEN;
+    }
+
+    public String getConsentString(Context context) {
+        return Preferences.getInstance(context).getGdprConsentString();
+    }
+
+    public boolean isConsentStringSet(Context context) {
+        return Preferences.getInstance(context).isGdprConsentStringSet();
+    }
+
+    public int getGdpr() {
+        return 1;
+    }
+
+    public int getCoppa() {
+        return 0;
     }
 }

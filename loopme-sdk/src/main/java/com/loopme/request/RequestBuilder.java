@@ -1,7 +1,10 @@
 package com.loopme.request;
 
 import android.content.Context;
+import android.text.TextUtils;
 
+import com.loopme.AdTargetingData;
+import com.loopme.CustomRequestParameter;
 import com.loopme.ad.LoopMeAd;
 
 import org.json.JSONArray;
@@ -75,6 +78,14 @@ public class RequestBuilder implements Serializable {
     private static final String PARAM_USER_CONSENT = "user_consent";
     private static final String PARAM_CONSENT_TYPE = "consent_type";
     private static final String EXP_DIR = "expdir";
+    private static final String USER = "user";
+    private static final String REGS = "regs";
+    private static final String COPPA = "coppa";
+    private static final String GDPR = "gdpr";
+    private static final String GENDER = "gender";
+    private static final String YOB = "yob";
+    private static final String KEYWORDS = "keywords";
+    private static final String CONSENT = "consent";
 
     public static JSONObject buildRequestJson(Context context, LoopMeAd loopMeAd) {
         RequestUtils requestUtils = new RequestUtils(context, loopMeAd);
@@ -152,9 +163,6 @@ public class RequestBuilder implements Serializable {
             JSONArray supportedTechsArray = new JSONArray(requestUtils.getSupportedTechs());
             extImpObj.put(SUPPORTED_TECS, supportedTechsArray);
 
-            extImpObj.put(PARAM_CONSENT_TYPE, requestUtils.getConsentType(context));
-            extImpObj.put(PARAM_USER_CONSENT, requestUtils.getUserConsent(context));
-
             JSONArray trackersArray = new JSONArray().put(requestUtils.getTrackersSupported());
             impObj.put(METRIC, trackersArray);
 
@@ -166,10 +174,51 @@ public class RequestBuilder implements Serializable {
 
             impArray.put(impObj);
             requestObj.put(IMP, impArray);
+            requestObj.put(USER, createUserObj(loopMeAd, requestUtils));
+            requestObj.put(REGS, createRegsObj(requestUtils));
         } catch (JSONException jsonException) {
             jsonException.printStackTrace();
         }
         return requestObj;
+    }
+
+    private static JSONObject createRegsObj(RequestUtils requestUtils) throws JSONException {
+        JSONObject ext = new JSONObject();
+        ext.put(GDPR, requestUtils.getGdpr());
+
+        JSONObject regs = new JSONObject();
+        regs.put(COPPA, requestUtils.getCoppa());
+        regs.put(EXT, ext);
+        return regs;
+    }
+
+    private static JSONObject createUserObj(LoopMeAd loopMeAd, RequestUtils requestUtils) throws JSONException {
+        JSONObject userObj = new JSONObject();
+
+        AdTargetingData targetingData = loopMeAd.getAdTargetingData();
+        String gender = targetingData.getGender();
+        String keywords = targetingData.getKeywords();
+        int yob = targetingData.getYob();
+
+        if (gender != null) {
+            userObj.put(GENDER, gender);
+        }
+        if (yob != 0) {
+            userObj.put(YOB, yob);
+        }
+        if (keywords != null) {
+            userObj.put(KEYWORDS, keywords);
+        }
+
+        JSONObject ext = new JSONObject();
+        if (requestUtils.isConsentStringSet(loopMeAd.getContext())) {
+            ext.put(CONSENT, requestUtils.getConsentString(loopMeAd.getContext()));
+        } else {
+            ext.put(PARAM_CONSENT_TYPE, requestUtils.getConsentType(loopMeAd.getContext()));
+            ext.put(CONSENT, requestUtils.getUserConsent(loopMeAd.getContext()));
+        }
+        userObj.put(EXT, ext);
+        return userObj;
     }
 
     private static JSONObject createBannerObject(RequestUtils requestUtils) throws JSONException {
