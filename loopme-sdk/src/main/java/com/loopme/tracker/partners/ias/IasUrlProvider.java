@@ -7,7 +7,6 @@ import com.loopme.tracker.AdIds;
 
 import java.util.HashMap;
 
-import okhttp3.HttpUrl;
 
 public class IasUrlProvider {
     private static final String SCRIPT_START = "<script type=\"text/javascript\" src=\"";
@@ -24,7 +23,6 @@ public class IasUrlProvider {
     private static final String ADSAFE_PAR = "1"; // is not necessary
 
     private String mCmTagUrl;
-    private String mLoggingTagUrl;
 
     private HashMap<String, String> mValuesMap;
 
@@ -34,31 +32,20 @@ public class IasUrlProvider {
     }
 
     private void build() {
-        Uri cmTagUri = Uri.parse(BuildConfig.IAS_CM_TAG_URL);
-        mCmTagUrl = new HttpUrl.Builder()
-                .scheme(cmTagUri.getScheme())
-                .host(cmTagUri.getHost())
-                .addPathSegment(cmTagUri.getLastPathSegment())
-                .addQueryParameter(PARAM_AN_ID, BuildConfig.IAS_LOOPME_PARTNER_ID)
-                .addQueryParameter(PARAM_ADV_ID, mValuesMap.get(PARAM_ADV_ID))
-                .addQueryParameter(PARAM_CAMP_ID, mValuesMap.get(PARAM_CAMP_ID))
-                .addQueryParameter(PARAM_PUB_ID, mValuesMap.get(PARAM_PUB_ID))
-                .addQueryParameter(PARAM_CHAN_ID, mValuesMap.get(PARAM_CHAN_ID))
-                .addQueryParameter(PARAM_PLACEMENT_ID, mValuesMap.get(PARAM_PLACEMENT_ID))
-                .addQueryParameter(PARAM_ADSAFE_PAR, mValuesMap.get(PARAM_ADSAFE_PAR))
-                .addQueryParameter(PARAM_BUNDLE_ID, mValuesMap.get(PARAM_BUNDLE_ID))
+        Uri cmTagUriSample = Uri.parse(BuildConfig.IAS_CM_TAG_URL);
+        mCmTagUrl = new Uri.Builder()
+                .scheme(cmTagUriSample.getScheme())
+                .authority(cmTagUriSample.getHost())
+                .appendPath(cmTagUriSample.getLastPathSegment())
+                .appendQueryParameter(PARAM_AN_ID, BuildConfig.IAS_LOOPME_PARTNER_ID)
+                .appendQueryParameter(PARAM_ADV_ID, mValuesMap.get(PARAM_ADV_ID))
+                .appendQueryParameter(PARAM_CAMP_ID, mValuesMap.get(PARAM_CAMP_ID))
+                .appendQueryParameter(PARAM_PUB_ID, mValuesMap.get(PARAM_PUB_ID))
+                .appendQueryParameter(PARAM_CHAN_ID, mValuesMap.get(PARAM_CHAN_ID))
+                .appendQueryParameter(PARAM_PLACEMENT_ID, mValuesMap.get(PARAM_PLACEMENT_ID))
+                .appendQueryParameter(PARAM_ADSAFE_PAR, mValuesMap.get(PARAM_ADSAFE_PAR))
+                .appendQueryParameter(PARAM_BUNDLE_ID, mValuesMap.get(PARAM_BUNDLE_ID))
                 .build().toString();
-
-        Uri loggingTagUri = Uri.parse(BuildConfig.IAS_LOGGING_TAG_URL);
-        HttpUrl.Builder loggingTagBuilder = new HttpUrl.Builder()
-                .scheme(loggingTagUri.getScheme())
-                .host(loggingTagUri.getHost());
-
-        for (String segment : loggingTagUri.getPathSegments()) {
-            loggingTagBuilder.addPathSegment(segment);
-        }
-        loggingTagBuilder.addQueryParameter(PARAM_PLACEMENT_ID, mValuesMap.get(PARAM_PLACEMENT_ID));
-        mLoggingTagUrl = loggingTagBuilder.build().toString();
     }
 
     private void populateData(AdIds adIds, String appKey) {
@@ -76,15 +63,7 @@ public class IasUrlProvider {
         return SCRIPT_START + mCmTagUrl + SCRIPT_END;
     }
 
-    public String getLoggingTagScript() {
-        return SCRIPT_START + mLoggingTagUrl + SCRIPT_END;
-    }
-
     public String getCmTagUrl() {
         return mCmTagUrl;
-    }
-
-    public String getLoggingTagUrl() {
-        return mLoggingTagUrl;
     }
 }

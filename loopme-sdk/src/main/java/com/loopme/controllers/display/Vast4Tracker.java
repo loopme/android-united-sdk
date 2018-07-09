@@ -9,7 +9,7 @@ import com.loopme.MoatViewAbilityUtils;
 import com.loopme.ad.AdParams;
 import com.loopme.utils.JsUtils;
 import com.loopme.vast.VastVpaidEventTracker;
-import com.loopme.webservice.ExecutorHelper;
+import com.loopme.utils.ExecutorHelper;
 
 import java.util.List;
 

@@ -6,7 +6,7 @@ import android.os.Looper;
 
 import com.loopme.Logging;
 import com.loopme.request.AdvertisingIdClient;
-import com.loopme.webservice.ExecutorHelper;
+import com.loopme.utils.ExecutorHelper;
 
 /**
  * Created by katerina on 4/27/18.

@@ -3,27 +3,24 @@ package com.loopme.loaders;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.ad.AdParams;
-import com.loopme.models.Errors;
 import com.loopme.common.LoopMeError;
+import com.loopme.models.Errors;
 import com.loopme.parser.XmlParseService;
 import com.loopme.vast.VastVpaidEventTracker;
 import com.loopme.vast.WrapperParser;
+import com.loopme.webservice.LoopMeAdServiceImpl;
+import com.loopme.network.GetResponse;
 import com.loopme.xml.vast4.VastInfo;
-import com.loopme.ResourceInfo;
-import com.loopme.utils.Utils;
-import com.loopme.webservice.HttpService;
 import com.loopme.xml.vast4.Wrapper;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Response;
 
 public class VastWrapperFetcher {
 
@@ -34,7 +31,6 @@ public class VastWrapperFetcher {
     private int mCurrentWrapper = 1;
     private String mVastString;
     private Listener mListener;
-    private HttpService mHttpService;
     private List<Wrapper> mWrappersList = new ArrayList<>();
     private CountDownTimer mWrapperTimer;
     protected Handler mHandler = new Handler(Looper.getMainLooper());
@@ -43,7 +39,6 @@ public class VastWrapperFetcher {
     public VastWrapperFetcher(String vastString, Listener listener) {
         mVastString = vastString;
         mListener = listener;
-        mHttpService = new HttpService();
     }
 
     public void start() {
@@ -54,13 +49,6 @@ public class VastWrapperFetcher {
         mListener = null;
         mIsStopped = true;
         stopTimer();
-        stopHttpService();
-    }
-
-    private void stopHttpService() {
-        if (mHttpService != null) {
-            mHttpService.cancel();
-        }
     }
 
     private boolean hasWrapper(VastInfo vastInfo) {
@@ -120,19 +108,19 @@ public class VastWrapperFetcher {
 
     private void doRequest(String vastTagUrl) {
         try {
-            ResourceInfo resourceInfo = Utils.getResourceInfo(vastTagUrl);
-            Response<String> response = mHttpService.downLoadSync(resourceInfo);
+            GetResponse<String> response = LoopMeAdServiceImpl.getInstance().downloadResource(vastTagUrl);
             stopTimer();
             parseVastResponse(response);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             stopTimer();
         }
     }
 
-    private void parseVastResponse(Response<String> response) {
-        if (response.code() == Constants.RESPONSE_SUCCESS && !mIsStopped) {
-            handleVastWrapperCase(response.body());
+    @NonNull
+    private void parseVastResponse(GetResponse<String> response) {
+        if (response.isSuccessful() && !mIsStopped) {
+            handleVastWrapperCase(response.getBody());
         } else {
             onFailed(Errors.NO_VAST_RESPONSE_AFTER_WRAPPER);
         }
