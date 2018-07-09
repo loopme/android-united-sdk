@@ -14,7 +14,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
-import com.loopme.request.RequestUtils;
 import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
 import com.loopme.utils.AnimationUtils;
@@ -69,7 +68,6 @@ public class GdprWebView extends WebView implements Observer {
     private void configure(Context context) {
         mContext = context;
 
-        RequestUtils.getAdvertisingIdInfo(context);
         WebSettings webSettings = getSettings();
         webSettings.setMediaPlaybackRequiresUserGesture(false);
         webSettings.setJavaScriptEnabled(true);

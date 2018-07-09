@@ -4,7 +4,6 @@ import android.app.Activity;
 
 import com.loopme.Logging;
 import com.loopme.Preferences;
-import com.loopme.request.RequestUtils;
 
 /**
  * Created by katerina on 4/27/18.
@@ -19,11 +18,11 @@ public class GdprChecker implements
     private static boolean sIsNeedCheckUserConsent = true;
     private static boolean sIsDialogWasShown = false;
     private static final String LOG_TAG = GdprChecker.class.getSimpleName();
+    private String mAdvId;
 
     public GdprChecker(Activity activity, OnConsentListener listener) {
         this.mActivity = activity;
         mListener = listener;
-        RequestUtils.getAdvertisingIdInfo(activity);
     }
 
     public void check() {
@@ -32,6 +31,7 @@ public class GdprChecker implements
 
     @Override
     public void onDntFetched(boolean isLimited, String advId) {
+        mAdvId = advId;
         if (isLimited) {
             onComplete();
         } else {
@@ -60,7 +60,7 @@ public class GdprChecker implements
     }
 
     private String buildConsentUrl(GdprResponse response) {
-        return response.getConsentUrl() + "?device_id=" + RequestUtils.getIfa() + "&is_sdk=true";
+        return response.getConsentUrl() + "?device_id=" + mAdvId + "&is_sdk=true";
     }
 
     private void saveUserConsent(int userConsent) {
