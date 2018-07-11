@@ -9,7 +9,6 @@ import android.os.BatteryManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
-import android.text.format.Formatter;
 import android.webkit.WebSettings;
 
 import com.loopme.BuildConfig;
@@ -25,7 +24,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -56,9 +54,9 @@ public class RequestUtils {
     private String mPn;
     private String mWn;
     private String mOr;
-    private static String mIfa;
+    private static String mIfa = "";
     private String mIp;
-    private static String mDnt;
+    private static String mDnt = "0";
     private int mInstl;
     private int mConnectionType;
     private int mDeviceWidthPx;
@@ -83,7 +81,7 @@ public class RequestUtils {
         if (context == null) {
             return;
         }
-        getAdvertisingIdInfo(context);
+        setAdvertisingIdInfo(context);
         setBattery(context);
         setAppBundle(context);
         setAppName(context);
@@ -328,7 +326,7 @@ public class RequestUtils {
 
 
     public String getDisplayManagerVersion() {
-        return String.valueOf(BuildConfig.VERSION_CODE) + String.valueOf(BuildConfig.VERSION_NAME);
+        return String.valueOf(BuildConfig.VERSION_CODE) + "." + String.valueOf(BuildConfig.VERSION_NAME);
     }
 
     public String getImpId() {
@@ -458,23 +456,13 @@ public class RequestUtils {
         }
     }
 
-    public static String getAdvertisingIdInfo(final Context context) {
-        RequestParamsUtils.getAdvertisingIdInfo(context, new AdvIdFetcher.Listener() {
-
-            @Override
-            public void onComplete(String googleAdId, boolean isDnt) {
-                mDnt = isDnt ? "1" : "0";
-                mIfa = googleAdId;
-                setGdprIfRestrictedByDeviceSettings();
-            }
-
-            private void setGdprIfRestrictedByDeviceSettings() {
-                if (Objects.equals(mDnt, "1")) {
-                    Preferences.getInstance(context).setGdprState(false, ConsentType.USER_RESTRICTED);
-                }
-            }
-        });
-        return mIfa;
+    private static void setAdvertisingIdInfo(final Context context) {
+        RequestParamsUtils.AdvAdInfo advAdInfo = RequestParamsUtils.getAdvertisingIdInfo(context);
+        mDnt = advAdInfo.getDoNotTrackAsString();
+        mIfa = advAdInfo.getAdvId();
+        if (advAdInfo.isUserSetDoNotTrack()) {
+            Preferences.getInstance(context).setGdprState(false, ConsentType.USER_RESTRICTED);
+        }
     }
 
     public String getDnt() {
@@ -519,17 +507,38 @@ public class RequestUtils {
         }
     }
 
-    public String getUserConsent(Context context) {
+    public int getUserConsent(Context context) {
         boolean gdprState = Preferences.getInstance(context).getGdprState();
-        return gdprState ? "1" : "0";
+        return gdprState ? 1 : 0;
     }
 
 
-    public String getConsentType(Context context) {
+    public int getConsentType(Context context) {
         return Preferences.getInstance(context).getConsentType();
     }
 
     public int[] getExpDir() {
         return EXPANDABLE_DIRECTION_FULLSCREEN;
+    }
+
+    public String getIabConsentString(Context context) {
+        return Preferences.getInstance(context).getIabConsentString();
+    }
+
+    public boolean isIabConsentCmpPresent(Context context) {
+        return Preferences.getInstance(context).isIabConsentCmpPresent();
+    }
+
+    public int getIabConsentSubjectToGdpr(Context context) {
+        String gdprSubjectState = Preferences.getInstance(context).getIabConsentSubjectToGdpr();
+        return gdprSubjectState.equals("1") ? 1 : 0;
+    }
+
+    public int getCoppa() {
+        return 0;
+    }
+
+    public boolean isSubjectToGdprPresent(Context context) {
+        return Preferences.getInstance(context).isSubjectToGdprPresent();
     }
 }

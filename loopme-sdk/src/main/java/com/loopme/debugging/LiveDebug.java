@@ -7,9 +7,10 @@ import android.os.Looper;
 
 import com.loopme.BuildConfig;
 import com.loopme.Constants;
-import com.loopme.HttpUtil;
 import com.loopme.Logging;
+import com.loopme.network.HttpUtils;
 import com.loopme.request.RequestUtils;
+import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.Utils;
 
 import java.text.MessageFormat;
@@ -85,7 +86,7 @@ public class LiveDebug {
                 if (sLogDbHelper != null) {
                     Logging.out(LOG_TAG, "send to server");
                     Map<String, String> params = initPostDataParams(context, appKey);
-                    HttpUtil.sendRequest(Constants.ERROR_URL, null, HttpUtil.obtainRequestString(params));
+                    HttpUtils.simpleRequest(Constants.ERROR_URL, LoopMeTracker.obtainRequestString(params));
                 }
             }
         });
@@ -98,7 +99,7 @@ public class LiveDebug {
         params.put(Params.DEVICE_OS, Constants.ADNROID_DEVICE_OS);
         params.put(Params.SDK_TYPE, Constants.LOOPME_SDK_TYPE);
         params.put(Params.SDK_VERSION, BuildConfig.VERSION_NAME);
-        params.put(Params.DEVICE_ID, RequestUtils.getAdvertisingIdInfo(context));
+        params.put(Params.DEVICE_ID, RequestUtils.getIfa());
         params.put(Params.PACKAGE_ID, context.getPackageName());
         params.put(Params.APP_KEY, appKey);
         params.put(Params.MSG, Constants.SDK_DEBUG_MSG);

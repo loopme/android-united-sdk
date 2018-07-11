@@ -1,4 +1,4 @@
-package com.loopme.webservice;
+package com.loopme.utils;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,9 +18,5 @@ public class ExecutorHelper {
 
     public static ExecutorService getSingleExecutor() {
         return sSingleExecutor;
-    }
-
-    public static void shutdown() {
-        sExecutor.shutdown();
     }
 }
