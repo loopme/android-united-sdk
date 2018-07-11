@@ -57,7 +57,7 @@ public class ManualView implements View.OnClickListener, AdListener, AdapterView
                 return true;
             }
         });
-        LoopMeSdk.setGdprConsent(mActivity, true);
+        LoopMeSdk.askGdprConsent(mActivity, null);
     }
 
     private void callDialog() {
