@@ -12,24 +12,19 @@ import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.models.Errors;
 import com.loopme.models.response.ResponseJsonModel;
+import com.loopme.network.GetResponse;
 import com.loopme.parser.ParseService;
 import com.loopme.parser.XmlParseService;
-import com.loopme.request.RequestBuilder;
 import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
-import com.loopme.webservice.ExecutorHelper;
-import com.loopme.webservice.HttpService;
+import com.loopme.utils.ExecutorHelper;
+import com.loopme.webservice.LoopMeAdServiceImpl;
 import com.loopme.xml.vast4.VastInfo;
 
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-
-import retrofit2.Response;
 
 public class AdFetchTaskByUrl implements Runnable, Observer {
 
@@ -44,7 +39,6 @@ public class AdFetchTaskByUrl implements Runnable, Observer {
     private ExecutorService mExecutorService;
     private volatile AdFetcherListener mAdFetcherListener;
     private final String mUrl;
-    private HttpService mHttpService;
     private Handler mHandler = new Handler((Looper.getMainLooper()));
     private static final String UNEXPECTED = "Unexpected";
     private boolean mIsVastVpaidAd;
@@ -55,7 +49,6 @@ public class AdFetchTaskByUrl implements Runnable, Observer {
         mLoopMeAd = loopMeAd;
         mAdFetcherListener = adFetcherListener;
         mUrl = url;
-        mHttpService = new HttpService();
         mTimers = new Timers(this);
         mExecutorService = ExecutorHelper.getExecutor();
     }
@@ -74,10 +67,6 @@ public class AdFetchTaskByUrl implements Runnable, Observer {
         if (mFetchTask != null) {
             mFetchTask.cancel(true);
             mFetchTask = null;
-        }
-        if (mHttpService != null) {
-            mHttpService.cancel();
-            mHttpService = null;
         }
         if (mVastWrapperFetcher != null) {
             mVastWrapperFetcher.cancel();
@@ -102,11 +91,11 @@ public class AdFetchTaskByUrl implements Runnable, Observer {
     @Override
     public void run() {
         try {
-            Response<ResponseJsonModel> response = mHttpService.fetchAdSync(mUrl);
+            GetResponse<ResponseJsonModel> response = LoopMeAdServiceImpl.getInstance().fetchAdByUrl(mUrl);
             Logging.out(LOG_TAG, "response received");
             stopRequestTimer();
             parseResponse(response);
-        } catch (IOException e) {
+        } catch (Exception e) {
             stopRequestTimer();
             handelBadResponse(e.getMessage());
         }
@@ -120,9 +109,9 @@ public class AdFetchTaskByUrl implements Runnable, Observer {
         }
     }
 
-    private void parseResponse(Response<ResponseJsonModel> response) {
-        if (response != null && response.code() == Constants.RESPONSE_SUCCESS) {
-            handleResponse(response.body());
+    private void parseResponse(GetResponse<ResponseJsonModel> response) {
+        if (response.isSuccessful()) {
+            handleResponse(response.getBody());
         } else {
             handleError(response);
         }
@@ -207,13 +196,17 @@ public class AdFetchTaskByUrl implements Runnable, Observer {
         }
     }
 
-    private void handleError(Response response) {
+    private void handleError(GetResponse<ResponseJsonModel> response) {
         if (response == null) {
             onErrorResult(Errors.NO_CONTENT);
-        } else if (response.code() == RESPONSE_NO_ADS) {
+        } else if (response.getCode() == RESPONSE_NO_ADS) {
             handleNoAds();
         } else {
-            onErrorResult(new LoopMeError(Constants.BAD_SERVERS_CODE + response.code()));
+            if (response.getCode() != 0) {
+                onErrorResult(new LoopMeError(Constants.BAD_SERVERS_CODE + response.getCode()));
+            } else {
+                onErrorResult(new LoopMeError(response.getMessage()));
+            }
         }
     }
 
