@@ -1,12 +1,16 @@
 package com.loopme.tester.ui.activity;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 
 import com.loopme.tester.PreferencesService;
@@ -50,6 +54,7 @@ public class BaseActivity extends AppCompatActivity implements Observer {
     protected static final int PERMISSION_REQUEST_CODE_LOAD = 501;
     public static final int PERMISSION_REQUEST_CODE_SAVE_LOG = 502;
     protected static final int PERMISSION_REQUEST_CODE_SHOW_LOG = 503;
+    protected static final int PERMISSION_CAMERA_CODE = 504;
     public static final int SCREEN_UNKNOWN = -1;
     public static final int SCREEN_HOME = 0;
     public static final int SCREEN_EDIT = 1;
@@ -473,5 +478,11 @@ public class BaseActivity extends AppCompatActivity implements Observer {
         return mPrefs.getGdprIntegrationCase();
     }
 
+    protected void askCameraPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_CAMERA_CODE);
+    }
 
+    protected boolean checkCameraPermission() {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+    }
 }

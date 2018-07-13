@@ -10,9 +10,9 @@ import android.view.ViewGroup;
 
 import com.loopme.LoopMeInterstitial;
 import com.loopme.common.LoopMeError;
+import com.loopme.tester.Constants;
 import com.loopme.tester.R;
 import com.loopme.tester.ui.activity.BaseActivity;
-import com.loopme.tester.ui.activity.QReaderActivity;
 
 public class QrFragment extends BaseFragment implements LoopMeInterstitial.Listener, View.OnClickListener {
     private LoopMeInterstitial mInterstitial;
@@ -49,7 +49,7 @@ public class QrFragment extends BaseFragment implements LoopMeInterstitial.Liste
 
     private void setUrl() {
         if (getArguments() != null) {
-            mUrl = getArguments().getString(QReaderActivity.ARG_AD_URL);
+            mUrl = getArguments().getString(Constants.ARG_QR_AD_URL_FROM_QR);
         }
     }
 
