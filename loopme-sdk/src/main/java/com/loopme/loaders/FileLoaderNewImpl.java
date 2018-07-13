@@ -13,7 +13,7 @@ import com.loopme.utils.ConnectionUtils;
 import com.loopme.utils.FileUtils;
 import com.loopme.utils.IOUtils;
 import com.loopme.utils.InternetUtils;
-import com.loopme.webservice.ExecutorHelper;
+import com.loopme.utils.ExecutorHelper;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -25,7 +25,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.util.concurrent.ExecutorService;
 
 
 public class FileLoaderNewImpl implements Loader {

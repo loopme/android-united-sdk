@@ -28,10 +28,6 @@ public class LoopMeSdk {
     }
 
     public static boolean isGdprConsentSet(Activity activity) {
-        return Preferences.getInstance(activity).isConsentSet();
-    }
-
-    public static void init(Activity activity) {
-        askGdprConsent(activity, null);
+        return Preferences.getInstance(activity).isIabConsentCmpPresent() || Preferences.getInstance(activity).isConsentSet();
     }
 }

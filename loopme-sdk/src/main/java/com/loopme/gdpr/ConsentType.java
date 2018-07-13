@@ -5,18 +5,18 @@ package com.loopme.gdpr;
  */
 
 public enum ConsentType {
-    LOOPME("0"),
-    PUBLISHER("1"),
-    USER_RESTRICTED("2"),
-    FAILED_SERVICE("3");
+    LOOPME(0),
+    PUBLISHER(1),
+    USER_RESTRICTED(2),
+    FAILED_SERVICE(3);
 
-    private String mType;
+    private int mType;
 
-    ConsentType(String type) {
+    ConsentType(int type) {
         mType = type;
     }
 
-    public String getType() {
+    public int getType() {
         return mType;
     }
 }

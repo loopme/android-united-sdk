@@ -21,7 +21,6 @@ import com.loopme.ad.LoopMeAd;
 import com.loopme.utils.ConnectionUtils;
 import com.loopme.utils.Utils;
 
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -219,8 +218,35 @@ public class RequestParamsUtils {
         }
     }
 
-    public static void getAdvertisingIdInfo(Context context, AdvIdFetcher.Listener listener) {
-        AdvIdFetcher advTask = new AdvIdFetcher(context, listener);
-        Executors.newSingleThreadExecutor().execute(advTask);
+    public static AdvAdInfo getAdvertisingIdInfo(Context context) {
+        AdvertisingIdClient.AdInfo adInfo = new AdvertisingIdClient.AdInfo();
+        try {
+            adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new AdvAdInfo(adInfo);
+    }
+
+    public static class AdvAdInfo {
+        private String mAdvId;
+        private boolean mIsDoNotTrack;
+
+        private AdvAdInfo(AdvertisingIdClient.AdInfo adInfo) {
+            mIsDoNotTrack = adInfo.isLimitAdTrackingEnabled();
+            mAdvId = adInfo.getId();
+        }
+
+        public String getAdvId() {
+            return mAdvId;
+        }
+
+        public boolean isUserSetDoNotTrack() {
+            return mIsDoNotTrack;
+        }
+
+        public String getDoNotTrackAsString() {
+            return mIsDoNotTrack ? "1" : "0";
+        }
     }
 }

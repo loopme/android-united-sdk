@@ -30,7 +30,6 @@ import android.widget.FrameLayout;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
-import com.loopme.ResourceInfo;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.request.AES;
@@ -46,6 +45,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class Utils {
+    private static final int START_BODY_TAG = 173;
     private static final int ZERO = 0;
     private static final float DEFAULT_DENSITY = 1;
     private static final float DEFAULT_VOLUME = 1.0f;
@@ -69,8 +69,6 @@ public class Utils {
     private static WindowManager sWindowManager;
     private static PackageManager sPackageManager;
     public static String sUserAgent;
-    private static int DEFAULT_WIDTH = 100;
-    private static int DEFAULT_HEIGHT = 100;
 
     public static void init(Context context) {
         if (context != null) {
@@ -394,16 +392,6 @@ public class Utils {
             }
         }
         return 0;
-    }
-
-    public static ResourceInfo getResourceInfo(String url) {
-        if (!TextUtils.isEmpty(url)) {
-            int lastIndexOfSlash = url.lastIndexOf("/");
-            String baseUrl = url.substring(0, lastIndexOfSlash + 1);
-            String resourceName = url.substring(lastIndexOfSlash + 1, url.length());
-            return new ResourceInfo(baseUrl, resourceName);
-        }
-        return new ResourceInfo();
     }
 
     // : ------------------------------------ do not test --------------------------------------------
@@ -770,4 +758,16 @@ public class Utils {
         return obj instanceof Float;
     }
 
+    public static String addMraidScript(String html) {
+        if (TextUtils.isEmpty(html)) {
+            return "";
+        }
+        String firstPart = html.substring(0, START_BODY_TAG);
+        String lastPart = html.substring(START_BODY_TAG);
+        return firstPart + Constants.MRAID_SCRIPT + lastPart;
+    }
+
+    public static String getUserAgent() {
+        return sUserAgent;
+    }
 }

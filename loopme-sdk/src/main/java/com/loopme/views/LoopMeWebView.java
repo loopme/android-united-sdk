@@ -23,6 +23,8 @@ public class LoopMeWebView extends WebView {
 
     public LoopMeWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        configureWebSettings();
+        allowCookies();
     }
 
     public LoopMeWebView(Context context) {

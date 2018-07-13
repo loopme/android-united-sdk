@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="ad_hidden_and_ready_to_load_again">Ad is hidden and ready to load again</string>
-    <string name="app_name">LoopMe Tester</string>
+    <string name="app_name">LoopMe X</string>
     <string name="about_dialog_import_button">Import</string>
     <string name="about_dialog_export_button">Export</string>
     <string name="fragment_export_title">Export file of AppKeys</string>
@@ -121,6 +121,12 @@
     <string name="native_video_banner">Native Video Banner</string>
     <string name="image_fullscreen">Image Interstitial</string>
     <string name="image_banner">Image Banner</string>
+    <string name="update_dialog_title">Update</string>
+    <string name="update_dialog_message">There is a newer version of the tester. Would you like to update it now?</string>
+    <string name="update_dialog_oupdate_button">Update</string>
+    <string name="update_dialog_close_button">Close</string>
+    <string name="update_dialog_no_updates_messege">No updates available.</string>
+    <string name="update_dialog_ok_button">Ok</string>
     <string-array name="ad_types">
         <item>ALL</item>
         <item>HTML</item>

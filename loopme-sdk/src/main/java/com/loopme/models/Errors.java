@@ -4,6 +4,8 @@ import com.loopme.Constants;
 import com.loopme.common.LoopMeError;
 
 public class Errors {
+    public static final String ERROR_MESSAGE_NETWORK_OPERATION = "Network operation timeout.";
+    public static final String ERROR_MESSAGE_BROKEN_SERVERS_RESPONSE = "Server's response is broken.";
 
     public static final LoopMeError DOWNLOAD_ERROR = new LoopMeError(100, "DOWNLOAD_ERROR");
     public static final LoopMeError NOT_SUPPORTED_ANDROID_VERSION_ERROR = new LoopMeError(101, "Not supported Android version. Expected Android 4.4+");

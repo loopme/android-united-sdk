@@ -13,12 +13,12 @@ import com.loopme.Helpers;
 import com.loopme.IdGenerator;
 import com.loopme.IntegrationType;
 import com.loopme.Logging;
+import com.loopme.LoopMeSdk;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.display.BaseTrackableController;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
 import com.loopme.controllers.display.DisplayControllerVast;
 import com.loopme.controllers.display.DisplayControllerVpaid;
-import com.loopme.controllers.interfaces.DisplayController;
 import com.loopme.debugging.LiveDebug;
 import com.loopme.gdpr.GdprChecker;
 import com.loopme.loaders.AdFetchTask;
@@ -309,7 +309,11 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
      * After its execution, the interstitial/banner notifies whether the loading of the ad content failed or succeeded.
      */
     public void load() {
-        load(IntegrationType.NORMAL);
+        if (LoopMeSdk.isGdprConsentSet(mContext)) {
+            load(IntegrationType.NORMAL);
+        } else {
+            LoopMeSdk.askGdprConsent(mContext, this);
+        }
     }
 
     public void load(IntegrationType integrationType) {
@@ -541,5 +545,9 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         int width = adSize[0];
         int height = adSize[1];
         return isBanner() && Utils.isExpandBanner(width, height);
+    }
+
+    public AdTargetingData getAdTargetingData() {
+        return mAdTargetingData;
     }
 }

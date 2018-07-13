@@ -90,8 +90,7 @@ dependencies {
     api files('libs/libAvid-loopme-3.6.7.jar')
     api files('libs/moat-mobile-appkit.jar')
 
-    api "com.squareup.retrofit2:converter-jackson:$retrofitVersion"
-    api "com.google.code.gson:gson:$gsonVersion"
+//    api "com.google.code.gson:gson:$gsonVersion"
 
     api "com.android.support:appcompat-v7:$supportLibraryVersion"
     api "com.android.support:recyclerview-v7:$supportLibraryVersion"

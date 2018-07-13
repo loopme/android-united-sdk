@@ -4,17 +4,19 @@ import android.text.TextUtils;
 
 import com.loopme.BuildConfig;
 import com.loopme.Constants;
-import com.loopme.HttpUtil;
 import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.debugging.LiveDebug;
 import com.loopme.debugging.Params;
+import com.loopme.network.HttpUtils;
 import com.loopme.request.RequestUtils;
 import com.loopme.utils.StringUtils;
 import com.loopme.utils.Utils;
-import com.loopme.webservice.ExecutorHelper;
+import com.loopme.utils.ExecutorHelper;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -66,14 +68,14 @@ public class LoopMeTracker {
         params.put(Params.MSG, Constants.SDK_ERROR_MSG);
         params.put(Params.ERROR_TYPE, errorType);
         params.put(Params.ERROR_MSG, errorMessage);
-        return HttpUtil.obtainRequestString(params);
+        return obtainRequestString(params);
     }
 
-    private static void sendDataToServer(final String errorUrl, final Map<String, String> headers, final String request) {
+    private static void sendDataToServer(final String errorUrl, final String request) {
         ExecutorHelper.getExecutor().submit(new Runnable() {
             @Override
             public void run() {
-                HttpUtil.sendRequest(errorUrl, headers, request);
+                HttpUtils.simpleRequest(errorUrl, request);
             }
         });
     }
@@ -81,7 +83,7 @@ public class LoopMeTracker {
     private static synchronized void postVastError(String vastErrorCode) {
         for (String url : sVastErrorUrlSet) {
             String urlWithCode = StringUtils.setErrorCode(url, vastErrorCode);
-            sendDataToServer(urlWithCode, null, null);
+            sendDataToServer(urlWithCode, null);
             Logging.out(LOG_TAG, urlWithCode);
         }
     }
@@ -92,7 +94,7 @@ public class LoopMeTracker {
 
     public static void trackSdkFeedBack(List<String> packageIds, String token) {
         if (Utils.isPackageInstalled(packageIds, Utils.getInstalledPackagesAsStringsList())) {
-            sendDataToServer(buildSdkFeedBackUrl(token), null, null);
+            sendDataToServer(buildSdkFeedBackUrl(token), null);
         }
     }
 
@@ -102,7 +104,7 @@ public class LoopMeTracker {
         requestParams.put(Params.EVENT_TYPE, Params.SDK_FEEDBACK);
         requestParams.put(Params.R, "1");
         requestParams.put(Params.ID, token);
-        return url + HttpUtil.obtainRequestString(requestParams);
+        return url + obtainRequestString(requestParams);
     }
 
     public static void postDebugEvent(String param, String value) {
@@ -118,7 +120,7 @@ public class LoopMeTracker {
         params.putAll(getGeneralInfo());
         params.put(Params.ERROR_TYPE, Constants.ErrorType.CUSTOM);
         params.put(param, value);
-        return HttpUtil.obtainRequestString(params);
+        return obtainRequestString(params);
     }
 
     private static Map<String, String> getGeneralInfo() {
@@ -134,9 +136,7 @@ public class LoopMeTracker {
 
     private static void proceedBuildEvent(String request) {
         String url = buildServerIssueUrl();
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", "application/x-www-form-urlencoded");
-        sendDataToServer(url, headers, request);
+        sendDataToServer(url, request);
     }
 
     public static void post(LoopMeError error) {
@@ -155,5 +155,25 @@ public class LoopMeTracker {
     private static boolean isVastError(String errorType) {
         return TextUtils.equals(errorType, Constants.ErrorType.VAST) ||
                 TextUtils.equals(errorType, Constants.ErrorType.VPAID);
+    }
+
+    public static String obtainRequestString(Map<String, String> params) {
+        StringBuilder result = new StringBuilder();
+        try {
+            boolean firstTime = true;
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                if (firstTime) {
+                    firstTime = false;
+                } else {
+                    result.append("&");
+                }
+                result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+                result.append("=");
+                result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+            }
+        } catch (UnsupportedEncodingException | NullPointerException e) {
+            Logging.out("HttpUtil", "UnsupportedEncoding: UTF-8");
+        }
+        return String.valueOf(result);
     }
 }
