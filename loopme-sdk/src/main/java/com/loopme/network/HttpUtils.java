@@ -3,10 +3,10 @@ package com.loopme.network;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.google.android.gms.common.util.IOUtils;
 import com.loopme.BuildConfig;
 import com.loopme.Logging;
 import com.loopme.models.Errors;
+import com.loopme.utils.IOUtils;
 import com.loopme.utils.Utils;
 
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class HttpUtils {
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 InputStream inputStream = connection.getInputStream();
-                byte[] bytes = IOUtils.toByteArray(inputStream);
+                byte[] bytes = IOUtils.inputStreamToByteArray(inputStream);
                 response.setBody(bytes);
             }
             response.setCode(responseCode);
