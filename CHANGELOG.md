@@ -1,3 +1,7 @@
+## Version 6.1.5 (17 of July, 2018)
+- Retrofit is removed
+- GDPR Consent with presented CMP SDK compatibility
+  
 ## Version 6.1.2 (08 of June, 2018)
 - Fixed NPE due parsing xml.
 
