@@ -24,7 +24,9 @@ public class LoopMeSdk {
      * Ask GDPR consent with LoopMe's SDK facilities, for internal use.
      */
     public static void askGdprConsent(Activity activity, GdprChecker.OnConsentListener listener) {
-        new GdprChecker(activity, listener).check();
+        if (!isGdprConsentSet(activity)) {
+            new GdprChecker(activity, listener).check();
+        }
     }
 
     public static boolean isGdprConsentSet(Activity activity) {

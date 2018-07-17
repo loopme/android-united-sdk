@@ -71,7 +71,7 @@ public class ParseService extends JsonParser {
         }
         String html = retrieveAdm(bidObject);
         String orientation = retrieveOrientation(bidObject);
-        String adid = retrieveAdid(bidObject);
+        String token = retrieveAdIdToken(bidObject);
         boolean v360 = retrieveV360(bidObject);
         boolean debug = retrieveDebug(bidObject);
         List<String> measurePartners = retrieveMeasurePartners(bidObject);
@@ -83,7 +83,7 @@ public class ParseService extends JsonParser {
         return new AdParams.AdParamsBuilder(retrieveAdFormat(loopMeAd))
                 .html(html)
                 .orientation(orientation)
-                .token(adid)
+                .token(token)
                 .debug(debug)
                 .trackersList(measurePartners)
                 .packageIds(packageIds)
@@ -168,9 +168,9 @@ public class ParseService extends JsonParser {
         }
     }
 
-    private static String retrieveAdid(Bid bidObject) {
+    private static String retrieveAdIdToken(Bid bidObject) {
         try {
-            return bidObject.getAdid();
+            return bidObject.getId();
         } catch (IllegalStateException | NullPointerException ex) {
             ex.printStackTrace();
         }
