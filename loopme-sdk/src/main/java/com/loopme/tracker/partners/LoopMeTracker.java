@@ -99,7 +99,7 @@ public class LoopMeTracker {
     }
 
     private static String buildSdkFeedBackUrl(String token) {
-        String url = Constants.OLD_TRACK_FEEDBACK_URL + "?";
+        String url = Constants.TRACK_FEEDBACK_URL + "?";
         Map<String, String> requestParams = new HashMap<>();
         requestParams.put(Params.EVENT_TYPE, Params.SDK_FEEDBACK);
         requestParams.put(Params.R, "1");
@@ -127,7 +127,7 @@ public class LoopMeTracker {
         Map<String, String> params = new HashMap<>();
         params.put(Params.DEVICE_OS, Constants.ADNROID_DEVICE_OS);
         params.put(Params.SDK_TYPE, BuildConfig.SDK_TYPE);
-        params.put(Params.SDK_VERSION, BuildConfig.VERSION_NAME);
+        params.put(Params.SDK_VERSION, BuildConfig.VERSION_CODE + "." + BuildConfig.VERSION_NAME);
         params.put(Params.DEVICE_ID, RequestUtils.getIfa());
         params.put(Params.APP_KEY, sAppKey);
         params.put(Params.PACKAGE_ID, sPackageId);
