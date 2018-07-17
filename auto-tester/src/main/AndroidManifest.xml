@@ -63,7 +63,7 @@
             android:name="com.mopub.mobileads.RewardedMraidActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.activity.QReaderActivity"
+            android:name=".qr.QRAdActivity"
             android:theme="@style/SlideableAppTheme" />
 
         <provider

@@ -11,7 +11,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -28,6 +27,7 @@ import com.loopme.tester.loaders.FileLoaderManager;
 import com.loopme.tester.model.AdSpot;
 import com.loopme.tester.model.Response;
 import com.loopme.tester.model.ScreenStackModel;
+import com.loopme.tester.qr.QRAdActivity;
 import com.loopme.tester.ui.dialog.CreateFolderDialogFragment;
 import com.loopme.tester.ui.fragment.ActionBarFragment;
 import com.loopme.tester.ui.fragment.ActiveSearchFragment;
@@ -437,7 +437,7 @@ public class MainActivity extends BaseActivity implements
             }
         } else if (requestCode == PERMISSION_CAMERA_CODE) {
             if (checkCameraPermission()) {
-                runQrReaderActivity();
+                runQrAdActivity();
             } else {
                 Snackbar.make(findViewById(R.id.main_layout_root), "To use this feature need camera permission", Snackbar.LENGTH_LONG).show();
             }
@@ -526,26 +526,14 @@ public class MainActivity extends BaseActivity implements
     @Override
     public void reedQrCode() {
         if (checkCameraPermission()) {
-            runQrReaderActivity();
+            runQrAdActivity();
         } else {
             askCameraPermission();
         }
     }
 
-    protected void runQrReaderActivity() {
-        Intent intent = new Intent(this, QReaderActivity.class);
+    private void runQrAdActivity() {
+        Intent intent = new Intent(this, QRAdActivity.class);
         startActivityForResult(intent, MainActivity.QR_ACTIVITY_REQUEST_CODE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == QR_ACTIVITY_REQUEST_CODE && resultCode == AppCompatActivity.RESULT_OK) {
-            String url = data.getStringExtra(Constants.ARG_QR_AD_URL_FROM_QR);
-            Bundle bundle = new Bundle();
-            bundle.putString(Constants.ARG_QR_AD_URL_FROM_QR, url);
-            openScreen(SCREEN_QR_AD, bundle);
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 }

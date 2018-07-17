@@ -19,7 +19,6 @@ import com.loopme.tester.handlers.AdSpotAsyncHandler;
 import com.loopme.tester.model.AdSpot;
 import com.loopme.tester.model.ScreenStackModel;
 import com.loopme.tester.ui.fragment.BaseFragment;
-import com.loopme.tester.ui.fragment.QrFragment;
 import com.loopme.tester.ui.fragment.screen.AdSpotCardFragment;
 import com.loopme.tester.ui.fragment.screen.EditAdSpotFragment;
 import com.loopme.tester.ui.fragment.screen.ExportFragment;
@@ -63,7 +62,6 @@ public class BaseActivity extends AppCompatActivity implements Observer {
     public static final int SCREEN_IMPORT = 4;
     public static final int SCREEN_EXPORT = 5;
     public static final int SCREEN_LOG = 6;
-    public static final int SCREEN_QR_AD = 7;
 
     protected Deque<ScreenStackModel> mScreenStack = new LinkedBlockingDeque<>();
 
@@ -351,10 +349,6 @@ public class BaseActivity extends AppCompatActivity implements Observer {
                 }
                 case SCREEN_LOG: {
                     fragmentTransaction.add(R.id.log_root, LogFragment.newInstance());
-                    break;
-                }
-                case SCREEN_QR_AD: {
-                    fragmentTransaction.add(R.id.root, QrFragment.newInstance(dataForAnotherScreen));
                     break;
                 }
                 default: {

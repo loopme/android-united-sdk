@@ -1,4 +1,4 @@
-package com.loopme.tester.ui.qr;
+package com.loopme.tester.qr;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,14 +9,14 @@ import com.loopme.tester.utils.UiUtils;
 import github.nisrulz.qreader.QRDataListener;
 import github.nisrulz.qreader.QREader;
 
-public class LoopMeQReader {
+public class QReader {
     private QREader mQReader;
     private SurfaceView mSurfaceView;
     private QRDataListener mListener;
     private Context mContext;
     private boolean mIsInited;
 
-    public LoopMeQReader(@NonNull SurfaceView surfaceView, QRDataListener listener) {
+    public QReader(@NonNull SurfaceView surfaceView, QRDataListener listener) {
         mContext = surfaceView.getContext();
         mSurfaceView = surfaceView;
         mListener = listener;
