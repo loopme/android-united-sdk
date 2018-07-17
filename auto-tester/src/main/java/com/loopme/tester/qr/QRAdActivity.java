@@ -4,61 +4,87 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.TextView;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.loopme.LoopMeInterstitial;
 import com.loopme.common.LoopMeError;
 import com.loopme.tester.R;
-import com.loopme.tester.qr.fragment.QReaderFragment;
 import com.loopme.tester.utils.UiUtils;
 
-public class QRAdActivity extends AppCompatActivity implements QReaderFragment.QReaderListener, LoopMeInterstitial.Listener, View.OnClickListener {
+public class QRAdActivity extends AppCompatActivity
+        implements QReaderFragment.QReaderListener,
+        LoopMeInterstitial.Listener,
+        QRControlsFragment.Listener {
     private LoopMeInterstitial mInterstitial;
-    private String mUrl;
-    private TextView mReplayUrlTextView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qr_ad);
 
+        loadFragments();
+        UiUtils.makeActivitySlidable(this);
+        mInterstitial = new LoopMeInterstitial(this, "mockAppKey");
+        mInterstitial.setListener(this);
+        mInterstitial.setAutoLoading(false);
+    }
+
+    private void loadFragments() {
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.activity_qr_ad_reader_container, QReaderFragment.newInstance())
                 .commit();
-        mReplayUrlTextView = (TextView) findViewById(R.id.activity_qr_ad_replay_url_text_view);
-        findViewById(R.id.activity_qr_ad_replay_image_view).setOnClickListener(this);
-        findViewById(R.id.activity_qr_ad_back_button).setOnClickListener(this);
-        UiUtils.makeActivitySlidable(this);
-        initAd();
-    }
 
-    private void initAd() {
-        if (mInterstitial == null) {
-            mInterstitial = new LoopMeInterstitial(this, "mockAppKey");
-            mInterstitial.setListener(this);
-            mInterstitial.setAutoLoading(false);
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        mInterstitial.destroy();
-        super.onDestroy();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.activity_qr_ad_controls_container, QRControlsFragment.newInstance())
+                .commit();
     }
 
     @Override
     public void onUrlDetected(String url) {
-        mUrl = url;
+        setReplayUrl(url);
         loadAd(url);
-
     }
 
     @Override
     public void onNoneUrlDetected(String content) {
         showMessage(content + " is not URL");
+    }
+
+    @Override
+    public void onCloseClicked() {
+        finish();
+    }
+
+    @Override
+    public void onReplayClicked(String url) {
+        loadAd(url);
+    }
+
+    public void loadAd(String url) {
+        if (mInterstitial != null && !mInterstitial.isLoading()) {
+            mInterstitial.load(url);
+            showProgress(true);
+            onPause();
+        }
+    }
+
+    private void showAd() {
+        if (mInterstitial != null) {
+            mInterstitial.show();
+        }
+    }
+
+    private void setReplayUrl(String url) {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.activity_qr_ad_controls_container);
+        if (fragment instanceof QRControlsFragment) {
+            ((QRControlsFragment) fragment).setReplayUrl(url);
+        }
     }
 
     private void showProgress(boolean show) {
@@ -72,34 +98,22 @@ public class QRAdActivity extends AppCompatActivity implements QReaderFragment.Q
         Snackbar.make(findViewById(R.id.activity_qr_ad_root), message, Snackbar.LENGTH_LONG).show();
     }
 
-    public void reload() {
-        if (mInterstitial != null) {
-            loadAd(mUrl);
+    private void enableControlsView() {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.activity_qr_ad_controls_container);
+        if (fragment instanceof QRControlsFragment) {
+            ((QRControlsFragment) fragment).enableControlsView();
         }
     }
 
-    public void loadAd(String url) {
-        if (mInterstitial != null && !mInterstitial.isLoading()) {
-            mInterstitial.load(url);
-            showProgress(true);
-            onPause();
-        }
+    @Override
+    protected void onDestroy() {
+        mInterstitial.destroy();
+        super.onDestroy();
     }
 
     @Override
     public void onLoopMeInterstitialLoadSuccess(LoopMeInterstitial interstitial) {
-        if (mInterstitial != null) {
-            mInterstitial.show();
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.activity_qr_ad_replay_image_view) {
-            reload();
-        } else if (v.getId() == R.id.activity_qr_ad_back_button) {
-            finish();
-        }
+        showAd();
     }
 
     @Override
@@ -110,34 +124,28 @@ public class QRAdActivity extends AppCompatActivity implements QReaderFragment.Q
     }
 
     @Override
+    public void onLoopMeInterstitialHide(LoopMeInterstitial interstitial) {
+        enableControlsView();
+    }
+
+    @Override
     public void onLoopMeInterstitialShow(LoopMeInterstitial interstitial) {
         showProgress(false);
     }
 
     @Override
-    public void onLoopMeInterstitialHide(LoopMeInterstitial interstitial) {
-        showProgress(false);
-        findViewById(R.id.activity_qr_ad_replay_view_layout).setVisibility(View.VISIBLE);
-        mReplayUrlTextView.setText(mUrl);
-    }
-
-    @Override
     public void onLoopMeInterstitialClicked(LoopMeInterstitial interstitial) {
-
     }
 
     @Override
     public void onLoopMeInterstitialLeaveApp(LoopMeInterstitial interstitial) {
-
     }
 
     @Override
     public void onLoopMeInterstitialExpired(LoopMeInterstitial interstitial) {
-
     }
 
     @Override
     public void onLoopMeInterstitialVideoDidReachEnd(LoopMeInterstitial interstitial) {
-
     }
 }

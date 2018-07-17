@@ -1,4 +1,4 @@
-package com.loopme.tester.qr.fragment;
+package com.loopme.tester.qr;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.webkit.URLUtil;
 
 import com.loopme.tester.R;
-import com.loopme.tester.qr.QReader;
 
 import github.nisrulz.qreader.QRDataListener;
 
