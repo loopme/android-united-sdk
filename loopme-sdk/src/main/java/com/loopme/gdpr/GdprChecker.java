@@ -56,6 +56,7 @@ public class GdprChecker implements
             sIsNeedCheckUserConsent = true;
         } else {
             setGdprState(false, ConsentType.FAILED_SERVICE);
+            onComplete();
         }
     }
 
