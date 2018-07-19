@@ -4,6 +4,6 @@
 
     <solid android:color="@color/white_transparent" />
     <size
-        android:width="40dp"
-        android:height="40dp" />
+        android:width="@dimen/touch_size_width"
+        android:height="@dimen/touch_size_height" />
 </shape>

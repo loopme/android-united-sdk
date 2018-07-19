@@ -19,6 +19,12 @@ import com.r0adkll.slidr.model.SlidrPosition;
 
 public class UiUtils {
 
+    private static final float SCRIM_START_ALPHA = 0.8f;
+    private static final float SCRIM_END_ALPHA = 0f;
+    private static final float VELOCITY_THRESHOLD = 2400;
+    private static final float DISTANCE_THRESHOLD = 0.25f;
+    private static final float EDGE_SIZE = 0.3f;
+
     public static int getSpecificFileImageResource(int fileType) {
         switch (fileType) {
             case FileModel.UP_FOLDER: {
@@ -51,7 +57,9 @@ public class UiUtils {
         if (view != null && context != null) {
             InputMethodManager imm = (InputMethodManager) context.getSystemService(
                     Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
         }
     }
 
@@ -59,12 +67,12 @@ public class UiUtils {
         SlidrConfig config = new SlidrConfig.Builder()
                 .position(SlidrPosition.LEFT)
                 .scrimColor(Color.BLACK)
-                .scrimStartAlpha(0.8f)
-                .scrimEndAlpha(0f)
-                .velocityThreshold(2400)
-                .distanceThreshold(0.25f)
+                .scrimStartAlpha(SCRIM_START_ALPHA)
+                .scrimEndAlpha(SCRIM_END_ALPHA)
+                .velocityThreshold(VELOCITY_THRESHOLD)
+                .distanceThreshold(DISTANCE_THRESHOLD)
                 .edge(true)
-                .edgeSize(0.3f)
+                .edgeSize(EDGE_SIZE)
                 .build();
         Slidr.attach(activity, config);
     }

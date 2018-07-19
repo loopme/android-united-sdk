@@ -42,12 +42,12 @@
 
         <ImageView
             android:id="@+id/action_bar_qr_ad"
-            android:layout_width="50dp"
+            android:layout_width="@dimen/action_bar_qr_ad_width"
             android:layout_height="match_parent"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/action_bar_add_button"
             android:background="@drawable/touch_feedback"
-            android:padding="12dp"
+            android:padding="@dimen/action_bar_qr_ad_padding"
             android:src="@drawable/qr_icon" />
 
 

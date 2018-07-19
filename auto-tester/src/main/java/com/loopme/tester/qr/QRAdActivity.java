@@ -4,11 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.loopme.LoopMeInterstitial;
 import com.loopme.common.LoopMeError;
@@ -19,6 +15,7 @@ public class QRAdActivity extends AppCompatActivity
         implements QReaderFragment.QReaderListener,
         LoopMeInterstitial.Listener,
         QRControlsFragment.Listener {
+    private static final String MOCK_APP_KEY = "mockAppKey";
     private LoopMeInterstitial mInterstitial;
 
     @Override
@@ -28,7 +25,7 @@ public class QRAdActivity extends AppCompatActivity
 
         loadFragments();
         UiUtils.makeActivitySlidable(this);
-        mInterstitial = new LoopMeInterstitial(this, "mockAppKey");
+        mInterstitial = new LoopMeInterstitial(this, MOCK_APP_KEY);
         mInterstitial.setListener(this);
         mInterstitial.setAutoLoading(false);
     }
@@ -107,7 +104,9 @@ public class QRAdActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
-        mInterstitial.destroy();
+        if (mInterstitial != null) {
+            mInterstitial.destroy();
+        }
         super.onDestroy();
     }
 

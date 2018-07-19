@@ -21,7 +21,7 @@ public class QReaderFragment extends Fragment implements QRDataListener {
     private QReader mLoopMeQReader;
     private QReaderListener mListener;
     private View mProgressBar;
-    private Handler HANDLER = new Handler(Looper.getMainLooper());
+    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
 
     public static QReaderFragment newInstance() {
         return new QReaderFragment();
@@ -57,18 +57,24 @@ public class QReaderFragment extends Fragment implements QRDataListener {
     @Override
     public void onResume() {
         super.onResume();
-        mLoopMeQReader.resume();
+        if (mLoopMeQReader != null) {
+            mLoopMeQReader.resume();
+        }
     }
 
     @Override
     public void onPause() {
-        mLoopMeQReader.pause();
+        if (mLoopMeQReader != null) {
+            mLoopMeQReader.pause();
+        }
         super.onPause();
     }
 
     @Override
     public void onDestroyView() {
-        mLoopMeQReader.destroy();
+        if (mLoopMeQReader != null) {
+            mLoopMeQReader.destroy();
+        }
         super.onDestroyView();
     }
 

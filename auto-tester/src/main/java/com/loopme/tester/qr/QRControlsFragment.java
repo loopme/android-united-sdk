@@ -70,7 +70,7 @@ public class QRControlsFragment extends Fragment implements View.OnClickListener
     }
 
     public void enableControlsView() {
-        if (mReplayView.getVisibility() == View.GONE) {
+        if (mReplayView != null && mReplayView.getVisibility() == View.GONE) {
             mReplayView.setVisibility(View.VISIBLE);
         }
     }
