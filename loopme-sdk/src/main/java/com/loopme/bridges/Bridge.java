@@ -93,7 +93,7 @@ public class Bridge extends WebViewClient {
             e.printStackTrace();
             LoopMeTracker.post("Broken redirect in bridge: " + url, Constants.ErrorType.JS);
             handleExtraUrl(url);
-            return false;
+            return true;
         }
 
         String protocol = redirect.getScheme();

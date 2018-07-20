@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -25,8 +26,18 @@ public class BaseFragment extends Fragment {
     private List<ChildFragmentModel> mChildFragments = new ArrayList<>();
     private View mRootView;
 
-    private void setActivity(Activity activity) {
+    private AppCompatActivity mActivity;
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof AppCompatActivity) {
+            mActivity = (AppCompatActivity) context;
+        }
+    }
+
+    public AppCompatActivity getAppCompatActivity() {
+        return mActivity;
     }
 
     public void setHasLandscapeView(boolean value) {
@@ -200,6 +211,7 @@ public class BaseFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        mActivity = null;
         setRootVisible(false);
         super.onDestroyView();
     }

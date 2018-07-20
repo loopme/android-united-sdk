@@ -6,11 +6,13 @@
     <color name="red">#df1010</color>
     <color name="blue">#0066CC</color>
     <color name="gray">#CCCCCC</color>
+    <color name="black_transparent">#77000000</color>
     <color name="dark_gray">#9A9A9A</color>
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
     <color name="shadow">#80000000</color>
     <color name="background_buttons_center_red">#FF0000</color>
-    <color name="white_transparent">#50ffffff</color>
+    <color name="white_transparent">#40ffffff</color>
     <color name="transparent">#00000000</color>
+    <drawable name="touchFeedback">#eabfbf</drawable>
 </resources>

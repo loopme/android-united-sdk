@@ -70,4 +70,9 @@ dependencies {
     }
     implementation "com.android.support:design:$supportLibraryVersion"
     implementation "com.android.support:multidex:$multidexLibraryVersion"
+    implementation('com.github.nisrulz:qreader:2.1.1',
+            { exclude group: 'com.google.android.gms' }
+    )
+    implementation "com.google.android.gms:play-services-vision:15.0.2"
+    implementation 'com.r0adkll:slidableactivity:2.0.6'
 }

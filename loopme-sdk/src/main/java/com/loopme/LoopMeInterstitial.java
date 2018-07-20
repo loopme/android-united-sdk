@@ -158,6 +158,12 @@ public class LoopMeInterstitial extends AdWrapper {
         };
     }
 
+    public void load(String url) {
+        if (mFirstLoopMeAd != null) {
+            mFirstLoopMeAd.load(url);
+        }
+    }
+
     public interface Listener {
 
         void onLoopMeInterstitialLoadSuccess(LoopMeInterstitial interstitial);

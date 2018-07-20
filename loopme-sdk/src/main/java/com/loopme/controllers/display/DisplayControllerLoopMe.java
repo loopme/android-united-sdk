@@ -282,11 +282,9 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
 
     private void resumeInterstitial() {
         resumeMraid();
-        if (isInterstitial()) {
-            resumeViewController();
-            resumeVideoController();
-            setWebViewState(Constants.WebviewState.VISIBLE);
-        }
+        resumeViewController();
+        resumeVideoController();
+        setWebViewState(Constants.WebviewState.VISIBLE);
     }
 
     private void pauseControllers() {

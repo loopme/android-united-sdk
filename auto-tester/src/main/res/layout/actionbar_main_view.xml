@@ -41,11 +41,23 @@
 
 
         <ImageView
+            android:id="@+id/action_bar_qr_ad"
+            android:layout_width="@dimen/action_bar_qr_ad_width"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/action_bar_add_button"
+            android:background="@drawable/touch_feedback"
+            android:padding="@dimen/action_bar_qr_ad_padding"
+            android:src="@drawable/qr_icon" />
+
+
+        <ImageView
             android:id="@+id/action_bar_add_button"
             android:layout_width="@dimen/action_bar_add_button_width"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:background="@drawable/touch_feedback"
             android:padding="@dimen/action_bar_add_button_padding"
             android:src="@drawable/ic_action_new" />
     </RelativeLayout>
