@@ -325,8 +325,4 @@ public class Constants {
         public static int[] EXPANDABLE_BANNER_SIZE = {EXPAND_BANNER_WIDTH, EXPAND_BANNER_HEIGHT};
         public static int[] MPU_BANNER_SIZE = {MPU_BANNER_WIDTH, MPU_BANNER_HEIGHT};
     }
-
-    public enum RetrofitType {
-        FETCH, DOWNLOAD, FETCH_BY_URL
-    }
 }
