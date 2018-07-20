@@ -21,7 +21,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 4
-        versionName "3.2"
+        versionName "3.3"
         multiDexEnabled true
         buildConfigField "String", "TESTFAIRY_APP_TOKEN", TESTFAIRY_TOKEN
         buildConfigField "String", "TESTFAIRY_API_URL", TESTFAIRY_API_URL
