@@ -11,17 +11,21 @@ import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.URLUtil;
+import android.widget.TextView;
 
 import com.loopme.tester.R;
+import com.loopme.tester.qr.model.AdDescriptor;
+import com.loopme.tester.qr.model.AdDescriptorUtils;
 
 import github.nisrulz.qreader.QRDataListener;
 
-public class QReaderFragment extends Fragment implements QRDataListener {
+public class QReaderFragment extends Fragment implements QRDataListener, View.OnClickListener {
     private QReader mLoopMeQReader;
     private QReaderListener mListener;
     private View mProgressBar;
-    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
+    private final Handler HANDLER = new Handler(Looper.getMainLooper());
+    private AdDescriptor mDescriptor;
+    private View mReplayView;
 
     public static QReaderFragment newInstance() {
         return new QReaderFragment();
@@ -43,8 +47,11 @@ public class QReaderFragment extends Fragment implements QRDataListener {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        SurfaceView surfaceView = (SurfaceView) view.findViewById(R.id.fragment_qr_reader_surface_view);
+        view.findViewById(R.id.fragment_qr_controls_replay_layout).setVisibility(View.GONE);
+        view.findViewById(R.id.fragment_qr_controls_replay_image_view).setOnClickListener(this);
+        mReplayView = view.findViewById(R.id.fragment_qr_controls_replay_layout);
         mProgressBar = view.findViewById(R.id.fragment_qr_reader_progress_bar);
+        SurfaceView surfaceView = (SurfaceView) view.findViewById(R.id.fragment_qr_reader_surface_view);
         mLoopMeQReader = new QReader(surfaceView, this);
     }
 
@@ -79,40 +86,68 @@ public class QReaderFragment extends Fragment implements QRDataListener {
     }
 
     @Override
-    public void onDetected(final String content) {
-        if (URLUtil.isNetworkUrl(content)) {
-            onUrlDetected(content);
+    public void onDetected(String content) {
+        handleContent(content);
+    }
+
+    private void handleContent(String content) {
+        if (AdDescriptorUtils.isValid(content)) {
+            mDescriptor = AdDescriptorUtils.parseAdDescriptor(content);
+            onAdDetected(mDescriptor);
         } else {
-            onNoneUrlDetected(content);
+            onTrashDetected(content);
         }
-
     }
 
-    public void onUrlDetected(final String url) {
+    public void onAdDetected(final AdDescriptor descriptor) {
         HANDLER.post(new Runnable() {
             @Override
             public void run() {
                 if (mListener != null) {
-                    mListener.onUrlDetected(url);
+                    mListener.onAdDetected(descriptor);
                 }
             }
         });
     }
 
-    public void onNoneUrlDetected(final String content) {
+    public void onTrashDetected(final String content) {
         HANDLER.post(new Runnable() {
             @Override
             public void run() {
                 if (mListener != null) {
-                    mListener.onNoneUrlDetected(content);
+                    mListener.onTrashDetected(content);
                 }
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fragment_qr_controls_replay_image_view: {
+                onReplayClicked();
+                break;
+            }
+        }
+    }
+
+    private void onReplayClicked() {
+        if (mListener != null) {
+            mListener.onReplayClicked(mDescriptor.getUrl());
+        }
+    }
+
+    public void enableControlsView() {
+        if (mReplayView != null && mReplayView.getVisibility() == View.GONE) {
+            mReplayView.setVisibility(View.VISIBLE);
+        }
     }
 
     public interface QReaderListener {
-        void onUrlDetected(String url);
+        void onAdDetected(@NonNull AdDescriptor descriptor);
 
-        void onNoneUrlDetected(String content);
+        void onTrashDetected(@NonNull String content);
+
+        void onReplayClicked(String url);
     }
 }

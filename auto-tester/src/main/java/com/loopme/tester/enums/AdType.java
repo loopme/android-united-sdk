@@ -1,5 +1,7 @@
 package com.loopme.tester.enums;
 
+import android.text.TextUtils;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -17,5 +19,13 @@ public enum AdType {
     @JsonValue
     public String getType() {
         return this.mType;
+    }
+
+    public static AdType fromString(String adType) {
+        if (!TextUtils.isEmpty(adType) && adType.equalsIgnoreCase(BANNER.name())) {
+            return BANNER;
+        } else {
+            return INTERSTITIAL;
+        }
     }
 }

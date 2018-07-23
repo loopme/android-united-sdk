@@ -13,6 +13,7 @@ public class Constants {
     public static final int ONE_SECOND_IN_MILLIS = 1000;
     public static final long AD_SPOT_DOES_NOT_EXIST_ID = -666;
     public static final String ARG_QR_AD_URL_FROM_QR = "ARG_QR_AD_URL_FROM_QR";
+    public static final String MOCK_APP_KEY = "mockAppKey";
 
     public class Keys {
         public static final String KEY_DV = "606a600593";

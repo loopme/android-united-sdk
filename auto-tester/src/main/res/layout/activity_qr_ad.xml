@@ -5,15 +5,11 @@
     android:layout_height="match_parent">
 
     <FrameLayout
-        android:id="@+id/activity_qr_ad_reader_container"
+        android:id="@+id/activity_qr_ad_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true" />
 
-    <FrameLayout
-        android:id="@+id/activity_qr_ad_controls_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true" />
+    <include layout="@layout/activity_qr_controls" />
 
 </RelativeLayout>

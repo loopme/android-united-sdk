@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/lm_background_port" />
+
+    <FrameLayout
+        android:id="@+id/fragment_qr_banner_view_container"
+        android:layout_width="@dimen/fragment_qr_banner_view_container_width"
+        android:layout_height="@dimen/fragment_qr_banner_view_container_height"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>

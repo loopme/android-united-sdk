@@ -348,7 +348,7 @@ public class ManualView implements View.OnClickListener, AdListener, AdapterView
     public void startLoadAd() {
         if (mIsFirstLaunch) {
             mIsFirstLaunch = false;
-//            loadAd();
+//            loadInterstitial();
         }
     }
 
