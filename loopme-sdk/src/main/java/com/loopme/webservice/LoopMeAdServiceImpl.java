@@ -35,4 +35,10 @@ public class LoopMeAdServiceImpl implements LoopMeAdService {
         HttpRawResponse httpRawResponse = HttpUtils.doRequest(resUrl, HttpUtils.Method.GET, null);
         return ResponseParser.parseStringBody(httpRawResponse);
     }
+
+    @Override
+    public GetResponse<ResponseJsonModel> fetchAdByUrl(String mUrl) {
+        HttpRawResponse httpRawResponse = HttpUtils.doRequest(mUrl, HttpUtils.Method.GET, null);
+        return ResponseParser.parse(httpRawResponse);
+    }
 }

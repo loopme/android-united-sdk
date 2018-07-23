@@ -62,6 +62,9 @@
         <activity
             android:name="com.mopub.mobileads.RewardedMraidActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".qr.QRAdActivity"
+            android:theme="@style/SlideableAppTheme" />
 
         <provider
             android:name="com.loopme.tester.db.AdSpotProvider"

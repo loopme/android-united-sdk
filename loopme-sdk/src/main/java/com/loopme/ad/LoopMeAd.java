@@ -22,6 +22,8 @@ import com.loopme.controllers.display.DisplayControllerVpaid;
 import com.loopme.debugging.LiveDebug;
 import com.loopme.gdpr.GdprChecker;
 import com.loopme.loaders.AdFetchTask;
+import com.loopme.loaders.AdFetchTaskByUrl;
+import com.loopme.loaders.AdFetcherListener;
 import com.loopme.models.Errors;
 import com.loopme.request.RequestParamsUtils;
 import com.loopme.time.Timers;
@@ -339,8 +341,8 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         mAdFetchTask.fetch();
     }
 
-    private AdFetchTask.AdFetcherListener initAdFetcherListener() {
-        return new AdFetchTask.AdFetcherListener() {
+    private AdFetcherListener initAdFetcherListener() {
+        return new AdFetcherListener() {
             @Override
             public void onAdFetchCompleted(AdParams adParams) {
                 onResponseReceived(adParams);
@@ -504,6 +506,28 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         } else {
             rebuildView(newContainerView);
         }
+    }
+
+    public void load(String url) {
+        setAdState(Constants.AdState.LOADING);
+        startTimer(TimersType.FETCHER_TIMER, null);
+        AdFetchTask adFetchTask = new AdFetchTaskByUrl(this, initAdFetcherByUrlListener(), url);
+        adFetchTask.fetch();
+    }
+
+    private AdFetcherListener initAdFetcherByUrlListener() {
+        return new AdFetcherListener() {
+            @Override
+            public void onAdFetchCompleted(AdParams adParams) {
+                onResponseReceived(adParams);
+            }
+
+            @Override
+            public void onAdFetchFailed(LoopMeError error) {
+                onResponseReceived(error);
+                stopFetchAdTask();
+            }
+        };
     }
 
     public enum Type {

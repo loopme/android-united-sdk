@@ -10,5 +10,7 @@ public interface LoopMeAdService {
     GetResponse<ResponseJsonModel> fetchAd(String url, JSONObject body);
 
     GetResponse<String> downloadResource(String url);
+
+    GetResponse<ResponseJsonModel> fetchAdByUrl(String mUrl);
 }
 
