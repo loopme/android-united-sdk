@@ -6,7 +6,6 @@ import com.loopme.tester.enums.AdSdk;
 import com.loopme.tester.enums.AdType;
 import com.loopme.tester.model.AdSpot;
 import com.loopme.tester.ui.activity.BaseActivity;
-import com.loopme.tester.ui.activity.MainActivity;
 
 /**
  * Created by katerina on 6/23/17.
@@ -20,14 +19,63 @@ public class Integration {
         }
     }
 
-    public static void insertMoatTestKeys(Activity activity) {
-        if (isInstanceOfBaseActivity(activity)) {
-            insertNativeAd(activity);
-            insertHtmlAd(activity);
-            insertNativeMpuAd(activity);
-            insertHtmlMpuAd(activity);
-            insert360Ad(activity);
-        }
+    public static void insertMoatTestKeys(BaseActivity activity) {
+        AdSpot htmlRichMedia = new AdSpot();
+        htmlRichMedia.setName(activity.getString(R.string.test_html_rich_media_interstitial));
+        htmlRichMedia.setAppKey(Constants.Keys.INTERSTITIAL_HTML_RICH_MEDIA);
+        htmlRichMedia.setTime(System.currentTimeMillis());
+        htmlRichMedia.setSdk(AdSdk.LOOPME);
+        htmlRichMedia.setType(AdType.INTERSTITIAL);
+        htmlRichMedia.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(htmlRichMedia);
+
+
+        AdSpot nativeVideo = new AdSpot();
+        nativeVideo.setName(activity.getString(R.string.app_key_name_video_full_screen));
+        nativeVideo.setAppKey(Constants.Keys.KEY_TEST_INTERSTITIAL_P);
+        nativeVideo.setTime(System.currentTimeMillis());
+        nativeVideo.setSdk(AdSdk.LOOPME);
+        nativeVideo.setType(AdType.INTERSTITIAL);
+        nativeVideo.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(nativeVideo);
+
+        AdSpot htmlVideo = new AdSpot();
+        htmlVideo.setName(activity.getString(R.string.app_key_name_html_video));
+        htmlVideo.setAppKey(Constants.Keys.INTERSTITIAL_HTML_VIDEO);
+        htmlVideo.setTime(System.currentTimeMillis());
+        htmlVideo.setSdk(AdSdk.LOOPME);
+        htmlVideo.setType(AdType.INTERSTITIAL);
+        htmlVideo.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(htmlVideo);
+
+        AdSpot imageFullScreen = new AdSpot();
+        imageFullScreen.setName(activity.getString(R.string.app_key_name_image_full_screen));
+        imageFullScreen.setAppKey(Constants.Keys.FULL_SCREEN_IMAGE);
+        imageFullScreen.setTime(System.currentTimeMillis());
+        imageFullScreen.setSdk(AdSdk.LOOPME);
+        imageFullScreen.setType(AdType.INTERSTITIAL);
+        imageFullScreen.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(imageFullScreen);
+
+        AdSpot imageBannerMPU = new AdSpot();
+        imageBannerMPU.setName(activity.getString(R.string.app_key_name_image_banner_mpu));
+        imageBannerMPU.setAppKey(Constants.Keys.BANNER_IMAGE);
+        imageBannerMPU.setTime(System.currentTimeMillis());
+        imageBannerMPU.setSdk(AdSdk.LOOPME);
+        imageBannerMPU.setType(AdType.BANNER);
+        imageBannerMPU.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(imageBannerMPU);
+
+
+        AdSpot expandableBanner = new AdSpot();
+        expandableBanner.setName(activity.getString(R.string.app_key_name_expandable_banner));
+        expandableBanner.setAppKey(Constants.Keys.BANNER_EXPANDABLE);
+        expandableBanner.setTime(System.currentTimeMillis());
+        expandableBanner.setSdk(AdSdk.LOOPME);
+        expandableBanner.setType(AdType.BANNER);
+        expandableBanner.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(expandableBanner);
+
     }
 
     public static void insertLoopMeTestKeys(Activity activity) {
@@ -166,10 +214,10 @@ public class Integration {
         ((BaseActivity) activity).insertAdSpot(nativeMpuAdSpot);
     }
 
-    private static void insertHtmlAd(Activity activity) {
+    private static void insertHtmlRichMedia(Activity activity) {
         AdSpot htmlAdSpot = new AdSpot();
-        htmlAdSpot.setName(activity.getString(R.string.test_html_interstitial));
-        htmlAdSpot.setAppKey(Constants.Keys.KEY_HTML_INTERSTITIAL);
+        htmlAdSpot.setName(activity.getString(R.string.test_html_rich_media_interstitial));
+        htmlAdSpot.setAppKey(Constants.Keys.INTERSTITIAL_HTML_RICH_MEDIA);
         htmlAdSpot.setTime(System.currentTimeMillis());
         htmlAdSpot.setSdk(AdSdk.LOOPME);
         htmlAdSpot.setType(AdType.INTERSTITIAL);
