@@ -216,6 +216,7 @@ public class MoatTracker implements Tracker {
 
     private class MoatWebTracker extends MoatBaseTracker {
         private WebAdTracker mTracker;
+        private  boolean mIsTrackingStarted;
 
         protected MoatWebTracker(LoopMeAd loopMeAd) {
             super(loopMeAd);
@@ -248,7 +249,8 @@ public class MoatTracker implements Tracker {
         }
 
         private void startTracking() {
-            if (mTracker != null) {
+            if (mTracker != null && !mIsTrackingStarted) {
+                mIsTrackingStarted = true;
                 mTracker.startTracking();
                 Logging.out(sLOG_TAG, "startTracking");
             }

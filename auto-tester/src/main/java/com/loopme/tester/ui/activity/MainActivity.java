@@ -99,7 +99,7 @@ public class MainActivity extends BaseActivity implements
             mScreenStack.push(new ScreenStackModel(SCREEN_HOME, null, ViewMode.INFO));
             fragmentTransaction.commit();
         }
-        Integration.insertIasKeys(this);
+        Integration.insertMoatTestKeys(this);
         new AppUpdateChecker(this, AppUpdateChecker.LaunchMode.START_UP).checkUpdate();
     }
 
