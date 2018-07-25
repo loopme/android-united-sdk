@@ -55,13 +55,14 @@ android {
 
 }
 dependencies {
-    implementation project(':loopme-sdk')
+//    implementation project(':loopme-sdk')
+    implementation "com.loopme:loopme-sdk:6.1.5"
     implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
     implementation "com.android.support:customtabs:$supportLibraryVersion"
     implementation "com.android.support:recyclerview-v7:$supportLibraryVersion"
     implementation "com.android.support:cardview-v7:$supportLibraryVersion"
     implementation "testfairy:testfairy-android-sdk:$testfairyVersion@aar"
-    api "com.squareup.retrofit2:converter-jackson:2.4.0"
+    api "com.squareup.retrofit2:converter-jackson:$retrofitJacksonVersion"
 
     implementation("com.mopub:mopub-sdk:$mopubVersion@aar") {
         transitive = true

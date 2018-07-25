@@ -3,4 +3,5 @@ ext{
     multidexLibraryVersion = '1.0.3'
     testfairyVersion = '1.6.4'
     mopubVersion = '4.20.0'
+    retrofitJacksonVersion = '2.4.0'
 }

@@ -312,7 +312,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
      */
     public void load() {
         if (LoopMeSdk.isGdprConsentSet(mContext)) {
-            load(IntegrationType.NORMAL);
+            load(mIntegrationType);
         } else {
             LoopMeSdk.askGdprConsent(mContext, this);
         }
