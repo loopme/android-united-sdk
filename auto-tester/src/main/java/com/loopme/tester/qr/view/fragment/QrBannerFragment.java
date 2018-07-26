@@ -1,15 +1,15 @@
-package com.loopme.tester.qr;
+package com.loopme.tester.qr.view.fragment;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.loopme.LoopMeBanner;
@@ -18,16 +18,15 @@ import com.loopme.tester.Constants;
 import com.loopme.tester.R;
 import com.loopme.tester.qr.listener.BannerListenerAdapter;
 import com.loopme.tester.qr.model.AdDescriptor;
+import com.loopme.tester.utils.Utils;
 
-public class QrBannerFragment extends Fragment {
-    private static final String ARG_AD_DESCRIPTOR = "ARG_AD_DESCRIPTOR";
-    private AdDescriptor mAdDescriptor;
+public class QrBannerFragment extends QrBaseFragment {
     private FrameLayout mBannerView;
     private LoopMeBanner mBanner;
     private Activity mActivity;
+    private View mProgressView;
 
     public static QrBannerFragment newInstance(AdDescriptor descriptor) {
-
         Bundle args = new Bundle();
         args.putParcelable(ARG_AD_DESCRIPTOR, descriptor);
         QrBannerFragment fragment = new QrBannerFragment();
@@ -41,7 +40,6 @@ public class QrBannerFragment extends Fragment {
         if (context instanceof Activity) {
             mActivity = (Activity) context;
         }
-        retrieveAdDescriptor();
     }
 
     @Nullable
@@ -53,10 +51,15 @@ public class QrBannerFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mBannerView = view.findViewById(R.id.fragment_qr_banner_view_container);
+        mProgressView = view.findViewById(R.id.fragment_qr_banner_progress_bar);
         configBannerView();
         initBanner();
-        if (mAdDescriptor != null) {
-            loadBanner(mAdDescriptor.getUrl());
+        loadBanner();
+    }
+
+    private void showProgress(boolean show) {
+        if (mProgressView != null) {
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -77,31 +80,32 @@ public class QrBannerFragment extends Fragment {
     }
 
     private void configBannerView() {
-        if (mAdDescriptor != null) {
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(mAdDescriptor.getWidth(), mAdDescriptor.getHeight());
-//            mBannerView.setLayoutParams(params);
+        if (mAdDescriptor != null && mBannerView != null) {
+            int width = Utils.convertDpToPixel(mAdDescriptor.getWidth(), mActivity);
+            int height = Utils.convertDpToPixel(mAdDescriptor.getHeight(), mActivity);
+            ViewGroup.LayoutParams layoutParams = mBannerView.getLayoutParams();
+            layoutParams.width = width;
+            layoutParams.height = height;
         }
     }
 
-    private void loadBanner(String url) {
-        if (mBanner != null) {
-            mBanner.load(url);
+    private void loadBanner() {
+        if (mBanner != null && mAdDescriptor != null) {
+            mBanner.load(mAdDescriptor.getUrl());
         }
     }
 
     @Override
     public void onDestroyView() {
         mActivity = null;
-        if (mBanner != null) {
-            mBanner.destroy();
-            mBanner = null;
-        }
+        destroyBanner();
         super.onDestroyView();
     }
 
-    private void retrieveAdDescriptor() {
-        if (getArguments() != null) {
-            mAdDescriptor = getArguments().getParcelable(ARG_AD_DESCRIPTOR);
+    private void destroyBanner() {
+        if (mBanner != null) {
+            mBanner.destroy();
+            mBanner = null;
         }
     }
 
@@ -113,9 +117,8 @@ public class QrBannerFragment extends Fragment {
             mBanner.setListener(new BannerListenerAdapter() {
                 @Override
                 public void onLoopMeBannerLoadSuccess(LoopMeBanner banner) {
-                    if (mBanner != null) {
-                        mBanner.show();
-                    }
+                    show();
+                    showProgress(false);
                 }
 
                 @Override
@@ -123,6 +126,12 @@ public class QrBannerFragment extends Fragment {
                     Toast.makeText(mActivity, error.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
+        }
+    }
+
+    private void show() {
+        if (mBanner != null) {
+            mBanner.show();
         }
     }
 }

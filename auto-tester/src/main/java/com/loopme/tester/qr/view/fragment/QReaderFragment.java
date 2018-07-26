@@ -1,4 +1,4 @@
-package com.loopme.tester.qr;
+package com.loopme.tester.qr.view.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -6,36 +6,41 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.loopme.tester.R;
+import com.loopme.tester.qr.custom.QReader;
 import com.loopme.tester.qr.model.AdDescriptor;
 import com.loopme.tester.qr.model.AdDescriptorUtils;
 
 import github.nisrulz.qreader.QRDataListener;
 
-public class QReaderFragment extends Fragment implements QRDataListener, View.OnClickListener {
+public class QReaderFragment extends QrBaseFragment implements QRDataListener, View.OnClickListener {
+    private static final String ARG_SHOW_REPLAY_VIEW = "ARG_SHOW_REPLAY_VIEW";
+    private boolean mShowReplayView;
+    private View mProgressBar;
+    private View mReplayView;
     private QReader mLoopMeQReader;
     private QReaderListener mListener;
-    private View mProgressBar;
     private final Handler HANDLER = new Handler(Looper.getMainLooper());
-    private AdDescriptor mDescriptor;
-    private View mReplayView;
 
-    public static QReaderFragment newInstance() {
-        return new QReaderFragment();
+    public static QReaderFragment newInstance(AdDescriptor descriptor, boolean showReplayView) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ARG_AD_DESCRIPTOR, descriptor);
+        bundle.putBoolean(ARG_SHOW_REPLAY_VIEW, showReplayView);
+        QReaderFragment fragment = new QReaderFragment();
+        fragment.setArguments(bundle);
+        return fragment;
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof QReaderListener) {
-            mListener = (QReaderListener) context;
+        if (getArguments() != null) {
+            mShowReplayView = getArguments().getBoolean(ARG_SHOW_REPLAY_VIEW);
         }
     }
 
@@ -47,7 +52,7 @@ public class QReaderFragment extends Fragment implements QRDataListener, View.On
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        view.findViewById(R.id.fragment_qr_controls_replay_layout).setVisibility(View.GONE);
+        view.findViewById(R.id.fragment_qr_controls_replay_layout).setVisibility(mShowReplayView ? View.VISIBLE : View.GONE);
         view.findViewById(R.id.fragment_qr_controls_replay_image_view).setOnClickListener(this);
         mReplayView = view.findViewById(R.id.fragment_qr_controls_replay_layout);
         mProgressBar = view.findViewById(R.id.fragment_qr_reader_progress_bar);
@@ -82,6 +87,8 @@ public class QReaderFragment extends Fragment implements QRDataListener, View.On
         if (mLoopMeQReader != null) {
             mLoopMeQReader.destroy();
         }
+        mLoopMeQReader = null;
+        mListener = null;
         super.onDestroyView();
     }
 
@@ -92,8 +99,8 @@ public class QReaderFragment extends Fragment implements QRDataListener, View.On
 
     private void handleContent(String content) {
         if (AdDescriptorUtils.isValid(content)) {
-            mDescriptor = AdDescriptorUtils.parseAdDescriptor(content);
-            onAdDetected(mDescriptor);
+            mAdDescriptor = AdDescriptorUtils.parseAdDescriptor(content);
+            onAdDetected(mAdDescriptor);
         } else {
             onTrashDetected(content);
         }
@@ -115,7 +122,7 @@ public class QReaderFragment extends Fragment implements QRDataListener, View.On
             @Override
             public void run() {
                 if (mListener != null) {
-                    mListener.onTrashDetected(content);
+                    mListener.onNotAdDetected(content);
                 }
             }
         });
@@ -133,7 +140,7 @@ public class QReaderFragment extends Fragment implements QRDataListener, View.On
 
     private void onReplayClicked() {
         if (mListener != null) {
-            mListener.onReplayClicked(mDescriptor.getUrl());
+            mListener.onReplayClicked(mAdDescriptor);
         }
     }
 
@@ -143,11 +150,15 @@ public class QReaderFragment extends Fragment implements QRDataListener, View.On
         }
     }
 
+    public void setListener(QReaderListener listener) {
+        mListener = listener;
+    }
+
     public interface QReaderListener {
         void onAdDetected(@NonNull AdDescriptor descriptor);
 
-        void onTrashDetected(@NonNull String content);
+        void onNotAdDetected(@NonNull String content);
 
-        void onReplayClicked(String url);
+        void onReplayClicked(AdDescriptor descriptor);
     }
 }
