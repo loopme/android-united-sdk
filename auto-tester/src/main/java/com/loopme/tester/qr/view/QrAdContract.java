@@ -1,7 +1,10 @@
 package com.loopme.tester.qr.view;
 
+import android.support.annotation.NonNull;
+
 import com.loopme.tester.qr.view.fragment.QReaderFragment;
 import com.loopme.tester.qr.model.AdDescriptor;
+import com.loopme.tester.tracker.AppEventTracker;
 
 public interface QrAdContract {
     interface View {
@@ -30,5 +33,7 @@ public interface QrAdContract {
         void destroy();
 
         void onBackPressed();
+
+        void track(@NonNull AppEventTracker.Event event, Object... args);
     }
 }

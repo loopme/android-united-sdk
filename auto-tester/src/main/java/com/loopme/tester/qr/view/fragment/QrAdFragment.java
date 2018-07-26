@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.loopme.tester.R;
 import com.loopme.tester.qr.view.QrAdContract;
 import com.loopme.tester.qr.model.AdDescriptor;
+import com.loopme.tester.tracker.AppEventTracker;
 import com.loopme.tester.utils.UiUtils;
 
 public class QrAdFragment extends Fragment implements QrAdContract.View, View.OnClickListener {
@@ -123,6 +124,12 @@ public class QrAdFragment extends Fragment implements QrAdContract.View, View.On
     private void onBackPressed() {
         if (mPresenter != null) {
             mPresenter.onBackPressed();
+        }
+    }
+
+    public void track(AppEventTracker.Event event) {
+        if (mPresenter != null) {
+            mPresenter.track(event);
         }
     }
 }

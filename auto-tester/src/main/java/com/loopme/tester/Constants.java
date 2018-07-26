@@ -14,6 +14,8 @@ public class Constants {
     public static final long AD_SPOT_DOES_NOT_EXIST_ID = -666;
     public static final String ARG_QR_AD_URL_FROM_QR = "ARG_QR_AD_URL_FROM_QR";
     public static final String MOCK_APP_KEY = "mockAppKey";
+    public static final int CONNECT_TIMEOUT = 5;
+    public static final int READ_TIMEOUT = 5;
 
     public class Keys {
         public static final String KEY_DV = "606a600593";

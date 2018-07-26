@@ -1,6 +1,7 @@
 package com.loopme.tester.testfairy;
 
 import com.loopme.tester.BuildConfig;
+import com.loopme.tester.Constants;
 import com.loopme.tester.testfairy.model.TestFairyResponse;
 
 import java.util.concurrent.TimeUnit;
@@ -13,8 +14,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class TestFairyServiceImpl {
-    private static final int CONNECT_TIMEOUT = 5;
-    private static final int READ_TIMEOUT = 6;
     private final OnUpdateListener mListener;
 
     public TestFairyServiceImpl(OnUpdateListener listener) {
@@ -57,8 +56,8 @@ public class TestFairyServiceImpl {
 
     private static Retrofit getRetrofit(String url, String login, String key) {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
-                .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
+                .connectTimeout(Constants.CONNECT_TIMEOUT, TimeUnit.SECONDS)
+                .readTimeout(Constants.READ_TIMEOUT, TimeUnit.SECONDS)
                 .addInterceptor(new AuthInterceptor(login, key))
                 .build();
         return new Retrofit

@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.loopme.LoopMeBanner;
@@ -18,6 +17,7 @@ import com.loopme.tester.Constants;
 import com.loopme.tester.R;
 import com.loopme.tester.qr.listener.BannerListenerAdapter;
 import com.loopme.tester.qr.model.AdDescriptor;
+import com.loopme.tester.tracker.AppEventTracker;
 import com.loopme.tester.utils.Utils;
 
 public class QrBannerFragment extends QrBaseFragment {
@@ -119,13 +119,22 @@ public class QrBannerFragment extends QrBaseFragment {
                 public void onLoopMeBannerLoadSuccess(LoopMeBanner banner) {
                     show();
                     showProgress(false);
+                    track(AppEventTracker.Event.QR_SUCCESS);
                 }
 
                 @Override
                 public void onLoopMeBannerLoadFail(LoopMeBanner banner, LoopMeError error) {
                     Toast.makeText(mActivity, error.getMessage(), Toast.LENGTH_SHORT).show();
+                    track(AppEventTracker.Event.QR_FAIL);
                 }
             });
+        }
+    }
+
+    private void track(AppEventTracker.Event event) {
+        if (getParentFragment() instanceof QrAdFragment) {
+            QrAdFragment qrAdFragment = (QrAdFragment) getParentFragment();
+            qrAdFragment.track(event);
         }
     }
 

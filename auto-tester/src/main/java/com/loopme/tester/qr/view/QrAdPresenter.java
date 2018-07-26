@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import com.loopme.tester.qr.custom.InterstitialController;
 import com.loopme.tester.qr.model.AdDescriptor;
+import com.loopme.tester.tracker.AppEventTracker;
 
 public class QrAdPresenter implements QrAdContract.Presenter, InterstitialController.Listener {
     private boolean mShowReplayView;
@@ -27,6 +28,7 @@ public class QrAdPresenter implements QrAdContract.Presenter, InterstitialContro
         if (!mIsViewCreated) {
             mIsViewCreated = true;
             addQReaderFragment();
+            track(AppEventTracker.Event.QR_SCANNER_LAUNCHED);
         }
     }
 
@@ -67,6 +69,11 @@ public class QrAdPresenter implements QrAdContract.Presenter, InterstitialContro
         } else {
             finish();
         }
+    }
+
+    @Override
+    public void track(@NonNull AppEventTracker.Event event, Object... args) {
+        AppEventTracker.getInstance().track(event, args);
     }
 
     private void finish() {

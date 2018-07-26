@@ -80,6 +80,16 @@ public class BaseActivity extends AppCompatActivity implements Observer {
         }
     }
 
+    public void setSetFirstLaunchDone() {
+        if (mPrefs != null) {
+            mPrefs.setSetFirstLaunchDone();
+        }
+    }
+
+    public boolean isFirstLaunch() {
+        return mPrefs != null && mPrefs.isFirstLaunch();
+    }
+
     public boolean getAutoLoadingState() {
         return mPrefs != null && mPrefs.getAutoLoadingState();
     }
