@@ -130,6 +130,10 @@
     <string name="qr_controls_title">Scan QR Code</string>
     <string name="ad_url_example">Ad Url</string>
     <string name="qr_watch_again_text">Watch again.</string>
+    <string name="appkey_name_html_ad">HTML Ad</string>
+    <string name="appkey_name_image_ad">Image Ad</string>
+    <string name="appkey_name_vpaid_ad">VPAID Ad</string>
+    <string name="appkey_name_expandable_ad">Expandable</string>
     <string-array name="ad_types">
         <item>ALL</item>
         <item>HTML</item>

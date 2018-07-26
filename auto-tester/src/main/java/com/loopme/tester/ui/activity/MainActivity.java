@@ -86,12 +86,6 @@ public class MainActivity extends BaseActivity implements
         setContentView(R.layout.activity_main);
         TestFairy.begin(this, BuildConfig.TESTFAIRY_APP_TOKEN);
 
-        //integration
-//        Integration.insertDvTestKeys(this);
-//        Integration.insertMoatTestKeys(this);
-//        Integration.insertLoopMeTestKeys(this);
-//        Integration.insertUserKeys(this);
-
         mFileLoaderManager = new FileLoaderManager(this, this);
         if (savedInstanceState == null) {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -99,7 +93,9 @@ public class MainActivity extends BaseActivity implements
             mScreenStack.push(new ScreenStackModel(SCREEN_HOME, null, ViewMode.INFO));
             fragmentTransaction.commit();
         }
-        Integration.insertIasKeys(this);
+//        Integration.insertIasKeys(this);
+        Integration.insertDefaultKeys(this);
+
         new AppUpdateChecker(this, AppUpdateChecker.LaunchMode.START_UP).checkUpdate();
     }
 

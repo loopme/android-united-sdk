@@ -382,7 +382,18 @@ public class ManualView implements View.OnClickListener, AdListener, AdapterView
         return new AdLoopMeInterstitial(mActivity, mAdSpot.getAppKey(), this, mIsAutoLoadingEnabled);
     }
 
+    private void setIfExpandableBannerSize(AdSpot mAdSpot) {
+        if (mAdSpot != null && mAdSpot.getType() == AdType.BANNER && mAdSpot.getName().toLowerCase().contains("expand")) {
+            if (mBanner != null) {
+                ViewGroup.LayoutParams layoutParams = mBanner.getLayoutParams();
+                layoutParams.width = Utils.convertDpToPixel(320, mActivity);
+                layoutParams.height = Utils.convertDpToPixel(50, mActivity);
+            }
+        }
+    }
+
     private Ad initializeLoopmeBanner() {
+        setIfExpandableBannerSize(mAdSpot);
         FrameLayout banner = (FrameLayout) mRootView.findViewById(R.id.loopme_banner);
         return new AdLoopMeBanner(mActivity, mAdSpot.getAppKey(), banner, this, mIsAutoLoadingEnabled);
     }

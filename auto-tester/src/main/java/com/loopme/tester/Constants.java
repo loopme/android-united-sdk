@@ -40,5 +40,10 @@ public class Constants {
         public static final String KEY_IMG_INTER = "74e0b90345";
         public static final String KEY_IMG_BANNER = "3ba34e8f85";
 
+        public static final String KEY_HTML_AD_DEFAULT = "1c62e7c5de";
+        public static final String KEY_IMAGE_AD_DEFAULT = "451f1dcd27";
+        public static final String KEY_VPAID_AD_DEFAULT = "679db2d728";
+        public static final String KEY_EXPANDABLE_BANNER_AD_DEFAULT = "92f70490fa";
+        public static final String KEY_VIDEO_360_AD_DEFAULT = "1f75aebbb8";
     }
 }
