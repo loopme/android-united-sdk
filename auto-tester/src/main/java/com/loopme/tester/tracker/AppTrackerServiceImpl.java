@@ -21,8 +21,8 @@ public class AppTrackerServiceImpl implements Callback<String> {
         mService = getRetrofit(com.loopme.Constants.BASE_EVENT_URL).create(AppTrackerService.class);
     }
 
-    public void trackEvent(String id, String eventName) {
-        mService.trackEvent(id, eventName).enqueue(this);
+    public void trackEvent(String eventName) {
+        mService.trackEvent(eventName).enqueue(this);
     }
 
     private static Retrofit getRetrofit(String url) {

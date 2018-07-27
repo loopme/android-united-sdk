@@ -102,7 +102,7 @@ public class MainActivity extends BaseActivity implements
     }
 
     private void trackFirstLaunch() {
-        AppEventTracker.getInstance().track(AppEventTracker.Event.FIRST_LAUNCH, isFirstLaunch());
+        AppEventTracker.getInstance().trackFirstLaunch(isFirstLaunch());
         setSetFirstLaunchDone();
     }
 

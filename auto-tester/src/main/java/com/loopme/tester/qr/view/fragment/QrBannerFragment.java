@@ -124,6 +124,7 @@ public class QrBannerFragment extends QrBaseFragment {
 
                 @Override
                 public void onLoopMeBannerLoadFail(LoopMeBanner banner, LoopMeError error) {
+                    showProgress(false);
                     Toast.makeText(mActivity, error.getMessage(), Toast.LENGTH_SHORT).show();
                     track(AppEventTracker.Event.QR_FAIL);
                 }

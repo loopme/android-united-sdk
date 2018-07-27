@@ -72,8 +72,8 @@ public class QrAdPresenter implements QrAdContract.Presenter, InterstitialContro
     }
 
     @Override
-    public void track(@NonNull AppEventTracker.Event event, Object... args) {
-        AppEventTracker.getInstance().track(event, args);
+    public void track(@NonNull AppEventTracker.Event event) {
+        AppEventTracker.getInstance().track(event);
     }
 
     private void finish() {

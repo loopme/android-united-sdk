@@ -34,6 +34,6 @@ public interface QrAdContract {
 
         void onBackPressed();
 
-        void track(@NonNull AppEventTracker.Event event, Object... args);
+        void track(@NonNull AppEventTracker.Event event);
     }
 }

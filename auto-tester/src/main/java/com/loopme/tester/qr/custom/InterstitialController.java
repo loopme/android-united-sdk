@@ -107,6 +107,6 @@ public class InterstitialController {
 
         void onAdLoading();
 
-        void track(@NonNull AppEventTracker.Event event, Object... args);
+        void track(@NonNull AppEventTracker.Event event);
     }
 }
