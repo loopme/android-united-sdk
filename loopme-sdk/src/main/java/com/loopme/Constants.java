@@ -80,7 +80,7 @@ public class Constants {
     public static final long FETCH_TIMEOUT = 1000 * 60;//1 minute
     public static long CACHED_VIDEO_LIFE_TIME = 1000 * 60 * 60 * 32;//32 hours
     public static final long GDPR_PAGE_READY_TIMEOUT = 1000;
-    public static boolean USE_MOBILE_NETWORK_FOR_CACHING = false;
+    public static boolean USE_MOBILE_NETWORK_FOR_CACHING = true;
     public static String sCacheDirectory = "";
     public static final String EXTRAS_ALLOW_ORIENTATION_CHANGE = "allowOrientationChange";
     public static final String EXTRAS_FORCE_ORIENTATION = "forceOrientation";
