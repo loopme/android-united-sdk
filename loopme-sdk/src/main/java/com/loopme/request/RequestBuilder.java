@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.loopme.AdTargetingData;
 import com.loopme.ad.LoopMeAd;
+import com.loopme.debugging.LiveDebug;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -83,6 +84,8 @@ public class RequestBuilder implements Serializable {
     private static final String YOB = "yob";
     private static final String KEYWORDS = "keywords";
     private static final String CONSENT = "consent";
+    private static final String OUTPUT = "audio_output";
+    private static final String MUSIC = "music";
 
     public static JSONObject buildRequestJson(Context context, LoopMeAd loopMeAd) {
         RequestUtils requestUtils = new RequestUtils(context, loopMeAd);
@@ -114,6 +117,7 @@ public class RequestBuilder implements Serializable {
             deviceObj.put(DNT, requestUtils.getDnt());
             deviceObj.put(MODEL, requestUtils.getModel());
 
+
             JSONObject extObj = new JSONObject();
             extObj.put(TIMEZONE, requestUtils.getTimeZone());
             extObj.put(PHONE_NAME, requestUtils.getPhoneName());
@@ -121,7 +125,7 @@ public class RequestBuilder implements Serializable {
             extObj.put(ORIENTATION, requestUtils.getOrientation());
             extObj.put(CHARGE_LEVEL, requestUtils.getChargeLevel(context));
             extObj.put(PLUGIN, requestUtils.getPlugin());
-
+            addDebugInfo(extObj, requestUtils, context);
             deviceObj.put(EXT, extObj);
             requestObj.put(DEVICE, deviceObj);
             requestObj.put(TMAX, requestUtils.getTmax());
@@ -179,6 +183,15 @@ public class RequestBuilder implements Serializable {
             ex.printStackTrace();
         }
         return requestObj;
+    }
+
+    private static void addDebugInfo(JSONObject extObj, RequestUtils requestUtils, Context context) throws JSONException {
+        if (LiveDebug.isDebugOn() && requestUtils != null && context != null) {
+            if (requestUtils.isAnyAudioOutput(context)) {
+                extObj.put(OUTPUT, requestUtils.getAudioOutputJson(context));
+            }
+            extObj.put(MUSIC, requestUtils.getMusic(context));
+        }
     }
 
     private static JSONObject createRegsObj(RequestUtils requestUtils, Context context) throws JSONException {
