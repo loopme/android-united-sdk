@@ -304,4 +304,50 @@ public class Integration {
         activity.insertAdSpot(imageBanner);
     }
 
+    public static void insertDefaultKeys(MainActivity activity) {
+        AdSpot htmlAd = new AdSpot();
+        htmlAd.setName(activity.getString(R.string.appkey_name_html_ad));
+        htmlAd.setAppKey(Constants.Keys.KEY_HTML_AD_DEFAULT);
+        htmlAd.setTime(System.currentTimeMillis());
+        htmlAd.setSdk(AdSdk.LOOPME);
+        htmlAd.setType(AdType.INTERSTITIAL);
+        htmlAd.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(htmlAd);
+
+        AdSpot imageAd = new AdSpot();
+        imageAd.setName(activity.getString(R.string.appkey_name_image_ad));
+        imageAd.setAppKey(Constants.Keys.KEY_IMAGE_AD_DEFAULT);
+        imageAd.setTime(System.currentTimeMillis());
+        imageAd.setSdk(AdSdk.LOOPME);
+        imageAd.setType(AdType.INTERSTITIAL);
+        imageAd.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(imageAd);
+
+        AdSpot vpaidAd = new AdSpot();
+        vpaidAd.setName(activity.getString(R.string.appkey_name_vpaid_ad));
+        vpaidAd.setAppKey(Constants.Keys.KEY_VPAID_AD_DEFAULT);
+        vpaidAd.setTime(System.currentTimeMillis());
+        vpaidAd.setSdk(AdSdk.LOOPME);
+        vpaidAd.setType(AdType.INTERSTITIAL);
+        vpaidAd.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(vpaidAd);
+
+        AdSpot expandableBanner = new AdSpot();
+        expandableBanner.setName(activity.getString(R.string.appkey_name_expandable_ad));
+        expandableBanner.setAppKey(Constants.Keys.KEY_EXPANDABLE_BANNER_AD_DEFAULT);
+        expandableBanner.setTime(System.currentTimeMillis());
+        expandableBanner.setSdk(AdSdk.LOOPME);
+        expandableBanner.setType(AdType.BANNER);
+        expandableBanner.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(expandableBanner);
+
+        AdSpot video360 = new AdSpot();
+        video360.setName("Video 360");
+        video360.setAppKey(Constants.Keys.KEY_VIDEO_360_AD_DEFAULT);
+        video360.setTime(System.currentTimeMillis());
+        video360.setSdk(AdSdk.LOOPME);
+        video360.setType(AdType.INTERSTITIAL);
+        video360.setBaseUrl(AdSpot.BASE_URL_DEFAULT_VALUE);
+        activity.insertAdSpot(video360);
+    }
 }

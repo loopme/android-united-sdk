@@ -100,7 +100,7 @@
     <string name="test_interstitial_360">Test Interstitial 360</string>
     <string name="test_html_mpu">HTML MPU</string>
     <string name="test_native_mpu">Native MPU</string>
-    <string name="test_html_rich_media_interstitial">HTML Rich Media</string>
+    <string name="test_html_interstitial">HTML interstitial</string>
     <string name="test_native_interstital">Native interstitial</string>
     <string name="test_dv_vast">DV test vast</string>
     <string name="vpaid_video">VPaid video</string>
@@ -127,14 +127,13 @@
     <string name="update_dialog_close_button">Close</string>
     <string name="update_dialog_no_updates_messege">No updates available.</string>
     <string name="update_dialog_ok_button">OK</string>
-    <string name="fragment_qr_controls_title">Scan QR Code</string>
+    <string name="qr_controls_title">Scan QR Code</string>
     <string name="ad_url_example">Ad Url</string>
     <string name="qr_watch_again_text">Watch again.</string>
-    <string name="app_key_name_video_full_screen">Video FullScreen</string>
-    <string name="app_key_name_html_video">HTML Video</string>
-    <string name="app_key_name_image_full_screen">Image FullScreen</string>
-    <string name="app_key_name_image_banner_mpu">Image 300x250</string>
-    <string name="app_key_name_expandable_banner">Expandable 320x50</string>
+    <string name="appkey_name_html_ad">HTML Ad</string>
+    <string name="appkey_name_image_ad">Image Ad</string>
+    <string name="appkey_name_vpaid_ad">VPAID Ad</string>
+    <string name="appkey_name_expandable_ad">Expandable</string>
     <string-array name="ad_types">
         <item>ALL</item>
         <item>HTML</item>

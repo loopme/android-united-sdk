@@ -14,6 +14,7 @@ import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.loopme.tester.tracker.AppEventTracker;
 import com.loopme.tester.AppUpdateChecker;
 import com.loopme.tester.BuildConfig;
 import com.loopme.tester.Constants;
@@ -85,12 +86,7 @@ public class MainActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         TestFairy.begin(this, BuildConfig.TESTFAIRY_APP_TOKEN);
-
-        //integration
-//        Integration.insertDvTestKeys(this);
-//        Integration.insertMoatTestKeys(this);
-//        Integration.insertLoopMeTestKeys(this);
-//        Integration.insertUserKeys(this);
+        trackFirstLaunch();
 
         mFileLoaderManager = new FileLoaderManager(this, this);
         if (savedInstanceState == null) {
@@ -99,8 +95,15 @@ public class MainActivity extends BaseActivity implements
             mScreenStack.push(new ScreenStackModel(SCREEN_HOME, null, ViewMode.INFO));
             fragmentTransaction.commit();
         }
-        Integration.insertMoatTestKeys(this);
+//        Integration.insertIasKeys(this);
+        Integration.insertDefaultKeys(this);
+
         new AppUpdateChecker(this, AppUpdateChecker.LaunchMode.START_UP).checkUpdate();
+    }
+
+    private void trackFirstLaunch() {
+        AppEventTracker.getInstance().trackFirstLaunch(isFirstLaunch());
+        setSetFirstLaunchDone();
     }
 
     @Override

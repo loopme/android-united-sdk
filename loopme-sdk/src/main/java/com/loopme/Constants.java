@@ -62,7 +62,7 @@ public class Constants {
     public static final String MRAID_NEED_CLOSE_BUTTON = "com.loopme.MRAID_NEED_CLOSE_BUTTON";
     public static final String PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=";
     public static final String ERROR_URL = HTTPS_SCHEME + "://track.loopme.me/api/errors";
-    public static final String TRACK_FEEDBACK_URL = "https://tk0x1.com/api/v2/events";
+    public static final String BASE_EVENT_URL = "https://tk0x1.com/api/v2/events/";
 
     public static final String TYPE_VPAID = "VPAID";
     public static final String TYPE_VAST = "VAST";

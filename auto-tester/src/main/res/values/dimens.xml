@@ -170,8 +170,8 @@
     <dimen name="fragment_qr_replay_width">90dp</dimen>
     <dimen name="fragment_qr_replay_height">90dp</dimen>
     <dimen name="fragment_qr_replay_padding">15dp</dimen>
-    <dimen name="fragment_qr_controls_close_button_width">50dp</dimen>
-    <dimen name="fragment_qr_controls_close_button_height">50dp</dimen>
+    <dimen name="qr_controls_close_button_width">50dp</dimen>
+    <dimen name="qr_controls_close_button_height">50dp</dimen>
     <dimen name="fragment_qr_controls_close_button_padding">10dp</dimen>
     <dimen name="fragment_qr_controls_replay_image_view_width">50dp</dimen>
     <dimen name="fragment_qr_controls_replay_image_view_height">50dp</dimen>
@@ -181,5 +181,7 @@
     <dimen name="touch_size_height">40dp</dimen>
     <dimen name="action_bar_qr_ad_width">50dp</dimen>
     <dimen name="action_bar_qr_ad_padding">12dp</dimen>
+    <dimen name="fragment_qr_banner_view_container_width">320dp</dimen>
+    <dimen name="fragment_qr_banner_view_container_height">50dp</dimen>
 
 </resources>

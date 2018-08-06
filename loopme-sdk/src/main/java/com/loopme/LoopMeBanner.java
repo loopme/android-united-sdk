@@ -293,6 +293,12 @@ public class LoopMeBanner extends AdWrapper {
         return mFirstLoopMeAd != null && mFirstLoopMeAd.isFullScreen();
     }
 
+    public void load(String url) {
+        if (mFirstLoopMeAd != null) {
+            mFirstLoopMeAd.load(url);
+        }
+    }
+
     public interface Listener {
 
         void onLoopMeBannerLoadSuccess(LoopMeBanner banner);

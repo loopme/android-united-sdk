@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentTop="true"
+    android:background="@color/black_transparent">
+
+    <ImageView
+        android:id="@+id/qr_controls_close_button"
+        android:layout_width="@dimen/qr_controls_close_button_width"
+        android:layout_height="@dimen/qr_controls_close_button_height"
+        android:padding="@dimen/fragment_qr_controls_close_button_padding"
+        android:src="@drawable/icon_back" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/qr_controls_title"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_18sp" />
+</RelativeLayout>

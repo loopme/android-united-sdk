@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
@@ -24,6 +27,8 @@ public class UiUtils {
     private static final float VELOCITY_THRESHOLD = 2400;
     private static final float DISTANCE_THRESHOLD = 0.25f;
     private static final float EDGE_SIZE = 0.3f;
+    private static final Handler HANDLER = new Handler();
+    private static final long TIME_DELAY = 50;
 
     public static int getSpecificFileImageResource(int fileType) {
         switch (fileType) {
@@ -97,5 +102,28 @@ public class UiUtils {
         Point size = new Point();
         display.getSize(size);
         return size.y;
+    }
+
+    public static void replaceFragmentDelayed(final FragmentManager fragmentManager, final int containerId, final Fragment fragment) {
+        if (fragmentManager != null) {
+            HANDLER.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    fragmentManager
+                            .beginTransaction()
+                            .replace(containerId, fragment)
+                            .commit();
+                }
+            }, TIME_DELAY);
+        }
+    }
+
+    public static void addFragment(FragmentManager fragmentManager, int containerId, Fragment fragment) {
+        if (fragmentManager != null) {
+            fragmentManager
+                    .beginTransaction()
+                    .add(containerId, fragment)
+                    .commit();
+        }
     }
 }
