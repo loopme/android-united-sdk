@@ -12,7 +12,8 @@ public enum IntegrationType {
     UNITY(4, "unity"),
     ADOBE_AIR(5, "adobe_air"),
     CORONA(6, "corona"),
-    ADMOST(7, "admost");
+    ADMOST(7, "admost"),
+    AMR(8, "amr");
 
     private int mId;
     private String mType;

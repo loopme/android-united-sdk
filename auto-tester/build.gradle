@@ -55,8 +55,8 @@ android {
 
 }
 dependencies {
-//    implementation project(':loopme-sdk')
-    implementation "com.loopme:loopme-sdk:6.1.5"
+//    implementation "com.loopme:loopme-sdk:6.1.5"
+    implementation project(':loopme-sdk')
     implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
     implementation "com.android.support:customtabs:$supportLibraryVersion"
     implementation "com.android.support:recyclerview-v7:$supportLibraryVersion"

@@ -30,8 +30,8 @@ public class LoopMeAdMobBridge implements CustomEventInterstitial {
 
         mListener = customEventInterstitialListener;
 
-        if (context != null && context instanceof Activity){
-            mInterstitial = LoopMeInterstitial.getInstance(s, (Activity)context);
+        if (context != null && context instanceof Activity) {
+            mInterstitial = LoopMeInterstitial.getInstance(s, (Activity) context);
             mInterstitial.setListener(mLoopMeListener);
             mInterstitial.load(IntegrationType.ADMOB);
         } else {
