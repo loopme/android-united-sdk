@@ -22,7 +22,7 @@ public abstract class AdConfig implements AdTargeting {
 
     /**
      * Defines, should use mobile network for caching video or not.
-     * By default, video will not cache on mobile network (only on wi-fi)
+     * By default, video will be cached on mobile network
      *
      * @param b - true if need to cache video on mobile network,
      *          false if need to cache video only on wi-fi network.

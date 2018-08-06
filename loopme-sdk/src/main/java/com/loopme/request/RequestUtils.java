@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.media.AudioManager;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -19,10 +20,12 @@ import com.loopme.ad.LoopMeAd;
 import com.loopme.gdpr.ConsentType;
 import com.loopme.utils.StringUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -45,6 +48,8 @@ public class RequestUtils {
     private static final String VPAID2 = "VPAID2";
     private static final String MRAID2 = "MRAID2";
     private static final String V360 = "V360";
+    private static final String BLUETOOTH = "bluetooth";
+    private static final String HEADPHONES = "headphones";
     private static final int[] EXPANDABLE_DIRECTION_FULLSCREEN = new int[]{5};
     private int[] mBattr;
     private String mAppBundle;
@@ -540,5 +545,40 @@ public class RequestUtils {
 
     public boolean isSubjectToGdprPresent(Context context) {
         return Preferences.getInstance(context).isSubjectToGdprPresent();
+    }
+
+    public int getMusic(Context context) {
+        AudioManager manager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        return manager != null && manager.isMusicActive() ? 1 : 0;
+    }
+
+    private List<String> getAudioOutput(Context context) {
+        AudioManager manager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        List<String> outputs = new ArrayList<>();
+        if (manager != null) {
+            boolean wiredHeadsetOn = manager.isWiredHeadsetOn();
+            if (wiredHeadsetOn) {
+                outputs.add(HEADPHONES);
+            }
+            boolean bluetoothA2dpOn = manager.isBluetoothA2dpOn();
+            if (bluetoothA2dpOn) {
+                outputs.add(BLUETOOTH);
+            }
+        }
+        return outputs;
+    }
+
+    public JSONArray getAudioOutputJson(Context context) {
+        JSONArray array = new JSONArray();
+        List<String> activeOutput = getAudioOutput(context);
+        for (String output : activeOutput) {
+            array.put(output);
+        }
+        return array;
+    }
+
+    public boolean isAnyAudioOutput(Context context) {
+        List<String> activeOutput = getAudioOutput(context);
+        return !activeOutput.isEmpty();
     }
 }
