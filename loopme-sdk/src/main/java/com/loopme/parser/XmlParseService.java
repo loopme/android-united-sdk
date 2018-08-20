@@ -99,6 +99,9 @@ public class XmlParseService {
     }
 
     private static AdParams createAdParams(Vast vast) {
+        if (vast == null || vast.getAd() == null) {
+            throw new IllegalArgumentException("Vast or vast.getAd() shouldn't be null");
+        }
         InLine inLine = vast.getAd().getInLine();
         Linear linear = getParamLinear(inLine);
 
