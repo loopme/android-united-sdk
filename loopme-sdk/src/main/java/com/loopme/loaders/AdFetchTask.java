@@ -31,7 +31,7 @@ import java.util.concurrent.Future;
 
 public class AdFetchTask implements Runnable, Observer {
 
-    private static final String LOG_TAG = AdFetchTask.class.getSimpleName();
+    protected static final String LOG_TAG = AdFetchTask.class.getSimpleName();
     private static final int RESPONSE_NO_ADS = 204;
 
     private AdType mAdType;
@@ -103,7 +103,7 @@ public class AdFetchTask implements Runnable, Observer {
         }
     }
 
-    private void handelBadResponse(String message) {
+    protected void handelBadResponse(String message) {
         if (!TextUtils.isEmpty(message) && message.contains(UNEXPECTED)) {
             onErrorResult(Errors.SYNTAX_ERROR_IN_RESPONSE);
         } else {
@@ -111,7 +111,7 @@ public class AdFetchTask implements Runnable, Observer {
         }
     }
 
-    private void parseResponse(GetResponse<ResponseJsonModel> response) {
+    protected void parseResponse(GetResponse<ResponseJsonModel> response) {
         if (response.isSuccessful()) {
             handleResponse(response.getBody());
         } else {
@@ -270,12 +270,5 @@ public class AdFetchTask implements Runnable, Observer {
                 }
             }
         });
-    }
-
-
-    public interface AdFetcherListener {
-        void onAdFetchCompleted(AdParams adParams);
-
-        void onAdFetchFailed(LoopMeError error);
     }
 }

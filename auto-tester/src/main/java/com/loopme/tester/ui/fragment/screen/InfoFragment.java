@@ -20,7 +20,6 @@ import com.loopme.tester.AppUpdateChecker;
 import com.loopme.tester.R;
 import com.loopme.tester.ui.activity.BaseActivity;
 import com.loopme.tester.ui.fragment.BaseFragment;
-import com.loopme.tester.utils.Utils;
 import com.loopme.utils.FileUtils;
 import com.mopub.common.MoPub;
 

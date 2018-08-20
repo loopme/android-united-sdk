@@ -21,7 +21,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 4
-        versionName "3.2"
+        versionName "3.3"
         multiDexEnabled true
         buildConfigField "String", "TESTFAIRY_APP_TOKEN", TESTFAIRY_TOKEN
         buildConfigField "String", "TESTFAIRY_API_URL", TESTFAIRY_API_URL
@@ -55,8 +55,8 @@ android {
 
 }
 dependencies {
-//    implementation project(':loopme-sdk')
-    implementation "com.loopme:loopme-sdk:6.1.5"
+//    implementation "com.loopme:loopme-sdk:6.1.5"
+    implementation project(':loopme-sdk')
     implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
     implementation "com.android.support:customtabs:$supportLibraryVersion"
     implementation "com.android.support:recyclerview-v7:$supportLibraryVersion"
@@ -71,4 +71,7 @@ dependencies {
     }
     implementation "com.android.support:design:$supportLibraryVersion"
     implementation "com.android.support:multidex:$multidexLibraryVersion"
+    implementation('com.github.nisrulz:qreader:2.1.1', { exclude group: 'com.google.android.gms' })
+    implementation "com.google.android.gms:play-services-vision:15.0.2"
+    implementation 'com.r0adkll:slidableactivity:2.0.6'
 }

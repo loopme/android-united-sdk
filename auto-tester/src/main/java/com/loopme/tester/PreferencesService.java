@@ -12,6 +12,7 @@ public class PreferencesService {
 
     private final Context mContext;
     private final SharedPreferences mPrefs;
+    private static final String ARG_FIRST_LAUNCH = "COM_LOOPME_TESTER_APP_INSTALLED";
 
     public PreferencesService(Context context) {
         mContext = context;
@@ -36,5 +37,15 @@ public class PreferencesService {
 
     public InfoFragment.GdprIntegrationCase getGdprIntegrationCase() {
         return InfoFragment.GdprIntegrationCase.valueOf(mPrefs.getString(GDPR_INTEGRATION_CASE, InfoFragment.GdprIntegrationCase.IGNORE.name()));
+    }
+
+    public boolean isFirstLaunch() {
+        return mPrefs.getBoolean(ARG_FIRST_LAUNCH, true);
+    }
+
+    public void setSetFirstLaunchDone() {
+        if (isFirstLaunch()) {
+            mPrefs.edit().putBoolean(ARG_FIRST_LAUNCH, false).apply();
+        }
     }
 }

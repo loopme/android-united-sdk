@@ -13,7 +13,6 @@ ext {
     playServicesVersion = '15.0.1'
     constraintLayout = '1.0.2'
     okHttpVersion = '3.10.0'
-    retrofitVersion = '2.4.0'
     moatVersion = '2.1.0'
     gsonVersion = '2.8.2'
 }

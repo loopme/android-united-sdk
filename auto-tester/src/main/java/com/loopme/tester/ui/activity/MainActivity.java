@@ -1,10 +1,12 @@
 package com.loopme.tester.ui.activity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
@@ -12,11 +14,12 @@ import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.loopme.tester.BuildConfig;
-import com.loopme.tester.Integration;
-import com.loopme.tester.Constants;
-import com.loopme.tester.R;
+import com.loopme.tester.tracker.AppEventTracker;
 import com.loopme.tester.AppUpdateChecker;
+import com.loopme.tester.BuildConfig;
+import com.loopme.tester.Constants;
+import com.loopme.tester.Integration;
+import com.loopme.tester.R;
 import com.loopme.tester.db.contracts.AdContract;
 import com.loopme.tester.enums.LoadType;
 import com.loopme.tester.enums.ViewMode;
@@ -25,6 +28,7 @@ import com.loopme.tester.loaders.FileLoaderManager;
 import com.loopme.tester.model.AdSpot;
 import com.loopme.tester.model.Response;
 import com.loopme.tester.model.ScreenStackModel;
+import com.loopme.tester.qr.QRAdActivity;
 import com.loopme.tester.ui.dialog.CreateFolderDialogFragment;
 import com.loopme.tester.ui.fragment.ActionBarFragment;
 import com.loopme.tester.ui.fragment.ActiveSearchFragment;
@@ -75,18 +79,14 @@ public class MainActivity extends BaseActivity implements
     private FileLoaderManager mFileLoaderManager;
     private boolean mIsNeedExport;
     private File mExportedFile;
+    private static final int QR_ACTIVITY_REQUEST_CODE = 777;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         TestFairy.begin(this, BuildConfig.TESTFAIRY_APP_TOKEN);
-
-        //integration
-//        Integration.insertDvTestKeys(this);
-//        Integration.insertMoatTestKeys(this);
-//        Integration.insertLoopMeTestKeys(this);
-//        Integration.insertUserKeys(this);
+        trackFirstLaunch();
 
         mFileLoaderManager = new FileLoaderManager(this, this);
         if (savedInstanceState == null) {
@@ -95,8 +95,15 @@ public class MainActivity extends BaseActivity implements
             mScreenStack.push(new ScreenStackModel(SCREEN_HOME, null, ViewMode.INFO));
             fragmentTransaction.commit();
         }
-        Integration.insertIasKeys(this);
+//        Integration.insertIasKeys(this);
+        Integration.insertDefaultKeys(this);
+
         new AppUpdateChecker(this, AppUpdateChecker.LaunchMode.START_UP).checkUpdate();
+    }
+
+    private void trackFirstLaunch() {
+        AppEventTracker.getInstance().trackFirstLaunch(isFirstLaunch());
+        setSetFirstLaunchDone();
     }
 
     @Override
@@ -431,8 +438,15 @@ public class MainActivity extends BaseActivity implements
             } else {
                 Toast.makeText(this, R.string.to_see_log_change_permission, Toast.LENGTH_LONG).show();
             }
+        } else if (requestCode == PERMISSION_CAMERA_CODE) {
+            if (checkCameraPermission()) {
+                runQrAdActivity();
+            } else {
+                Snackbar.make(findViewById(R.id.main_layout_root), "To use this feature need camera permission", Snackbar.LENGTH_LONG).show();
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override
@@ -510,5 +524,19 @@ public class MainActivity extends BaseActivity implements
                 }
             }
         });
+    }
+
+    @Override
+    public void reedQrCode() {
+        if (checkCameraPermission()) {
+            runQrAdActivity();
+        } else {
+            askCameraPermission();
+        }
+    }
+
+    private void runQrAdActivity() {
+        Intent intent = new Intent(this, QRAdActivity.class);
+        startActivityForResult(intent, MainActivity.QR_ACTIVITY_REQUEST_CODE);
     }
 }

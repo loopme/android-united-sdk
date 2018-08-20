@@ -282,11 +282,9 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
 
     private void resumeInterstitial() {
         resumeMraid();
-        if (isInterstitial()) {
-            resumeViewController();
-            resumeVideoController();
-            setWebViewState(Constants.WebviewState.VISIBLE);
-        }
+        resumeViewController();
+        resumeVideoController();
+        setWebViewState(Constants.WebviewState.VISIBLE);
     }
 
     private void pauseControllers() {
@@ -441,12 +439,18 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
                 public void onResult(MoatViewAbilityUtils.ViewAbilityInfo info) {
                     if (info.isVisibleMore50Percents()) {
                         setWebViewState(Constants.WebviewState.VISIBLE);
+                        dispatchEvent();
                     } else {
                         setWebViewState(Constants.WebviewState.HIDDEN);
                     }
                 }
             });
         }
+    }
+
+    private void dispatchEvent() {
+        onNewActivity(mLoopMeAd.getContext());
+        onStartWebMeasuringDelayed();
     }
 
     @Override

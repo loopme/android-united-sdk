@@ -99,7 +99,7 @@ public class LoopMeTracker {
     }
 
     private static String buildSdkFeedBackUrl(String token) {
-        String url = Constants.TRACK_FEEDBACK_URL + "?";
+        String url = Constants.BASE_EVENT_URL + "?";
         Map<String, String> requestParams = new HashMap<>();
         requestParams.put(Params.EVENT_TYPE, Params.SDK_FEEDBACK);
         requestParams.put(Params.R, "1");
