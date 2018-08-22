@@ -1,3 +1,8 @@
+## Version 6.1.6 (22 of August, 2018)
+- Deliver ads via cellular connection as well as via Wi-Fi.
+- Additional debug events
+- Fixed bug with version naming
+
 ## Version 6.1.5 (17 of July, 2018)
 - Retrofit is removed
 - GDPR Consent with presented CMP SDK compatibility

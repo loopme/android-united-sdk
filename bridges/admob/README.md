@@ -32,7 +32,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.loopme:loopme-sdk:6.1.5@aar'
+    compile 'com.loopme:loopme-sdk:6.1.6@aar'
 }
 ```
 

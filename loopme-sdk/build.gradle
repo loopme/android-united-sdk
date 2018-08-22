@@ -109,10 +109,10 @@ task clearJar(type: Delete) {
 }
 
 task makeJar(type: Copy) {
-    from('build/intermediates/classes/release/')
+    from('build/intermediate-jars/classes/release/')
     into('build/outputs/')
     include('classes.jar')
-    rename('classes.jar', 'loopme-sdk-6.1.5.jar')
+    rename('classes.jar', 'loopme-sdk-6.1.6.jar')
 }
 
 task wrapper(type: Wrapper) {

@@ -98,7 +98,7 @@ public class LiveDebug {
         Map<String, String> params = new HashMap<>();
         params.put(Params.DEVICE_OS, Constants.ADNROID_DEVICE_OS);
         params.put(Params.SDK_TYPE, Constants.LOOPME_SDK_TYPE);
-        params.put(Params.SDK_VERSION, BuildConfig.VERSION_NAME);
+        params.put(Params.SDK_VERSION, String.valueOf(BuildConfig.VERSION_CODE) + "." + String.valueOf(BuildConfig.VERSION_NAME));
         params.put(Params.DEVICE_ID, RequestUtils.getIfa());
         params.put(Params.PACKAGE_ID, context.getPackageName());
         params.put(Params.APP_KEY, appKey);
