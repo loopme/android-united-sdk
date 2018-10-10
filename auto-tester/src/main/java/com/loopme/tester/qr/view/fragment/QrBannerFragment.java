@@ -5,10 +5,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.loopme.LoopMeBanner;
@@ -83,9 +86,24 @@ public class QrBannerFragment extends QrBaseFragment {
         if (mAdDescriptor != null && mBannerView != null) {
             int width = Utils.convertDpToPixel(mAdDescriptor.getWidth(), mActivity);
             int height = Utils.convertDpToPixel(mAdDescriptor.getHeight(), mActivity);
-            ViewGroup.LayoutParams layoutParams = mBannerView.getLayoutParams();
-            layoutParams.width = width;
-            layoutParams.height = height;
+
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT); // or wrap_content
+
+            ViewParent parent = mBannerView.getParent();
+            if (parent instanceof RelativeLayout) {
+
+                if (mAdDescriptor.getHeight() > 60) {
+                    lp.addRule(RelativeLayout.CENTER_IN_PARENT);
+                    ((RelativeLayout) parent).setGravity(Gravity.CENTER);
+                } else {
+                    lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                    lp.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                }
+            }
+            lp.width = width;
+            lp.height = height;
+            mBannerView.setLayoutParams(lp);
         }
     }
 

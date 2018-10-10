@@ -14,7 +14,6 @@ import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.loopme.tester.tracker.AppEventTracker;
 import com.loopme.tester.AppUpdateChecker;
 import com.loopme.tester.BuildConfig;
 import com.loopme.tester.Constants;
@@ -29,6 +28,7 @@ import com.loopme.tester.model.AdSpot;
 import com.loopme.tester.model.Response;
 import com.loopme.tester.model.ScreenStackModel;
 import com.loopme.tester.qr.QRAdActivity;
+import com.loopme.tester.tracker.AppEventTracker;
 import com.loopme.tester.ui.dialog.CreateFolderDialogFragment;
 import com.loopme.tester.ui.fragment.ActionBarFragment;
 import com.loopme.tester.ui.fragment.ActiveSearchFragment;

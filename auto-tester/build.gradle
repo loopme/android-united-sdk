@@ -20,8 +20,8 @@ android {
         applicationId "com.loopme.tester"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 4
-        versionName "3.3"
+        versionCode 1
+        versionName "3.4.10"
         multiDexEnabled true
         buildConfigField "String", "TESTFAIRY_APP_TOKEN", TESTFAIRY_TOKEN
         buildConfigField "String", "TESTFAIRY_API_URL", TESTFAIRY_API_URL
@@ -53,6 +53,10 @@ android {
         all*.exclude group: 'com.android.volley'
     }
 
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
 }
 dependencies {
 //    implementation "com.loopme:loopme-sdk:6.1.5"

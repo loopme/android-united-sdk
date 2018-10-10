@@ -26,19 +26,25 @@ public class QReader {
         if (!mIsInited) {
             init();
         } else {
-            mQReader.start();
+            if (mQReader != null && !mQReader.isCameraRunning()) {
+                mQReader.start();
+            }
         }
     }
 
     public void pause() {
         if (mIsInited) {
-            mQReader.stop();
+            if (mQReader != null) {
+                mQReader.stop();
+            }
         }
     }
 
     public void destroy() {
         mContext = null;
-        mQReader.releaseAndCleanup();
+        if (mQReader != null) {
+            mQReader.releaseAndCleanup();
+        }
     }
 
     private void init() {

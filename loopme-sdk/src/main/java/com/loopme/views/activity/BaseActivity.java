@@ -129,7 +129,7 @@ public final class BaseActivity extends Activity
     private void retrieveLoopMeAdOrFinish() {
         mLoopMeAd = LoopMeAdHolder.getAd(getIntent());
         finishIfNull(mLoopMeAd);
-        if (mLoopMeAd.getAdParams() != null) {
+        if (mLoopMeAd != null && mLoopMeAd.getAdParams() != null) {
             mIsCloseButtonPresent = mLoopMeAd.getAdParams().isOwnCloseButton();
         }
     }

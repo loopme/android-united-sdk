@@ -6,7 +6,7 @@
     android:background="@color/black_transparent">
 
     <ImageView
-        android:id="@+id/qr_controls_close_button"
+        android:id="@+id/qr_controls_back_button"
         android:layout_width="@dimen/qr_controls_close_button_width"
         android:layout_height="@dimen/qr_controls_close_button_height"
         android:padding="@dimen/fragment_qr_controls_close_button_padding"

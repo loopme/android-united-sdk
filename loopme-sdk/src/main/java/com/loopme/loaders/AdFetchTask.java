@@ -12,6 +12,7 @@ import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.models.Errors;
 import com.loopme.models.response.ResponseJsonModel;
+import com.loopme.network.GetResponse;
 import com.loopme.parser.ParseService;
 import com.loopme.parser.XmlParseService;
 import com.loopme.request.RequestBuilder;
@@ -19,7 +20,6 @@ import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
 import com.loopme.utils.ExecutorHelper;
 import com.loopme.webservice.LoopMeAdServiceImpl;
-import com.loopme.network.GetResponse;
 import com.loopme.xml.vast4.VastInfo;
 
 import org.json.JSONObject;
