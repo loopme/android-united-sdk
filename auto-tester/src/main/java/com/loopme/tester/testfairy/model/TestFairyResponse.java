@@ -67,7 +67,8 @@ public class TestFairyResponse {
         leaveOnlyReleases();
 
         for (Build build : builds) {
-            if (build.isOlderThan(BuildConfig.VERSION_NAME)) {
+            if (build.isOlderThan(BuildConfig.VERSION_NAME) &&
+                    !build.getAppVersionCode().equals(String.valueOf(BuildConfig.VERSION_CODE))) {
                 return true;
             }
         }

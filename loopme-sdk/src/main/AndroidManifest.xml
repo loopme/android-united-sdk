@@ -28,6 +28,7 @@
         <activity android:name=".views.activity.MraidVideoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:hardwareAccelerated="true"/>
+
     </application>
 
 </manifest>

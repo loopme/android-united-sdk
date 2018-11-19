@@ -11,8 +11,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.loopme.tester.R;
-import com.loopme.tester.qr.view.QrAdContract;
 import com.loopme.tester.qr.model.AdDescriptor;
+import com.loopme.tester.qr.view.QrAdContract;
 import com.loopme.tester.tracker.AppEventTracker;
 import com.loopme.tester.utils.UiUtils;
 
@@ -39,7 +39,7 @@ public class QrAdFragment extends Fragment implements QrAdContract.View, View.On
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        view.findViewById(R.id.qr_controls_close_button).setOnClickListener(this);
+        view.findViewById(R.id.qr_controls_back_button).setOnClickListener(this);
         if (mPresenter != null) {
             mPresenter.onViewCreated();
         }
@@ -87,7 +87,7 @@ public class QrAdFragment extends Fragment implements QrAdContract.View, View.On
     public void resumeQReader() {
         Fragment fragment = getChildFragmentManager().findFragmentById(R.id.fragment_qr_ad_container);
         if (fragment instanceof QReaderFragment) {
-            fragment.onResume();
+            ((QReaderFragment) fragment).resume();
         }
     }
 
@@ -95,7 +95,7 @@ public class QrAdFragment extends Fragment implements QrAdContract.View, View.On
     public void pauseQReader() {
         Fragment fragment = getChildFragmentManager().findFragmentById(R.id.fragment_qr_ad_container);
         if (fragment instanceof QReaderFragment) {
-            fragment.onPause();
+            ((QReaderFragment) fragment).pause();
         }
     }
 
@@ -114,7 +114,7 @@ public class QrAdFragment extends Fragment implements QrAdContract.View, View.On
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.qr_controls_close_button: {
+            case R.id.qr_controls_back_button: {
                 onBackPressed();
                 break;
             }

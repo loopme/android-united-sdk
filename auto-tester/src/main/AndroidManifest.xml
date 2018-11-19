@@ -64,7 +64,6 @@
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".qr.QRAdActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/SlideableAppTheme" />
 
         <provider

@@ -15,6 +15,7 @@ import com.loopme.tester.R;
 import com.loopme.tester.qr.custom.QReader;
 import com.loopme.tester.qr.model.AdDescriptor;
 import com.loopme.tester.qr.model.AdDescriptorUtils;
+import com.loopme.tester.tracker.AppEventTracker;
 
 import github.nisrulz.qreader.QRDataListener;
 
@@ -69,16 +70,24 @@ public class QReaderFragment extends QrBaseFragment implements QRDataListener, V
     @Override
     public void onResume() {
         super.onResume();
+        resume();
+    }
+
+    public void resume() {
         if (mLoopMeQReader != null) {
             mLoopMeQReader.resume();
         }
     }
 
-    @Override
-    public void onPause() {
+    public void pause() {
         if (mLoopMeQReader != null) {
             mLoopMeQReader.pause();
         }
+    }
+
+    @Override
+    public void onPause() {
+        pause();
         super.onPause();
     }
 
@@ -107,23 +116,17 @@ public class QReaderFragment extends QrBaseFragment implements QRDataListener, V
     }
 
     public void onAdDetected(final AdDescriptor descriptor) {
-        HANDLER.post(new Runnable() {
-            @Override
-            public void run() {
-                if (mListener != null) {
-                    mListener.onAdDetected(descriptor);
-                }
+        HANDLER.post(() -> {
+            if (mListener != null) {
+                mListener.onAdDetected(descriptor);
             }
         });
     }
 
     public void onTrashDetected(final String content) {
-        HANDLER.post(new Runnable() {
-            @Override
-            public void run() {
-                if (mListener != null) {
-                    mListener.onNotAdDetected(content);
-                }
+        HANDLER.post(() -> {
+            if (mListener != null) {
+                mListener.onNotAdDetected(content);
             }
         });
     }
@@ -139,9 +142,14 @@ public class QReaderFragment extends QrBaseFragment implements QRDataListener, V
     }
 
     private void onReplayClicked() {
+        track(AppEventTracker.Event.QR_AD_WATCH_AGAIN);
         if (mListener != null) {
             mListener.onReplayClicked(mAdDescriptor);
         }
+    }
+
+    private void track(@NonNull AppEventTracker.Event event) {
+        AppEventTracker.getInstance().track(event);
     }
 
     public void enableControlsView() {

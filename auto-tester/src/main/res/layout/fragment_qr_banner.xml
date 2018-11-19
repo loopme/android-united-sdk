@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_alignParentBottom="true"
-    android:background="@color/white"
+    android:background="@color/black"
     android:orientation="vertical">
 
     <ImageView
@@ -12,15 +12,14 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:scaleType="fitXY"
-        android:src="@drawable/lm_background_port" />
+        android:background="@color/black" />
 
     <FrameLayout
         android:id="@+id/fragment_qr_banner_view_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_gravity="center|bottom">
+        android:background="@color/black">
 
         <ProgressBar
             android:id="@+id/fragment_qr_banner_progress_bar"

@@ -113,6 +113,7 @@ public class QrAdPresenter implements QrAdContract.Presenter, InterstitialContro
 
     @Override
     public void onAdFail(String message) {
+        mIsInProcess = false;
         mView.showMessage(message);
         mView.showProgress(false);
         mView.resumeQReader();
