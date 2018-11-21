@@ -51,7 +51,7 @@ public class GdprChecker implements
     }
 
     private void showDialogOnlyFirstTime(GdprResponse response) {
-        if (!sIsDialogWasShown) {
+        if (!sIsDialogWasShown && !mActivity.isFinishing()) {
             new GdprDialog(mActivity, this).show(buildConsentUrl(response));
             sIsNeedCheckUserConsent = true;
         } else {

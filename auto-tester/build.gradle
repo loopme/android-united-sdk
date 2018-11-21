@@ -59,8 +59,8 @@ android {
         all*.exclude group: 'com.android.volley'
     }
     compileOptions {
-        targetCompatibility 1.8
-        sourceCompatibility 1.8
+        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_7
     }
 }
 dependencies {

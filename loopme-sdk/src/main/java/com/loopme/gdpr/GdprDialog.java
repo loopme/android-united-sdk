@@ -1,5 +1,6 @@
 package com.loopme.gdpr;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
@@ -73,7 +74,8 @@ public class GdprDialog implements GdprWebView.GdprViewListener {
     }
 
     private void dismissDialog() {
-        if (mDialog != null) {
+        if (mDialog != null && mContext instanceof Activity &&
+                !((Activity) mContext).isFinishing()) {
             mDialog.dismiss();
         }
     }

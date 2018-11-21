@@ -1,3 +1,6 @@
+## Version 6.1.7 (21 of November, 2018)
+- Bug fixes related to the GDPR dialog 
+
 ## Version 6.1.6 (22 of August, 2018)
 - Deliver ads via cellular connection as well as via Wi-Fi.
 - Additional debug events

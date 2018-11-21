@@ -2,13 +2,13 @@ apply plugin: 'com.android.library'
 apply from: '../dependencies.gradle'
 
 repositories {
+    google()
     jcenter()
     mavenLocal()
-    google()
+    maven { url "https://maven.google.com" }
     flatDir {
         dirs 'libs'
     }
-    maven { url "https://maven.google.com" }
 }
 
 android {
@@ -96,7 +96,7 @@ dependencies {
     api "com.android.support:support-annotations:$supportLibraryVersion"
     api "com.google.android.gms:play-services-ads:$playServicesVersion"
     api "com.android.support:multidex:$multidexLibraryVersion"
-    //fixed "Mixing versions can lead runtime crashes". Causes because some libraries contains v26.1.0
+
     implementation "com.android.support:support-media-compat:$supportLibraryVersion"
     implementation "com.android.support:support-v4:$supportLibraryVersion"
     implementation "com.android.support:customtabs:$supportLibraryVersion"
@@ -105,19 +105,20 @@ dependencies {
 }
 
 task clearJar(type: Delete) {
-    delete 'build/outputs/loopme-sdk-6.1.4.jar'
+    delete 'build/outputs/loopme-sdk-6.1.6.jar'
 }
 
 task makeJar(type: Copy) {
     from('build/intermediate-jars/classes/release/')
     into('build/outputs/')
     include('classes.jar')
-    rename('classes.jar', 'loopme-sdk-6.1.6.jar')
+    rename('classes.jar', 'loopme-sdk-6.1.7.jar')
 }
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.4'
 }
+
 configurations.all {
     resolutionStrategy {
         force 'org.ow2.asm:asm:5.0.4'

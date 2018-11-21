@@ -4,8 +4,8 @@ import android.webkit.URLUtil;
 
 import com.loopme.Logging;
 import com.loopme.network.HttpUtils;
-import com.loopme.utils.StringUtils;
 import com.loopme.utils.ExecutorHelper;
+import com.loopme.utils.StringUtils;
 import com.loopme.xml.Tracking;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class VastVpaidEventTracker {
 
     private void postEventByType(String eventType, String addMessage) {
         for (Tracking event : mEventsList) {
-            if (event.isTypeOf(eventType)) {
+            if (event != null && eventType != null && event.isTypeOf(eventType)) {
                 postEventByUrl(event.getText(), addMessage);
             }
         }
