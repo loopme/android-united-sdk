@@ -1,5 +1,3 @@
-import com.sun.tools.classfile.Dependency
-
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
@@ -9,7 +7,7 @@ def deployArtifact = new Properties()
 deployArtifact.load(new FileInputStream("deploy.settings"))
 
 group = 'com.loopme'
-version = '6.1.7'
+version = '6.1.8'
 
 bintray {
     user = BINTRAY_USER
@@ -76,7 +74,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'com.loopme'
             artifactId 'loopme-sdk'
-            version '6.1.7'
+            version '6.1.8'
 
             artifact bundleRelease
             artifact androidJavadocsJar

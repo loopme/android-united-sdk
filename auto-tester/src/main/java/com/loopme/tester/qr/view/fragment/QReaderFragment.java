@@ -116,17 +116,23 @@ public class QReaderFragment extends QrBaseFragment implements QRDataListener, V
     }
 
     public void onAdDetected(final AdDescriptor descriptor) {
-        HANDLER.post(() -> {
-            if (mListener != null) {
-                mListener.onAdDetected(descriptor);
+        HANDLER.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mListener != null) {
+                    mListener.onAdDetected(descriptor);
+                }
             }
         });
     }
 
     public void onTrashDetected(final String content) {
-        HANDLER.post(() -> {
-            if (mListener != null) {
-                mListener.onNotAdDetected(content);
+        HANDLER.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mListener != null) {
+                    mListener.onNotAdDetected(content);
+                }
             }
         });
     }

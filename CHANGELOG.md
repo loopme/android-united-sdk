@@ -1,3 +1,6 @@
+## Version 6.1.8 (21 of November, 2018)
+- Changed request parameter(android version)
+
 ## Version 6.1.7 (21 of November, 2018)
 - Bug fixes related to the GDPR dialog 
 

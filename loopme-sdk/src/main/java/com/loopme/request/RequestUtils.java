@@ -200,7 +200,7 @@ public class RequestUtils {
     }
 
     public String getOsv() {
-        return String.valueOf(Build.VERSION.SDK_INT);
+        return String.valueOf(Build.VERSION.RELEASE);
     }
 
     public int getConnectionType() {

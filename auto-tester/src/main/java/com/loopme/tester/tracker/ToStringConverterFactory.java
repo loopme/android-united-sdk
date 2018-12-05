@@ -1,5 +1,6 @@
 package com.loopme.tester.tracker;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
@@ -16,7 +17,12 @@ public class ToStringConverterFactory extends Converter.Factory {
     @Override
     public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
         if (String.class.equals(type)) {
-            return (Converter<ResponseBody, String>) ResponseBody::string;
+            return new Converter<ResponseBody, String>() {
+                @Override
+                public String convert(ResponseBody value) throws IOException {
+                    return value.string();
+                }
+            };
         }
         return null;
     }
@@ -25,7 +31,12 @@ public class ToStringConverterFactory extends Converter.Factory {
     public Converter<?, RequestBody> requestBodyConverter(Type type, Annotation[] parameterAnnotations, Annotation[] methodAnnotations, Retrofit retrofit) {
 
         if (String.class.equals(type)) {
-            return (Converter<String, RequestBody>) value -> RequestBody.create(MEDIA_TYPE, value);
+            return new Converter<String, RequestBody>() {
+                @Override
+                public RequestBody convert(String value) throws IOException {
+                    return RequestBody.create(MEDIA_TYPE, value);
+                }
+            };
         }
         return null;
     }
