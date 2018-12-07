@@ -34,7 +34,6 @@ android {
 
     buildTypes {
         release {
-            buildConfigField "String", "BACKEND", BACKEND_URL
             buildConfigField "String", "MOAT_TOKEN", MOAT_TOKEN
             buildConfigField "String", "DV_TOKEN", DV_TOKEN
             buildConfigField "String", "SDK_TYPE", SDK_TYPE
