@@ -33,8 +33,8 @@ ext {
 
     // Project
     versionCode = 6
-    versionName = '1.8'
-    versionFull = '6.1.8'
+    versionName = '1.9'
+    versionFull = '6.1.9'
     organization = 'com.loopme'
     projectName = 'loopme-united-sdk'
     description = 'Please meet our New United SDK. It combines multiple premium ads technologies with the highest performance and lean resource consumption.'

@@ -7,7 +7,7 @@ def deployArtifact = new Properties()
 deployArtifact.load(new FileInputStream("deploy.settings"))
 
 group = 'com.loopme'
-version = '6.1.8'
+version = '6.1.9'
 
 bintray {
     user = BINTRAY_USER
@@ -74,7 +74,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'com.loopme'
             artifactId 'loopme-sdk'
-            version '6.1.8'
+            version '6.1.9'
 
             artifact bundleRelease
             artifact androidJavadocsJar

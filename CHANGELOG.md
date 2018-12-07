@@ -1,3 +1,6 @@
+## Version 6.1.9 (07 of December, 2018)
+- Minor gradle bugfixes
+
 ## Version 6.1.8 (21 of November, 2018)
 - Changed request parameter(android version)
 
