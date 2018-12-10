@@ -1,1 +1,1 @@
-include ':loopme-sdk', ':auto-tester'
+include ':loopme-sdk', 'sample-interstitial', 'sample-banner'
