@@ -487,14 +487,16 @@ public class RequestUtils {
         return techsList;
     }
 
-    public JSONObject getTrackersSupported() {
-        JSONObject object = new JSONObject();
+    public JSONArray getTrackersSupported() {
+        JSONArray arr = new JSONArray();
         try {
-            object.put(TYPE_KEY, VIEWABILITY_VENDOR).put(VENDOR_KEY, MOAT);
+            arr.put(new JSONObject().put(TYPE_KEY, VIEWABILITY_VENDOR).put(VENDOR_KEY, MOAT));
+            arr.put(new JSONObject().put(TYPE_KEY, VIEWABILITY_VENDOR).put(VENDOR_KEY, IAS));
+            return arr;
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return object;
+        return arr;
     }
 
     public int getSkippable() {

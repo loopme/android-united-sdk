@@ -2,6 +2,7 @@ package com.loopme;
 
 import android.app.Activity;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.widget.FrameLayout;
 
@@ -17,7 +18,7 @@ import com.loopme.tracker.partners.LoopMeTracker;
  * such as when an ad has been loaded or has failed to load its content, when video ad has been watched completely,
  * when an ad has been presented or dismissed from the screen, and when an ad has expired or received a tap.
  */
-public class LoopMeBanner extends AdWrapper {
+public final class LoopMeBanner extends AdWrapper {
     public static final String TEST_MPU_BANNER = "test_mpu";
     private static final String FIRST_BANNER = "FIRST_BANNER";
     private static final String SECOND_BANNER = "SECOND_BANNER";
@@ -26,6 +27,10 @@ public class LoopMeBanner extends AdWrapper {
     private volatile FrameLayout mBannerView;
     private String mCurrentAd = FIRST_BANNER;
 
+    private LoopMeBanner() {
+        super(null, null);
+    }
+
     /**
      * Creates new `LoopMeBanner` object with the given appKey
      *
@@ -33,12 +38,8 @@ public class LoopMeBanner extends AdWrapper {
      * @param appKey   - your app key
      * @throws IllegalArgumentException if any of parameters is null
      */
-    public LoopMeBanner(Activity activity, String appKey) {
+    private LoopMeBanner(Activity activity, String appKey) {
         super(activity, appKey);
-        if (Build.VERSION.SDK_INT < 21) {
-            LoopMeError error = new LoopMeError("Unsupported android version. Loopme-sdk requires android API_LEVEL >= 21.");
-            throw new UnsupportedClassVersionError(error.getMessage());
-        }
         mFirstLoopMeAd = LoopMeBannerGeneral.getInstance(appKey, activity);
         if (isAutoLoadingEnabled()) {
             mSecondLoopMeAd = LoopMeBannerGeneral.getInstance(appKey, activity);
@@ -47,14 +48,16 @@ public class LoopMeBanner extends AdWrapper {
 
     /**
      * Getting already initialized ad object or create new one with specified appKey
-     * Note: Returns null if Android version under 4.0
      *
-     * @param appKey   - your app key
-     * @param activity - Activity context
-     * @return instance of LoopMeBanner
+     * @param appKey your app key
+     * @param activity activity context
+     * @return instance of LoopMeBanner; null - android version is under API 21 (5.0 LOLLIPOP)
      */
+    @Nullable
     public static LoopMeBanner getInstance(String appKey, Activity activity) {
-        return new LoopMeBanner(activity, appKey);
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP
+                ? null
+                : new LoopMeBanner(activity, appKey);
     }
 
     @Override

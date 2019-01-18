@@ -43,6 +43,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utils {
     private static final int START_BODY_TAG = 173;
@@ -758,13 +760,21 @@ public class Utils {
         return obj instanceof Float;
     }
 
+    private static final Pattern BODY_TAG_PATTERN = Pattern.compile("<\\s*body\\b[^>]*>");
+
     public static String addMraidScript(String html) {
         if (TextUtils.isEmpty(html)) {
             return "";
         }
-        String firstPart = html.substring(0, START_BODY_TAG);
-        String lastPart = html.substring(START_BODY_TAG);
-        return firstPart + Constants.MRAID_SCRIPT + lastPart;
+
+        Matcher m = BODY_TAG_PATTERN.matcher(html);
+        if (!m.find()) {
+            Logging.out(LOG_TAG, "Couldn't find <body>");
+            return html;
+        }
+
+        // TODO. Performance?
+        return new StringBuilder(html).insert(m.end(), Constants.MRAID_SCRIPT).toString();
     }
 
     public static String getUserAgent() {

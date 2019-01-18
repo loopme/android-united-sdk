@@ -44,6 +44,8 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     private int mVerificationScriptCounter;
     private int mVerificationScriptNumber;
     private boolean mIsAdSkipped;
+    // TODO. Refactor.
+    private boolean playerPrepared;
 
     public DisplayControllerVast(LoopMeAd loopMeAd) {
         super(loopMeAd);
@@ -116,12 +118,18 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         mLoopMePlayer = new LoopMeMediaPlayer(mVideoUri, this);
     }
 
-    private void resumeMediaPlayer(Surface surface) {
-        if (mLoopMePlayer != null) {
-            mLoopMePlayer.setSurface(surface);
-            mLoopMePlayer.start();
-            resumeVideoTimer();
-        }
+    // TODO. Refactor.
+    private void resumeMediaPlayer(final Surface surface) {
+        if (mLoopMePlayer == null)
+            return;
+
+        mLoopMePlayer.setSurface(surface);
+
+        if (!playerPrepared)
+            return;
+
+        mLoopMePlayer.start();
+        resumeVideoTimer();
     }
 
     private void resumeVideoTimer() {
@@ -344,11 +352,15 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+        playerPrepared = true;
+
         mVideoDuration = mp.getDuration();
         mViewControllerVast.adjustLayoutParams(mp.getVideoWidth(), mp.getVideoHeight(), mLoopMeAd.isBanner());
         createVideoTimer(mVideoDuration);
         prepareControls(mVideoDuration);
+
         resumeMediaPlayer(getSurface());
+
         postEvents(mp);
         muteVideo(mViewControllerVast.isMute(), false);
     }

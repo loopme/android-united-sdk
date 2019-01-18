@@ -1,5 +1,6 @@
 package com.loopme;
 
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.view.Surface;
@@ -28,7 +29,11 @@ public class LoopMeMediaPlayer {
     private void configurePlayer() {
         if (mMediaPlayer != null) {
             mMediaPlayer.setLooping(false);
-            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mMediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
+                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
+                    .build());
         }
     }
 

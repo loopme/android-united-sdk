@@ -115,7 +115,7 @@ protected void onResume() {
 <br> Instead of <b>10</b> put your rewarded amount.
 
 * Download and copy `LoopMeMoPubRewardedVideo` bridge class to the `com.mopub.mobileads` package in your project. 
-* Initialize `MoPubRewardedVideos` in method `onCreate()` of your `Activity.class` 
+* **(For MoPub SDK below v5.x.x)** Initialize `MoPubRewardedVideos` in method `onCreate()` of your `Activity.class` 
 ```java
       MoPubRewardedVideos.initializeRewardedVideo(this);
 ```

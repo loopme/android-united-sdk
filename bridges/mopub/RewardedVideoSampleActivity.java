@@ -24,7 +24,12 @@ public class RewardedVideoSampleActivity extends Activity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        MoPubRewardedVideos.initializeRewardedVideo(this);
+
+        /**
+         * Note: if mopub-sdk version of your app is less than v5.0.0 - uncomment this line.
+         * https://developers.mopub.com/docs/android/initialization/
+         */
+        // MoPubRewardedVideos.initializeRewardedVideo(this);
         MoPubRewardedVideos.setRewardedVideoListener(this);
 
         findViewById(R.id.load_rewarded_video_button).setOnClickListener(this);

@@ -3,6 +3,7 @@ package com.loopme;
 
 import android.app.Activity;
 import android.os.Build;
+import android.support.annotation.Nullable;
 
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
@@ -16,12 +17,16 @@ import com.loopme.common.LoopMeError;
  * such as when an ad has been loaded or has failed to load its content, when video ad has been watched completely,
  * when an ad has been presented or dismissed from the screen, and when an ad has expired or received a tap.
  */
-public class LoopMeInterstitial extends AdWrapper {
+public final class LoopMeInterstitial extends AdWrapper {
     public static final String TEST_PORT_INTERSTITIAL = "test_interstitial_p";
     public static final String TEST_LAND_INTERSTITIAL = "test_interstitial_l";
 
     private static final String LOG_TAG = LoopMeInterstitial.class.getSimpleName();
     private Listener mMainAdListener;
+
+    private LoopMeInterstitial() {
+        super(null, null);
+    }
 
     /**
      * Creates new `LoopMeInterstitial` object with the given appKey
@@ -30,12 +35,8 @@ public class LoopMeInterstitial extends AdWrapper {
      * @param appKey   - your app key
      * @throws IllegalArgumentException if any of parameters is null
      */
-    public LoopMeInterstitial(Activity activity, String appKey) {
+    private LoopMeInterstitial(Activity activity, String appKey) {
         super(activity, appKey);
-        if (Build.VERSION.SDK_INT < 21) {
-            LoopMeError error = new LoopMeError("Unsupported android version. Loopme-sdk requires android API_LEVEL >= 21.");
-            throw new UnsupportedClassVersionError(error.getMessage());
-        }
         mFirstLoopMeAd = LoopMeInterstitialGeneral.getInstance(appKey, activity);
         if (isAutoLoadingEnabled()) {
             mSecondLoopMeAd = LoopMeInterstitialGeneral.getInstance(appKey, activity);
@@ -44,14 +45,16 @@ public class LoopMeInterstitial extends AdWrapper {
 
     /**
      * Getting already initialized ad object or create new one with specified appKey
-     * Note: Returns null if Android version under 4.0
      *
-     * @param appKey   - your app key
-     * @param activity - Activity context
-     * @return instance of LoopMeInterstitial
+     * @param appKey your app key
+     * @param activity activity context
+     * @return instance of LoopMeInterstitial; null - android version is under API 21 (5.0 LOLLIPOP)
      */
+    @Nullable
     public static LoopMeInterstitial getInstance(String appKey, Activity activity) {
-        return new LoopMeInterstitial(activity, appKey);
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP
+                ? null
+                : new LoopMeInterstitial(activity, appKey);
     }
 
 
