@@ -62,7 +62,7 @@ public class LoopMeWebView extends WebView {
     }
 
     private void setDebugConfig() {
-        if (BuildConfig.DEBUG_MODE || Constants.sDebugMode) {
+        if (BuildConfig.DEBUG || Constants.sDebugMode) {
             getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
             clearCache(true);
             setWebContentsDebuggingEnabled(true);

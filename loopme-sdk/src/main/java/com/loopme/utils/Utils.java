@@ -46,6 +46,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+// TODO. Refactor.
 public class Utils {
     private static final int START_BODY_TAG = 173;
     private static final int ZERO = 0;
@@ -534,6 +535,21 @@ public class Utils {
 
     public static int convertDpToPixel(float dp) {
         return sResources != null ? (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, sResources.getDisplayMetrics()) : ZERO;
+    }
+
+    public static int convertDpToPixel(float dp, Context ctx) {
+        if (ctx == null)
+            return ZERO;
+
+        Resources res = ctx.getResources();
+        if (res == null)
+            return ZERO;
+
+        DisplayMetrics dm = res.getDisplayMetrics();
+        if (dm == null)
+            return ZERO;
+
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, dm);
     }
 
     public static int roundNumberToHundredth(int number) {

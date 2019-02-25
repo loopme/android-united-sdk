@@ -12,15 +12,37 @@ public class Logging {
     private Logging() {
     }
 
-    public static void out(String tag, final String text) {
-        if (TextUtils.isEmpty(text)) {
+    private static String createDebugTag(final String tag) {
+        return PREFIX + tag;
+    }
+
+    private static void log(final String tag, final String text) {
+        if (BuildConfig.DEBUG || Constants.sDebugMode)
+            Log.i(tag, text);
+    }
+
+    /**
+     * @param forceSave TODO. Refactor. For handling cases when sIsDebugOn isn't set yet.
+     */
+    public static void out(final String tag, final String text, boolean forceSave) {
+        if (TextUtils.isEmpty(text))
             return;
-        }
-        final String logTag = PREFIX + tag;
-        if (BuildConfig.DEBUG_MODE || Constants.sDebugMode) {
-            Log.i(logTag, text);
-        }
-        LiveDebug.handle(logTag, text);
+
+        final String logTag = createDebugTag(tag);
+        log(logTag, text);
+
+        LiveDebug.handle(logTag, text, forceSave);
+    }
+
+    // TODO. Refactor. Duplicate code.
+    public static void out(final String tag, final String text) {
+        if (TextUtils.isEmpty(text))
+            return;
+
+        final String logTag = createDebugTag(tag);
+        log(logTag, text);
+
+        LiveDebug.handle(logTag, text, false);
     }
 
     public static void out(final String text) {

@@ -7,7 +7,7 @@ import android.text.TextUtils;
 
 import com.loopme.IntegrationType;
 import com.loopme.LoopMeInterstitial;
-import com.loopme.common.Logging;
+import com.loopme.Logging;
 import com.loopme.common.LoopMeError;
 import com.mopub.common.LifecycleListener;
 import com.mopub.common.MoPubReward;

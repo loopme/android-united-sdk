@@ -93,11 +93,19 @@ public class AdFetchTask implements Runnable, Observer {
     public void run() {
         try {
             JSONObject data = RequestBuilder.buildRequestJson(mLoopMeAd.getContext(), mLoopMeAd);
+
+            if (Thread.interrupted()) {
+                Logging.out(LOG_TAG, "Thread interrupted.");
+                stopRequestTimer();
+                return;
+            }
+
             GetResponse<ResponseJsonModel> response = LoopMeAdServiceImpl.getInstance().fetchAd(Constants.BASE_URL, data);
             Logging.out(LOG_TAG, "response received");
             stopRequestTimer();
             parseResponse(response);
         } catch (Exception e) {
+            Logging.out(LOG_TAG, e.toString());
             stopRequestTimer();
             handelBadResponse(e.getMessage());
         }

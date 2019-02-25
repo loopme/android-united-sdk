@@ -219,13 +219,7 @@ public class RequestParamsUtils {
     }
 
     public static AdvAdInfo getAdvertisingIdInfo(Context context) {
-        AdvertisingIdClient.AdInfo adInfo = new AdvertisingIdClient.AdInfo();
-        try {
-            adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new AdvAdInfo(adInfo);
+        return new AdvAdInfo(AdvertisingIdClient.getAdvertisingIdInfo(context));
     }
 
     public static class AdvAdInfo {

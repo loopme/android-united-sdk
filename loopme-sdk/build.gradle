@@ -1,26 +1,13 @@
 apply plugin: 'com.android.library'
-apply from: '../dependencies.gradle'
-
-repositories {
-    google()
-    jcenter()
-    mavenLocal()
-    maven { url "https://maven.google.com" }
-    flatDir {
-        dirs 'libs'
-    }
-}
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode rootProject.ext.versionCode
-        versionName rootProject.ext.versionName
-        multiDexEnabled true
+        versionCode 6
+        versionName '6.1.12'
     }
 
     signingConfigs {
@@ -43,7 +30,6 @@ android {
             buildConfigField "String", "IAS_CM_TAG_URL", IAS_CM_TAG_URL
             buildConfigField "String", "IAS_LOGGING_TAG_URL", IAS_LOGGING_TAG_URL
             buildConfigField "String", "LOOPME_GDPR_URL", LOOPME_GDPR_URL
-            buildConfigField "Boolean", "DEBUG_MODE", "true"
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             minifyEnabled false
@@ -73,6 +59,7 @@ android {
         maxProcessCount 4
         javaMaxHeapSize '4g'
     }
+
     packagingOptions {
         exclude 'META-INF/ASL2.0'
         exclude 'META-INF/LICENSE'
@@ -83,43 +70,16 @@ android {
     }
 }
 
-
 dependencies {
-    api files('libs/libAvid-loopme-3.6.7.jar')
-    api files('libs/moat-mobile-appkit.jar')
+    implementation files('libs/libAvid-loopme-3.6.7.jar')
+    implementation files('libs/moat-mobile-appkit.jar')
     implementation files('libs/unity-classes.jar')
 
-    api "com.android.support:appcompat-v7:$supportLibraryVersion"
-    api "com.android.support:recyclerview-v7:$supportLibraryVersion"
-    api "com.android.support:cardview-v7:$supportLibraryVersion"
-    api "com.android.support:support-annotations:$supportLibraryVersion"
-    api "com.google.android.gms:play-services-ads:$playServicesVersion"
-    api "com.android.support:multidex:$multidexLibraryVersion"
-    implementation "com.android.support:support-media-compat:$supportLibraryVersion"
-    implementation "com.android.support:support-v4:$supportLibraryVersion"
-    implementation "com.android.support:customtabs:$supportLibraryVersion"
-    testImplementation "junit:junit:$junitVersion"
-}
+    api 'com.android.support:appcompat-v7:28.0.0'
+    api 'com.android.support:recyclerview-v7:28.0.0'
 
-task clearJar(type: Delete) {
-    delete 'build/outputs/loopme-sdk-6.1.9.jar'
-}
-
-task makeJar(type: Copy) {
-    from('build/intermediate-jars/classes/release/')
-    into('build/outputs/')
-    include('classes.jar')
-    rename('classes.jar', 'loopme-sdk-6.1.10.jar')
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.4'
-}
-
-configurations.all {
-    resolutionStrategy {
-        force 'org.ow2.asm:asm:5.0.4'
-    }
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.google.android.gms:play-services-ads-identifier:16.0.0'
 }
 
 apply from: '../publishing.gradle'

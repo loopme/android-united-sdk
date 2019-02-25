@@ -74,7 +74,13 @@ public class EndCardLayout extends FrameLayout implements View.OnClickListener {
         mReplayImageView.setId(REPLAY_BUTTON_ID);
         mReplayImageView.setScaleType(ImageView.ScaleType.CENTER);
         mReplayImageView.setImageResource(R.drawable.l_replay);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(Constants.BUTTON_SIZE, Constants.BUTTON_SIZE, Gravity.START);
+
+        int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI, getContext());
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                btnSizePx,
+                btnSizePx,
+                Gravity.START);
+
         mReplayImageView.setLayoutParams(params);
     }
 
@@ -84,7 +90,13 @@ public class EndCardLayout extends FrameLayout implements View.OnClickListener {
 
         mCloseImageView.setScaleType(ImageView.ScaleType.CENTER);
         mCloseImageView.setImageResource(R.drawable.l_close);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(Constants.BUTTON_SIZE, Constants.BUTTON_SIZE, Gravity.END);
+
+        int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI, getContext());
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                btnSizePx,
+                btnSizePx,
+                Gravity.END);
+
         mCloseImageView.setLayoutParams(params);
     }
 

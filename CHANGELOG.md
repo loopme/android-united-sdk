@@ -1,9 +1,18 @@
+## Version 6.1.12 (25 of February, 2019)
+- Potentially fixed "empty advertising id" bug and added logging to track the issue down if it occurs again
+- Removed `multidex`
+- Updated `gradle`
+- Updated support and `google` libraries
+- Replaced `play-services-ads` with `play-services-ads-identifier` library
+- Removed unnecessary dependencies
+- Other minor bugfixes   
+
 ## Version 6.1.10 (18 of January, 2019)
 - Updated `RewardedVideoSampleActivity` bridge to support [*MoPub SDK* v5.x.x](https://developers.mopub.com/docs/android/initialization/)
 - Fixed crash for banner/interstitial `getInstance` calls when android API level < 21: in this case method returns `null`. *Make sure your app code is aware of that*
 - `new LoopMeInterstitial()` and `new LoopMeBanner()` constructor calls are no longer valid: use respective `getInstance` methods
 - Fixed "Problem displaying media file" for VAST ads      
-- other minor bugfixes
+- Other minor bugfixes
 
 ## Version 6.1.9 (07 of December, 2018)
 - Minor gradle bugfixes

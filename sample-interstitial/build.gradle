@@ -1,17 +1,12 @@
 apply plugin: 'com.android.application'
-apply from: '../dependencies.gradle'
 
 repositories {
     jcenter()
     google()
-    flatDir {
-        dirs 'libs'
-    }
 }
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         applicationId "com.loopme.interstitial_sample"
@@ -19,9 +14,6 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
     buildTypes {
         release {
@@ -45,9 +37,6 @@ android {
 }
 
 dependencies {
-    api project(':loopme-sdk')
-
-    api "com.android.support:appcompat-v7:$supportLibraryVersion"
-    api "com.android.support.constraint:constraint-layout:$constraintLayout"
-    testImplementation "junit:junit:$junitVersion"
+    implementation project(':loopme-sdk')
+    implementation 'com.android.support:appcompat-v7:28.0.0'
 }

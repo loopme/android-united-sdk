@@ -1,7 +1,5 @@
 package com.loopme;
 
-import com.loopme.utils.Utils;
-
 public class Constants {
     public static final String UTF_8 = "UTF-8";
     public static final String MIME_TYPE_TEXT_HTML = "text/html";
@@ -24,13 +22,13 @@ public class Constants {
     public static final int DEFAULT_AD_ID = -1;
     public static final long ONE_SECOND_IN_MILLIS = 1000;
     public static final int AUTO_LOADING_ABSENCE = -1;
-    public static final int BUTTON_SIZE = Utils.convertDpToPixel(40);
+    public static final int BUTTON_SIZE_DPI = 40;
 
     public static final int DEFAULT_BANNER_WIDTH = 350;
     public static final int DEFAULT_BANNER_HEIGHT = 250;
     public static final long DESTROY_TIME_DELAY = 200;
 
-    public static boolean sDebugMode = true;
+    public static boolean sDebugMode = false;
     public static final String MRAID_SCRIPT = "<script src=\"mraid.js\"></script>";
 
     private Constants() {

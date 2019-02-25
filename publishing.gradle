@@ -1,119 +1,19 @@
-apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
-apply plugin: 'maven-publish'
+apply plugin: 'com.novoda.bintray-release'
 
-def deployArtifact = new Properties()
-deployArtifact.load(new FileInputStream("deploy.settings"))
-
-group = 'com.loopme'
-version = '6.1.10'
-
-bintray {
-    user = BINTRAY_USER
-    key = BINTRAY_KEY
-    configurations = ['archives']
-    pkg {
-        repo = deployArtifact.repo
-        name = deployArtifact.name
-        desc = deployArtifact.description
-
-        websiteUrl = deployArtifact.websiteUrl
-        vcsUrl = deployArtifact.vcsUrl
-        licenses = deployArtifact.licenses
-        publish = true
-        publicDownloadNumbers = true
-    }
+publish {
+    bintrayUser = BINTRAY_USER
+    bintrayKey = BINTRAY_KEY
+    uploadName = 'loopme-united-sdk'
+    userOrg = 'loopme'
+    groupId = 'com.loopme'
+    artifactId = 'loopme-sdk'
+    publishVersion = project.android.defaultConfig.versionName
+    website = 'https://github.com/loopme/android-united-sdk'
+    licences = ['Apache-2.0']
+    dryRun = false
+    autoPublish = true
+    desc = 'Please meet our New United SDK. ' +
+            'It combines multiple premium ads technologies ' +
+            'with the highest performance ' +
+            'and lean resource consumption.'
 }
-
-install {
-    repositories.mavenInstaller {
-        pom.project {
-            packaging 'aar'
-            groupId 'com.loopme'
-            artifactId 'loopme-sdk'
-
-            name 'LoopMeSDK'
-            description deployArtifact.description
-            url deployArtifact.vcsUrl
-
-            licenses {
-                license {
-                    name deployArtifact.licenseLoopmeName
-                    url deployArtifact.licenseLoopmeUrl
-                }
-            }
-            developers {
-                developer {
-                    id deployArtifact.developerId
-                    name deployArtifact.developerName
-                    email deployArtifact.developerEmail
-                }
-            }
-        }
-    }
-}
-
-task androidJavadocs(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-    classifier = 'javadoc'
-    from androidJavadocs.destinationDir
-}
-
-task androidSourcesJar(type: Jar) {
-    classifier = 'sources'
-    from android.sourceSets.main.java.srcDirs
-}
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId 'com.loopme'
-            artifactId 'loopme-sdk'
-            version '6.1.10'
-
-            artifact bundleRelease
-            artifact androidJavadocsJar
-            artifact androidSourcesJar
-
-            pom.withXml {
-                def dependenciesNode = asNode().appendNode('dependencies')
-
-
-                configurations.getByName('api').getAllDependencies().each { Dependency dep ->
-                    addDependenciesToPom(dependenciesNode, dep)
-                }
-
-                configurations.getByName('implementation').getAllDependencies().each { Dependency dep ->
-                    addDependenciesToPom(dependenciesNode, dep)
-                }
-            }
-        }
-    }
-}
-
-
-def addDependenciesToPom(def dependenciesNode, Dependency dep) {
-    if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified")
-        return // ignore invalid dependencies
-
-    def dependencyNode = dependenciesNode.appendNode('dependency')
-    dependencyNode.appendNode('groupId', dep.group)
-    dependencyNode.appendNode('artifactId', dep.name)
-    dependencyNode.appendNode('version', dep.version)
-}
-
-repositories {
-    maven {
-        url "${System.env.HOME}/.m2/repository"
-    }
-}
-install.dependsOn build
-uploadArchives.dependsOn build
-
-
-apply plugin: 'com.github.dcendents.android-maven'

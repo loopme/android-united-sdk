@@ -120,7 +120,13 @@ public class PlayerLayout extends FrameLayout implements View.OnTouchListener, V
         mSkipButton.setScaleType(ImageView.ScaleType.CENTER);
         mSkipButton.setImageResource(R.drawable.l_skip);
         mSkipButton.setVisibility(View.INVISIBLE);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(Constants.BUTTON_SIZE, Constants.BUTTON_SIZE, Gravity.END);
+
+        int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI, getContext());
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                btnSizePx,
+                btnSizePx,
+                Gravity.END);
+
         mSkipButton.setLayoutParams(params);
     }
 
@@ -130,7 +136,13 @@ public class PlayerLayout extends FrameLayout implements View.OnTouchListener, V
         mMuteButton.setScaleType(ImageView.ScaleType.CENTER);
         mMuteButton.setImageResource(R.drawable.l_unmute);
         mMuteButton.setVisibility(View.VISIBLE);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(Constants.BUTTON_SIZE, Constants.BUTTON_SIZE, Gravity.START);
+
+        int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI, getContext());
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                btnSizePx,
+                btnSizePx,
+                Gravity.START);
+
         mMuteButton.setLayoutParams(params);
     }
 

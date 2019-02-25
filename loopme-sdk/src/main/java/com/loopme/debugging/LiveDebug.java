@@ -24,8 +24,8 @@ public class LiveDebug {
 
     private static final String LOG_TAG = LiveDebug.class.getSimpleName();
 
-    //default debug time is 5 minutes
-    private static final int DEBUG_TIME = 5 * 60 * 1000;
+    // Default debug time is 3 minutes.
+    private static final int DEBUG_TIME = 3 * 60 * 1000;
 
     private static LogDbHelper sLogDbHelper;
     private static ExecutorService sExecutor = Executors.newSingleThreadExecutor();
@@ -53,10 +53,12 @@ public class LiveDebug {
         }
     }
 
-    public static void handle(String logTag, String text) {
-        if (sIsDebugOn) {
+    /**
+     * @param forceSave TODO. Refactor. For handling cases when sIsDebugOn isn't set yet.
+     */
+    public static void handle(String logTag, String text, boolean forceSave) {
+        if (sIsDebugOn || forceSave)
             saveLog(logTag, text);
-        }
     }
 
     private static void startTimer(final Context context, final String appKey) {

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.loopme.Logging;
 import com.loopme.request.AdvertisingIdClient;
 import com.loopme.utils.ExecutorHelper;
 
@@ -32,16 +31,10 @@ public class DntFetcher implements Runnable {
 
     @Override
     public void run() {
-        boolean isLimited = false;
-        String advId = "";
-        try {
-            AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
-            isLimited = adInfo.isLimitAdTrackingEnabled();
-            advId = adInfo.getId();
-        } catch (Exception e) {
-            Logging.out(LOG_TAG, "Exception: " + e.getMessage());
-        }
-        onDntFetchedOnUiThread(isLimited, advId);
+        AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
+        onDntFetchedOnUiThread(
+                adInfo.isLimitAdTrackingEnabled(),
+                adInfo.getId());
     }
 
     private void onDntFetchedOnUiThread(final boolean isLimited, final String advId) {

@@ -2,7 +2,6 @@ package com.loopme;
 
 import android.app.Activity;
 
-import com.loopme.common.Logging;
 import com.loopme.common.LoopMeError;
 import com.unity3d.player.UnityPlayer;
 

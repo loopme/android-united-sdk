@@ -1,34 +1,31 @@
 package com.loopme.request;
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.IBinder;
-import android.os.IInterface;
-import android.os.Looper;
-import android.os.Parcel;
-import android.os.RemoteException;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
-import java.io.IOException;
-import java.util.concurrent.LinkedBlockingQueue;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.loopme.Logging;
 
 /**
  * Detect google advertising id
  */
 public final class AdvertisingIdClient {
 
+    private final static String LOG_TAG = AdvertisingIdClient.class.getSimpleName();
+
+    private final static String DNT_AD_ID = "00000000-0000-0000-0000-000000000000";
+
     public static final class AdInfo {
 
         private String mAdvertisingId;
         private boolean mLimitAdTrackingEnabled;
 
-        AdInfo() {
+        private AdInfo() {
         }
 
-        AdInfo(String advertisingId, boolean limitAdTrackingEnabled) {
+        private AdInfo(String advertisingId, boolean limitAdTrackingEnabled) {
             mAdvertisingId = advertisingId;
             mLimitAdTrackingEnabled = limitAdTrackingEnabled;
         }
@@ -42,102 +39,47 @@ public final class AdvertisingIdClient {
         }
     }
 
-    public static AdInfo getAdvertisingIdInfo(Context context) throws Exception {
-        if (Looper.myLooper() == Looper.getMainLooper())
-            throw new IllegalStateException("Cannot be called from the main thread");
-
+    @NonNull
+    public static AdInfo getAdvertisingIdInfo(Context context) {
         try {
-            PackageManager pm = context.getPackageManager();
-            pm.getPackageInfo("com.android.vending", 0);
-        } catch (NameNotFoundException e) {
-            e.printStackTrace();
-        }
+            Context appContext = context.getApplicationContext();
+            com.google.android.gms.ads.identifier.AdvertisingIdClient.Info result =
+                    com.google.android.gms.ads.identifier.AdvertisingIdClient
+                            .getAdvertisingIdInfo(
+                                    appContext == null
+                                            ? context
+                                            : appContext);
 
-        AdvertisingConnection connection = new AdvertisingConnection();
-        Intent intent = new Intent("com.google.android.gms.ads.identifier.service.START");
-        intent.setPackage("com.google.android.gms");
+            boolean dnt = result.isLimitAdTrackingEnabled();
+            String id = dnt ? DNT_AD_ID : result.getId();
 
-        if (context.bindService(intent, connection, Context.BIND_AUTO_CREATE)) {
-            try {
-                AdvertisingInterface adInterface = new AdvertisingInterface(connection.getBinder());
-                return new AdInfo(adInterface.getId(),
-                        adInterface.isLimitAdTrackingEnabled(true));
-            } finally {
-                context.unbindService(connection);
+            if (TextUtils.isEmpty(id)) {
+                id = "";
+                Logging.out(LOG_TAG, "getId() returned empty id.", true);
             }
-        }
-        throw new IOException("Google Play connection failed");
-    }
 
-    private static final class AdvertisingConnection implements ServiceConnection {
+            return new AdInfo(id, dnt);
 
-        boolean mRetrieved = false;
-        private final LinkedBlockingQueue<IBinder> mQueue = new LinkedBlockingQueue<IBinder>(1);
-
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            try {
-                mQueue.put(service);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        public void onServiceDisconnected(ComponentName name) {
-        }
-
-        public IBinder getBinder() throws InterruptedException {
-            if (mRetrieved) {
-                throw new IllegalStateException();
-            }
-            mRetrieved = true;
-            return mQueue.take();
-        }
-    }
-
-    private static final class AdvertisingInterface implements IInterface {
-
-        private IBinder mBinder;
-
-        public AdvertisingInterface(IBinder binder) {
-            mBinder = binder;
+        } catch (GooglePlayServicesRepairableException e) {
+            Logging.out(LOG_TAG,
+                    e.toString() +
+                            " MESSAGE: " +
+                            e.getMessage() +
+                            " CONNECTION_STATUS_CODE: " +
+                            e.getConnectionStatusCode(),
+                    true);
+        } catch (GooglePlayServicesNotAvailableException e) {
+            Logging.out(LOG_TAG,
+                    e.toString() +
+                            " MESSAGE: " +
+                            e.getMessage() +
+                            " ERROR_CODE: " +
+                            e.errorCode,
+                    true);
+        } catch (Exception e) {
+            Logging.out(LOG_TAG, e.toString(), true);
         }
 
-        public IBinder asBinder() {
-            return mBinder;
-        }
-
-        public String getId() throws RemoteException {
-            Parcel data = Parcel.obtain();
-            Parcel reply = Parcel.obtain();
-            String id;
-            try {
-                data.writeInterfaceToken("com.google.android.gms.ads.identifier.internal.IAdvertisingIdService");
-                mBinder.transact(1, data, reply, 0);
-                reply.readException();
-                id = reply.readString();
-            } finally {
-                reply.recycle();
-                data.recycle();
-            }
-            return id;
-        }
-
-        public boolean isLimitAdTrackingEnabled(boolean paramBoolean)
-                throws RemoteException {
-            Parcel data = Parcel.obtain();
-            Parcel reply = Parcel.obtain();
-            boolean limitAdTracking;
-            try {
-                data.writeInterfaceToken("com.google.android.gms.ads.identifier.internal.IAdvertisingIdService");
-                data.writeInt(paramBoolean ? 1 : 0);
-                mBinder.transact(2, data, reply, 0);
-                reply.readException();
-                limitAdTracking = 0 != reply.readInt();
-            } finally {
-                reply.recycle();
-                data.recycle();
-            }
-            return limitAdTracking;
-        }
+        return new AdInfo("", false);
     }
 }

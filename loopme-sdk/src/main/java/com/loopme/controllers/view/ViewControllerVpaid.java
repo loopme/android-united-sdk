@@ -16,6 +16,7 @@ import com.loopme.R;
 import com.loopme.controllers.display.DisplayControllerVpaid;
 import com.loopme.time.TimerWithPause;
 import com.loopme.utils.ImageUtils;
+import com.loopme.utils.Utils;
 
 public class ViewControllerVpaid implements View.OnClickListener {
 
@@ -77,7 +78,13 @@ public class ViewControllerVpaid implements View.OnClickListener {
         mCloseImageView.setId(CLOSE_BUTTON_ID);
         mCloseImageView.setScaleType(ImageView.ScaleType.CENTER);
         mCloseImageView.setImageResource(R.drawable.l_close);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(Constants.BUTTON_SIZE, Constants.BUTTON_SIZE, Gravity.END);
+
+        int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI, context);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                btnSizePx,
+                btnSizePx,
+                Gravity.END);
+
         mCloseImageView.setLayoutParams(params);
         enableCloseButton(false);
     }
