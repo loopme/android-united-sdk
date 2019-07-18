@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 import com.loopme.Constants;
 import com.loopme.tracker.partners.LoopMeTracker;
@@ -19,7 +18,7 @@ import java.net.URISyntaxException;
  * Custom WebViewClient for AdBrowserWebView which handles different url schemes.
  * Has listener to communicate with buttons on AdBrowserLayout.
  */
-public class AdBrowserWebViewClient extends WebViewClient {
+public class AdBrowserWebViewClient extends WebViewClientCompat {
 
     private static final String LOG_TAG = AdBrowserWebViewClient.class.getSimpleName();
     private static final String HEADER_PLAIN_TEXT = "plain/text";
@@ -56,8 +55,8 @@ public class AdBrowserWebViewClient extends WebViewClient {
     }
 
     @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        Logging.out(LOG_TAG, "shouldOverrideUrlLoading url=" + url);
+    public boolean shouldOverrideUrlLoadingCompat(WebView view, String url) {
+        Logging.out(LOG_TAG, "shouldOverrideUrlLoadingCompat url=" + url);
 
         Uri uri = parseUri(url);
         if (uri == null) {

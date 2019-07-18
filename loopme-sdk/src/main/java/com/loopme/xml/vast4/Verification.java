@@ -2,34 +2,37 @@ package com.loopme.xml.vast4;
 
 import com.loopme.parser.xml.Attribute;
 import com.loopme.parser.xml.Tag;
+import com.loopme.xml.TrackingEvents;
+
+import java.util.List;
 
 public class Verification {
 
     @Attribute
     private String vendor;
 
-    @Tag
-    private JavaScriptResource javaScriptResource;
+    @Tag("JavaScriptResource")
+    private List<JavaScriptResource> javaScriptResourceList;
 
     @Tag
-    private FlashResource flashResource;
+    private TrackingEvents trackingEvents;
 
     @Tag
-    private ViewableImpression viewableImpression;
+    private VerificationParameters verificationParameters;
 
     public String getVendor() {
         return vendor;
     }
 
-    public JavaScriptResource getJavaScriptResource() {
-        return javaScriptResource;
+    public List<JavaScriptResource> getJavaScriptResourceList() {
+        return javaScriptResourceList;
     }
 
-    public FlashResource getFlashResource() {
-        return flashResource;
+    public TrackingEvents getTrackingEvents() {
+        return trackingEvents;
     }
 
-    public ViewableImpression getViewableImpression() {
-        return viewableImpression;
+    public VerificationParameters getVerificationParameters() {
+        return verificationParameters;
     }
 }

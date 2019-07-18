@@ -8,6 +8,7 @@ import com.loopme.Logging;
 import com.loopme.bridges.Bridge;
 import com.loopme.bridges.BridgeCommandBuilder;
 import com.loopme.bridges.BridgeInterface;
+import com.loopme.listener.Listener;
 import com.loopme.utils.Utils;
 
 
@@ -15,17 +16,22 @@ public class AdView extends LoopMeWebView implements BridgeInterface, Bridge.Lis
 
     private static final String LOG_TAG = AdView.class.getSimpleName();
     private Constants.VideoState mCurrentVideoState = Constants.VideoState.IDLE;
-    private boolean mCurrentFullScreenState;
-    private Bridge.Listener mBridgeListener;
-    private volatile Bridge mBridge;
 
-    public AdView(Context context) {
+    private Bridge.Listener mBridgeListener;
+
+    public AdView(Context context, Listener adReadyListener) {
         super(context);
         Logging.out(LOG_TAG, "AdView created");
-        mBridge = new Bridge(this, getContext());
-        setWebViewClient(mBridge);
+        setWebViewClient(new Bridge(getContext(), this, adReadyListener));
         setDefaultWebChromeClient();
         modifyUserAgentForKrPano();
+    }
+
+    // This helps Omid to send sessionFinish js event when ad is about to be destroyed.
+    @Override
+    public void destroy() {
+        mBridgeListener = null;
+        destroyGracefully();
     }
 
     public void addBridgeListener(Bridge.Listener listener) {

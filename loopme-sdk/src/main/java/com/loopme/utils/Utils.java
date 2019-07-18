@@ -48,7 +48,6 @@ import java.util.regex.Pattern;
 
 // TODO. Refactor.
 public class Utils {
-    private static final int START_BODY_TAG = 173;
     private static final int ZERO = 0;
     private static final float DEFAULT_DENSITY = 1;
     private static final float DEFAULT_VOLUME = 1.0f;
@@ -776,21 +775,21 @@ public class Utils {
         return obj instanceof Float;
     }
 
-    private static final Pattern BODY_TAG_PATTERN = Pattern.compile("<\\s*body\\b[^>]*>");
+    private static final Pattern SCRIPT_TAG_PATTERN = Pattern.compile("<\\s*script\\b[^>]*>");
 
     public static String addMraidScript(String html) {
         if (TextUtils.isEmpty(html)) {
             return "";
         }
 
-        Matcher m = BODY_TAG_PATTERN.matcher(html);
+        Matcher m = SCRIPT_TAG_PATTERN.matcher(html);
         if (!m.find()) {
-            Logging.out(LOG_TAG, "Couldn't find <body>");
+            Logging.out(LOG_TAG, "Couldn't find <script>");
             return html;
         }
 
         // TODO. Performance?
-        return new StringBuilder(html).insert(m.end(), Constants.MRAID_SCRIPT).toString();
+        return new StringBuilder(html).insert(m.start(), Constants.MRAID_SCRIPT).toString();
     }
 
     public static String getUserAgent() {

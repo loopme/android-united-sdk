@@ -3,20 +3,19 @@ package com.loopme.controllers.display;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Build;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
+import com.loopme.utils.ApiLevel;
 import com.loopme.views.webclient.AdViewChromeClient;
 
 public class VastWebView extends WebView {
 
-    private Vast4Tracker.OnAdVerificationListener mListener;
-
-    public VastWebView(Context context, Vast4Tracker.OnAdVerificationListener listener) {
+    public VastWebView(Context context) {
         super(context);
-        mListener = listener;
         configure();
         allowCookies();
     }
@@ -26,36 +25,40 @@ public class VastWebView extends WebView {
         getSettings().setJavaScriptEnabled(true);
         getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         setBackgroundColor(Color.TRANSPARENT);
+        // TODO.
         setWebContentsDebuggingEnabled(true);
         setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
         setWebChromeClient(new AdViewChromeClient(new AdViewChromeClient.OnErrorFromJsCallback() {
             @Override
             public void onErrorFromJs(String message) {
-                onVerificationJsFailed(message);
+
             }
         }));
 
-        setWebViewClient(new Vast4WebViewClient(mListener));
-    }
-
-    private void onVerificationJsFailed(String message) {
-        if (mListener != null) {
-            mListener.onVerificationJsFailed(message);
-        }
+        setWebViewClient(new Vast4WebViewClient());
     }
 
     private void allowCookies() {
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (ApiLevel.isApi21AndHigher()) {
             cookieManager.setAcceptThirdPartyCookies(this, true);
         }
     }
 
+    // TODO. Refactor. Duplicate of LoopMeWebView.
     public void destroy() {
+        ViewParent parent = getParent();
+        if (parent != null)
+            ((ViewGroup)parent).removeView(this);
+
         clearCache(true);
-        setWebChromeClient(null);
+        clearHistory();
+
         setWebViewClient(null);
+        setWebChromeClient(null);
+
         loadUrl("about:blank");
+        super.destroy();
     }
 }

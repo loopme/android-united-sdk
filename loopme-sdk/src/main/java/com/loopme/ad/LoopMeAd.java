@@ -13,14 +13,12 @@ import com.loopme.Helpers;
 import com.loopme.IdGenerator;
 import com.loopme.IntegrationType;
 import com.loopme.Logging;
-import com.loopme.LoopMeSdk;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.display.BaseTrackableController;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
 import com.loopme.controllers.display.DisplayControllerVast;
 import com.loopme.controllers.display.DisplayControllerVpaid;
 import com.loopme.debugging.LiveDebug;
-import com.loopme.gdpr.GdprChecker;
 import com.loopme.loaders.AdFetchTask;
 import com.loopme.loaders.AdFetchTaskByUrl;
 import com.loopme.loaders.AdFetcherListener;
@@ -35,7 +33,7 @@ import com.loopme.utils.ValidationHelper;
 import java.util.Observable;
 import java.util.Observer;
 
-public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting, Observer, GdprChecker.OnConsentListener {
+public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting, Observer {
 
     private static final String LOG_TAG = LoopMeAd.class.getSimpleName();
     private static final String WRONG_PARAMETERS = "Context or AppKey is null!";
@@ -208,11 +206,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         return mAdState == Constants.AdState.LOADING;
     }
 
-    @Override
-    public void onComplete() {
-        load(mIntegrationType);
-    }
-
     private void onResponseReceived(AdParams adParam) {
         if (adParam != null) {
             LoopMeTracker.trackSdkFeedBack(adParam.getPackageIds(), adParam.getToken());
@@ -311,11 +304,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
      * After its execution, the interstitial/banner notifies whether the loading of the ad content failed or succeeded.
      */
     public void load() {
-        if (LoopMeSdk.isGdprConsentSet(mContext)) {
-            load(mIntegrationType);
-        } else {
-            LoopMeSdk.askGdprConsent(mContext, this);
-        }
+        load(mIntegrationType);
     }
 
     public void load(IntegrationType integrationType) {

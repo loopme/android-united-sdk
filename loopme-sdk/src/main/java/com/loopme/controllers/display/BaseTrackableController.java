@@ -46,9 +46,8 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
 
     @Override
     public void onStartLoad() {
-        if (isEventManagerNeeded()) {
+        if (isEventManagerNeeded())
             mEventManager = new EventManager(mLoopMeAd);
-        }
     }
 
     protected void initTrackers() {
@@ -59,6 +58,7 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
         }
     }
 
+    // TODO.
     private boolean isNativeAd() {
         return mLoopMeAd != null && !mLoopMeAd.isMraidAd() && !mLoopMeAd.isVpaidAd() && (mLoopMeAd.isVideo360() || mLoopMeAd.isVastAd());
     }

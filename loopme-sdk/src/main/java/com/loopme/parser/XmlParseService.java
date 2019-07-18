@@ -153,24 +153,14 @@ public class XmlParseService {
     }
 
     private static void setAdVerificationJavaScriptUrl(AdVerifications adVerifications) {
-        if (adVerifications != null && adVerifications.getVerificationList() != null) {
-            List<String> javaScriptUrlList = getJavaScriptVerificationList(adVerifications.getVerificationList());
-            sAdParams.setAdVerificationJavaScriptUrlList(javaScriptUrlList);
-        }
-    }
+        if (adVerifications == null)
+            return;
 
-    private static List<String> getJavaScriptVerificationList(List<Verification> verificationList) {
-        ArrayList<String> javaScriptUrlList = new ArrayList<>();
+        List<Verification> verifications = adVerifications.getVerificationList();
+        if (verifications == null)
+            return;
 
-        if (verificationList != null && verificationList.size() > 0) {
-            for (Verification verification : verificationList) {
-                String jsUrl = verification.getJavaScriptResource().getText();
-                if (!TextUtils.isEmpty(jsUrl)) {
-                    javaScriptUrlList.add(jsUrl);
-                }
-            }
-        }
-        return javaScriptUrlList;
+        sAdParams.setVerificationList(verifications);
     }
 
     private static void setParamCompanionCreativeViewEvents(Companion companion) {

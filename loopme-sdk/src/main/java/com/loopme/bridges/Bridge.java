@@ -7,19 +7,19 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.Utils;
 import com.loopme.views.AdView;
+import com.loopme.views.webclient.WebViewClientCompat;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
 
-public class Bridge extends WebViewClient {
+public class Bridge extends WebViewClientCompat {
 
     private static final String LOG_TAG = Bridge.class.getSimpleName();
 
@@ -45,16 +45,23 @@ public class Bridge extends WebViewClient {
     private static final String QUERY_PARAM_MUTE = "mute";
     private static final String QUERY_PARAM_FULLSCREEN_MODE = "mode";
 
-    private Listener mListener;
     private Context mContext;
+    private Listener mListener;
+    private com.loopme.listener.Listener adReadyListener;
 
-    public Bridge(Listener listener, Context context) {
+    // TODO. Refactor.
+    public Bridge(
+            Context context,
+            Listener listener,
+            com.loopme.listener.Listener adReadyListener) {
+
         if (listener != null) {
-            mListener = listener;
             mContext = context;
-        } else {
+            mListener = listener;
+        } else
             Logging.out(LOG_TAG, "VideoBridgeListener should not be null");
-        }
+
+        this.adReadyListener = adReadyListener;
     }
 
     @Override
@@ -76,8 +83,8 @@ public class Bridge extends WebViewClient {
     }
 
     @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        Logging.out(LOG_TAG, "shouldOverrideUrlLoading " + url);
+    public boolean shouldOverrideUrlLoadingCompat(WebView view, String url) {
+        Logging.out(LOG_TAG, "shouldOverrideUrlLoadingCompat " + url);
 
         if (TextUtils.isEmpty(url)) {
             LoopMeTracker.post("Broken redirect in bridge: " + url, Constants.ErrorType.JS);
@@ -142,7 +149,7 @@ public class Bridge extends WebViewClient {
     }
 
     private void onLeaveApp() {
-        if(mListener != null){
+        if (mListener != null) {
             mListener.onLeaveApp();
         }
     }
@@ -291,7 +298,7 @@ public class Bridge extends WebViewClient {
     }
 
     private void onJsFullscreenMode(boolean mode) {
-        if(mListener != null){
+        if (mListener != null) {
             mListener.onJsFullscreenMode(mode);
         }
     }
@@ -309,7 +316,7 @@ public class Bridge extends WebViewClient {
     }
 
     private void onJsVideoPause(int pauseTime) {
-        if(mListener != null) {
+        if (mListener != null) {
             mListener.onJsVideoPause(pauseTime);
         }
     }
@@ -333,13 +340,15 @@ public class Bridge extends WebViewClient {
     }
 
     private void onJsLoadSuccess() {
-        if(mListener != null){
+        if (mListener != null)
             mListener.onJsLoadSuccess();
-        }
+
+        if (adReadyListener != null)
+            adReadyListener.onCall();
     }
 
     private void onJsClose() {
-        if(mListener != null){
+        if (mListener != null) {
             mListener.onJsClose();
         }
     }

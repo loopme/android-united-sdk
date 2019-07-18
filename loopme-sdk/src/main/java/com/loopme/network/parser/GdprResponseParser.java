@@ -15,15 +15,15 @@ public class GdprResponseParser extends BaseJSONParser {
         String responseAsString = new String(body);
         JSONObject jsonObject = new JSONObject(responseAsString);
 
-        int needConsent = getInt(jsonObject, PARAM_NEED_CONSENT, true);
-        if (needConsent == 0) {
-            int userConsent = getInt(jsonObject, PARAM_USER_CONSENT, true);
-            response.setUserConsent(userConsent);
-        } else {
-            String consentUrl = getString(jsonObject, PARAM_CONSENT_URL, true);
-            response.setConsentUrl(consentUrl);
-        }
-        response.setNeedConsent(needConsent);
+        if (jsonObject.has(PARAM_NEED_CONSENT))
+            response.setNeedConsent(getInt(jsonObject, PARAM_NEED_CONSENT, true));
+
+        if (jsonObject.has(PARAM_USER_CONSENT))
+            response.setUserConsent(getInt(jsonObject, PARAM_USER_CONSENT, true));
+
+        if (jsonObject.has(PARAM_CONSENT_URL))
+            response.setConsentUrl(getString(jsonObject, PARAM_CONSENT_URL, true));
+
         return response;
     }
 }

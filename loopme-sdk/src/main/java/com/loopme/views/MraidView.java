@@ -8,7 +8,7 @@ import com.loopme.Logging;
 import com.loopme.bridges.BridgeCommandBuilder;
 import com.loopme.bridges.mraid.MraidBridge;
 import com.loopme.controllers.MraidController;
-import com.loopme.utils.Utils;
+import com.loopme.listener.Listener;
 
 
 public class MraidView extends LoopMeWebView {
@@ -16,17 +16,31 @@ public class MraidView extends LoopMeWebView {
     private static final String LOG_TAG = MraidView.class.getSimpleName();
     private String mCurrentMraidState;
 
-    public MraidView(Context context, final MraidController mraidController) {
+    public MraidView(
+            Context context,
+            final MraidController mraidController,
+            Listener adReadyListener) {
         super(context);
         getSettings().setAllowUniversalAccessFromFileURLs(true);
         mraidController.setMraidView(this);
-        setWebViewClient(new MraidBridge(mraidController));
+        setWebViewClient(new MraidBridge(mraidController, adReadyListener));
         setDefaultWebChromeClient();
     }
 
-    public void loadData(String html) {
-        html = Utils.addMraidScript(html);
-        loadDataWithBaseURL(Constants.MRAID_ANDROID_ASSET, html, Constants.MIME_TYPE_TEXT_HTML, Constants.UTF_8, null);
+    // This helps Omid to send sessionFinish js event when ad is about to be destroyed.
+    @Override
+    public void destroy() {
+        destroyGracefully();
+    }
+
+    @Override
+    public void loadHtml(String html) {
+        loadDataWithBaseURL(
+                Constants.MRAID_ANDROID_ASSET,
+                html,
+                Constants.MIME_TYPE_TEXT_HTML,
+                Constants.UTF_8,
+                null);
     }
 
     public void setIsViewable(boolean isViewable) {

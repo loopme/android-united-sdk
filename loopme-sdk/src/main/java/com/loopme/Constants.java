@@ -50,6 +50,7 @@ public class Constants {
     public static final String ORIENTATION_LAND = "landscape";
     public static final String INTERSTITIAL_TAG = "interstitial";
     public static final String EXTRAS_CUSTOM_CLOSE = "customClose";
+    public static final String EXTRAS_DEBUG_OBSTRUCTION_ENABLED = "EXTRAS_DEBUG_OBSTRUCTION_ENABLED";
     public static final String CACHED_LOG_FILE_NAME = "events_log.txt";
     public static final String CLICK_INTENT = "com.loopme.CLICK_INTENT";
     public static final String BASE_URL = HTTPS_SCHEME + "://loopme.me/api/ortb/ads";

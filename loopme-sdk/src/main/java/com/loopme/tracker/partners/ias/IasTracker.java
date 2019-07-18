@@ -74,7 +74,7 @@ public class IasTracker implements Tracker {
     }
 
     private String getPartnerVersion() {
-        return String.valueOf(BuildConfig.VERSION_CODE) + "." + String.valueOf(BuildConfig.VERSION_NAME);
+        return BuildConfig.VERSION_NAME;
     }
 
     public static void startSdk(LoopMeAd loopMeAd) {

@@ -1,7 +1,6 @@
 package com.loopme.utils;
 
 import android.app.Activity;
-import android.os.Build;
 import android.text.TextUtils;
 
 import com.loopme.Constants;
@@ -94,6 +93,6 @@ public class ValidationHelper {
     }
 
     public static boolean isProperlyAndroidVersion() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+        return ApiLevel.isApi21AndHigher();
     }
 }

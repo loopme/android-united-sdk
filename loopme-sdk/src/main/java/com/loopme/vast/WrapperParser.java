@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import com.loopme.Constants;
 import com.loopme.xml.Impression;
 import com.loopme.xml.Tracking;
+import com.loopme.xml.vast4.Verification;
 import com.loopme.xml.vast4.ViewableImpression;
 import com.loopme.xml.vast4.Wrapper;
 
@@ -20,7 +21,9 @@ public class WrapperParser {
     private List<Tracking> mTrackingList = new ArrayList<Tracking>();
     private ArrayList<String> mSimpleImpressionList = new ArrayList<String>();
     private Map<String, ArrayList<String>> mViewableImpressionMap = new HashMap<String, ArrayList<String>>();
-    private ArrayList<String> mAdVerificationJavaScriptUrlList = new ArrayList<String>();
+
+    private List<Verification> verificationList = new ArrayList<>();
+
     private List<String> mVideoClicksList = new ArrayList<String>();
 
     private List<String> mCompanionCreativeViewEventsList = new ArrayList<String>();
@@ -36,7 +39,7 @@ public class WrapperParser {
         setSimpleImpressionsList();
         setTrackingEvents();
         setErrorUrlList();
-        setAdVerificationJavaScriptUrlList();
+        setVerificationList();
         setVideoClicksList();
         setCompanionAdsTrackingDetails();
     }
@@ -96,25 +99,22 @@ public class WrapperParser {
         }
     }
 
-    private void setAdVerificationJavaScriptUrlList() {
-        for (Wrapper wrapper : mWrapperList) {
-            addAdVerificationJavaScriptUrl(wrapper);
-        }
+    private void setVerificationList() {
+        for (Wrapper wrapper : mWrapperList)
+            addToVerificationList(wrapper);
     }
 
-    private void addAdVerificationJavaScriptUrl(Wrapper wrapper) {
-        if (wrapper != null) {
-            List<String> javaScriptUrlList = wrapper.getAdVerificationJavaScriptUrlList();
-            for (String jsUrl : javaScriptUrlList) {
-                addToAdVerificationJavaScriptUrlList(jsUrl);
-            }
-        }
-    }
+    private void addToVerificationList(Wrapper wrapper) {
+        if (wrapper == null)
+            return;
 
-    private void addToAdVerificationJavaScriptUrlList(String jsUrl) {
-        if (!TextUtils.isEmpty(jsUrl)) {
-            mAdVerificationJavaScriptUrlList.add(jsUrl);
-        }
+        List<Verification> verificationList = wrapper.getVerificationList();
+        if (verificationList == null)
+            return;
+
+        for (Verification verification : verificationList)
+            if (verification != null)
+                this.verificationList.add(verification);
     }
 
     public List<String> getErrorUrlList() {
@@ -133,8 +133,8 @@ public class WrapperParser {
         return mTrackingList;
     }
 
-    public ArrayList<String> getAdVerificationJavaScriptUrlList() {
-        return mAdVerificationJavaScriptUrlList;
+    public List<Verification> getVerificationList() {
+        return verificationList;
     }
 
     private void addErrorUrl(Wrapper wrapper) {

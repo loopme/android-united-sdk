@@ -44,6 +44,19 @@ public class LoopMeInterstitialUnity implements LoopMeInterstitial.Listener {
         }
     }
 
+	public synchronized void setAutoLoading(final boolean autoLoading) {
+		mActivity.runOnUiThread(new Runnable() {
+
+		    @Override
+			public void run() {
+		        if (mLoopMeInterstitial != null)
+				    mLoopMeInterstitial.setAutoLoading(autoLoading);
+		        else
+                    Logging.out(LOG_TAG, "setAutoLoading call failed: mLoopMeInterstitial is null");
+			}
+		});
+    }
+
     public void load() {
         mActivity.runOnUiThread(new Runnable() {
 

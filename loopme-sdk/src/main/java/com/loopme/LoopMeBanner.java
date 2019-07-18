@@ -1,7 +1,6 @@
 package com.loopme;
 
 import android.app.Activity;
-import android.os.Build;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.widget.FrameLayout;
@@ -9,6 +8,7 @@ import android.widget.FrameLayout;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.tracker.partners.LoopMeTracker;
+import com.loopme.utils.ApiLevel;
 
 /**
  * The `LoopMeBanner` class provides facilities to display a custom size ads
@@ -49,15 +49,16 @@ public final class LoopMeBanner extends AdWrapper {
     /**
      * Getting already initialized ad object or create new one with specified appKey
      *
-     * @param appKey your app key
+     * @param appKey   your app key
      * @param activity activity context
-     * @return instance of LoopMeBanner; null - android version is under API 21 (5.0 LOLLIPOP)
+     * @return instance of LoopMeBanner;
+     * null - android version is under API 21 (5.0 LOLLIPOP) or SDK isn't initialized
      */
     @Nullable
     public static LoopMeBanner getInstance(String appKey, Activity activity) {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP
-                ? null
-                : new LoopMeBanner(activity, appKey);
+        return LoopMeSdk.isInitialized() && ApiLevel.isApi21AndHigher()
+                ? new LoopMeBanner(activity, appKey)
+                : null;
     }
 
     @Override

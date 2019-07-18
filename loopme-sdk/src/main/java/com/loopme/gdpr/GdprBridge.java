@@ -10,26 +10,25 @@ import android.webkit.JavascriptInterface;
 
 public class GdprBridge {
 
-    private final Handler mHandler = new Handler(Looper.getMainLooper());
-    private OnCloseListener mListener;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private OnCloseListener listener;
 
-    public GdprBridge(OnCloseListener listener) {
-        mListener = listener;
+    GdprBridge(OnCloseListener listener) {
+        this.listener = listener;
     }
 
     @JavascriptInterface
     public void close() {
-        mHandler.post(new Runnable() {
+        mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                if (mListener != null) {
-                    mListener.onClose();
-                }
+                if (listener != null)
+                    listener.onGdprClose();
             }
         });
     }
 
     public interface OnCloseListener {
-        void onClose();
+        void onGdprClose();
     }
 }

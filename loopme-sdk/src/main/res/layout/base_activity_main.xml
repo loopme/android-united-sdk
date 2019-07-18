@@ -9,4 +9,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <FrameLayout
+        android:id="@+id/debug_obstruction"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ff00ff"
+        android:layout_margin="100dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"/>
 </FrameLayout>

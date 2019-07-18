@@ -1,6 +1,7 @@
 package com.loopme.views.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
@@ -68,7 +69,17 @@ public final class BaseActivity extends Activity
 
     private void setContentView() {
         setContentView(R.layout.base_activity_main);
-        mLoopMeContainerView = (FrameLayout) findViewById(R.id.loopme_container_view);
+
+        // Debug obstruction visibility.
+        Intent i = getIntent();
+        Bundle b = i == null ? null : i.getExtras();
+        View debugObstruction = findViewById(R.id.debug_obstruction);
+        debugObstruction.setVisibility(
+                b != null && b.getBoolean(Constants.EXTRAS_DEBUG_OBSTRUCTION_ENABLED)
+                        ? View.VISIBLE
+                        : View.GONE);
+
+        mLoopMeContainerView = findViewById(R.id.loopme_container_view);
         mLoopMeAd.onNewContainer(mLoopMeContainerView);
         mDisplayController.onAdRegisterView(this, mDisplayController.getWebView());
         mDisplayController.postImpression();
@@ -111,6 +122,10 @@ public final class BaseActivity extends Activity
 
     @Override
     protected void onDestroy() {
+        if (mDisplayController instanceof DisplayControllerLoopMe)
+            ((DisplayControllerLoopMe) mDisplayController)
+                    .tryRemoveOmidFriendlyObstruction(mMraidCloseButton);
+
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         clearLayout();
         destroyReceivers();
@@ -265,6 +280,10 @@ public final class BaseActivity extends Activity
         mMraidCloseButton.addInLayout(mLoopMeContainerView);
         mMraidCloseButton.setOnClickListener(initMraidCloseButtonListener());
         onCloseButtonVisibilityChanged(mIsCloseButtonPresent);
+
+        if (mDisplayController instanceof DisplayControllerLoopMe)
+            ((DisplayControllerLoopMe) mDisplayController)
+                    .tryAddOmidFriendlyObstruction(mMraidCloseButton);
     }
 
     private View.OnClickListener initMraidCloseButtonListener() {

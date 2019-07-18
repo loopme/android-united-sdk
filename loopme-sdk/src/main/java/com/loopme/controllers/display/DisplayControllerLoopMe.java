@@ -5,12 +5,15 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
+import com.iab.omid.library.loopme.adsession.AdEvents;
+import com.iab.omid.library.loopme.adsession.AdSession;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.LoopMeBannerGeneral;
@@ -27,16 +30,24 @@ import com.loopme.controllers.interfaces.LoopMeDisplayController;
 import com.loopme.controllers.view.IViewController;
 import com.loopme.controllers.view.View360Controller;
 import com.loopme.controllers.view.ViewControllerLoopMe;
+import com.loopme.listener.Listener;
 import com.loopme.loaders.FileLoaderNewImpl;
 import com.loopme.loaders.Loader;
 import com.loopme.models.Errors;
 import com.loopme.models.Message;
+import com.loopme.om.OmidEventTrackerWrapper;
+import com.loopme.om.OmidHelper;
 import com.loopme.utils.UiUtils;
+import com.loopme.utils.Utils;
 import com.loopme.views.AdView;
 import com.loopme.views.LoopMeWebView;
 import com.loopme.views.MraidView;
 
-public class DisplayControllerLoopMe extends BaseTrackableController implements LoopMeDisplayController {
+public class DisplayControllerLoopMe
+        extends BaseTrackableController
+        implements LoopMeDisplayController {
+
+    private static final String LOG_TAG = DisplayControllerLoopMe.class.getSimpleName();
 
     private static final int MRAID_WIDTH = 400;
     private static final int MRAID_HEIGHT = 600;
@@ -54,6 +65,10 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     private View.OnTouchListener mOnTouchListener;
     private DisplayModeResolver mDisplayModeResolver;
 
+    private AdSession omidAdSession;
+    private OmidEventTrackerWrapper omidEventTrackerWrapper;
+    private boolean needWaitOmidJsLoad;
+
     public DisplayControllerLoopMe(LoopMeAd loopMeAd) {
         super(loopMeAd);
         if (loopMeAd == null) {
@@ -67,7 +82,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     }
 
     public void initControllers() {
-        if (mAdParams.isMraidAd()) {
+        if (isMraidAd()) {
             initMraidControllers();
         } else {
             initLoopMeControllers();
@@ -78,7 +93,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
 
     private void initLoopMeControllers() {
         onMessage(Message.LOG, "initLoopMeSdkController");
-        mAdView = new AdView(mLoopMeAd.getContext());
+        mAdView = new AdView(mLoopMeAd.getContext(), createAdReadyListener());
         mBridgeListener = initBridgeListener();
         mAdView.addBridgeListener(mBridgeListener);
         mOnTouchListener = initOnTouchListener();
@@ -88,7 +103,10 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     private void initMraidControllers() {
         onMessage(Message.LOG, "initMraidController");
         mMraidController = new MraidController(mLoopMeAd);
-        mMraidView = new MraidView(mLoopMeAd.getContext(), mMraidController);
+        mMraidView = new MraidView(
+                mLoopMeAd.getContext(),
+                mMraidController,
+                createAdReadyListener());
     }
 
     public void initVideoController() {
@@ -107,9 +125,24 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     }
 
     private void buildMraidContainer(FrameLayout containerView) {
-        if (mMraidController != null) {
+        if (mMraidController != null)
             mMraidController.buildMraidContainer(containerView);
-        }
+    }
+
+    // TODO. Ugly.
+    public void tryAddOmidFriendlyObstruction(View view) {
+        if (omidAdSession == null || view == null)
+            return;
+
+        omidAdSession.addFriendlyObstruction(view);
+    }
+
+    // TODO. Ugly.
+    public void tryRemoveOmidFriendlyObstruction(View view) {
+        if (omidAdSession == null || view == null)
+            return;
+
+        omidAdSession.removeFriendlyObstruction(view);
     }
 
     public void collapseMraidBanner() {
@@ -123,18 +156,6 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     private void onCollapseBanner() {
         if (mMraidController != null) {
             mMraidController.onCollapseBanner();
-        }
-    }
-
-    private void preloadMraidAd() {
-        if (mAdParams.isMraidAd()) {
-            mMraidView.loadData(mAdParams.getHtml());
-        }
-    }
-
-    private void preloadLoopMeAd() {
-        if (!mAdParams.isMraidAd()) {
-            loadHtml(mAdParams.getHtml());
         }
     }
 
@@ -230,11 +251,75 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     private void preloadHtml() {
         onAdRegisterView(mLoopMeAd.getContext(), getWebView());
         injectTrackingJsForWeb();
-        if (isMraidAd()) {
-            preloadMraidAd();
-        } else {
-            preloadLoopMeAd();
-        }
+
+        final String preInjectOmidHtml =
+                isMraidAd()
+                        ? Utils.addMraidScript(mAdParams.getHtml())
+                        : mAdParams.getHtml();
+
+        OmidHelper.injectScriptContentIntoHtmlAsync(
+                mLoopMeAd.getContext().getApplicationContext(),
+                preInjectOmidHtml,
+                new OmidHelper.ScriptInjectListener() {
+                    @Override
+                    public void onReady(String injectedOmidHtml) {
+                        onOmidScriptInjectResult(injectedOmidHtml, null);
+                    }
+
+                    @Override
+                    public void onError(String injectOmidError) {
+                        onOmidScriptInjectResult(preInjectOmidHtml, injectOmidError);
+                    }
+                });
+    }
+
+    private void onOmidScriptInjectResult(String html, String injectOmidError) {
+        Logging.out(LOG_TAG, injectOmidError);
+
+        // Omid has been injected successfully.
+        // Wait for html loading and then create omid ad session.
+        if (TextUtils.isEmpty(injectOmidError))
+            needWaitOmidJsLoad = true;
+
+        // Start loading html.
+        WebView wv = getWebView();
+        if (wv instanceof LoopMeWebView)
+            ((LoopMeWebView) wv).loadHtml(html);
+    }
+
+    // TODO. Ugly. Use LoopMeAd.onLoadSuccess at least.
+    private Listener createAdReadyListener() {
+        return new Listener() {
+            @Override
+            public void onCall() {
+                tryCreateOmidAdSession();
+            }
+        };
+    }
+
+    // TODO. Refactor.
+    private void tryCreateOmidAdSession() {
+        if (!needWaitOmidJsLoad)
+            return;
+
+        needWaitOmidJsLoad = false;
+
+        if (omidAdSession != null)
+            return;
+
+        WebView wv = getWebView();
+
+        omidAdSession = OmidHelper.createWebDisplayAdSession(wv);
+        // Something went wrong with omid. See logs.
+        if (omidAdSession == null)
+            return;
+
+        omidEventTrackerWrapper = new OmidEventTrackerWrapper(
+                AdEvents.createAdEvents(omidAdSession),
+                null);
+
+        omidAdSession.registerAdView(wv);
+        omidAdSession.start();
     }
 
     private void injectTrackingJsForWeb() {
@@ -353,16 +438,28 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        if (omidAdSession != null)
+            omidAdSession.finish();
+
+        omidAdSession = null;
+        omidEventTrackerWrapper = null;
+        needWaitOmidJsLoad = false;
+
         destroyMraidController();
         destroyVideoController();
+
         stopVideoLoader();
+
         clearWebView(mAdView);
         clearWebView(mMraidView);
 
         mAdView = null;
         mMraidView = null;
+
         mBridgeListener = null;
         mOnTouchListener = null;
+
         mDisplayModeResolver.destroy();
     }
 
@@ -485,13 +582,6 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
         mViewController.setStretchParam(stretch);
     }
 
-
-    private void loadHtml(String html) {
-        if (mAdView != null) {
-            mAdView.loadHtml(html);
-        }
-    }
-
     public boolean isVideoPresented() {
         return mVideoPresented;
     }
@@ -503,12 +593,14 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     }
 
     public void setWebViewState(Constants.WebviewState state) {
-        if (mAdView != null) {
+        if (mAdView != null)
             mAdView.setWebViewState(state);
-        }
-        if (mMraidView != null) {
+
+        if (mMraidView != null)
             mMraidView.setWebViewState(state);
-        }
+
+        if (omidEventTrackerWrapper != null && state == Constants.WebviewState.VISIBLE)
+            omidEventTrackerWrapper.sendOneTimeImpression();
     }
 
     private View.OnTouchListener initOnTouchListener() {
@@ -712,7 +804,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     }
 
     public void buildView(FrameLayout containerView) {
-        if (mAdParams.isMraidAd()) {
+        if (isMraidAd()) {
             onBuildMraidView(containerView);
         } else {
             if (isNativeAd()) {

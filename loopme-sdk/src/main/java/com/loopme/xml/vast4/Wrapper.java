@@ -113,11 +113,10 @@ public class Wrapper {
         return null;
     }
 
-    public List<String> getAdVerificationJavaScriptUrlList() {
-        if (adVerifications != null) {
-            return adVerifications.getJavaScriptResourceList();
-        }
-        return new ArrayList<>();
+    public List<Verification> getVerificationList() {
+        return adVerifications == null
+                ? new ArrayList<Verification>()
+                : adVerifications.getVerificationList();
     }
 
     public List<String> getVideoClicksList() {

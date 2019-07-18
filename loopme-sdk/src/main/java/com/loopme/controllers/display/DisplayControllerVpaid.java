@@ -3,7 +3,6 @@ package com.loopme.controllers.display;
 import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
@@ -32,7 +31,6 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         BridgeEventHandler,
         VastVpaidDisplayController,
         AdViewChromeClient.OnErrorFromJsCallbackVpaid,
-        Vast4Tracker.OnAdVerificationListener,
         Vast4WebViewClient.OnPageLoadedListener {
 
     private static final String LOG_TAG = DisplayControllerVpaid.class.getSimpleName();
@@ -44,8 +42,6 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     private VpaidBridge mVpaidBridge;
     private ViewControllerVpaid mViewControllerVpaid;
-
-    private LoopMeWebView mWebView;
 
     private boolean mIsWaitingForSkippableState;
     private boolean mIsWaitingForWebView;
@@ -65,31 +61,38 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         Logging.out(mLogTag);
     }
 
-    @Override
-    public void onStartLoad() {
-        super.onStartLoad();
-        initTrackers();
-    }
-
     //region DisplayController methods
+
     @Override
     public void prepare() {
-        initWebView();
-        onAdRegisterView(mLoopMeAd.getContext(), mWebView);
-        initVast4Tracker(mWebView);
-        loadHtml(prepareHtml());
+        super.prepare();
+
+        StringBuilder htmlBuilder =
+                Utils.readAssets(getAssetsManager(), HTML_SOURCE_FILE);
+
+        onAdInjectJsVpaid(htmlBuilder);
+        String html = htmlBuilder.toString().replace(VPAID_CREATIVE_URL_STRING, mAdParams.getVpaidJsUrl());
+
+        mIsWaitingForWebView = true;
+        ((LoopMeWebView) getWebView()).loadHtml(html);
     }
 
-    private String prepareHtml() {
-        StringBuilder htmlBuilder = Utils.readAssets(getAssetsManager(), HTML_SOURCE_FILE);
-        addVerificationScripts(htmlBuilder);
-        onAdInjectJsVpaid(htmlBuilder);
-        return htmlBuilder.toString().replace(VPAID_CREATIVE_URL_STRING, mAdParams.getVpaidJsUrl());
+    @SuppressLint("JavascriptInterface")
+    @Override
+    protected WebView createWebView() {
+        WebView wv = new LoopMeWebView(mLoopMeAd.getContext());
+        wv.setWebChromeClient(new AdViewChromeClient(this));
+        wv.setWebViewClient(initVast4WebViewClient());
+        wv.addJavascriptInterface(mVpaidBridge, ANDROID_JS_INTERFACE);
+        return wv;
     }
 
     @Override
     public void onBuildVideoAdView(FrameLayout containerView) {
-        mViewControllerVpaid.buildVideoAdView(containerView, mWebView, mLoopMeAd.getContext());
+        mViewControllerVpaid.buildVideoAdView(
+                containerView,
+                getWebView(),
+                mLoopMeAd.getContext());
     }
 
     @Override
@@ -106,60 +109,33 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
             super.onPause();
             callBridgeMethod(BridgeMethods.VPAID_PAUSE_AD);
         }
-        pauseViewController();
+
+        if (mViewControllerVpaid != null)
+            mViewControllerVpaid.pause();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         callBridgeMethod(BridgeMethods.VPAID_RESUME_AD);
-        resumeViewController();
+        if (mViewControllerVpaid != null)
+            mViewControllerVpaid.resume();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                destroy();
+                callBridgeMethod(BridgeMethods.VPAID_STOP_AD);
+                destroyWebView();
             }
         });
-        destroyViewController();
-    }
 
-    private void pauseViewController() {
-        if (mViewControllerVpaid != null) {
-            mViewControllerVpaid.pause();
-        }
-    }
-
-    private void resumeViewController() {
-        if (mViewControllerVpaid != null) {
-            mViewControllerVpaid.resume();
-        }
-    }
-
-    private void destroyViewController() {
-        if (mViewControllerVpaid != null) {
+        if (mViewControllerVpaid != null)
             mViewControllerVpaid.destroy();
-        }
-    }
-
-    private void destroy() {
-        callBridgeMethod(BridgeMethods.VPAID_STOP_AD);
-        destroyWebView();
-    }
-
-    private void destroyWebView() {
-        if (mWebView != null) {
-            mWebView.destroy();
-            mWebView = null;
-        }
-    }
-
-    public View getView() {
-        return mWebView;
     }
 
     @Override
@@ -196,9 +172,9 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     }
 
     private void loadUrlToWebView(String url) {
-        if (mWebView != null) {
-            mWebView.loadUrl("javascript:" + url);
-        }
+        WebView wv = getWebView();
+        if (wv != null)
+            wv.loadUrl("javascript:" + url);
     }
 
     @Override
@@ -301,17 +277,9 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     //endregion
 
     //region other methods
-    @SuppressLint("JavascriptInterface")
-    private void initWebView() {
-        mWebView = new LoopMeWebView(mLoopMeAd.getContext());
-        mWebView.setWebChromeClient(new AdViewChromeClient(this));
-        mWebView.setWebViewClient(initVast4WebViewClient());
-        mIsWaitingForWebView = true;
-        mWebView.addJavascriptInterface(mVpaidBridge, ANDROID_JS_INTERFACE);
-    }
 
     private WebViewClient initVast4WebViewClient() {
-        Vast4WebViewClient vast4WebViewClient = new Vast4WebViewClient(this);
+        Vast4WebViewClient vast4WebViewClient = new Vast4WebViewClient();
         vast4WebViewClient.setOnPageLoadedListener(this);
         return vast4WebViewClient;
     }
@@ -324,18 +292,6 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     @Override
     public void onVideoSource(String source) {
         videoSourceEventOccurred(source);
-    }
-
-    @Override
-    public void onVerificationJsLoaded() {
-        Logging.out(LOG_TAG, "verification script successfully loaded");
-    }
-
-    @Override
-    public void onVerificationJsFailed(String message) {
-        LoopMeError error = new LoopMeError(Errors.VERIFICATION_UNIT_NOT_EXECUTED);
-        error.addToMessage(message);
-        onPostWarning(error);
     }
 
     @Override
@@ -359,12 +315,6 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         }
     }
 
-    private void loadHtml(String html) {
-        if (mWebView != null) {
-            mWebView.loadHtml(html);
-        }
-    }
-
     @Override
     public void closeSelf() {
         mIsWaitingForWebView = false;
@@ -382,8 +332,8 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
             onMessage(Message.LOG, "mAdParams.getImpressionsList() " + url);
         }
 
-        setVerificationView(mWebView);
-        postViewableEvents(Vast4Tracker.IMPRESSION_TIME_NATIVE_VIDEO);
+        setVerificationView(getWebView());
+        postViewableEvents(ViewableImpressionTracker.IMPRESSION_TIME_NATIVE_VIDEO);
     }
 
 
@@ -423,11 +373,6 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     @Override
     public void setVideoTime(int time) {
         mCurrentVideoTime = String.valueOf(mVideoDuration - time);
-    }
-
-    @Override
-    public WebView getWebView() {
-        return mWebView;
     }
 
     @Override

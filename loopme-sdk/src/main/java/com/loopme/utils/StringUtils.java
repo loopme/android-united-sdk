@@ -10,16 +10,18 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
 
 public class StringUtils {
     private static final String ERROR_CODE = "[ERRORCODE]";
     private static final String PLAY_TIME = "[CONTENTPLAYHEAD]";
     private static final String TIMESTAMP_CODE_PATTERN = "[TIMESTAMP]";
+    private static final String REASON = "[REASON]";
     private static final String ISO_8601_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.mmm'Z'";
 
     public static String getEncryptedString(String name) {
+        name = name == null ? "" : name;
+
         AES.setDefaultKey();
         AES.encrypt(name);
         return deleteLastCharacter(AES.getEncryptedString());
@@ -46,6 +48,7 @@ public class StringUtils {
         return replace(vastErrorUrl, ERROR_CODE, vastErrorCode);
     }
 
+    // TODO. Refactor. VAST specific method.
     public static String setMessage(String url, String addMessage) {
         if (TextUtils.isEmpty(url)) {
             return "";
@@ -57,9 +60,15 @@ public class StringUtils {
             completeUrl = setErrorCode(url, addMessage);
         } else if (url.contains(PLAY_TIME)) {
             completeUrl = setPlayTime(url, addMessage);
+        } else if (url.contains(REASON)) {
+            completeUrl = setReason(url, addMessage);
         }
 
         return completeUrl;
+    }
+
+    private static String setReason(String trackUrl, String code) {
+        return replace(trackUrl, REASON, code);
     }
 
     private static String setPlayTime(String trackUrl, String currentPosition) {

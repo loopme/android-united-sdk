@@ -6,21 +6,22 @@ import android.view.View;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.MraidOrientation;
 import com.loopme.common.LoopMeError;
+import com.loopme.listener.Listener;
 import com.loopme.models.Errors;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.Utils;
 import com.loopme.views.MraidView;
+import com.loopme.views.webclient.WebViewClientCompat;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class MraidBridge extends WebViewClient {
+public class MraidBridge extends WebViewClientCompat {
 
     private static final String LOG_TAG = MraidBridge.class.getSimpleName();
 
@@ -55,14 +56,20 @@ public class MraidBridge extends WebViewClient {
     private static final int START_URLS_INDEX = 17;
 
     private OnMraidBridgeListener mOnMraidBridgeListener;
+    private Listener adReadyListener;
     private Uri mCommandUri;
 
-    public MraidBridge(OnMraidBridgeListener onMraidBridgeListener) {
+    // TODO. Refactor.
+    public MraidBridge(
+            OnMraidBridgeListener onMraidBridgeListener,
+            Listener adReadyListener) {
+
         mOnMraidBridgeListener = onMraidBridgeListener;
+        this.adReadyListener = adReadyListener;
     }
 
     @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+    public boolean shouldOverrideUrlLoadingCompat(WebView view, String url) {
         if (TextUtils.isEmpty(url)) {
             notifyError(view, "Broken redirect in mraid: " + url);
             return false;
@@ -273,9 +280,11 @@ public class MraidBridge extends WebViewClient {
     }
 
     private void onLoadSuccess() {
-        if (mOnMraidBridgeListener != null) {
+        if (mOnMraidBridgeListener != null)
             mOnMraidBridgeListener.onLoadSuccess();
-        }
+
+        if (adReadyListener != null)
+            adReadyListener.onCall();
     }
 
     private String detectStringQueryParameter(String parameter) {

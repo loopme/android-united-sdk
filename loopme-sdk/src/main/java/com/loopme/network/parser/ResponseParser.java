@@ -91,7 +91,7 @@ public class ResponseParser {
         return null;
     }
 
-    public static GetResponse<GdprResponse> parsGdprResponse(HttpRawResponse rawResponse) {
+    public static GetResponse<GdprResponse> parseGdprResponse(HttpRawResponse rawResponse) {
         GetResponse<GdprResponse> response = new GetResponse<>();
         if (rawResponse.getCode() == HttpURLConnection.HTTP_OK) {
             if (isGdprBodyParcelable(rawResponse.getBody())) {

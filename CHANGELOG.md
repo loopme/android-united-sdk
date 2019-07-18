@@ -1,3 +1,8 @@
+## Version 7.0.0 (18 of July, 2019)
+- Added Open Measurement SDK (OM SDK) for viewability measurement
+- Added VAST 4.1 support
+- **Breaking change**: sdk must be [initialized](https://github.com/loopme/android-united-sdk/wiki/Initialization) before use
+
 ## Version 6.1.12 (25 of February, 2019)
 - Potentially fixed "empty advertising id" bug and added logging to track the issue down if it occurs again
 - Removed `multidex`

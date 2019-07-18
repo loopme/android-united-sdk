@@ -1,35 +1,138 @@
 package com.loopme;
 
 import android.app.Activity;
+import android.os.Looper;
+import android.support.annotation.MainThread;
+import android.support.annotation.NonNull;
 
-import com.loopme.gdpr.ConsentType;
 import com.loopme.gdpr.GdprChecker;
+import com.loopme.om.OmidHelper;
+import com.loopme.utils.ApiLevel;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Created by katerina on 4/27/18.
  */
 
-public class LoopMeSdk {
+public final class LoopMeSdk {
     private LoopMeSdk() {
     }
 
+    private static final String LOG_TAG = LoopMeSdk.class.getSimpleName();
+
+    public static final int ERROR_NONE = -1;
     /**
-     * Use this method in case if you Publisher is  willing to ask GDPR consent with his own dialog, pass GDPR consent to this method.
+     * Android is under api level 21 (Lollipop 5.0).
      */
-    public static void setGdprConsent(Activity activity, boolean userConsent) {
-        Preferences.getInstance(activity).setGdprState(userConsent, ConsentType.PUBLISHER);
+    public static final int ERROR_INCOMPATIBLE_ANDROID_API_LEVEL = 0;
+    /**
+     * Open Measurement SDK failed to initialize.
+     */
+    public static final int ERROR_OMID_FAILED_TO_INITIALIZE = 1;
+
+    private static WeakReference<LoopMeSdkListener> loopMeSdkInitListener =
+            new WeakReference<>(null);
+
+    public interface LoopMeSdkListener {
+        void onSdkInitializationSuccess();
+
+        void onSdkInitializationFail(int error, String message);
     }
 
-    /**
-     * Ask GDPR consent with LoopMe's SDK facilities, for internal use.
-     */
-    public static void askGdprConsent(Activity activity, GdprChecker.OnConsentListener listener) {
-        if (!isGdprConsentSet(activity)) {
-            new GdprChecker(activity, listener).check();
+    public static class Configuration {
+
+        private GdprChecker.PublisherConsent publisherConsent;
+
+        public GdprChecker.PublisherConsent getPublisherConsent() {
+            return publisherConsent;
+        }
+
+        /**
+         * Use this method in case if you Publisher is willing to ask GDPR consent with your own dialog,
+         * pass GDPR consent to this method.
+         */
+        public void setPublisherConsent(GdprChecker.PublisherConsent publisherConsent) {
+            this.publisherConsent = publisherConsent;
         }
     }
 
-    public static boolean isGdprConsentSet(Activity activity) {
-        return Preferences.getInstance(activity).isIabConsentCmpPresent() || Preferences.getInstance(activity).isConsentSet();
+    @MainThread
+    public static void initialize(@NonNull Activity activity,
+                                  @NonNull Configuration configuration,
+                                  @NonNull LoopMeSdkListener loopMeSdkInitListener) {
+
+        if (Looper.getMainLooper() != Looper.myLooper())
+            throw new IllegalStateException("Must be called on the main thread");
+
+        if (!ApiLevel.isApi21AndHigher()) {
+            loopMeSdkInitListener.onSdkInitializationFail(
+                    ERROR_INCOMPATIBLE_ANDROID_API_LEVEL, "");
+            return;
+        }
+
+        if (isInitialized()) {
+            loopMeSdkInitListener.onSdkInitializationSuccess();
+            return;
+        }
+
+        LoopMeSdk.loopMeSdkInitListener = new WeakReference<>(loopMeSdkInitListener);
+
+        // Omid init.
+        OmidHelper.tryInitOmidAsync(
+                activity.getApplicationContext(),
+                createOmidSdkInitListener());
+
+        // Gdpr.
+        GdprChecker.start(activity,
+                configuration.getPublisherConsent(),
+                createGdprCheckerListener());
+    }
+
+    public static boolean isInitialized() {
+        return OmidHelper.sdkInitialized() && GdprChecker.checkedAtLeastOnce();
+    }
+
+    private static OmidHelper.SDKInitListener createOmidSdkInitListener() {
+        return new OmidHelper.SDKInitListener() {
+            @Override
+            public void onReady() {
+                checkInitStatus(ERROR_NONE, "");
+            }
+
+            @Override
+            public void onError(String error) {
+                checkInitStatus(ERROR_OMID_FAILED_TO_INITIALIZE, error);
+            }
+        };
+    }
+
+    private static GdprChecker.Listener createGdprCheckerListener() {
+        return new GdprChecker.Listener() {
+            @Override
+            public void onGdprChecked() {
+                checkInitStatus(ERROR_NONE, "");
+            }
+        };
+    }
+
+    private static void checkInitStatus(int errorCode, String errorMessage) {
+        LoopMeSdkListener listener = loopMeSdkInitListener.get();
+        if (listener == null)
+            return;
+
+        boolean hasError = errorCode != ERROR_NONE;
+
+        if (!hasError && !isInitialized())
+            return;
+
+        loopMeSdkInitListener = new WeakReference<>(null);
+
+        if (hasError) {
+            Logging.out(LOG_TAG, errorMessage, true);
+            listener.onSdkInitializationFail(errorCode, errorMessage);
+        } else {
+            listener.onSdkInitializationSuccess();
+        }
     }
 }

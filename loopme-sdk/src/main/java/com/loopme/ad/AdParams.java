@@ -8,6 +8,7 @@ import com.loopme.tracker.AdIds;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.vast.WrapperParser;
 import com.loopme.xml.Tracking;
+import com.loopme.xml.vast4.Verification;
 import com.loopme.xml.vast4.Wrapper;
 
 import java.io.Serializable;
@@ -60,7 +61,7 @@ public class AdParams implements Serializable {
 
     private List<String> mErrorUrlList = new ArrayList<>();
     private List<Tracking> mTrackingEventsList = new ArrayList<>();
-    private List<String> mAdVerificationJavaScriptUrlList = new ArrayList<>();
+    private List<Verification> verificationList = new ArrayList<>();
     private Map<String, List<String>> mViewableImpressionMap = new HashMap<>();
     private List<String> mTrackersList = new ArrayList<>();
     private boolean mAutoLoading;
@@ -177,7 +178,7 @@ public class AdParams implements Serializable {
         private String mBuilderOrientation;
         private int mBuilderExpiredDate;
 
-        private List<String> mPackageIds = new ArrayList<String>();
+        private List<String> mPackageIds = new ArrayList<>();
         private List<String> mTrackersList = new ArrayList<>();
         private String mToken;
         private AdType mAdType;
@@ -364,7 +365,7 @@ public class AdParams implements Serializable {
     }
 
     public List<Tracking> getTrackingEventsList() {
-        return new ArrayList<Tracking>(mTrackingEventsList);
+        return new ArrayList<>(mTrackingEventsList);
     }
 
     public void setTrackingEventsList(List<Tracking> events) {
@@ -442,7 +443,8 @@ public class AdParams implements Serializable {
         mTrackingEventsList.addAll(parser.getTrackingEvents());
         mErrorUrlList.addAll(parser.getErrorUrlList());
 
-        mAdVerificationJavaScriptUrlList.addAll(parser.getAdVerificationJavaScriptUrlList());
+        verificationList.addAll(parser.getVerificationList());
+
         mVideoClicksList.addAll(parser.getVideoClicksList());
         mCompanionCreativeViewEventsList.addAll(parser.getCompanionCreativeViewList());
         mEndCardClicksList.addAll(parser.getCompanionClickTrackingList());
@@ -452,12 +454,8 @@ public class AdParams implements Serializable {
         return mErrorUrlList;
     }
 
-    public List<String> getAdVerificationJavaScriptUrlList() {
-        return mAdVerificationJavaScriptUrlList;
-    }
-
-    public boolean isVast4VerificationNeeded() {
-        return !mAdVerificationJavaScriptUrlList.isEmpty();
+    public boolean hasVast4ViewableImpressions() {
+        return mViewableImpressionMap != null && !mViewableImpressionMap.isEmpty();
     }
 
     public Map<String, List<String>> getViewableImpressionMap() {
@@ -472,8 +470,12 @@ public class AdParams implements Serializable {
         this.mViewableImpressionMap = viewableImpressionMap;
     }
 
-    public void setAdVerificationJavaScriptUrlList(List<String> javaScriptUrlList) {
-        this.mAdVerificationJavaScriptUrlList = javaScriptUrlList;
+    public void setVerificationList(List<Verification> verificationList) {
+        this.verificationList = new ArrayList<>(verificationList);
+    }
+
+    public List<Verification> getVerificationList() {
+        return new ArrayList<>(verificationList);
     }
 
     public List<String> getVisibleImpressions() {

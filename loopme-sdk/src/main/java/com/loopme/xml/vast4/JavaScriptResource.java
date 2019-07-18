@@ -8,6 +8,9 @@ public class JavaScriptResource {
     @Attribute
     private String apiFramework;
 
+    @Attribute
+    private boolean browserOptional;
+
     @Text
     private String text;
 
@@ -15,7 +18,12 @@ public class JavaScriptResource {
         return apiFramework;
     }
 
+    public boolean getBrowserOptional() {
+        return browserOptional;
+    }
+
     public String getText() {
         return text;
     }
+
 }

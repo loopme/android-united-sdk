@@ -2,11 +2,11 @@ package com.loopme;
 
 
 import android.app.Activity;
-import android.os.Build;
 import android.support.annotation.Nullable;
 
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
+import com.loopme.utils.ApiLevel;
 
 /**
  * The `LoopMeInterstitial` class provides the facilities to display a full-screen ad
@@ -46,15 +46,16 @@ public final class LoopMeInterstitial extends AdWrapper {
     /**
      * Getting already initialized ad object or create new one with specified appKey
      *
-     * @param appKey your app key
+     * @param appKey   your app key
      * @param activity activity context
-     * @return instance of LoopMeInterstitial; null - android version is under API 21 (5.0 LOLLIPOP)
+     * @return instance of LoopMeInterstitial;
+     * null - android version is under API 21 (5.0 LOLLIPOP) or SDK isn't initialized
      */
     @Nullable
     public static LoopMeInterstitial getInstance(String appKey, Activity activity) {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP
-                ? null
-                : new LoopMeInterstitial(activity, appKey);
+        return LoopMeSdk.isInitialized() && ApiLevel.isApi21AndHigher()
+                ? new LoopMeInterstitial(activity, appKey)
+                : null;
     }
 
 

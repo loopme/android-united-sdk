@@ -2,33 +2,34 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.loopme">
 
-    <uses-feature android:name="android.hardware.touchscreen"
+    <uses-feature
+        android:name="android.hardware.touchscreen"
         android:required="false" />
-    <uses-feature android:name="android.hardware.sensor.accelerometer"
+    <uses-feature
+        android:name="android.hardware.sensor.accelerometer"
         android:required="false" />
-     <uses-sdk tools:overrideLibrary="com.moat.analytics.mobile.loo" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <uses-sdk tools:overrideLibrary="com.moat.analytics.mobile.loo" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application>
         <activity
             android:name="com.loopme.views.activity.BaseActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:hardwareAccelerated="true"
             android:alwaysRetainTaskState="true"
-            android:exported="true"/>
-        <activity android:name=".views.activity.AdBrowserActivity"/>
-        <activity android:name=".views.activity.MraidVideoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:hardwareAccelerated="true"/>
-
+            android:exported="true"
+            android:hardwareAccelerated="true" />
+        <activity android:name=".views.activity.AdBrowserActivity" />
+        <activity
+            android:name=".views.activity.MraidVideoActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:hardwareAccelerated="true" />
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package com.loopme.request;
 
 import android.content.Context;
+import android.location.Location;
 
 import com.loopme.AdTargetingData;
 import com.loopme.ad.LoopMeAd;
@@ -86,6 +87,10 @@ public class RequestBuilder implements Serializable {
     private static final String CONSENT = "consent";
     private static final String OUTPUT = "audio_output";
     private static final String MUSIC = "music";
+    private static final String LAT = "lat";
+    private static final String LON = "lon";
+    private static final String GEO_TYPE = "type";
+    private static final String GEO = "geo";
 
     public static JSONObject buildRequestJson(Context context, LoopMeAd loopMeAd) {
         RequestUtils requestUtils = new RequestUtils(context, loopMeAd);
@@ -117,6 +122,7 @@ public class RequestBuilder implements Serializable {
             deviceObj.put(DNT, requestUtils.getDnt());
             deviceObj.put(MODEL, requestUtils.getModel());
 
+            tryAddGeo(deviceObj, requestUtils);
 
             JSONObject extObj = new JSONObject();
             extObj.put(TIMEZONE, requestUtils.getTimeZone());
@@ -183,6 +189,24 @@ public class RequestBuilder implements Serializable {
             ex.printStackTrace();
         }
         return requestObj;
+    }
+
+    private static void tryAddGeo(JSONObject deviceObj, RequestUtils requestUtils)
+            throws JSONException {
+
+        if (deviceObj == null || requestUtils == null)
+            return;
+
+        Location location = requestUtils.getLocation();
+        if (location == null)
+            return;
+
+        JSONObject geoObj = new JSONObject();
+        geoObj.put(LAT, (float)location.getLatitude());
+        geoObj.put(LON, (float)location.getLongitude());
+        geoObj.put(GEO_TYPE, 1 /*gps/location services*/);
+
+        deviceObj.put(GEO, geoObj);
     }
 
     private static void addDebugInfo(JSONObject extObj, RequestUtils requestUtils, Context context) throws JSONException {

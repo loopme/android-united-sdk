@@ -1,101 +1,207 @@
 package com.loopme.gdpr;
 
 import android.app.Activity;
+import android.content.Context;
 
 import com.loopme.Logging;
-import com.loopme.Preferences;
+import com.loopme.GdprPreferences;
+import com.loopme.gdpr.dialog.GdprDialogFragmentHelper;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Created by katerina on 4/27/18.
  */
 
+// TODO. WeakReference for listener field if used somewhere except LoopMeSdk.
 public class GdprChecker implements
-        GdprDialog.OnGdprDialogListener,
         DntFetcher.OnDntFetcherListener,
-        LoopMeGdprServiceImpl.Callback {
-    private Activity mActivity;
-    private OnConsentListener mListener;
-    private static boolean sIsNeedCheckUserConsent = true;
-    private static boolean sIsDialogWasShown = false;
-    private static final String LOG_TAG = GdprChecker.class.getSimpleName();
-    private String mAdvId;
+        LoopMeGdprService.Callback {
 
-    public GdprChecker(Activity activity, OnConsentListener listener) {
-        this.mActivity = activity;
-        mListener = listener;
+    private static final String LOG_TAG = GdprChecker.class.getSimpleName();
+
+    private static GdprChecker instance;
+    private static boolean checkedAtLeastOnce;
+
+    private WeakReference<Activity> activity;
+    private Context appContext;
+
+    private PublisherConsent publisherConsent;
+    private String advId;
+
+    private Listener listener;
+
+    private boolean destroyed;
+    private boolean gdprDialogWasShown;
+
+    private GdprChecker(
+            Activity activity,
+            PublisherConsent publisherConsent,
+            Listener listener) {
+        this.activity = new WeakReference<>(activity);
+        this.appContext = activity.getApplicationContext();
+        this.publisherConsent = publisherConsent;
+        this.listener = listener;
     }
 
-    public void check() {
-        new DntFetcher(mActivity, this).start();
+    public static class PublisherConsent {
+
+        private boolean consent;
+
+        public PublisherConsent(boolean consent) {
+            this.consent = consent;
+        }
+
+        public boolean getConsent() {
+            return consent;
+        }
+
+        public void setConsent(boolean consent) {
+            this.consent = consent;
+        }
+    }
+
+    public interface Listener {
+        void onGdprChecked();
+    }
+
+    public static boolean checkedAtLeastOnce() {
+        return checkedAtLeastOnce;
+    }
+
+    public static void start(
+            Activity activity,
+            PublisherConsent publisherConsent,
+            Listener listener) {
+
+        if (checkedAtLeastOnce()) {
+            listener.onGdprChecked();
+            return;
+        }
+
+        if (instance != null)
+            instance.destroy();
+
+        instance = new GdprChecker(activity, publisherConsent, listener);
+        instance.check();
+    }
+
+    private void setGdprState(boolean isAccepted, ConsentType consentType) {
+        if (destroyed)
+            return;
+
+        GdprPreferences
+                .getInstance(appContext)
+                .setGdprState(isAccepted, consentType);
+
+        checkedAtLeastOnce = true;
+
+        // TODO. Ugly.
+        Listener listener = this.listener;
+
+        destroy();
+
+        if (listener != null)
+            listener.onGdprChecked();
+    }
+
+    private void destroy() {
+        destroyed = true;
+
+        instance = null;
+
+        Activity activity = this.activity.get();
+
+        this.activity = new WeakReference<>(null);
+        appContext = null;
+        listener = null;
+        publisherConsent = null;
+
+        GdprDialogFragmentHelper.tryCancelCurrentGdprDialog(activity);
+    }
+
+    private void check() {
+        if (destroyed)
+            return;
+
+        if (GdprPreferences.getInstance(appContext).isIabConsentCmpPresent()) {
+            setGdprState(true, ConsentType.PUBLISHER);
+            return;
+        }
+
+        if (publisherConsent != null) {
+            setGdprState(publisherConsent.getConsent(), ConsentType.PUBLISHER);
+            return;
+        }
+
+        new DntFetcher(
+                appContext,
+                this).start();
     }
 
     @Override
     public void onDntFetched(boolean isLimited, String advId) {
-        mAdvId = advId;
+        if (destroyed)
+            return;
+
+        this.advId = advId;
+
         if (isLimited) {
-            onComplete();
-        } else {
-            new LoopMeGdprServiceImpl(advId, this).start();
+            setGdprState(false, ConsentType.USER_RESTRICTED);
+            return;
         }
+
+        new LoopMeGdprService(advId, this).start();
     }
 
     @Override
-    public void onSuccess(GdprResponse response) {
-        if (response.needShowDialog()) {
-            showDialogOnlyFirstTime(response);
-        } else {
-            saveUserConsent(response.getUserConsent());
-            onComplete();
-        }
-        Logging.out(LOG_TAG, "need consent: " + response.getNeedConsent());
-    }
+    public void onLoopMeGdprResponseFail(String message) {
+        if (destroyed)
+            return;
 
-    private void showDialogOnlyFirstTime(GdprResponse response) {
-        if (!sIsDialogWasShown && !mActivity.isFinishing()) {
-            new GdprDialog(mActivity, this).show(buildConsentUrl(response));
-            sIsNeedCheckUserConsent = true;
-        } else {
-            setGdprState(false, ConsentType.FAILED_SERVICE);
-            onComplete();
-        }
-    }
-
-    private String buildConsentUrl(GdprResponse response) {
-        return response.getConsentUrl() + "?device_id=" + mAdvId + "&is_sdk=true";
-    }
-
-    private void saveUserConsent(int userConsent) {
-        boolean isAccepted = userConsent == 1;
-        setGdprState(isAccepted, ConsentType.LOOPME);
-    }
-
-    @Override
-    public void onFail(String message) {
         Logging.out(LOG_TAG, message);
         setGdprState(false, ConsentType.FAILED_SERVICE);
-        onComplete();
-    }
-
-    private void setGdprState(boolean isAccepted, ConsentType consentType) {
-        Preferences.getInstance(mActivity).setGdprState(isAccepted, consentType);
     }
 
     @Override
-    public void onCloseDialog() {
-        if (sIsNeedCheckUserConsent) {
-            sIsNeedCheckUserConsent = false;
-            sIsDialogWasShown = true;
-            check();
+    public void onLoopMeGdprResponseSuccess(GdprResponse response) {
+        if (destroyed)
+            return;
+
+        Logging.out(LOG_TAG, "need consent: " + response.getNeedConsent());
+
+        if (!response.needShowDialog()) {
+            setGdprState(response.getUserConsent() == 1, ConsentType.LOOPME);
+            return;
         }
+
+        // Don't show gdpr dialog again. Something went wrong
+        // as if user dismissed gdpr dialog via back button.
+        if (gdprDialogWasShown) {
+            setGdprState(false, ConsentType.FAILED_SERVICE);
+            return;
+        }
+
+        Activity activity = this.activity.get();
+        if (activity == null) {
+            Logging.out(LOG_TAG, "activity is null. Failed to create gdpr dialog");
+            setGdprState(false, ConsentType.FAILED_SERVICE);
+            return;
+        }
+
+        GdprDialogFragmentHelper.showGdprDialog(
+                activity,
+                response.getConsentUrl() + "?device_id=" + advId + "&is_sdk=true");
+
+        gdprDialogWasShown = true;
     }
 
-    private void onComplete() {
-        if (mListener != null) {
-            mListener.onComplete();
-        }
-    }
-
-    public interface OnConsentListener {
-        void onComplete();
+    /**
+     * For internal use.
+     */
+    // TODO. Refactor. new LoopMeGdprService(advId, this).start() call is enough.
+    public static void onGdprDialogDismissed() {
+        if (instance != null)
+            instance.check();
     }
 }

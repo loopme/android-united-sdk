@@ -1,6 +1,6 @@
 package com.loopme.gdpr;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -15,35 +15,31 @@ public class DntFetcher implements Runnable {
 
     private static final String LOG_TAG = DntFetcher.class.getSimpleName();
 
-    private final Activity mContext;
-    private final OnDntFetcherListener mOnDntListener;
-    private final Handler mHandler = new Handler(Looper.getMainLooper());
+    private final Context context;
+    private final OnDntFetcherListener onDntFetcherListener;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public void start() {
         ExecutorHelper.getExecutor().submit(this);
     }
 
-
-    public DntFetcher(Activity context, OnDntFetcherListener onDntFetcherListener) {
-        mContext = context;
-        mOnDntListener = onDntFetcherListener;
+    DntFetcher(Context context, OnDntFetcherListener onDntFetcherListener) {
+        this.context = context;
+        this.onDntFetcherListener = onDntFetcherListener;
     }
 
     @Override
     public void run() {
-        AdvertisingIdClient.AdInfo adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
-        onDntFetchedOnUiThread(
-                adInfo.isLimitAdTrackingEnabled(),
-                adInfo.getId());
-    }
+        final AdvertisingIdClient.AdInfo adInfo =
+                AdvertisingIdClient.getAdvertisingIdInfo(context);
 
-    private void onDntFetchedOnUiThread(final boolean isLimited, final String advId) {
-        mHandler.post(new Runnable() {
+        mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                if (mOnDntListener != null) {
-                    mOnDntListener.onDntFetched(isLimited, advId);
-                }
+                if (onDntFetcherListener != null)
+                    onDntFetcherListener.onDntFetched(
+                            adInfo.isLimitAdTrackingEnabled(),
+                            adInfo.getId());
             }
         });
     }

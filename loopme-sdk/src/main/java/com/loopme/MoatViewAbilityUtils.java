@@ -1,7 +1,6 @@
 package com.loopme;
 
 import android.graphics.Rect;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
@@ -47,12 +46,12 @@ public class MoatViewAbilityUtils {
     }
 
     public static ViewAbilityInfo calculateViewAbilityInfo(View view) {
-        if (view != null && isViewInFocus(view) && !isViewHidden(view) && getSquareOfView(view) > 0) {
+        if (isViewInFocus(view) && isViewShown(view) && getSquareOfView(view) > 0) {
             return calculateViewAbilityInfoInternal(view);
         } else {
             Logging.out(LOG_TAG, "view != null " + (view != null));
             Logging.out(LOG_TAG, "isViewInFocus " + isViewInFocus(view));
-            Logging.out(LOG_TAG, "isViewNotHidden(view) " + !isViewHidden(view));
+            Logging.out(LOG_TAG, "isViewShown(view) " + isViewShown(view));
             Logging.out(LOG_TAG, "getSquareOfView(view) > 0 " + (getSquareOfView(view) > 0));
             return new ViewAbilityInfo();
         }
@@ -66,8 +65,8 @@ public class MoatViewAbilityUtils {
         return view != null && view.hasWindowFocus();
     }
 
-    private static boolean isViewHidden(View view) {
-        return view == null || !view.isShown();
+    private static boolean isViewShown(View view) {
+        return view != null && view.isShown();
     }
 
     private static double getSquareOfView(View view) {
@@ -76,17 +75,20 @@ public class MoatViewAbilityUtils {
     }
 
     private static Rect getViewRect(View view) {
-        int[] locationInWindowArray = new int[]{0, 0};
-        if (view != null) {
-            view.getLocationInWindow(locationInWindowArray);
-            int left = locationInWindowArray[0];
-            int top = locationInWindowArray[1];
-            int right = left + view.getWidth();
-            int bottom = top + view.getHeight();
-            return new Rect(left, top, right, bottom);
-        } else {
+        if (view == null)
             return new Rect(0, 0, 0, 0);
-        }
+
+        int[] locationInWindow = new int[]{0, 0};
+        view.getLocationInWindow(locationInWindow);
+
+        int left = locationInWindow[0];
+        int top = locationInWindow[1];
+
+        return new Rect(
+                left,
+                top,
+                left + view.getWidth(),
+                top + view.getHeight());
     }
 
     private static double getRectSquare(Rect rect) {
@@ -94,36 +96,37 @@ public class MoatViewAbilityUtils {
     }
 
     private static ViewAbilityInfo calculateViewAbilityInfoInternal(View checkedView) {
-        ViewAbilityInfo viewAbilityInfo = new ViewAbilityInfo();
+        ViewAbilityInfo viewabilityInfo = new ViewAbilityInfo();
         Rect globalRect = new Rect(0, 0, 0, 0);
 
-        if (checkedView.getGlobalVisibleRect(globalRect)) {
-            double totalViewSquare = getRectSquare(globalRect);
-            View rootView = checkedView.getRootView();
+        if (!checkedView.getGlobalVisibleRect(globalRect))
+            return viewabilityInfo;
 
-            if (rootView instanceof ViewGroup) {
-                HashSet<Rect> hashSet = new HashSet<>();
-                boolean totalOverlapped = isTotalOverlapped(globalRect, checkedView, hashSet);
+        double totalViewSquare = getRectSquare(globalRect);
+        View rootView = checkedView.getRootView();
 
-                if (totalOverlapped) {
-                    viewAbilityInfo.setOverlapping(TOTAL_OVERLAPPED);
-                    viewAbilityInfo.setVisibility(INVISIBLE);
-                    return viewAbilityInfo;
-                } else {
-                    double overlappedViewSquare = calculateOverlappedSquare(globalRect, hashSet);
-                    if (overlappedViewSquare > 0) {
-                        double overlappedPercent = overlappedViewSquare / totalViewSquare;
-                        viewAbilityInfo.setOverlapping(overlappedPercent);
-                    }
+        if (!(rootView instanceof ViewGroup))
+            return viewabilityInfo;
 
-                    double visibleViewSquare = totalViewSquare - overlappedViewSquare;
-                    double visibility = visibleViewSquare / getSquareOfView(checkedView);
-                    viewAbilityInfo.setVisibility(visibility);
-                }
-            }
+        HashSet<Rect> hashSet = new HashSet<>();
+
+        if (isTotalOverlapped(globalRect, checkedView, hashSet)) {
+            viewabilityInfo.setOverlapping(TOTAL_OVERLAPPED);
+            viewabilityInfo.setVisibility(INVISIBLE);
+            return viewabilityInfo;
         }
 
-        return viewAbilityInfo;
+        double overlappedViewSquare = calculateOverlappedSquare(globalRect, hashSet);
+        if (overlappedViewSquare > 0) {
+            double overlappedPercent = overlappedViewSquare / totalViewSquare;
+            viewabilityInfo.setOverlapping(overlappedPercent);
+        }
+
+        double visibleViewSquare = totalViewSquare - overlappedViewSquare;
+        double visibility = visibleViewSquare / getSquareOfView(checkedView);
+        viewabilityInfo.setVisibility(visibility);
+
+        return viewabilityInfo;
     }
 
     private static int calculateOverlappedSquare(Rect rootRect, Set<Rect> rectSet) {
@@ -170,12 +173,11 @@ public class MoatViewAbilityUtils {
     }
 
     private static ArrayList<Rect> createChildrenRectSortedArrayList(Set<Rect> rectSet) {
-        ArrayList<Rect> childRectList = new ArrayList<>();
-        childRectList.addAll(rectSet);
+        ArrayList<Rect> childRectList = new ArrayList<>(rectSet);
         Collections.sort(childRectList, new Comparator<Rect>() {
             @Override
             public int compare(Rect rect1, Rect rect2) {
-                return Integer.valueOf(rect1.top).compareTo(rect2.top);
+                return Integer.compare(rect1.top, rect2.top);
             }
         });
         return childRectList;
@@ -183,40 +185,42 @@ public class MoatViewAbilityUtils {
 
 
     private static boolean isTotalOverlapped(Rect rootRect, View checkedView, Set<Rect> rectSet) {
-        int counter = 0;
-        boolean var4 = false;
         View rootView = checkedView.getRootView();
         ArrayDeque<View> arrayDeque = new ArrayDeque<>();
         arrayDeque.add(rootView);
 
+        int counter = 0;
+        boolean checkedViewFoundInViewTree = false;
+
         while (!arrayDeque.isEmpty() && counter < 250) {
-            ++counter;
+            counter++;
             View lastView = arrayDeque.pollLast();
+
             if (lastView.equals(checkedView)) {
-                var4 = true;
-            } else if (isViewVisible(lastView)) {
-                if (lastView instanceof ViewGroup && !(lastView instanceof ListView)) {
-                    ViewGroup viewGroup = (ViewGroup) lastView;
-                    int childCount = viewGroup.getChildCount();
+                checkedViewFoundInViewTree = true;
+                continue;
+            }
 
-                    for (int i = childCount - 1; i >= 0; --i) {
-                        View childView = viewGroup.getChildAt(i);
-                        if (!isEmptyView(childView)) {
-                            arrayDeque.add(childView);
-                        }
-                    }
+            if (!isViewVisible(lastView))
+                continue;
+
+            if (lastView instanceof ViewGroup && !(lastView instanceof ListView)) {
+                ViewGroup viewGroup = (ViewGroup) lastView;
+                int childCount = viewGroup.getChildCount();
+
+                for (int i = childCount - 1; i >= 0; i--) {
+                    View childView = viewGroup.getChildAt(i);
+                    if (!isEmptyView(childView))
+                        arrayDeque.add(childView);
                 }
+            }
 
-                boolean sdkValidation = checkSdk21(lastView, checkedView, var4);
-
-                if (sdkValidation) {
-                    Rect viewRect = getViewRect(lastView);
-                    if (viewRect.setIntersect(rootRect, viewRect)) {
-                        rectSet.add(viewRect);
-                        if (viewRect.contains(rootRect)) {
-                            return true;
-                        }
-                    }
+            if (mayOverlap(lastView, checkedView, checkedViewFoundInViewTree)) {
+                Rect viewRect = getViewRect(lastView);
+                if (viewRect.setIntersect(rootRect, viewRect)) {
+                    rectSet.add(viewRect);
+                    if (viewRect.contains(rootRect))
+                        return true;
                 }
             }
         }
@@ -224,27 +228,22 @@ public class MoatViewAbilityUtils {
         return false;
     }
 
+    // TODO.
     private static boolean isEmptyView(View view) {
-        if (view == null) {
-            return true;
-        }
-        if (view instanceof FrameLayout && view.getClass() == FrameLayout.class) {
-            if (((FrameLayout) view).getChildCount() == 0 && view.getBackground() == null) {
-                return true;
-            }
-        }
-        return false;
+        return view == null ||
+                view instanceof FrameLayout &&
+                        view.getClass() == FrameLayout.class &&
+                        ((FrameLayout) view).getChildCount() == 0 &&
+                        view.getBackground() == null;
     }
 
-    private static boolean checkSdk21(View lastView, View checkedView, boolean var4) {
-        if (Build.VERSION.SDK_INT >= 21) {
-            if (lastView.getElevation() > checkedView.getElevation()) {
-                return true;
-            } else if (var4 && lastView.getElevation() == checkedView.getElevation()) {
-                return true;
-            }
-        }
-        return var4;
+    private static boolean mayOverlap(View lastView, View checkedView, boolean checkedViewFound) {
+        float lvElev = lastView.getElevation();
+        float cvElev = checkedView.getElevation();
+
+        return lvElev > cvElev ||
+                checkedViewFound && lvElev == cvElev ||
+                checkedViewFound;
     }
 
     public static class ViewAbilityInfo {

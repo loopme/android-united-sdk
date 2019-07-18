@@ -22,19 +22,17 @@ import com.loopme.controllers.display.DisplayControllerLoopMe;
 import com.loopme.utils.InternetUtils;
 import com.loopme.utils.UiUtils;
 import com.loopme.utils.Utils;
-import com.loopme.views.CloseButton;
 import com.loopme.views.MraidView;
 import com.loopme.views.activity.AdBrowserActivity;
 import com.loopme.views.activity.MraidVideoActivity;
 
-public class MraidController implements MraidBridge.OnMraidBridgeListener, View.OnClickListener {
+public class MraidController implements MraidBridge.OnMraidBridgeListener {
 
     private static final String LOG_TAG = MraidController.class.getSimpleName();
     private static final String EXTRAS_VIDEO_URL = "videoUrl";
 
     private LoopMeAd mLoopMeAd;
     private MraidView mMraidView;
-    private CloseButton mCloseButton;
 
     private int mWidth;
     private int mHeight;
@@ -192,17 +190,6 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener, View.
     public void onChangeCloseButtonVisibility(boolean hasOwnCloseButton) {
         setOwnCloseButton(hasOwnCloseButton);
         broadcastCloseButtonIntent(hasOwnCloseButton);
-        showCustomCloseInBanner(hasOwnCloseButton);
-    }
-
-    private void showCustomCloseInBanner(boolean useCloseButton) {
-        if (mCloseButton != null) {
-            if (useCloseButton) {
-                mCloseButton.setAlpha(0);
-            } else {
-                mCloseButton.setAlpha(1);
-            }
-        }
     }
 
     private void broadcastCloseButtonIntent(boolean hasOwnCloseButton) {
@@ -278,21 +265,5 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener, View.
                 FrameLayout.LayoutParams.MATCH_PARENT);
         Utils.removeParent(mMraidView);
         containerView.addView(mMraidView, mraidViewLayoutParams);
-        if (mLoopMeAd.isBanner()) {
-            initCloseButton(mLoopMeAd.getContext());
-        }
-    }
-
-    private void initCloseButton(Activity context) {
-        mCloseButton = new CloseButton(context);
-        mCloseButton.addInLayout(mLoopMeAd.getContainerView());
-        mCloseButton.setOnClickListener(this);
-        mCloseButton.setVisibility(View.VISIBLE);
-        mCloseButton.setAlpha(0);
-    }
-
-    @Override
-    public void onClick(View v) {
-        close();
     }
 }

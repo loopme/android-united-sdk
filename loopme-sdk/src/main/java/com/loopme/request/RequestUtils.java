@@ -4,8 +4,8 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.location.Location;
 import android.media.AudioManager;
-import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.provider.Settings;
@@ -14,10 +14,12 @@ import android.webkit.WebSettings;
 
 import com.loopme.BuildConfig;
 import com.loopme.LoopMeInterstitialGeneral;
-import com.loopme.Preferences;
+import com.loopme.GdprPreferences;
 import com.loopme.R;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.gdpr.ConsentType;
+import com.loopme.location.GoogleLocationService;
+import com.loopme.utils.ApiLevel;
 import com.loopme.utils.StringUtils;
 
 import org.json.JSONArray;
@@ -31,7 +33,6 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import static android.content.Context.BATTERY_SERVICE;
-import static android.content.Context.WIFI_SERVICE;
 
 public class RequestUtils {
 
@@ -59,8 +60,8 @@ public class RequestUtils {
     private String mPn;
     private String mWn;
     private String mOr;
+    private Location location;
     private static String mIfa = "";
-    private String mIp;
     private static String mDnt = "0";
     private int mInstl;
     private int mConnectionType;
@@ -101,10 +102,10 @@ public class RequestUtils {
         setOr(context);
         setAdSize(context);
         setInstl();
-        setIp(context);
         setPn(context);
         setSkippable();
         setApi();
+        setLocation(context);
     }
 
     public String getAppBundle() {
@@ -215,15 +216,6 @@ public class RequestUtils {
         return RequestConstants.ANDROID_OS;
     }
 
-    public String getIp() {
-        return mIp;
-    }
-
-    public void setIp(Context context) {
-        WifiManager wifiManager = (WifiManager) context.getSystemService(WIFI_SERVICE);
-//        mIp = Formatter.formatIpAddress(wifiManager.getConnectionInfo().getIpAddress());
-    }
-
     public String getLanguage() {
         return Locale.getDefault().getLanguage();
     }
@@ -284,8 +276,11 @@ public class RequestUtils {
             mOr = "p";
             return;
         }
-        boolean isLandscape = Configuration.ORIENTATION_LANDSCAPE == context.getResources().getConfiguration().orientation;
-        mOr = isLandscape ? "p" : "l";
+
+        mOr = context.getResources().getConfiguration().orientation ==
+                Configuration.ORIENTATION_LANDSCAPE
+                ? "l"
+                : "p";
     }
 
     private boolean isReverseOrientation() {
@@ -293,7 +288,7 @@ public class RequestUtils {
     }
 
     public String getChargeLevel(Context context) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        if (ApiLevel.isApi21AndHigher()) {
             BatteryManager bm = (BatteryManager) context.getSystemService(BATTERY_SERVICE);
             int level = 1;
             if (bm != null) {
@@ -331,7 +326,7 @@ public class RequestUtils {
 
 
     public String getDisplayManagerVersion() {
-        return String.valueOf(BuildConfig.VERSION_CODE) + "." + String.valueOf(BuildConfig.VERSION_NAME);
+        return BuildConfig.VERSION_NAME;
     }
 
     public String getImpId() {
@@ -466,7 +461,7 @@ public class RequestUtils {
         mDnt = advAdInfo.getDoNotTrackAsString();
         mIfa = advAdInfo.getAdvId();
         if (advAdInfo.isUserSetDoNotTrack()) {
-            Preferences.getInstance(context).setGdprState(false, ConsentType.USER_RESTRICTED);
+            GdprPreferences.getInstance(context).setGdprState(false, ConsentType.USER_RESTRICTED);
         }
     }
 
@@ -515,13 +510,13 @@ public class RequestUtils {
     }
 
     public int getUserConsent(Context context) {
-        boolean gdprState = Preferences.getInstance(context).getGdprState();
+        boolean gdprState = GdprPreferences.getInstance(context).getGdprState();
         return gdprState ? 1 : 0;
     }
 
 
     public int getConsentType(Context context) {
-        return Preferences.getInstance(context).getConsentType();
+        return GdprPreferences.getInstance(context).getConsentType();
     }
 
     public int[] getExpDir() {
@@ -529,15 +524,15 @@ public class RequestUtils {
     }
 
     public String getIabConsentString(Context context) {
-        return Preferences.getInstance(context).getIabConsentString();
+        return GdprPreferences.getInstance(context).getIabConsentString();
     }
 
     public boolean isIabConsentCmpPresent(Context context) {
-        return Preferences.getInstance(context).isIabConsentCmpPresent();
+        return GdprPreferences.getInstance(context).isIabConsentCmpPresent();
     }
 
     public int getIabConsentSubjectToGdpr(Context context) {
-        String gdprSubjectState = Preferences.getInstance(context).getIabConsentSubjectToGdpr();
+        String gdprSubjectState = GdprPreferences.getInstance(context).getIabConsentSubjectToGdpr();
         return gdprSubjectState.equals("1") ? 1 : 0;
     }
 
@@ -546,7 +541,7 @@ public class RequestUtils {
     }
 
     public boolean isSubjectToGdprPresent(Context context) {
-        return Preferences.getInstance(context).isSubjectToGdprPresent();
+        return GdprPreferences.getInstance(context).isSubjectToGdprPresent();
     }
 
     public int getMusic(Context context) {
@@ -582,5 +577,13 @@ public class RequestUtils {
     public boolean isAnyAudioOutput(Context context) {
         List<String> activeOutput = getAudioOutput(context);
         return !activeOutput.isEmpty();
+    }
+
+    private void setLocation(Context context) {
+        location = GoogleLocationService.getLocation(context);
+    }
+
+    public Location getLocation() {
+        return location;
     }
 }

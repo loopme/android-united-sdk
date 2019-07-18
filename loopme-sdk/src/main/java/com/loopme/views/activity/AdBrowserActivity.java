@@ -119,6 +119,7 @@ public final class AdBrowserActivity extends Activity implements OnClickListener
             AdBrowserWebViewClient.Listener webClientListener = initAdBrowserClientListener();
             AdBrowserWebViewClient client = new AdBrowserWebViewClient(this, webClientListener);
             mLoopMeWebView.setWebViewClient(client);
+            // TODO.
             WebView.setWebContentsDebuggingEnabled(true);
             mLoopMeWebView.getSettings().setBuiltInZoomControls(false);
         }
