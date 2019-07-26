@@ -9,8 +9,6 @@ import com.loopme.gdpr.GdprChecker;
 import com.loopme.om.OmidHelper;
 import com.loopme.utils.ApiLevel;
 
-import java.lang.ref.WeakReference;
-
 /**
  * Created by katerina on 4/27/18.
  */
@@ -31,8 +29,7 @@ public final class LoopMeSdk {
      */
     public static final int ERROR_OMID_FAILED_TO_INITIALIZE = 1;
 
-    private static WeakReference<LoopMeSdkListener> loopMeSdkInitListener =
-            new WeakReference<>(null);
+    private static LoopMeSdkListener loopMeSdkInitListener;
 
     public interface LoopMeSdkListener {
         void onSdkInitializationSuccess();
@@ -76,7 +73,7 @@ public final class LoopMeSdk {
             return;
         }
 
-        LoopMeSdk.loopMeSdkInitListener = new WeakReference<>(loopMeSdkInitListener);
+        LoopMeSdk.loopMeSdkInitListener = loopMeSdkInitListener;
 
         // Omid init.
         OmidHelper.tryInitOmidAsync(
@@ -117,8 +114,7 @@ public final class LoopMeSdk {
     }
 
     private static void checkInitStatus(int errorCode, String errorMessage) {
-        LoopMeSdkListener listener = loopMeSdkInitListener.get();
-        if (listener == null)
+        if (loopMeSdkInitListener == null)
             return;
 
         boolean hasError = errorCode != ERROR_NONE;
@@ -126,7 +122,8 @@ public final class LoopMeSdk {
         if (!hasError && !isInitialized())
             return;
 
-        loopMeSdkInitListener = new WeakReference<>(null);
+        LoopMeSdkListener listener = loopMeSdkInitListener;
+        loopMeSdkInitListener = null;
 
         if (hasError) {
             Logging.out(LOG_TAG, errorMessage, true);

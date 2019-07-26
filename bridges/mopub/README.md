@@ -4,10 +4,11 @@
 2. **[Register on LoopMe network](#register-on-loopme-network)**
 3. **[Adding LoopMe Android SDK](#adding-loopme-android-sdk)**
 4. **[Create Custom Native Network on Mopub dashboard](#create-custom-native-network-on-mopub-dashboard)**
-5. **[Mediate from Mopub Interstitial to LoopMe Interstitial Ad](#mediate-from-mopub-interstitial-to-loopme-interstitial-ad)**
-6. **[Mediate from Mopub banner to LoopMe Native Video Ad](#mediate-from-mopub-banner-to-loopme-native-video-ad)**
-7. **[Mediate from Mopub Rewarded Video to LoopMe Rewarded Video Ad](#mediate-from-mopub-rewarded-video-to-loopme-rewarded-video-ad)**
-8. **[Sample project](#sample-project)**
+5. **[Initialization](#initialization)**
+6. **[Mediate from Mopub Interstitial to LoopMe Interstitial Ad](#mediate-from-mopub-interstitial-to-loopme-interstitial-ad)**
+7. **[Mediate from Mopub banner to LoopMe Native Video Ad](#mediate-from-mopub-banner-to-loopme-native-video-ad)**
+8. **[Mediate from Mopub Rewarded Video to LoopMe Rewarded Video Ad](#mediate-from-mopub-rewarded-video-to-loopme-rewarded-video-ad)**
+9. **[Sample project](#sample-project)**
 
 ## Overview ##
 
@@ -31,10 +32,11 @@ Add the following to your build.gradle:
 ```java
 repositories {
     jcenter()
+    maven { url 'https://dl.bintray.com/loopme/maven' }
 }
 
 dependencies {
-    compile 'com.loopme:loopme-sdk:6.1.6@aar'
+    implementation 'com.loopme:loopme-sdk:7.0.1'
 }
 ```
 
@@ -44,17 +46,48 @@ dependencies {
 
 * On Mopub dashboard click Networks -> add a network. Choose “Custom Native Network”
 
+## Initialization ##
+
+Starting from MoPub SDK v5.x.x you have to initialize MoPub SDK and LoopMe mediation. To do so copy `LoopMeAdapterConfiguration.java` to the `com.mopub.mobileads` package in your app and insert this piece of code in your `Activity`:
+
+```
+protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        Map<String, String> loopMeConf = new HashMap<>();
+
+        // Use this method in case if you Publisher is willing to ask GDPR consent with your own or
+        // MoPub dialog AND don't want LoopMe consent dialog to be shown - pass GDPR consent to this method.
+        //LoopMeAdapterConfiguration.setPublisherConsent(loopMeConf, true);
+
+        // Unfortunately, MoPub SDK v5.5.x doesn't pass Activity context to initializeNetwork method:
+        // pass it here, before initializing MoPub SDK.
+        LoopMeAdapterConfiguration.setWeakActivity(this);
+
+        MoPub.initializeSdk(this,
+                new SdkConfiguration.Builder(BuildConfig.AD_UNIT_ID_BANNER)
+                        .withAdditionalNetwork(
+                                LoopMeAdapterConfiguration.class.getName())
+                        .withMediatedNetworkConfiguration(
+                                LoopMeAdapterConfiguration.class.getName(), loopMeConf)
+                        .withLogLevel(MoPubLog.LogLevel.INFO)
+                        .build(),
+                this);
+}
+```
+
 ## Mediate from Mopub Interstitial to LoopMe Interstitial Ad ##
 
 <br><b>Configure Custom Native Network on Mopub dashboard </b>
 <p><img src="images/mopub interstitial dashboard.png"  /></a>
 <br> Instead of test_interstitial_p put your LoopMe app key.
 
-* Download and copy `LoopMeMopubInterstitial` bridge class to the `com.mopub.mobileads` package in your project. 
+* Download and copy `LoopMeMoPubInterstitial` bridge class to the `com.mopub.mobileads` package in your project. 
 * Load `MoPubInterstitial` as usual
 ```java
-mInterstitial = new MoPubInterstitial(LoopMeMopubInterstitialSampleActivity.this, AD_UNIT_ID);
-mInterstitial.setInterstitialAdListener(LoopMeMopubInterstitialSampleActivity.this);
+mInterstitial = new MoPubInterstitial(LoopMeMoPubInterstitialSampleActivity.this, AD_UNIT_ID);
+mInterstitial.setInterstitialAdListener(LoopMeMoPubInterstitialSampleActivity.this);
 mInterstitial.load();
 ```
 * implement in your Activity `MoPubInterstitial.InterstitialAdListener` interface
@@ -71,18 +104,18 @@ Displaying `LoopMe` native video ads requires extra integration steps in order t
 <p><img src="images/mopub banner dashboard.png"  /></a>
 <br> Instead of test_mpu put your LoopMe app key.
 
-* Download and copy `LoopMeMopubBanner` bridge class to the `com.mopub.mobileads` package in your project. 
-* Define `LoopMeBannerView` in xml
+* Download and copy `LoopMeMoPubBanner` bridge class to the `com.mopub.mobileads` package in your project. 
+* Define `FrameLayout` in xml
 * Init `MoPubView`
 ```java
 MoPubView mBanner = (MoPubView) findViewById(R.id.mopubView);
 mBanner.setAdUnitId(AD_UNIT_ID);
 mBanner.setBannerAdListener(this);
 ```
-* Add `LoopMeBannerView` in localExtras as "bannerView"
+* Add `FrameLayout` in localExtras as "bannerView"
 ```java
-LoopMeBannerView loopmeView = (LoopMeBannerView) findViewById(R.id.loopme_view);
-Map extras = new HashMap();
+FrameLayout loopmeView = findViewById(R.id.loopme_view);
+Map<String, Object> extras = new HashMap<>();
 extras.put("bannerView", loopmeView);
 mBanner.setLocalExtras(extras);
 ```
@@ -90,19 +123,19 @@ mBanner.setLocalExtras(extras);
 ```java
 mBanner.loadAd();
 ```
-* Add `LoopMeMopubBanner.pause()` in onPause() to pause video
+* Add `LoopMeMoPubBanner.pause()` in onPause() to pause video
 ```java
 @Override
 protected void onPause() {
-    LoopMeMopubBanner.pause();
+    LoopMeMoPubBanner.pause();
     super.onPause();
 }
 ```
-* Add `LoopMeMopubBanner.resume()` in onResume() to resume video
+* Add `LoopMeMoPubBanner.resume()` in onResume() to resume video
 ```java
 @Override
 protected void onResume() {
-    LoopMeMopubBanner.resume();
+    LoopMeMoPubBanner.resume();
     super.onResume();
 }
 ```
@@ -146,5 +179,4 @@ Could not load custom event because Activity reference was null. Call MoPubRewar
 
 ## Sample project ##
 
-Check out our `BannerSampleActivity.java` , `InterstitialSampleActivity` and `RewardedVideoSampleActivity.java` as an integration examples.
-
+Check out our `mopub-mediation-sample` for implementation details.

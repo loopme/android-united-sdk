@@ -1,10 +1,11 @@
-package com.loopme.bridge.mopub;
+package com.loopme.mopub_mediation_sample;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import com.mopub.common.MoPubReward;
 import com.mopub.mobileads.MoPubErrorCode;
@@ -14,22 +15,15 @@ import com.mopub.mobileads.MoPubRewardedVideos;
 
 import java.util.Set;
 
-public class RewardedVideoSampleActivity extends Activity implements
+public class RewardedVideoActivity extends Activity implements
         View.OnClickListener,
         MoPubRewardedVideoListener {
-
-    private static final String AD_UNIT_ID_REWARDED_VIDEO = "57977d46e8304f4c8cf2ab44eb1e0ab7";//Your mopub key
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_rewarded);
 
-        /**
-         * Note: if mopub-sdk version of your app is less than v5.0.0 - uncomment this line.
-         * https://developers.mopub.com/docs/android/initialization/
-         */
-        // MoPubRewardedVideos.initializeRewardedVideo(this);
         MoPubRewardedVideos.setRewardedVideoListener(this);
 
         findViewById(R.id.load_rewarded_video_button).setOnClickListener(this);
@@ -53,44 +47,49 @@ public class RewardedVideoSampleActivity extends Activity implements
     }
 
     private void showRewardedVideo() {
-        if (MoPubRewardedVideos.hasRewardedVideo(AD_UNIT_ID_REWARDED_VIDEO)) {
-            MoPubRewardedVideos.showRewardedVideo(AD_UNIT_ID_REWARDED_VIDEO);
+        if (MoPubRewardedVideos.hasRewardedVideo(BuildConfig.AD_UNIT_ID_REWARDED)) {
+            MoPubRewardedVideos.showRewardedVideo(BuildConfig.AD_UNIT_ID_REWARDED);
         }
     }
 
     private void loadRewardedVideo() {
         MoPubRewardedVideoManager.updateActivity(this);
-        MoPubRewardedVideos.loadRewardedVideo(AD_UNIT_ID_REWARDED_VIDEO);
+        MoPubRewardedVideos.loadRewardedVideo(BuildConfig.AD_UNIT_ID_REWARDED);
     }
 
     @Override
     public void onRewardedVideoLoadSuccess(@NonNull String adUnitId) {
-        Toast.makeText(RewardedVideoSampleActivity.this, "Rewarded video is ready", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Rewarded video is ready", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onRewardedVideoLoadFailure(@NonNull String adUnitId, @NonNull MoPubErrorCode errorCode) {
-        Toast.makeText(RewardedVideoSampleActivity.this, "Fail: " + errorCode.toString(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Fail: " + errorCode.toString(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onRewardedVideoStarted(@NonNull String adUnitId) {
-        Toast.makeText(RewardedVideoSampleActivity.this, "onRewardedVideoStarted", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "onRewardedVideoStarted", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onRewardedVideoPlaybackError(@NonNull String adUnitId, @NonNull MoPubErrorCode errorCode) {
-        Toast.makeText(RewardedVideoSampleActivity.this, "onRewardedVideoPlaybackError", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "onRewardedVideoPlaybackError", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRewardedVideoClicked(@NonNull String adUnitId) {
+
     }
 
     @Override
     public void onRewardedVideoClosed(@NonNull String adUnitId) {
-        Toast.makeText(RewardedVideoSampleActivity.this, "onRewardedVideoClosed", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "onRewardedVideoClosed", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onRewardedVideoCompleted(@NonNull Set<String> adUnitIds, @NonNull MoPubReward reward) {
         String rewardMessage = "your reward: " + reward.getAmount() + " " + reward.getLabel();
-        Toast.makeText(RewardedVideoSampleActivity.this, rewardMessage, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, rewardMessage, Toast.LENGTH_SHORT).show();
     }
 }

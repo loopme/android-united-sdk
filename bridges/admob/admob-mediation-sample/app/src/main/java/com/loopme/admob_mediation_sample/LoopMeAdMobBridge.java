@@ -1,4 +1,4 @@
-package com.integration.admob;
+package com.loopme.admob_mediation_sample;
 
 import android.app.Activity;
 import android.content.Context;

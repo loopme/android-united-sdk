@@ -4,15 +4,16 @@
 2. **[Register on LoopMe network](#register-on-loopme-network)**
 3. **[Adding LoopMe Android SDK](#adding-loopme-android-sdk)**
 4. **[Adding LoopMe's AdMob Bridge](#adding-loopmes-admob-bridge)**
-5. **[Mediate from AdMob Interstitial to LoopMe Interstitial Ad](#mediate-from-admob-interstitial-to-loopme-interstitial-ad)**
-8. **[Sample project](#sample-project)**
+5. **[Initialization](#Initialization)**
+6. **[Mediate from AdMob Interstitial to LoopMe Interstitial Ad](#mediate-from-admob-interstitial-to-loopme-interstitial-ad)**
+7. **[Sample project](#sample-project)**
 
 ## Overview ##
 
 LoopMe is the largest mobile video DSP and Ad Network, reaching over 1 billion consumers world-wide. LoopMe’s full-screen video and rich media ad formats deliver more engaging mobile advertising experiences to consumers on smartphones and tablets.
 LoopMe supports SDK bridges to ad mediation platforms. The LoopMe SDK bridge allows you to control the use of the LoopMe SDK via your existing mediation platform.
 
-`LoopMe Android bridge` allows publishers monitize applications using `AdMob mediation ad platform`.
+`LoopMe Android bridge` allows publishers monetize applications using `AdMob mediation ad platform`.
 
 <b>NOTE:</b> This page assumes you already have account on `AdMob` platform and integrated with the `AdMob` Android SDK
 
@@ -29,10 +30,11 @@ You will need the app key during next steps of integration.
 ```java
 repositories {
     jcenter()
+    maven { url 'https://dl.bintray.com/loopme/maven' }
 }
 
 dependencies {
-    compile 'com.loopme:loopme-sdk:6.1.6@aar'
+    implementation 'com.loopme:loopme-sdk:7.0.1'
 }
 ```
 
@@ -40,6 +42,10 @@ dependencies {
 
 Download `LoopMeAdMobBridge` class and move it to `com.integration.admob` package in your project.
 NOTE: `LoopMeAdMobSampleActivity` is just a sample how to use `LoopMeAdMobBridge`. 
+
+## Initialization ##
+
+Make sure `LoopMeSdk` is [initialized](https://github.com/loopme/android-united-sdk/wiki/Initialization) before using AdMob.
 
 ## Mediate from AdMob Interstitial to LoopMe Interstitial Ad ##
 
@@ -79,5 +85,4 @@ mInterstitialAd.show();
 
 ## Sample project ##
 
-Check out our `LoopMeAdMobSampleActivity` as an integration example.
-
+Check out our `admob-mediation-sample` as an integration example.

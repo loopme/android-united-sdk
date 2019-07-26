@@ -1,68 +1,39 @@
-package com.loopme.mopubbridgedemo3;
+package com.loopme.mopub_mediation_sample;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.widget.Toast;
 
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
 
-public class InterstitialSampleActivity extends Activity implements
+public class InterstitialActivity extends Activity implements
         MoPubInterstitial.InterstitialAdListener {
 
     private MoPubInterstitial mInterstitial;
-    private static final String AD_UNIT_ID = "5f1b7dca09ac479c91d4ce1e1c25fb35";//Your mopub key
-    private PersonalInfoManager mPersonalInfoManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_main);
-
-        mPersonalInfoManager = MoPub.getPersonalInformationManager();
-        if(mPersonalInfoManager != null && mPersonalInfoManager.shouldShowConsentDialog()){
-            mPersonalInfoManager.loadConsentDialog(mConsentDialogListener);
-        }
+        setContentView(R.layout.activity_interstitial);
     }
 
-    private ConsentDialogListener mConsentDialogListener = new ConsentDialogListener() {
-
-        @Override
-        public void onConsentDialogLoaded() {
-            if (mPersonalInfoManager != null) {
-                mPersonalInfoManager.showConsentDialog();
-            }
-        }
-
-        @Override
-        public void onConsentDialogLoadFailed(@NonNull MoPubErrorCode moPubErrorCode) {
-            MoPubLog.i("Consent dialog failed to load.");
-        }
-    };
-
-    public void onShowClicked(View view){
+    public void onShowClicked(View view) {
         if (mInterstitial != null) {
             mInterstitial.show();
         }
     }
 
-    public void onLoadClicked(View view){
-        LoopMeSdk.setGdprConsent(this, MoPub.canCollectPersonalInformation());
-        mInterstitial = new MoPubInterstitial(InterstitialSampleActivity.this, AD_UNIT_ID);
-        mInterstitial.setInterstitialAdListener(InterstitialSampleActivity.this);
+    public void onLoadClicked(View view) {
+        mInterstitial = new MoPubInterstitial(this, BuildConfig.AD_UNIT_ID_INTERSTITIAL);
+        mInterstitial.setInterstitialAdListener(this);
         mInterstitial.load();
-    }
-
-    public void onTestBannerClicked(View view){
-        startActivity(new Intent(this, BannerSampleActivity.class));
     }
 
     @Override
     protected void onDestroy() {
-        if(mInterstitial != null){
+        if (mInterstitial != null) {
             mInterstitial.destroy();
         }
         super.onDestroy();

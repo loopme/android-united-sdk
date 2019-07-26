@@ -1,3 +1,7 @@
+## Version 7.0.1 (24 of July, 2019)
+- Initialization bug fix
+- Updated bridges and samples
+
 ## Version 7.0.0 (18 of July, 2019)
 - Added Open Measurement SDK (OM SDK) for viewability measurement
 - Added VAST 4.1 support

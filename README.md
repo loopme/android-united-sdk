@@ -2,11 +2,10 @@ You can find integration guide in our github [wiki](https://github.com/loopme/an
 
 ## What's new ##
 
-**Version 7.0.0**
+**Version 7.0.1**
 
-- Added Open Measurement SDK (OM SDK) for viewability measurement
-- Added VAST 4.1 support
-- **Breaking change**: sdk must be [initialized](https://github.com/loopme/android-united-sdk/wiki/Initialization) before use
+- Initialization bug fix
+- Updated bridges and samples
 
 Please view the [changelog](CHANGELOG.md) for details.
 
