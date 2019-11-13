@@ -2,7 +2,9 @@ package com.loopme.controllers.view;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.view.GestureDetector;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -11,14 +13,17 @@ import com.loopme.Constants;
 import com.loopme.R;
 import com.loopme.utils.ImageUtils;
 import com.loopme.utils.Utils;
+import com.loopme.utils.ViewUtils;
 
-public class EndCardLayout extends FrameLayout implements View.OnClickListener {
-    private static final int END_CARD_VIEW_ID = View.generateViewId();
-    private static final int CLOSE_BUTTON_ID = View.generateViewId();
-    private static final int REPLAY_BUTTON_ID = View.generateViewId();
+public class EndCardLayout extends FrameLayout implements GestureDetector.OnGestureListener {
+    private final int END_CARD_VIEW_ID = View.generateViewId();
+    private final int CLOSE_BUTTON_ID = View.generateViewId();
+    private final int REPLAY_BUTTON_ID = View.generateViewId();
     private ImageView mEndCardImageView;
     private ImageView mCloseImageView;
     private ImageView mReplayImageView;
+    private View[] buttonViews;
+
     private OnEndCardListener mListener;
 
     public EndCardLayout(@NonNull Context context, OnEndCardListener listener) {
@@ -40,27 +45,54 @@ public class EndCardLayout extends FrameLayout implements View.OnClickListener {
         configureEndCardImageView();
         configureCloseView();
         configureReplayView();
-        setListeners();
+
+        buttonViews = new View[]{mReplayImageView, mCloseImageView};
     }
 
-    private void setListeners() {
-        mEndCardImageView.setOnClickListener(this);
-        mCloseImageView.setOnClickListener(this);
-        mReplayImageView.setOnClickListener(this);
+    private GestureDetector gestureDetector = new GestureDetector(getContext(), this);
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return gestureDetector.onTouchEvent(event);
     }
 
     @Override
-    public void onClick(View view) {
-        int id = view.getId();
-        if (id == CLOSE_BUTTON_ID) {
-            onCloseClick();
-        } else if (id == REPLAY_BUTTON_ID) {
-            onReplayClick();
-        } else if (id == END_CARD_VIEW_ID) {
-            onEndCardClick();
-        }
+    public boolean onDown(MotionEvent e) {
+        return true;
     }
 
+    @Override
+    public void onShowPress(MotionEvent e) {
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        View v = ViewUtils.findVisibleView(buttonViews, e);
+
+        if (v == null)
+            onEndCardClick();
+        else if (v.getId() == REPLAY_BUTTON_ID)
+            onReplayClick();
+        else if (v.getId() == CLOSE_BUTTON_ID)
+            onCloseClick();
+
+        return true;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        return false;
+    }
 
     public void destroy() {
         if (mEndCardImageView != null) {

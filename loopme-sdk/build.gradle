@@ -6,34 +6,19 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 8
-        versionName '7.0.1'
-    }
-
-    signingConfigs {
-        release {
-            storeFile rootProject.file(STORE_FILE)
-            storePassword STORE_PASSWORD
-            keyAlias KEY_ALIAS
-            keyPassword KEY_PASSWORD
-        }
+        versionCode 10
+        versionName '7.1.0'
     }
 
     buildTypes {
         release {
             buildConfigField "String", "MOAT_TOKEN", MOAT_TOKEN
-            buildConfigField "String", "DV_TOKEN", DV_TOKEN
-            buildConfigField "String", "SDK_TYPE", SDK_TYPE
-            buildConfigField "String", "SUPPORTED_TRACKERS", SUPPORTED_TRACKERS
-            buildConfigField "String", "OPEN_RTB_VERSION", OPEN_RTB_VERSION
             buildConfigField "String", "IAS_LOOPME_PARTNER_ID", IAS_LOOPME_PARTNER_ID
             buildConfigField "String", "IAS_CM_TAG_URL", IAS_CM_TAG_URL
-            buildConfigField "String", "IAS_LOGGING_TAG_URL", IAS_LOGGING_TAG_URL
             buildConfigField "String", "LOOPME_GDPR_URL", LOOPME_GDPR_URL
             buildConfigField "String", "OM_SDK_JS_URL", OM_SDK_JS_URL
             buildConfigField "String", "OM_SDK_PARTNER", OM_SDK_PARTNER
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
             minifyEnabled false
             debuggable false
         }
@@ -68,10 +53,9 @@ android {
 }
 
 dependencies {
-    implementation files('libs/omsdk-android-1.2.16-loopme.jar')
+    implementation files('libs/omsdk-android-1.2.20-loopme.jar')
     implementation files('libs/libAvid-loopme-3.6.7.jar')
     implementation files('libs/moat-mobile-appkit.jar')
-    implementation files('libs/unity-classes.jar')
 
     api 'com.android.support:appcompat-v7:28.0.0'
     api 'com.android.support:recyclerview-v7:28.0.0'

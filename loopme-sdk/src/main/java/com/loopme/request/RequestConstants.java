@@ -12,7 +12,7 @@ public class RequestConstants {
     public static final String VIDEO_3GPP = "video/3gpp";
     public static final String VIDEO_MP4 = "video/mp4";
     public static final String DEVICE_BLUETOOTH_NAME = "bluetooth_name";
-    public static final int DEFAULT_MAX_DURATION = 1800;
+    public static final int DEFAULT_MAX_DURATION = 999;
     public static final int BOXING_DEFAULT = 1;
     public static final int MAX_TIME_TO_SUBMIT_BID = 250;
     public static final int SECURE_IMPRESSION = 1;
@@ -22,6 +22,7 @@ public class RequestConstants {
     public static final int START_DELAY_DEFAULT_VALUE = 1;
     public static final int FRAMEWORK_VIPAID_2_0 = 2;
     public static final int FRAMEWORK_MRAID_2 = 5;
+    public static final int FRAMEWORK_OMID_1 = 7;
     public static final int DELIVERY_METHOD_PROGRESSIVE = 2;
     public static final int PROTOCOLS_VAST_2_0 = 2;
     public static final int PROTOCOLS_VAST_3_0 = 3;

@@ -76,7 +76,7 @@ public class RequestUtils {
     private int mSkippable;
     private int[] mApi;
 
-    public RequestUtils(Context context, LoopMeAd loopMeAd) {
+    RequestUtils(Context context, LoopMeAd loopMeAd) {
         if (loopMeAd != null) {
             mLoopMeAd = loopMeAd;
             init(context);
@@ -88,7 +88,7 @@ public class RequestUtils {
             return;
         }
         setAdvertisingIdInfo(context);
-        setBattery(context);
+        setBattery();
         setAppBundle(context);
         setAppName(context);
         setAppVersion(context);
@@ -108,19 +108,19 @@ public class RequestUtils {
         setLocation(context);
     }
 
-    public String getAppBundle() {
+    String getAppBundle() {
         return mAppBundle;
     }
 
-    public void setAppBundle(Context context) {
+    private void setAppBundle(Context context) {
         this.mAppBundle = context.getPackageName();
     }
 
-    public String getAppName() {
+    String getAppName() {
         return mAppName;
     }
 
-    public void setAppName(Context context) {
+    private void setAppName(Context context) {
         final PackageManager packageManager = context.getPackageManager();
         ApplicationInfo appInfo = null;
         try {
@@ -137,11 +137,11 @@ public class RequestUtils {
         }
     }
 
-    public String getAppVersion() {
+    String getAppVersion() {
         return mAppVersion;
     }
 
-    public void setAppVersion(Context context) {
+    private void setAppVersion(Context context) {
         mAppVersion = "0.0";
         if (context != null) {
             try {
@@ -153,15 +153,15 @@ public class RequestUtils {
         }
     }
 
-    public String getUuId() {
+    String getUuId() {
         return UUID.randomUUID().toString();
     }
 
-    public int getDeviceType() {
+    int getDeviceType() {
         return mDeviceType;
     }
 
-    public void setDeviceType(Context context) {
+    private void setDeviceType(Context context) {
         boolean tabletSize = context.getResources().getBoolean(R.bool.isTablet);
         if (tabletSize) {
             mDeviceType = RequestConstants.DEVICE_TYPE_TABLET;
@@ -170,19 +170,19 @@ public class RequestUtils {
         }
     }
 
-    public int getDeviceWidthPx() {
+    int getDeviceWidthPx() {
         return mDeviceWidthPx;
     }
 
-    public void setDeviceWidthPx(Context context) {
+    private void setDeviceWidthPx(Context context) {
         mDeviceWidthPx = RequestParamsUtils.getDeviceWidthPx(context);
     }
 
-    public int getDeviceHeightPx() {
+    int getDeviceHeightPx() {
         return mDeviceHeightPx;
     }
 
-    public void setDeviceHeightPx(Context context) {
+    private void setDeviceHeightPx(Context context) {
         mDeviceHeightPx = RequestParamsUtils.getDeviceHeightPx(context);
     }
 
@@ -200,15 +200,15 @@ public class RequestUtils {
         return mIfa;
     }
 
-    public String getOsv() {
+    String getOsv() {
         return String.valueOf(Build.VERSION.RELEASE);
     }
 
-    public int getConnectionType() {
+    int getConnectionType() {
         return mConnectionType;
     }
 
-    public void setConnectionType(Context context) {
+    private void setConnectionType(Context context) {
         mConnectionType = RequestParamsUtils.getConnectionType(context);
     }
 
@@ -216,23 +216,23 @@ public class RequestUtils {
         return RequestConstants.ANDROID_OS;
     }
 
-    public String getLanguage() {
+    String getLanguage() {
         return Locale.getDefault().getLanguage();
     }
 
-    public String getMake() {
+    String getMake() {
         return Build.MANUFACTURER;
     }
 
-    public String getHwv() {
+    String getHwv() {
         return Build.HARDWARE;
     }
 
-    public String getUa() {
+    String getUa() {
         return mUa;
     }
 
-    public void setUa(Context context) {
+    private void setUa(Context context) {
         mUa = WebSettings.getDefaultUserAgent(context);
     }
 
@@ -241,15 +241,15 @@ public class RequestUtils {
         return Build.MODEL;
     }
 
-    public String getTimeZone() {
+    String getTimeZone() {
         return TimeZone.getDefault().getDisplayName();
     }
 
-    public String getPhoneName() {
+    String getPhoneName() {
         return mPn;
     }
 
-    public void setPn(Context context) {
+    private void setPn(Context context) {
         if (context != null) {
             String name = Settings.Secure.getString(context.getContentResolver(), RequestConstants.DEVICE_BLUETOOTH_NAME);
             name = StringUtils.getEncryptedString(name);
@@ -259,11 +259,11 @@ public class RequestUtils {
         }
     }
 
-    public String getWifiName() {
+    String getWifiName() {
         return mWn;
     }
 
-    public void setWn(Context context) {
+    private void setWn(Context context) {
         mWn = RequestParamsUtils.getWifiName(context);
     }
 
@@ -287,7 +287,7 @@ public class RequestUtils {
         return mLoopMeAd != null && mLoopMeAd.isReverseOrientationRequest();
     }
 
-    public String getChargeLevel(Context context) {
+    String getChargeLevel(Context context) {
         if (ApiLevel.isApi21AndHigher()) {
             BatteryManager bm = (BatteryManager) context.getSystemService(BATTERY_SERVICE);
             int level = 1;
@@ -301,52 +301,53 @@ public class RequestUtils {
         }
     }
 
-    public int getPlugin() {
+    int getPlugin() {
         return -1;
     }
 
-    public int getTmax() {
+    int getTmax() {
         return RequestConstants.MAX_TIME_TO_SUBMIT_BID;
     }
 
-    public String[] getBcat() {
+    String[] getBcat() {
         return new String[]{RequestConstants.IAB25_3, RequestConstants.IAB25, RequestConstants.IAB26};
     }
 
-    public int getSecure() {
+    int getSecure() {
         return RequestConstants.SECURE_IMPRESSION;
     }
 
-    public String getTagId() {
-        if (mLoopMeAd != null) {
-            mLoopMeAd.getAppKey();
-        }
-        return Build.UNKNOWN;
-    }
-
-
-    public String getDisplayManagerVersion() {
+    String getDisplayManagerVersion() {
         return BuildConfig.VERSION_NAME;
     }
 
-    public String getImpId() {
+    String getImpId() {
         return String.valueOf(System.currentTimeMillis());
     }
-
 
     private void setApi() {
         LoopMeAd.Type adType = mLoopMeAd.getPreferredAdType();
         switch (adType) {
             case ALL: {
-                mApi = new int[]{RequestConstants.FRAMEWORK_MRAID_2, RequestConstants.FRAMEWORK_VIPAID_2_0};
+                mApi = new int[]{
+                        RequestConstants.FRAMEWORK_MRAID_2,
+                        RequestConstants.FRAMEWORK_VIPAID_2_0,
+                        RequestConstants.FRAMEWORK_OMID_1
+                };
                 break;
             }
             case HTML: {
-                mApi = new int[]{RequestConstants.FRAMEWORK_MRAID_2};
+                mApi = new int[]{
+                        RequestConstants.FRAMEWORK_MRAID_2,
+                        RequestConstants.FRAMEWORK_OMID_1
+                };
                 break;
             }
             case VIDEO: {
-                mApi = new int[]{RequestConstants.FRAMEWORK_VIPAID_2_0};
+                mApi = new int[]{
+                        RequestConstants.FRAMEWORK_VIPAID_2_0,
+                        RequestConstants.FRAMEWORK_OMID_1
+                };
             }
         }
     }
@@ -360,11 +361,11 @@ public class RequestUtils {
     }
 
 
-    public int[] getBattery() {
+    int[] getBattery() {
         return mBattr;
     }
 
-    public void setBattery(Context context) {
+    private void setBattery() {
         mBattr = new int[]{3, 8};
     }
 
@@ -376,16 +377,16 @@ public class RequestUtils {
         return mLoopMeAd.getIntegrationType().getType();
     }
 
-    public float getBidFloor() {
+    float getBidFloor() {
         return RequestConstants.BID_FLOOR_DEFAULT_VALUE;
     }
 
 
-    public int getMaxDuration() {
+    int getMaxDuration() {
         return RequestConstants.DEFAULT_MAX_DURATION;
     }
 
-    public int[] getProtocols() {
+    int[] getProtocols() {
         return new int[]{RequestConstants.PROTOCOLS_VAST_2_0,
                 RequestConstants.PROTOCOLS_VAST_3_0,
                 RequestConstants.PROTOCOLS_VAST_4_0,
@@ -393,51 +394,51 @@ public class RequestUtils {
     }
 
 
-    public int getLinearity() {
+    int getLinearity() {
         return RequestConstants.LINEAR_IN_STREAM;
     }
 
 
-    public String[] getMimeTypes() {
+    String[] getMimeTypes() {
         return new String[]{RequestConstants.VIDEO_MP4};
     }
 
-    public int getStartDelay() {
+    int getStartDelay() {
         return RequestConstants.START_DELAY_DEFAULT_VALUE;
     }
 
-    public int[] getDelivery() {
+    int[] getDelivery() {
         return new int[]{RequestConstants.DELIVERY_METHOD_PROGRESSIVE};
     }
 
-    public int getSequence() {
+    int getSequence() {
         return RequestConstants.SEQUENCE_DEFAULT_VALUE;
     }
 
 
-    public int getMinDuration() {
+    int getMinDuration() {
         return RequestConstants.MIN_BITRATE_DEFAULT_VALUE;
     }
 
-    public int getBoxingAllowed() {
+    int getBoxingAllowed() {
         return RequestConstants.BOXING_DEFAULT;
     }
 
-    public int getMaxBitrate() {
+    int getMaxBitrate() {
         return RequestConstants.MAX_BITRATE_DEFAULT_VALUE;
     }
 
 
-    public String getDisplayManager() {
+    String getDisplayManager() {
         return RequestConstants.LOOPME_SDK;
     }
 
 
-    public int getInstl() {
+    int getInstl() {
         return mInstl;
     }
 
-    public void setInstl() {
+    private void setInstl() {
         boolean interstitial = false;
         if (mLoopMeAd instanceof LoopMeInterstitialGeneral) {
             interstitial = true;
@@ -465,11 +466,11 @@ public class RequestUtils {
         }
     }
 
-    public String getDnt() {
+    String getDnt() {
         return mDnt;
     }
 
-    public ArrayList getSupportedTechs() {
+    ArrayList getSupportedTechs() {
         ArrayList<String> techsList = new ArrayList<>();
         techsList.add(VIDEO);
         techsList.add(VAST2);
@@ -482,7 +483,7 @@ public class RequestUtils {
         return techsList;
     }
 
-    public JSONArray getTrackersSupported() {
+    JSONArray getTrackersSupported() {
         JSONArray arr = new JSONArray();
         try {
             arr.put(new JSONObject().put(TYPE_KEY, VIEWABILITY_VENDOR).put(VENDOR_KEY, MOAT));
@@ -494,7 +495,7 @@ public class RequestUtils {
         return arr;
     }
 
-    public int getSkippable() {
+    int getSkippable() {
         return mSkippable;
     }
 
@@ -509,42 +510,42 @@ public class RequestUtils {
         }
     }
 
-    public int getUserConsent(Context context) {
+    int getUserConsent(Context context) {
         boolean gdprState = GdprPreferences.getInstance(context).getGdprState();
         return gdprState ? 1 : 0;
     }
 
 
-    public int getConsentType(Context context) {
+    int getConsentType(Context context) {
         return GdprPreferences.getInstance(context).getConsentType();
     }
 
-    public int[] getExpDir() {
+    int[] getExpDir() {
         return EXPANDABLE_DIRECTION_FULLSCREEN;
     }
 
-    public String getIabConsentString(Context context) {
+    String getIabConsentString(Context context) {
         return GdprPreferences.getInstance(context).getIabConsentString();
     }
 
-    public boolean isIabConsentCmpPresent(Context context) {
+    boolean isIabConsentCmpPresent(Context context) {
         return GdprPreferences.getInstance(context).isIabConsentCmpPresent();
     }
 
-    public int getIabConsentSubjectToGdpr(Context context) {
+    int getIabConsentSubjectToGdpr(Context context) {
         String gdprSubjectState = GdprPreferences.getInstance(context).getIabConsentSubjectToGdpr();
         return gdprSubjectState.equals("1") ? 1 : 0;
     }
 
-    public int getCoppa() {
+    int getCoppa() {
         return 0;
     }
 
-    public boolean isSubjectToGdprPresent(Context context) {
+    boolean isSubjectToGdprPresent(Context context) {
         return GdprPreferences.getInstance(context).isSubjectToGdprPresent();
     }
 
-    public int getMusic(Context context) {
+    int getMusic(Context context) {
         AudioManager manager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         return manager != null && manager.isMusicActive() ? 1 : 0;
     }
@@ -565,7 +566,7 @@ public class RequestUtils {
         return outputs;
     }
 
-    public JSONArray getAudioOutputJson(Context context) {
+    JSONArray getAudioOutputJson(Context context) {
         JSONArray array = new JSONArray();
         List<String> activeOutput = getAudioOutput(context);
         for (String output : activeOutput) {
@@ -574,7 +575,7 @@ public class RequestUtils {
         return array;
     }
 
-    public boolean isAnyAudioOutput(Context context) {
+    boolean isAnyAudioOutput(Context context) {
         List<String> activeOutput = getAudioOutput(context);
         return !activeOutput.isEmpty();
     }
@@ -583,7 +584,7 @@ public class RequestUtils {
         location = GoogleLocationService.getLocation(context);
     }
 
-    public Location getLocation() {
+    Location getLocation() {
         return location;
     }
 }

@@ -14,4 +14,8 @@ public class ApiLevel {
     public static boolean isApi24AndHigher() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
     }
+
+    public static boolean isApi26AndHigher() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+    }
 }

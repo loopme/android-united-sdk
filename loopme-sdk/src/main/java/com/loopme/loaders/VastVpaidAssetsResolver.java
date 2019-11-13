@@ -8,7 +8,6 @@ import com.loopme.Logging;
 import com.loopme.ad.AdParams;
 import com.loopme.models.Errors;
 import com.loopme.common.LoopMeError;
-import com.loopme.utils.StringUtils;
 
 public class VastVpaidAssetsResolver {
 
@@ -49,32 +48,21 @@ public class VastVpaidAssetsResolver {
     }
 
     private void loadVideoAndEndCard() {
-        if (isEmptyList() || !hasSupportedFormat()) {
+        if (isEmptyList()) {
             onErrorOccurred(Errors.VAST_COULD_NOT_FIND_SUPPORTED_FORMAT);
             return;
         }
 
-        if (mAdParams.getVideoFileUrlsList().size() > 0) {
-            String videoUrl = mAdParams.getVideoFileUrlsList().get(videoFileIndex);
-            mVideoLoader = new FileLoaderNewImpl(videoUrl, mContext, initVastFileLoaderCallback());
-            mVideoLoader.start();
-        }
+        mVideoLoader = new FileLoaderNewImpl(
+                mAdParams.getVideoFileUrlsList().get(videoFileIndex),
+                mContext,
+                initVastFileLoaderCallback());
+
+        mVideoLoader.start();
     }
 
     private boolean isEmptyList() {
-        return mAdParams == null || mAdParams.getVideoFileUrlsList() == null || mAdParams.getVideoFileUrlsList().isEmpty();
-    }
-
-    private boolean hasSupportedFormat() {
-        if (mAdParams == null) {
-            return false;
-        }
-        for (String videoUrl : mAdParams.getVideoFileUrlsList()) {
-            if (StringUtils.hasMp4Extension(videoUrl)) {
-                return true;
-            }
-        }
-        return false;
+        return mAdParams.getVideoFileUrlsList() == null || mAdParams.getVideoFileUrlsList().isEmpty();
     }
 
     private void loadEndCard() {

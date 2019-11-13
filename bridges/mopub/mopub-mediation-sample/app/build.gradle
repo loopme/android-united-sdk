@@ -23,9 +23,9 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'com.loopme:loopme-sdk:7.0.1'
-    implementation('com.mopub:mopub-sdk:5.7.1@aar') {
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.loopme:loopme-sdk:7.1.0'
+    implementation('com.mopub:mopub-sdk:5.10.0') {
         transitive = true
         exclude module: 'libAvid-mopub' // To exclude AVID
         exclude module: 'moat-mobile-app-kit' // To exclude Moat

@@ -148,7 +148,7 @@ public class Bridge extends WebViewClientCompat {
 
     }
 
-    private void onLeaveApp() {
+    protected void onLeaveApp() {
         if (mListener != null) {
             mListener.onLeaveApp();
         }

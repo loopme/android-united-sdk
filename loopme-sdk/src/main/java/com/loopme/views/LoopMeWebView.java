@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.webkit.CookieManager;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
@@ -117,7 +118,7 @@ public class LoopMeWebView extends WebView {
     private void tryRemoveFromParent() {
         ViewParent parent = getParent();
         if (parent != null)
-            ((ViewGroup)parent).removeView(this);
+            ((ViewGroup) parent).removeView(this);
     }
 
     public void setWebViewState(Constants.WebviewState webviewState) {
@@ -133,4 +134,17 @@ public class LoopMeWebView extends WebView {
         Logging.out(LOG_TAG, command);
         loadUrl(command);
     }
+
+    @Override
+    public void setWebChromeClient(WebChromeClient client) {
+        super.setWebChromeClient(client);
+        if (!ApiLevel.isApi26AndHigher())
+            webChromeClient = client;
+    }
+
+    public WebChromeClient getWebChromeClientCompat() {
+        return ApiLevel.isApi26AndHigher() ? getWebChromeClient() : webChromeClient;
+    }
+
+    private WebChromeClient webChromeClient;
 }

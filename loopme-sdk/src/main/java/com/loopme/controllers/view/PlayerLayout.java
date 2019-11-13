@@ -3,6 +3,7 @@ package com.loopme.controllers.view;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.support.annotation.NonNull;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.Surface;
@@ -18,24 +19,33 @@ import android.widget.TextView;
 import com.loopme.Constants;
 import com.loopme.R;
 import com.loopme.utils.Utils;
+import com.loopme.utils.ViewUtils;
 
-public class PlayerLayout extends FrameLayout implements View.OnTouchListener, View.OnClickListener, TextureView.SurfaceTextureListener {
-    private static final int SKIP_BUTTON_ID = View.generateViewId();
-    private static final int PLAYER_VIEW_ID = View.generateViewId();
-    private static final int WEBVIEW_ID = View.generateViewId();
-    private static final int MUTE_BUTTON_ID = View.generateViewId();
+public class PlayerLayout extends FrameLayout
+        implements GestureDetector.OnGestureListener, TextureView.SurfaceTextureListener {
+
     private static final int PROGRESS_HEIGHT = Utils.convertDpToPixel(3);
     private static final int TIME_MARGIN = Utils.convertDpToPixel(6);
     private static final float TEXT_SIZE = 12;
+
+    private final int SKIP_BUTTON_ID = View.generateViewId();
+    private final int PLAYER_VIEW_ID = View.generateViewId();
+    private final int WEBVIEW_ID = View.generateViewId();
+    private final int MUTE_BUTTON_ID = View.generateViewId();
+
     private int mViewPosition;
     private boolean mMuteState;
     private Surface mSurface;
     private WebView mWebView;
-    private TextureView mPlayerTextureView;
     private TextView mTextView;
-    private ImageView mMuteButton;
     private ProgressBar mProgressBar;
+
+    private ImageView mMuteButton;
     private ImageView mSkipButton;
+    private TextureView mPlayerTextureView;
+
+    private View[] buttonViews;
+
     private OnPlayerListener mListener;
     private static final String TIME_FINISHED = "00:00";
     private static final int MINIMAL_TIME_STEP = 200;
@@ -55,7 +65,8 @@ public class PlayerLayout extends FrameLayout implements View.OnTouchListener, V
         configureTextureView();
         configureTimeTextView();
         configureWebView();
-        setListeners();
+
+        buttonViews = new View[]{mMuteButton, mSkipButton};
     }
 
     private void buildLayout() {
@@ -70,15 +81,6 @@ public class PlayerLayout extends FrameLayout implements View.OnTouchListener, V
         addView(mTextView, generateViewPosition());
     }
 
-    private void setListeners() {
-        mMuteButton.setOnClickListener(this);
-        mSkipButton.setOnClickListener(this);
-        mPlayerTextureView.setSurfaceTextureListener(this);
-        if (mWebView == null) {
-            mPlayerTextureView.setOnClickListener(this);
-        }
-    }
-
     public void adjustLayoutParams(int width, int height, int containerWidth, int containerHeight) {
         FrameLayout.LayoutParams oldParams = (FrameLayout.LayoutParams) mPlayerTextureView.getLayoutParams();
         ViewGroup.LayoutParams newParams = Utils.calculateNewLayoutParams(oldParams, width, height,
@@ -91,10 +93,8 @@ public class PlayerLayout extends FrameLayout implements View.OnTouchListener, V
     }
 
     private void configureWebView() {
-        if (mWebView != null) {
+        if (mWebView != null)
             mWebView.setId(WEBVIEW_ID);
-            mWebView.setOnTouchListener(this);
-        }
     }
 
     private void configureTimeTextView() {
@@ -150,36 +150,59 @@ public class PlayerLayout extends FrameLayout implements View.OnTouchListener, V
         mPlayerTextureView = new TextureView(getContext());
         mPlayerTextureView.setId(PLAYER_VIEW_ID);
         mPlayerTextureView.setLayoutParams(Utils.createMatchParentLayoutParams());
+        mPlayerTextureView.setSurfaceTextureListener(this);
     }
 
     @Override
-    public void onClick(View view) {
-        int id = view.getId();
-        if (id == SKIP_BUTTON_ID) {
-            onSkipClick();
-        } else if (id == WEBVIEW_ID || id == PLAYER_VIEW_ID) {
-            onPlayerClick();
-        } else if (id == MUTE_BUTTON_ID) {
-            muteVideo();
-        }
+    public boolean onTouchEvent(MotionEvent event) {
+        return gestureDetector.onTouchEvent(event);
     }
 
+    private GestureDetector gestureDetector = new GestureDetector(getContext(), this);
+
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN && v.getId() == WEBVIEW_ID) {
-            onPlayerClick();
-            return false;
-        }
+    public boolean onDown(MotionEvent e) {
         return true;
     }
 
-    public void showSkipButton() {
-        if (mSkipButton != null) {
-            mSkipButton.setVisibility(View.VISIBLE);
-            mSkipButton.setClickable(true);
-        }
+    @Override
+    public void onShowPress(MotionEvent e) {
+
     }
 
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        View v = ViewUtils.findVisibleView(buttonViews, e);
+
+        if (v == null)
+            onPlayerClick();
+        else if (v.getId() == MUTE_BUTTON_ID)
+            muteVideo();
+        else if (v.getId() == SKIP_BUTTON_ID)
+            onSkipClick();
+
+        return true;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        return false;
+    }
+
+    public void showSkipButton() {
+        if (mSkipButton != null)
+            mSkipButton.setVisibility(View.VISIBLE);
+    }
 
     public boolean isMute() {
         return mMuteState;
@@ -190,7 +213,6 @@ public class PlayerLayout extends FrameLayout implements View.OnTouchListener, V
         switchButton();
         onMuteClick(mMuteState);
     }
-
 
     private void switchButton() {
         if (mMuteState) {
@@ -219,7 +241,6 @@ public class PlayerLayout extends FrameLayout implements View.OnTouchListener, V
         }
     }
 
-
     public void setMaxProgress(int duration) {
         if (mProgressBar != null) {
             mProgressBar.setMax(duration);
@@ -242,7 +263,6 @@ public class PlayerLayout extends FrameLayout implements View.OnTouchListener, V
     }
 
     @Override
-
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
     }
 

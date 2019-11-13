@@ -29,7 +29,7 @@ public class LoopMeAdapterConfiguration extends BaseAdapterConfiguration {
     @NonNull
     @Override
     public String getAdapterVersion() {
-        return "7.0.1.0";
+        return "7.1.0.0";
     }
 
     @Nullable
@@ -47,7 +47,7 @@ public class LoopMeAdapterConfiguration extends BaseAdapterConfiguration {
     @NonNull
     @Override
     public String getNetworkSdkVersion() {
-        return "7.0.1";
+        return "7.1.0";
     }
 
     @Override

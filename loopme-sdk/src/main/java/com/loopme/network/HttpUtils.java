@@ -3,7 +3,7 @@ package com.loopme.network;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.loopme.BuildConfig;
+import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.models.Errors;
 import com.loopme.utils.IOUtils;
@@ -107,7 +107,7 @@ public class HttpUtils {
         connection.setConnectTimeout(CONNECT_TIMEOUT);
         connection.setReadTimeout(READ_TIMEOUT);
         connection.setRequestProperty(HEADER_USER_AGENT, Utils.getUserAgent());
-        connection.setRequestProperty(HEADER_OPEN_RTB_VER, BuildConfig.OPEN_RTB_VERSION);
+        connection.setRequestProperty(HEADER_OPEN_RTB_VER, Constants.OPEN_RTB_VERSION);
         return connection;
     }
 

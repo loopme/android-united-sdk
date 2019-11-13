@@ -6,6 +6,7 @@ import android.location.Location;
 import com.loopme.AdTargetingData;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.debugging.LiveDebug;
+import com.loopme.om.OmidHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,7 +35,6 @@ public class RequestBuilder implements Serializable {
     private static final String OSV = "osv";
     private static final String CONNECTION_TYPE = "connectiontype";
     private static final String OS = "os";
-    private static final String IP = "ip";
     private static final String LANGUAGE = "language";
     private static final String MAKE = "make";
     private static final String HWV = "hwv";
@@ -50,11 +50,16 @@ public class RequestBuilder implements Serializable {
     private static final String PLUGIN = "plugin";
     private static final String TMAX = "tmax";
     private static final String BCAT = "bcat";
+    private static final String SOURCE = "source";
+    private static final String EVENTS = "events";
+    private static final String OMID_PARTNER_NAME = "omidpn";
+    private static final String OMID_PARTNER_VERSION = "omidpv";
     private static final String IMP = "imp";
     private static final String SECURE = "secure";
     private static final String DISPLAY_MANAGER_VERSION = "displaymanagerver";
     private static final String BANNER = "banner";
     private static final String API = "api";
+    private static final String APIS = "apis";
     private static final String BATTR = "battr";
     private static final String IT = "it";
     private static final String BID_FLOOR = "bidfloor";
@@ -70,7 +75,6 @@ public class RequestBuilder implements Serializable {
     private static final String MIN_DURATION = "minduration";
     private static final String MAX_BITRATE = "maxbitrate";
     private static final String DISPLAY_MANAGER = "displaymanager";
-    private static final String TRACKERS = "trackers";
     private static final String INSTL = "instl";
     private static final String SUPPORTED_TECS = "supported_techs";
     private static final String METRIC = "metric";
@@ -110,11 +114,11 @@ public class RequestBuilder implements Serializable {
             deviceObj.put(WIDTH, requestUtils.getDeviceWidthPx());
             deviceObj.put(HEIGHT, requestUtils.getDeviceHeightPx());
             deviceObj.put(JS, requestUtils.getJs());
-            deviceObj.put(IFA, requestUtils.getIfa());
+            deviceObj.put(IFA, RequestUtils.getIfa());
             deviceObj.put(OSV, requestUtils.getOsv());
             deviceObj.put(CONNECTION_TYPE, requestUtils.getConnectionType());
             deviceObj.put(OS, requestUtils.getOs());
-//            deviceObj.put(IP, requestUtils.getIp());
+
             deviceObj.put(LANGUAGE, requestUtils.getLanguage());
             deviceObj.put(MAKE, requestUtils.getMake());
             deviceObj.put(HWV, requestUtils.getHwv());
@@ -138,6 +142,26 @@ public class RequestBuilder implements Serializable {
 
             JSONArray bcatArray = new JSONArray(requestUtils.getBcat());
             requestObj.put(BCAT, bcatArray);
+
+            JSONObject sourceObj = new JSONObject();
+            requestObj.put(SOURCE, sourceObj);
+
+            JSONObject sourceExtObj = new JSONObject();
+            sourceObj.put(EXT, sourceExtObj);
+
+            sourceExtObj.put(OMID_PARTNER_NAME, OmidHelper.getPartnerName());
+            sourceExtObj.put(OMID_PARTNER_VERSION, OmidHelper.getPartnerVersion());
+
+            JSONObject eventsObject = new JSONObject();
+            requestObj.put(EVENTS, eventsObject);
+
+            eventsObject.put(APIS, new JSONArray(new int[]{RequestConstants.FRAMEWORK_OMID_1}));
+
+            JSONObject eventsExtObj = new JSONObject();
+            eventsObject.put(EXT, eventsExtObj);
+
+            eventsExtObj.put(OMID_PARTNER_NAME, OmidHelper.getPartnerName());
+            eventsExtObj.put(OMID_PARTNER_VERSION, OmidHelper.getPartnerVersion());
 
             JSONArray impArray = new JSONArray();
             JSONObject impObj = new JSONObject();
@@ -183,9 +207,7 @@ public class RequestBuilder implements Serializable {
             requestObj.put(IMP, impArray);
             requestObj.put(USER, createUserObj(requestUtils, loopMeAd));
             requestObj.put(REGS, createRegsObj(requestUtils, context));
-        } catch (JSONException jsonException) {
-            jsonException.printStackTrace();
-        } catch (ClassCastException ex) {
+        } catch (JSONException | ClassCastException ex) {
             ex.printStackTrace();
         }
         return requestObj;
@@ -202,8 +224,8 @@ public class RequestBuilder implements Serializable {
             return;
 
         JSONObject geoObj = new JSONObject();
-        geoObj.put(LAT, (float)location.getLatitude());
-        geoObj.put(LON, (float)location.getLongitude());
+        geoObj.put(LAT, (float) location.getLatitude());
+        geoObj.put(LON, (float) location.getLongitude());
         geoObj.put(GEO_TYPE, 1 /*gps/location services*/);
 
         deviceObj.put(GEO, geoObj);

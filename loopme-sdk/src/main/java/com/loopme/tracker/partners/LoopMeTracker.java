@@ -118,7 +118,7 @@ public class LoopMeTracker {
     private static Map<String, String> getGeneralInfo() {
         Map<String, String> params = new HashMap<>();
         params.put(Params.DEVICE_OS, Constants.ADNROID_DEVICE_OS);
-        params.put(Params.SDK_TYPE, BuildConfig.SDK_TYPE);
+        params.put(Params.SDK_TYPE, Constants.LOOPME_SDK_TYPE);
         params.put(Params.SDK_VERSION, BuildConfig.VERSION_NAME);
         params.put(Params.DEVICE_ID, RequestUtils.getIfa());
         params.put(Params.APP_KEY, sAppKey);

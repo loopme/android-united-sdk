@@ -32,6 +32,15 @@ public final class OmidHelper {
     public static final int FINISH_AD_SESSION_DELAY_MILLIS = 1000;
 
     private static Partner partner;
+
+    public static String getPartnerName() {
+        return partner == null ? "" : partner.getName();
+    }
+
+    public static String getPartnerVersion() {
+        return partner == null ? "" : partner.getVersion();
+    }
+
     private static String omSDKJavaScript;
 
     private static boolean initialized;

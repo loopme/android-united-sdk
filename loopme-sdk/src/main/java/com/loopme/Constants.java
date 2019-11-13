@@ -56,6 +56,7 @@ public class Constants {
     public static final String BASE_URL = HTTPS_SCHEME + "://loopme.me/api/ortb/ads";
 
     public static final String OPEN_RTB_URL = "https://loopme.me/api/ortb/";
+    public static final String OPEN_RTB_VERSION = "2.5";
     public static final String LOOPME_PREFERENCES = "LOOPME_PREFERENCES";
     public static final String DESTROY_INTENT = "com.loopme.DESTROY_INTENT";
     public static final String MRAID_NEED_CLOSE_BUTTON = "com.loopme.MRAID_NEED_CLOSE_BUTTON";
