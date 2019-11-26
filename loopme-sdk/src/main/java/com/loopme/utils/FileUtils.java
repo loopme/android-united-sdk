@@ -11,8 +11,7 @@ import com.loopme.Logging;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.security.MessageDigest;
 
 /**
  * Created by vynnykiakiv on 4/20/17.
@@ -84,12 +83,14 @@ public class FileUtils {
         }
     }
 
-    public static String obtainHashName(String url) {
-        if (!TextUtils.isEmpty(url)) {
-            int urlHash = url.hashCode();
-            return Long.toString(urlHash & 0xFFFFFFFFL);
-        } else {
-            return Long.toString(0L);
+    public static String calculateChecksum(String url) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(url.getBytes());
+            return Utils.bytesToHex(md.digest());
+        } catch (Exception e) {
+            Logging.out(LOG_TAG, e.toString());
+            return null;
         }
     }
 
@@ -127,7 +128,7 @@ public class FileUtils {
                     return deleteFile(file);
                 }
             } else {
-               return deleteFile(file);
+                return deleteFile(file);
             }
         }
         return false;
@@ -150,20 +151,20 @@ public class FileUtils {
 
     public static File checkIfFileExists(String filename, Context context) {
         File parentDir = getExternalFilesDir(context);
-        if (parentDir == null) {
+        if (parentDir == null)
             return null;
-        }
+
         Logging.out(LOG_TAG, "Cache dir: " + parentDir.getAbsolutePath());
 
         File[] files = parentDir.listFiles();
-        if (files == null) {
+        if (files == null)
             return null;
-        }
+
         for (File file : files) {
-            if (isValidFile(file) && file.getName().startsWith(filename)) {
+            if (isValidFile(file) && file.getName().equalsIgnoreCase(filename))
                 return file;
-            }
         }
+
         return null;
     }
 

@@ -1,3 +1,6 @@
+## Version 7.1.1 (26 of November, 2019)
+- VAST video caching fix
+
 ## Version 7.1.0 (13 of November, 2019)
 - Html based ads can have access to camera, geolocation, microphone 
 if corresponding permissions are **granted** to the app:

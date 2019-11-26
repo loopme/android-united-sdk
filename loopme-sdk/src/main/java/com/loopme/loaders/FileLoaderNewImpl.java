@@ -17,7 +17,6 @@ import com.loopme.utils.ExecutorHelper;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +24,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-
 
 public class FileLoaderNewImpl implements Loader {
 
@@ -36,25 +34,25 @@ public class FileLoaderNewImpl implements Loader {
     private static final int BUFFER_SIZE = 4096;
     private static final int READ_TIMEOUT = 10000;
     private static final int CONNECT_TIMEOUT = 10000;
-    private String mFileUrl;
 
-    private String mFileName;
-    private volatile boolean mIsStopped;
-    private volatile boolean mIsFileFullyDownloaded;
+    private String fileUrl;
+    private String destFilePath;
 
-    private Callback mCallback;
-    private Context mContext;
-    private File mLoadingFile;
-    private Handler mHandler;
-    private volatile HttpURLConnection mConnection;
-    private volatile FileOutputStream mOutputStream;
+    private volatile boolean isStopped;
+
+    private Callback callback;
+    private Context context;
+
+    private Handler handler;
+
+    private volatile HttpURLConnection connection;
 
     public FileLoaderNewImpl(@NonNull String fileUrl, @NonNull Context context, @NonNull Callback callback) {
-        mFileUrl = fileUrl;
-        mContext = context;
-        mCallback = callback;
-        mHandler = new Handler(Looper.getMainLooper());
-        FileUtils.deleteExpiredFiles(mContext);
+        this.fileUrl = fileUrl;
+        this.context = context;
+        this.callback = callback;
+        handler = new Handler(Looper.getMainLooper());
+        FileUtils.deleteExpiredFiles(this.context);
     }
 
     @Override
@@ -62,143 +60,137 @@ public class FileLoaderNewImpl implements Loader {
         Logging.out(LOG_TAG, "start()");
         Logging.out(LOG_TAG, "Use mobile network for caching: " + Constants.USE_MOBILE_NETWORK_FOR_CACHING);
 
-        mFileName = FileUtils.getFileName(mFileUrl);
-        File file = FileUtils.checkIfFileExists(mFileName, mContext);
+        String filename = FileUtils.calculateChecksum(fileUrl);
+        if (filename == null)
+            filename = FileUtils.getFileName(fileUrl);
 
-        if (file != null) {
-            handleFileExists();
-        } else {
+        destFilePath = createFilePath(context, filename);
+
+        File file = FileUtils.checkIfFileExists(filename, context);
+        if (file == null)
             handleFileDoesNotExist();
-        }
+        else
+            onFileFullLoaded();
     }
 
     @Override
     public void stop() {
-        mCallback = null;
+        callback = null;
         disconnect();
-        mIsStopped = true;
-        deleteFileIfNotFullyDownloaded();
+        isStopped = true;
         Logging.out(LOG_TAG, "stop()");
     }
 
-    private void load(String filename) {
-        if (mIsStopped) {
+    private void load() {
+        if (isStopped)
             return;
-        }
+
         long startLoadingTime = System.currentTimeMillis();
         InputStream inputStream = null;
+        FileOutputStream outputStream = null;
 
         try {
-            mConnection = openConnection(mFileUrl, HTTP_METHOD_GET);
-            mConnection.setReadTimeout(READ_TIMEOUT);
-            mConnection.setConnectTimeout(CONNECT_TIMEOUT);
-            inputStream = new BufferedInputStream(mConnection.getInputStream());
-            mOutputStream = createFileOutputStream(filename);
-            writeStreamToFile(inputStream, mOutputStream);
-            handleFileFullDownloaded();
-            long time = System.currentTimeMillis() - startLoadingTime;
-            Logging.out(LOG_TAG, "Asset successfully loaded (" + time + "ms)");
+            connection = openConnection(fileUrl);
+
+            File file = new File(destFilePath + "_download");
+
+            inputStream = new BufferedInputStream(connection.getInputStream());
+            outputStream = new FileOutputStream(file, false);
+
+            // If download was stopped.
+            if (!writeStreamToFile(inputStream, outputStream))
+                return;
+
+            if (file.renameTo(new File(destFilePath))) {
+                onFileFullLoaded();
+                long time = System.currentTimeMillis() - startLoadingTime;
+                Logging.out(LOG_TAG, "Asset successfully loaded (" + time + "ms)");
+                return;
+            }
+
+            Logging.out(LOG_TAG, "Couldn't rename downloaded file");
+            LoopMeError error = new LoopMeError(Errors.VAST_BAD_ASSET);
+            error.addToMessage(fileUrl);
+            onError(error);
 
         } catch (SocketTimeoutException e) {
-            e.printStackTrace();
             onError(Errors.REQUEST_TIMEOUT);
-
         } catch (MalformedURLException e) {
-            e.printStackTrace();
             onError(Errors.BAD_ASSET);
-
         } catch (IOException e) {
             Logging.out(LOG_TAG, "Exception: " + e.getMessage());
             LoopMeError error = new LoopMeError(Errors.VAST_BAD_ASSET);
-            error.addToMessage(mFileUrl);
+            error.addToMessage(fileUrl);
             onError(error);
-
         } finally {
-            IOUtils.closeQuietly(mOutputStream);
+            IOUtils.closeQuietly(outputStream);
             IOUtils.closeQuietly(inputStream);
+            connection.disconnect();
         }
     }
 
-    private void writeStreamToFile(InputStream stream, FileOutputStream outputStream) throws IOException {
-        if (stream != null && outputStream != null && !mIsStopped) {
-            int length;
-            byte buffer[] = new byte[BUFFER_SIZE];
+    private boolean writeStreamToFile(InputStream stream, FileOutputStream outputStream) throws IOException {
+        if (isStopped)
+            return false;
 
-            while ((length = stream.read(buffer)) != -1 && !mIsStopped) {
-                outputStream.write(buffer, 0, length);
-            }
+        int length;
+        byte[] buffer = new byte[BUFFER_SIZE];
+
+        while ((length = stream.read(buffer)) != -1) {
+            if (isStopped)
+                return false;
+
+            outputStream.write(buffer, 0, length);
         }
+
+        return true;
     }
 
     private void handleFileDoesNotExist() {
-        if (InternetUtils.isOnline(mContext)) {
-            if (ConnectionUtils.isWifiConnection(mContext)) {
+        if (InternetUtils.isOnline(context)) {
+            if (ConnectionUtils.isWifiConnection(context))
                 preloadFile();
-            } else {
+            else
                 loadViaMobileNetwork();
-            }
         }
     }
 
     private void loadViaMobileNetwork() {
-        if (Constants.USE_MOBILE_NETWORK_FOR_CACHING) {
+        if (Constants.USE_MOBILE_NETWORK_FOR_CACHING)
             preloadFile();
-        } else {
+        else
             onError(Errors.MOBILE_NETWORK_ERROR);
-        }
     }
 
-    private void handleFileExists() {
-        Logging.out(LOG_TAG, "File already exists");
-        String filePath = FileUtils.getExternalFilesDir(mContext).getAbsolutePath() + SLASH + mFileName;
-        onFileFullLoaded(filePath);
-    }
+    private HttpURLConnection openConnection(String fileUrl) throws IOException, NullPointerException {
+        HttpURLConnection connection = (HttpURLConnection) new URL(fileUrl).openConnection();
 
-    private HttpURLConnection openConnection(String fileUrl, String httpMethod) throws IOException, NullPointerException {
-        URL url = new URL(fileUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod(httpMethod);
+        connection.setRequestMethod(HTTP_METHOD_GET);
+        connection.setReadTimeout(READ_TIMEOUT);
+        connection.setConnectTimeout(CONNECT_TIMEOUT);
+
         return connection;
-    }
-
-    private FileOutputStream createFileOutputStream(String filename) throws FileNotFoundException {
-        mFileName = FileUtils.getExternalFilesDir(mContext).getAbsolutePath() + SLASH + filename;
-        mLoadingFile = new File(mFileName);
-        mOutputStream = new FileOutputStream(mLoadingFile);
-        return mOutputStream;
     }
 
     private void preloadFile() {
         runInBackgroundThread(new Runnable() {
             @Override
             public void run() {
-                load(mFileName);
+                load();
             }
         });
-    }
-
-    private void deleteFileIfNotFullyDownloaded() {
-        if (!mIsFileFullyDownloaded && mLoadingFile != null && mLoadingFile.exists()) {
-            Logging.out(LOG_TAG, "remove bad file");
-            mLoadingFile.delete();
-        }
     }
 
     private void disconnect() {
         runInBackgroundThread(new Runnable() {
             @Override
             public void run() {
-                if (mConnection != null) {
-                    mConnection.disconnect();
+                if (connection != null) {
+                    connection.disconnect();
                     Logging.out(LOG_TAG, "disconnect()");
                 }
             }
         });
-    }
-
-    private void handleFileFullDownloaded() {
-        mIsFileFullyDownloaded = true;
-        onFileFullLoaded(mFileName);
     }
 
     private void runInBackgroundThread(Runnable runnable) {
@@ -206,18 +198,16 @@ public class FileLoaderNewImpl implements Loader {
     }
 
     private void runOnUiThread(Runnable runnable) {
-        if (mHandler != null) {
-            mHandler.post(runnable);
-        }
+        if (handler != null)
+            handler.post(runnable);
     }
 
-    private void onFileFullLoaded(final String filePath) {
+    private void onFileFullLoaded() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mCallback != null && !mIsStopped) {
-                    mCallback.onFileFullLoaded(filePath);
-                }
+                if (callback != null && !isStopped)
+                    callback.onFileFullLoaded(destFilePath);
             }
         });
     }
@@ -226,11 +216,14 @@ public class FileLoaderNewImpl implements Loader {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mCallback != null) {
-                    mCallback.onError(error);
-                }
+                if (callback != null)
+                    callback.onError(error);
             }
         });
+    }
+
+    private static String createFilePath(Context context, String filename) {
+        return FileUtils.getExternalFilesDir(context).getAbsolutePath() + SLASH + filename;
     }
 
     public interface Callback {
