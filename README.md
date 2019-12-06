@@ -2,8 +2,8 @@ You can find integration guide in our github [wiki](https://github.com/loopme/an
 
 ## What's new ##
 
-**Version 7.1.1**
-- VAST video caching fix   
+**Version 7.2.0**
+- Added support of California Consumer Privacy Act (CCPA)   
 
 Please view the [changelog](CHANGELOG.md) for details.
 

@@ -524,6 +524,10 @@ public class RequestUtils {
         return EXPANDABLE_DIRECTION_FULLSCREEN;
     }
 
+    String getUSPrivacyString(Context context) {
+        return GdprPreferences.getInstance(context).getUSPrivacyString();
+    }
+
     String getIabConsentString(Context context) {
         return GdprPreferences.getInstance(context).getIabConsentString();
     }

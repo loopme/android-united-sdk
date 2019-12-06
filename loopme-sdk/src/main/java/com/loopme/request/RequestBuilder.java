@@ -85,6 +85,7 @@ public class RequestBuilder implements Serializable {
     private static final String REGS = "regs";
     private static final String COPPA = "coppa";
     private static final String GDPR = "gdpr";
+    private static final String US_PRIVACY = "us_privacy";
     private static final String GENDER = "gender";
     private static final String YOB = "yob";
     private static final String KEYWORDS = "keywords";
@@ -243,13 +244,16 @@ public class RequestBuilder implements Serializable {
     private static JSONObject createRegsObj(RequestUtils requestUtils, Context context) throws JSONException {
         JSONObject regs = new JSONObject();
 
-        if (requestUtils.isSubjectToGdprPresent(context)) {
-            JSONObject ext = new JSONObject();
-            ext.put(GDPR, requestUtils.getIabConsentSubjectToGdpr(context));
-            regs.put(EXT, ext);
-        }
-
         regs.put(COPPA, requestUtils.getCoppa());
+
+        JSONObject ext = new JSONObject();
+        regs.put(EXT, ext);
+
+        ext.put(US_PRIVACY, requestUtils.getUSPrivacyString(context));
+
+        if (requestUtils.isSubjectToGdprPresent(context))
+            ext.put(GDPR, requestUtils.getIabConsentSubjectToGdpr(context));
+
         return regs;
     }
 

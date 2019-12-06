@@ -1,3 +1,6 @@
+## Version 7.2.0 (06 of December, 2019)
+- Added support of California Consumer Privacy Act (CCPA) 
+
 ## Version 7.1.1 (26 of November, 2019)
 - VAST video caching fix
 
