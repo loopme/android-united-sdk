@@ -48,35 +48,50 @@ public class WebViewClientCompat extends WebViewClient {
                 handleShouldOverrideUrlLoading(view, request.getUrl().toString());
     }
 
-    // TODO. Rename.
     private boolean handleShouldOverrideUrlLoading(WebView webView, String url) {
-        return tryHandleUriSchemeActions(webView, url) ||
-                shouldOverrideUrlLoadingCompat(webView, url);
+        Uri uri = null;
+        try {
+            uri = Uri.parse(url);
+        } catch (Exception ex) {
+            Logging.out(LOG_TAG, ex.toString());
+        }
+
+        Context context = webView.getContext();
+
+        String scheme = uri == null ? "" : uri.getScheme();
+        if (scheme == null) scheme = "";
+
+        if (tryHandleUriSchemeActions(context, uri))
+            // Abort current url loading process.
+            return true;
+
+        if (scheme.equalsIgnoreCase(HTTP_SCHEME) ||
+                scheme.equalsIgnoreCase(HTTPS_SCHEME) ||
+                canHandleCustomScheme(scheme))
+            return shouldOverrideUrlLoadingCompat(webView, url);
+
+        // Abort current url loading process.
+        return true;
+    }
+
+    protected boolean canHandleCustomScheme(String scheme) {
+        return false;
     }
 
     protected boolean shouldOverrideUrlLoadingCompat(WebView webView, String url) {
         return false;
     }
 
-    // TODO. Remame.
-    private boolean tryHandleUriSchemeActions(WebView webView, String url) {
-        Uri uri = null;
-        String scheme = null;
-        String host = null;
-
-        try {
-            uri = Uri.parse(url);
-            scheme = uri.getScheme();
-            host = uri.getHost();
-        } catch (Exception ex) {
-            Logging.out(LOG_TAG, ex.toString());
-        }
-
-        if (TextUtils.isEmpty(scheme)) {
+    private boolean tryHandleUriSchemeActions(Context context, Uri uri) {
+        if (uri == null)
             return false;
-        }
 
-        Context context = webView.getContext();
+        String scheme = uri.getScheme();
+        if (TextUtils.isEmpty(scheme))
+            return false;
+
+        String url = uri.toString();
+        String host = uri.getHost();
 
         if (scheme.equalsIgnoreCase(TEL_SCHEME))
             return tryStartTask(new Intent(Intent.ACTION_DIAL, uri), context);

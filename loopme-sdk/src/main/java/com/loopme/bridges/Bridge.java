@@ -127,6 +127,11 @@ public class Bridge extends WebViewClientCompat {
         return true;
     }
 
+    @Override
+    protected boolean canHandleCustomScheme(String scheme) {
+        return scheme.equalsIgnoreCase(LOOPME);
+    }
+
     private void handleExtraUrl(String url) {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

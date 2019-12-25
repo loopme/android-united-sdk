@@ -103,6 +103,12 @@ public class MraidBridge extends WebViewClientCompat {
         return false;
     }
 
+    @Override
+    protected boolean canHandleCustomScheme(String scheme) {
+        return scheme.equalsIgnoreCase(MRAID_SCHEME) ||
+                scheme.equalsIgnoreCase(LOOPME_SCHEME);
+    }
+
     private void notifyError(View view, String errorMessage) {
         LoopMeTracker.post(errorMessage);
         ((MraidView) view).notifyError();

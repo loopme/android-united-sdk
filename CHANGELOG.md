@@ -1,3 +1,6 @@
+## Version 7.2.1 (25 of December, 2019)
+- WebViewClient unsupported uri scheme fix
+
 ## Version 7.2.0 (06 of December, 2019)
 - Added support of California Consumer Privacy Act (CCPA) 
 

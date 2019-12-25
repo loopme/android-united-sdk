@@ -23,9 +23,10 @@ import com.loopme.views.webclient.WebViewClientCompat;
 public class GdprWebView extends WebView {
 
     private static final String BRIDGE = "GdprBridge";
-    private static final String LOOPME_SCHEMA = "loopme://popup/";
-    private static final String READY_EVENT = "ready";
-    private static final String CLOSE_EVENT = "close";
+    private static final String POPUP = "://popup/";
+    private static final String LOOPME_SCHEMA = "loopme";
+    private static final String READY_EVENT = POPUP + "ready";
+    private static final String CLOSE_EVENT = POPUP + "close";
     private static final String PRIVACY_PAGE = "privacy";
 
     private GdprBridge.OnCloseListener gdprBridgeCloseListener;
@@ -98,6 +99,11 @@ public class GdprWebView extends WebView {
             @Override
             public boolean shouldOverrideUrlLoadingCompat(WebView view, String url) {
                 return GdprWebView.this.shouldOverrideUrlLoading(url);
+            }
+
+            @Override
+            protected boolean canHandleCustomScheme(String scheme) {
+                return scheme.equalsIgnoreCase(LOOPME_SCHEMA);
             }
         });
     }
