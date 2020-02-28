@@ -1,3 +1,5 @@
+You can find integration guide in our github [wiki](https://github.com/loopme/android-united-sdk/wiki) page.
+
 ## What's new ##
 
 **Version 8.0.0**
