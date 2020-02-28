@@ -22,7 +22,7 @@ public class AdView extends LoopMeWebView implements BridgeInterface, Bridge.Lis
     public AdView(Context context, Listener adReadyListener) {
         super(context);
         Logging.out(LOG_TAG, "AdView created");
-        setWebViewClient(new Bridge(getContext(), this, adReadyListener));
+        setWebViewClient(new Bridge(this, adReadyListener));
         setDefaultWebChromeClient();
         modifyUserAgentForKrPano();
     }
@@ -46,11 +46,6 @@ public class AdView extends LoopMeWebView implements BridgeInterface, Bridge.Lis
         String userString = WebSettings.getDefaultUserAgent(getContext());
         String modifiedUserString = Utils.makeChromeShortCut(userString);
         getSettings().setUserAgentString(modifiedUserString);
-    }
-
-    @Override
-    public void setWebViewState(Constants.WebviewState state) {
-        super.setWebViewState(state);
     }
 
     @Override
@@ -142,13 +137,6 @@ public class AdView extends LoopMeWebView implements BridgeInterface, Bridge.Lis
     public void onNonLoopMe(String url) {
         if (mBridgeListener != null) {
             mBridgeListener.onNonLoopMe(url);
-        }
-    }
-
-    @Override
-    public void onLeaveApp() {
-        if (mBridgeListener != null) {
-            mBridgeListener.onLeaveApp();
         }
     }
 

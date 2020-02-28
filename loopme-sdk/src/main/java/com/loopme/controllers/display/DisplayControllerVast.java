@@ -3,7 +3,9 @@ package com.loopme.controllers.display;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
+
 import android.text.TextUtils;
 import android.view.Surface;
 import android.webkit.WebView;
@@ -12,7 +14,8 @@ import android.widget.FrameLayout;
 import com.iab.omid.library.loopme.adsession.AdEvents;
 import com.iab.omid.library.loopme.adsession.AdSession;
 import com.iab.omid.library.loopme.adsession.VerificationScriptResource;
-import com.iab.omid.library.loopme.adsession.video.VideoEvents;
+import com.iab.omid.library.loopme.adsession.media.MediaEvents;
+
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.LoopMeMediaPlayer;
@@ -121,7 +124,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
             try {
                 omidEventTrackerWrapper = new OmidEventTrackerWrapper(
                         AdEvents.createAdEvents(adSession),
-                        VideoEvents.createVideoEvents(adSession));
+                        MediaEvents.createMediaEvents(adSession));
                 // Starting adSession.
                 omidAdSession = adSession;
                 omidAdSession.start();

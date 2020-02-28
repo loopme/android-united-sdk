@@ -14,7 +14,7 @@ import android.webkit.WebSettings;
 
 import com.loopme.BuildConfig;
 import com.loopme.LoopMeInterstitialGeneral;
-import com.loopme.GdprPreferences;
+import com.loopme.IABPreferences;
 import com.loopme.R;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.gdpr.ConsentType;
@@ -462,7 +462,7 @@ public class RequestUtils {
         mDnt = advAdInfo.getDoNotTrackAsString();
         mIfa = advAdInfo.getAdvId();
         if (advAdInfo.isUserSetDoNotTrack()) {
-            GdprPreferences.getInstance(context).setGdprState(false, ConsentType.USER_RESTRICTED);
+            IABPreferences.getInstance(context).setGdprState(false, ConsentType.USER_RESTRICTED);
         }
     }
 
@@ -511,13 +511,13 @@ public class RequestUtils {
     }
 
     int getUserConsent(Context context) {
-        boolean gdprState = GdprPreferences.getInstance(context).getGdprState();
+        boolean gdprState = IABPreferences.getInstance(context).getGdprState();
         return gdprState ? 1 : 0;
     }
 
 
     int getConsentType(Context context) {
-        return GdprPreferences.getInstance(context).getConsentType();
+        return IABPreferences.getInstance(context).getConsentType();
     }
 
     int[] getExpDir() {
@@ -525,28 +525,27 @@ public class RequestUtils {
     }
 
     String getUSPrivacyString(Context context) {
-        return GdprPreferences.getInstance(context).getUSPrivacyString();
+        return IABPreferences.getInstance(context).getUSPrivacyString();
     }
 
-    String getIabConsentString(Context context) {
-        return GdprPreferences.getInstance(context).getIabConsentString();
+    String getIabTcfTcString(Context context) {
+        return IABPreferences.getInstance(context).getIabTcfTcString();
     }
 
-    boolean isIabConsentCmpPresent(Context context) {
-        return GdprPreferences.getInstance(context).isIabConsentCmpPresent();
+    boolean isIabTcfCmpSdkPresent(Context context) {
+        return IABPreferences.getInstance(context).isIabTcfCmpSdkPresent();
     }
 
-    int getIabConsentSubjectToGdpr(Context context) {
-        String gdprSubjectState = GdprPreferences.getInstance(context).getIabConsentSubjectToGdpr();
-        return gdprSubjectState.equals("1") ? 1 : 0;
+    int getIabTcfGdprApplies(Context context) {
+        return IABPreferences.getInstance(context).getIabTcfGdprApplies();
     }
 
     int getCoppa() {
         return 0;
     }
 
-    boolean isSubjectToGdprPresent(Context context) {
-        return GdprPreferences.getInstance(context).isSubjectToGdprPresent();
+    boolean isIabTcfGdprAppliesPresent(Context context) {
+        return IABPreferences.getInstance(context).isIabTcfGdprAppliesPresent();
     }
 
     int getMusic(Context context) {

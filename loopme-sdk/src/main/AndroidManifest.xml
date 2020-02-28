@@ -27,7 +27,6 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
             android:hardwareAccelerated="true" />
-        <activity android:name=".views.activity.AdBrowserActivity" />
         <activity
             android:name=".views.activity.MraidVideoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

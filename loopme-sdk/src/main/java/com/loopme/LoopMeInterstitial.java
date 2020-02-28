@@ -2,7 +2,7 @@ package com.loopme;
 
 
 import android.app.Activity;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;

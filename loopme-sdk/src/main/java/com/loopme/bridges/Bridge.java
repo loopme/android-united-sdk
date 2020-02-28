@@ -1,8 +1,6 @@
 package com.loopme.bridges;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.text.TextUtils;
@@ -14,10 +12,6 @@ import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.Utils;
 import com.loopme.views.AdView;
 import com.loopme.views.webclient.WebViewClientCompat;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-
 
 public class Bridge extends WebViewClientCompat {
 
@@ -45,21 +39,19 @@ public class Bridge extends WebViewClientCompat {
     private static final String QUERY_PARAM_MUTE = "mute";
     private static final String QUERY_PARAM_FULLSCREEN_MODE = "mode";
 
-    private Context mContext;
     private Listener mListener;
     private com.loopme.listener.Listener adReadyListener;
 
     // TODO. Refactor.
     public Bridge(
-            Context context,
             Listener listener,
             com.loopme.listener.Listener adReadyListener) {
 
-        if (listener != null) {
-            mContext = context;
-            mListener = listener;
-        } else
+        if (listener == null)
             Logging.out(LOG_TAG, "VideoBridgeListener should not be null");
+        else
+            mListener = listener;
+
 
         this.adReadyListener = adReadyListener;
     }
@@ -83,137 +75,87 @@ public class Bridge extends WebViewClientCompat {
     }
 
     @Override
-    public boolean shouldOverrideUrlLoadingCompat(WebView view, String url) {
+    public boolean shouldOverrideUrlLoadingCompat(WebView webView, String url) {
         Logging.out(LOG_TAG, "shouldOverrideUrlLoadingCompat " + url);
 
-        if (TextUtils.isEmpty(url)) {
-            LoopMeTracker.post("Broken redirect in bridge: " + url, Constants.ErrorType.JS);
-            return false;
-        }
-
-        Context context = view.getContext();
-        URI redirect;
+        Uri uri;
         try {
-            redirect = new URI(url);
-        } catch (URISyntaxException e) {
-            Logging.out(LOG_TAG, e.getMessage());
-            e.printStackTrace();
+            uri = Uri.parse(url);
+        } catch (Exception e) {
+            Logging.out(LOG_TAG, e.toString());
             LoopMeTracker.post("Broken redirect in bridge: " + url, Constants.ErrorType.JS);
-            handleExtraUrl(url);
             return true;
         }
 
-        String protocol = redirect.getScheme();
-        if (TextUtils.isEmpty(protocol)) {
-            return false;
+        if (!LOOPME.equalsIgnoreCase(uri.getScheme())) {
+            handleNonLoopMe(url);
+            return true;
         }
 
-        if (protocol.equalsIgnoreCase(LOOPME)) {
-            ((AdView) view).sendNativeCallFinished();
-            String host = redirect.getHost();
-            String path = redirect.getPath();
-            if (TextUtils.isEmpty(host) || TextUtils.isEmpty(path)) {
-                return false;
-            }
-            if (host.equalsIgnoreCase(WEBVIEW)) {
-                handleWebviewCommands(path, url, context);
-            } else if (host.equalsIgnoreCase(VIDEO)) {
-                handleVideoCommands(path, url);
-            }
-        } else {
-            handleNonLoopMe(url);
+        // TODO. Something old. Remove?
+        ((AdView) webView).sendNativeCallFinished();
+
+        String host = uri.getHost();
+
+        if (WEBVIEW.equalsIgnoreCase(host)) {
+            handleWebViewCommands(uri, webView.getContext());
+            return true;
+        }
+
+        if (VIDEO.equalsIgnoreCase(host)) {
+            handleVideoCommands(uri);
+            return true;
         }
 
         return true;
     }
 
-    @Override
-    protected boolean canHandleCustomScheme(String scheme) {
-        return scheme.equalsIgnoreCase(LOOPME);
-    }
-
-    private void handleExtraUrl(String url) {
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        if (startActivity(intent)) {
-            onLeaveApp();
-        }
-    }
-
-    private boolean startActivity(Intent intent) {
-        try {
-            if (mContext != null) {
-                mContext.startActivity(intent);
-                return true;
-            }
-        } catch (ActivityNotFoundException e) {
-            e.printStackTrace();
-        }
-        return false;
-
-    }
-
-    protected void onLeaveApp() {
-        if (mListener != null) {
-            mListener.onLeaveApp();
-        }
-    }
-
-    private void handleWebviewCommands(String command, String url, Context context) {
-        if (TextUtils.isEmpty(command) || mListener == null) {
+    private void handleWebViewCommands(Uri uri, Context context) {
+        String command = uri.getPath();
+        if (TextUtils.isEmpty(command))
             return;
-        }
+
         switch (command) {
-            case WEBVIEW_CLOSE: {
+            case WEBVIEW_CLOSE:
                 onJsClose();
                 break;
-            }
-            case WEBVIEW_VIBRATE: {
+
+            case WEBVIEW_VIBRATE:
                 handleVibrate(context);
                 break;
-            }
-            case WEBVIEW_FAIL: {
+
+            case WEBVIEW_FAIL:
                 onJsLoadFail("Ad received specific URL loopme://webview/fail");
                 break;
-            }
-            case WEBVIEW_FULLSCREEN: {
-                handleFullscreenMode(url);
+
+            case WEBVIEW_FULLSCREEN:
+                handleFullscreenMode(uri);
                 break;
-            }
-            case WEBVIEW_SUCCESS: {
+
+            case WEBVIEW_SUCCESS:
                 onJsLoadSuccess();
-                break;
-            }
-            default:
                 break;
         }
     }
 
-    private void handleVideoCommands(String command, String url) {
-        if (command == null || mListener == null) {
+    private void handleVideoCommands(Uri uri) {
+        String command = uri.getPath();
+        if (TextUtils.isEmpty(command))
             return;
-        }
-        Uri uri;
-        try {
-            uri = Uri.parse(url);
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-            return;
-        }
 
         switch (command) {
-            case VIDEO_LOAD: {
+            case VIDEO_LOAD:
                 handleVideoLoad(uri);
                 break;
-            }
-            case VIDEO_MUTE: {
+
+            case VIDEO_MUTE:
                 handleVideoMute(uri);
                 break;
-            }
-            case VIDEO_PLAY: {
+
+            case VIDEO_PLAY:
                 handleVideoPlay(uri);
                 break;
-            }
+
             case VIDEO_PAUSE:
                 handleVideoPause(uri);
                 break;
@@ -225,15 +167,11 @@ public class Bridge extends WebViewClientCompat {
             case VIDEO_DISABLE_STRETCH:
                 onJsVideoStretch(false);
                 break;
-
-            default:
-                break;
         }
     }
 
-    private void handleFullscreenMode(String url) {
+    private void handleFullscreenMode(Uri uri) {
         try {
-            Uri uri = Uri.parse(url);
             String modeString = detectQueryParameter(uri, QUERY_PARAM_FULLSCREEN_MODE);
             if (!isValidBooleanParameter(modeString)) {
                 LoopMeTracker.post("Empty parameter in js command: fullscreen mode", Constants.ErrorType.JS);
@@ -241,7 +179,7 @@ public class Bridge extends WebViewClientCompat {
                 onJsFullscreenMode(Boolean.parseBoolean(modeString));
             }
         } catch (NullPointerException | UnsupportedOperationException e) {
-            e.printStackTrace();
+            Logging.out(LOG_TAG, e.toString());
         }
     }
 
@@ -297,51 +235,44 @@ public class Bridge extends WebViewClientCompat {
         try {
             result = uri.getQueryParameter(parameter);
         } catch (NullPointerException | UnsupportedOperationException e) {
-            e.printStackTrace();
+            Logging.out(LOG_TAG, e.toString());
         }
         return result;
     }
 
     private void onJsFullscreenMode(boolean mode) {
-        if (mListener != null) {
+        if (mListener != null)
             mListener.onJsFullscreenMode(mode);
-        }
     }
 
     private void onJsVideoMute(boolean mute) {
-        if (mListener != null) {
+        if (mListener != null)
             mListener.onJsVideoMute(mute);
-        }
     }
 
     private void onJsVideoPlay(int time) {
-        if (mListener != null) {
+        if (mListener != null)
             mListener.onJsVideoPlay(time);
-        }
     }
 
     private void onJsVideoPause(int pauseTime) {
-        if (mListener != null) {
+        if (mListener != null)
             mListener.onJsVideoPause(pauseTime);
-        }
     }
 
     private void onJsVideoLoad(String videoUrl) {
-        if (mListener != null) {
+        if (mListener != null)
             mListener.onJsVideoLoad(videoUrl);
-        }
     }
 
     private void onJsLoadFail(String description) {
-        if (mListener != null) {
+        if (mListener != null)
             mListener.onJsLoadFail("onReceivedError " + description);
-        }
     }
 
     private void onJsVideoStretch(boolean stretch) {
-        if (mListener != null) {
+        if (mListener != null)
             mListener.onJsVideoStretch(stretch);
-        }
     }
 
     private void onJsLoadSuccess() {
@@ -353,15 +284,13 @@ public class Bridge extends WebViewClientCompat {
     }
 
     private void onJsClose() {
-        if (mListener != null) {
+        if (mListener != null)
             mListener.onJsClose();
-        }
     }
 
     private void handleNonLoopMe(String url) {
-        if (mListener != null) {
+        if (mListener != null)
             mListener.onNonLoopMe(url);
-        }
     }
 
     public interface Listener {
@@ -385,8 +314,5 @@ public class Bridge extends WebViewClientCompat {
         void onJsVideoStretch(boolean b);
 
         void onNonLoopMe(String url);
-
-        void onLeaveApp();
     }
-
 }

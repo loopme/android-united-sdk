@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 
 import com.loopme.Logging;
-import com.loopme.GdprPreferences;
+import com.loopme.IABPreferences;
 import com.loopme.gdpr.dialog.GdprDialogFragmentHelper;
 
 import java.lang.ref.WeakReference;
@@ -90,7 +90,7 @@ public class GdprChecker implements
         if (destroyed)
             return;
 
-        GdprPreferences
+        IABPreferences
                 .getInstance(appContext)
                 .setGdprState(isAccepted, consentType);
 
@@ -124,7 +124,7 @@ public class GdprChecker implements
         if (destroyed)
             return;
 
-        if (GdprPreferences.getInstance(appContext).isIabConsentCmpPresent()) {
+        if (IABPreferences.getInstance(appContext).isIabTcfCmpSdkPresent()) {
             setGdprState(true, ConsentType.PUBLISHER);
             return;
         }

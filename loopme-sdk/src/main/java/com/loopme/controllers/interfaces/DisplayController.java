@@ -1,6 +1,6 @@
 package com.loopme.controllers.interfaces;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 

@@ -1,11 +1,10 @@
 package com.loopme;
 
 import android.app.Activity;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.loopme.common.AdChecker;
 import com.loopme.common.LoopMeError;

@@ -2,7 +2,7 @@ package com.loopme.controllers.view;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;

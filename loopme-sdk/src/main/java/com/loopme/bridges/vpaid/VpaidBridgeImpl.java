@@ -1,9 +1,8 @@
 package com.loopme.bridges.vpaid;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 import android.webkit.JavascriptInterface;
 
-import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.ad.*;
 import com.loopme.tracker.constants.EventConstants;

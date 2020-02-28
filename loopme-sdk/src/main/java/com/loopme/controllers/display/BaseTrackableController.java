@@ -1,19 +1,20 @@
 package com.loopme.controllers.display;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
+
 import android.text.TextUtils;
 import android.view.View;
 import android.webkit.WebView;
 
+import com.loopme.AdUtils;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.LoopMeAd;
-import com.loopme.ad.LoopMeAdHolder;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.interfaces.DisplayController;
 import com.loopme.models.Message;
@@ -21,8 +22,6 @@ import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.tracker.AdEvents;
 import com.loopme.tracker.EventManager;
-import com.loopme.utils.UiUtils;
-import com.loopme.utils.Utils;
 
 public abstract class BaseTrackableController implements DisplayController, AdEvents {
 
@@ -139,13 +138,9 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     public void onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
         onAdClickedEvent();
         onMessage(Message.LOG, "Handle url");
-        LoopMeAdHolder.putAd(loopMeAd);
-        Intent intent = UiUtils.createRedirectIntent(url, loopMeAd);
-        if (Utils.isActivityResolved(intent, loopMeAd.getContext())) {
-            loopMeAd.getContext().startActivity(intent);
-        } else {
-            Logging.out(mLogTag, "Warning url = " + url);
-        }
+
+        if (AdUtils.tryStartCustomTabs(loopMeAd.getContext(), url))
+            loopMeAd.onAdLeaveApp();
     }
 
     // events region
@@ -329,7 +324,7 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
         }
     }
 
-   @Override
+    @Override
     public void onAdInjectJsVpaid(StringBuilder html) {
         if (mEventManager != null) {
             mEventManager.onAdInjectJsVpaid(html);

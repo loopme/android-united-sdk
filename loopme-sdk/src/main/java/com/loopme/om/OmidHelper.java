@@ -3,8 +3,10 @@ package com.loopme.om;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.MainThread;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.MainThread;
+import androidx.annotation.NonNull;
+
 import android.text.TextUtils;
 import android.webkit.WebView;
 
@@ -13,6 +15,8 @@ import com.iab.omid.library.loopme.ScriptInjector;
 import com.iab.omid.library.loopme.adsession.AdSession;
 import com.iab.omid.library.loopme.adsession.AdSessionConfiguration;
 import com.iab.omid.library.loopme.adsession.AdSessionContext;
+import com.iab.omid.library.loopme.adsession.CreativeType;
+import com.iab.omid.library.loopme.adsession.ImpressionType;
 import com.iab.omid.library.loopme.adsession.Owner;
 import com.iab.omid.library.loopme.adsession.Partner;
 import com.iab.omid.library.loopme.adsession.VerificationScriptResource;
@@ -28,6 +32,9 @@ import java.util.List;
 public final class OmidHelper {
 
     private static final String LOG_TAG = OmidHelper.class.getSimpleName();
+
+    private static final String CONTENT_URL = null;
+    private static final String CUSTOM_REFERENCE_DATA = "";
 
     public static final int FINISH_AD_SESSION_DELAY_MILLIS = 1000;
 
@@ -69,20 +76,11 @@ public final class OmidHelper {
 
         // 1. Omid activation.
         try {
-            if (!Omid.isActive() &&
-                    !Omid.activateWithOmidApiVersion(
-                            Omid.getVersion(),
-                            applicationContext.getApplicationContext())) {
-
-                String err = "Failed to activate omid";
-                Logging.out(LOG_TAG, err);
-                sdkInitListener.onError(err);
-                return;
-            }
+            Omid.activate(applicationContext.getApplicationContext());
         } catch (Exception e) {
             String err = e.toString();
             Logging.out(LOG_TAG, err);
-            sdkInitListener.onError(e.toString());
+            sdkInitListener.onError(err);
             return;
         }
 
@@ -108,8 +106,7 @@ public final class OmidHelper {
         }
     }
 
-    // TODO. Prevent parallel calls or implement "initAsync" method for LoopMe SDK
-    // TODO. and put om.js download operation there.
+    // TODO. Prevent parallel calls or implement "initAsync" method for LoopMe SDK.
     private static void tryDownloadOMSDKJavaScriptAsync(final SDKInitListener sdkInitListener) {
         ExecutorHelper.getExecutor().submit(new Runnable() {
             @Override
@@ -152,14 +149,7 @@ public final class OmidHelper {
                 new SDKInitListener() {
                     @Override
                     public void onReady() {
-                        AdSession adSession = createAdSession(
-                                false,
-                                null,
-                                verificationScriptResourceList,
-                                Owner.NATIVE,
-                                Owner.NATIVE,
-                                false);
-
+                        AdSession adSession = createAdSession(verificationScriptResourceList);
                         if (adSession == null)
                             listener.onError("Couldn't create adSession");
                         else
@@ -173,14 +163,8 @@ public final class OmidHelper {
                 });
     }
 
-    public static AdSession createWebDisplayAdSession(WebView adView) {
-        return createAdSession(
-                true,
-                adView,
-                null,
-                Owner.NATIVE,
-                null,
-                false);
+    public static AdSession createWebDisplayAdSession(WebView webView) {
+        return createAdSession(webView);
     }
 
     // TODO. Remove init call.
@@ -214,44 +198,55 @@ public final class OmidHelper {
                 });
     }
 
-    // TODO. Refactor.
-    private static AdSession createAdSession(
-            boolean webAd,
-            WebView adView,
-            List<VerificationScriptResource> verificationScriptResourceList,
-            Owner impressionOwner,
-            Owner videoEventsOwner,
-            boolean isolateVerificationScripts) {
-
+    private static AdSession createAdSession(WebView webView) {
         try {
-            String customReferenceData = "";
-            AdSessionContext adSessionContext =
-                    webAd
-                            ? AdSessionContext.createHtmlAdSessionContext(
+            return createAdSession(
+                    CreativeType.HTML_DISPLAY,
+                    Owner.NONE,
+                    AdSessionContext.createHtmlAdSessionContext(
                             partner,
-                            adView,
-                            customReferenceData)
-                            : AdSessionContext.createNativeAdSessionContext(
-                            partner,
-                            omSDKJavaScript,
-                            verificationScriptResourceList,
-                            customReferenceData);
-
-            AdSessionConfiguration adSessionConfiguration =
-                    AdSessionConfiguration.createAdSessionConfiguration(
-                            impressionOwner,
-                            videoEventsOwner,
-                            isolateVerificationScripts);
-
-            return AdSession.createAdSession(
-                    adSessionConfiguration,
-                    adSessionContext);
-
+                            webView,
+                            CONTENT_URL,
+                            CUSTOM_REFERENCE_DATA));
         } catch (Exception e) {
             Logging.out(LOG_TAG, e.toString());
         }
-
         return null;
+    }
+
+    private static AdSession createAdSession(List<VerificationScriptResource> resources) {
+        try {
+            return createAdSession(
+                    CreativeType.VIDEO,
+                    Owner.NATIVE,
+                    AdSessionContext.createNativeAdSessionContext(
+                            partner,
+                            omSDKJavaScript,
+                            resources,
+                            CONTENT_URL,
+                            CUSTOM_REFERENCE_DATA));
+        } catch (Exception e) {
+            Logging.out(LOG_TAG, e.toString());
+        }
+        return null;
+    }
+
+    private static AdSession createAdSession(
+            CreativeType creativeType,
+            Owner mediaEventsOwner,
+            AdSessionContext adSessionContext
+    ) {
+        AdSessionConfiguration adSessionConfiguration =
+                AdSessionConfiguration.createAdSessionConfiguration(
+                        creativeType,
+                        ImpressionType.BEGIN_TO_RENDER,
+                        Owner.NATIVE,
+                        mediaEventsOwner,
+                        false);
+
+        return AdSession.createAdSession(
+                adSessionConfiguration,
+                adSessionContext);
     }
 
     public interface AdSessionListener {

@@ -2,8 +2,8 @@ package com.loopme;
 
 import android.app.Activity;
 import android.os.Looper;
-import android.support.annotation.MainThread;
-import android.support.annotation.NonNull;
+import androidx.annotation.MainThread;
+import androidx.annotation.NonNull;
 
 import com.loopme.gdpr.GdprChecker;
 import com.loopme.om.OmidHelper;

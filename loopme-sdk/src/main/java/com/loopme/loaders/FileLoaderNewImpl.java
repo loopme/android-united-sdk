@@ -3,7 +3,7 @@ package com.loopme.loaders;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.loopme.Constants;
 import com.loopme.Logging;

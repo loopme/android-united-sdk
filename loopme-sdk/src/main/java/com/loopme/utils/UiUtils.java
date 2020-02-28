@@ -16,7 +16,6 @@ import com.loopme.Logging;
 import com.loopme.MinimizedMode;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
-import com.loopme.views.activity.AdBrowserActivity;
 
 public class UiUtils {
 
@@ -40,18 +39,6 @@ public class UiUtils {
         lp.bottomMargin = minimizedMode.getMarginBottom();
         lp.rightMargin = minimizedMode.getMarginRight();
         bannerView.setLayoutParams(lp);
-    }
-
-    public static Intent createRedirectIntent(String url, LoopMeAd loopMeAd) {
-        if (TextUtils.isEmpty(url) || loopMeAd == null) {
-            return new Intent();
-        }
-        Intent redirectIntent = new Intent(loopMeAd.getContext(), AdBrowserActivity.class);
-        redirectIntent.putExtra(Constants.EXTRA_URL, url);
-        redirectIntent.putExtra(Constants.AD_ID_TAG, loopMeAd.getAdId());
-        redirectIntent.putExtra(Constants.FORMAT_TAG, loopMeAd.getAdFormat().ordinal());
-        redirectIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        return redirectIntent;
     }
 
     public static AdSpotDimensions getViewSize(MinimizedMode minimizedMode, LoopMeAd loopMeAd, Constants.DisplayMode displayMode) {

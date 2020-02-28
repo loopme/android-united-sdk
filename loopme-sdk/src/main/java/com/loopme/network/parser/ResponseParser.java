@@ -1,6 +1,6 @@
 package com.loopme.network.parser;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.loopme.Logging;
 import com.loopme.gdpr.GdprResponse;

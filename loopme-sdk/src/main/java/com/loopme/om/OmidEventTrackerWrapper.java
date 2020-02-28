@@ -1,10 +1,10 @@
 package com.loopme.om;
 
 import com.iab.omid.library.loopme.adsession.AdEvents;
-import com.iab.omid.library.loopme.adsession.video.InteractionType;
-import com.iab.omid.library.loopme.adsession.video.Position;
-import com.iab.omid.library.loopme.adsession.video.VastProperties;
-import com.iab.omid.library.loopme.adsession.video.VideoEvents;
+import com.iab.omid.library.loopme.adsession.media.InteractionType;
+import com.iab.omid.library.loopme.adsession.media.MediaEvents;
+import com.iab.omid.library.loopme.adsession.media.Position;
+import com.iab.omid.library.loopme.adsession.media.VastProperties;
 import com.loopme.Logging;
 import com.loopme.time.TimeUtils;
 import com.loopme.tracker.constants.EventConstants;
@@ -26,11 +26,11 @@ public final class OmidEventTrackerWrapper {
     private Set<String> sentProgressEvents = new HashSet<>();
 
     private AdEvents adEvents;
-    private VideoEvents videoEvents;
+    private MediaEvents mediaEvents;
 
-    public OmidEventTrackerWrapper(AdEvents adEvents, VideoEvents videoEvents) {
+    public OmidEventTrackerWrapper(AdEvents adEvents, MediaEvents mediaEvents) {
         this.adEvents = adEvents;
-        this.videoEvents = videoEvents;
+        this.mediaEvents = mediaEvents;
     }
 
     public void sendOneTimeImpression() {
@@ -46,11 +46,11 @@ public final class OmidEventTrackerWrapper {
     }
 
     public void sendOneTimeStartEvent(float duration, boolean videoMuted) {
-        if (startSent || videoEvents == null)
+        if (startSent || mediaEvents == null)
             return;
 
         try {
-            videoEvents.start(duration, videoMuted ? 0 : 1);
+            mediaEvents.start(duration, videoMuted ? 0 : 1);
             startSent = true;
         } catch (Exception e) {
             Logging.out(LOG_TAG, e.toString());
@@ -59,7 +59,7 @@ public final class OmidEventTrackerWrapper {
 
     // TODO. Refactor. Ugly af.
     public void sendOneTimeProgressEvent(float progress, float duration) {
-        if (videoEvents == null)
+        if (mediaEvents == null)
             return;
 
         float progressPercent = progress / duration * 100;
@@ -79,13 +79,13 @@ public final class OmidEventTrackerWrapper {
             try {
                 switch (progressPointKey) {
                     case EventConstants.FIRST_QUARTILE:
-                        videoEvents.firstQuartile();
+                        mediaEvents.firstQuartile();
                         break;
                     case EventConstants.MIDPOINT:
-                        videoEvents.midpoint();
+                        mediaEvents.midpoint();
                         break;
                     case EventConstants.THIRD_QUARTILE:
-                        videoEvents.thirdQuartile();
+                        mediaEvents.thirdQuartile();
                         break;
                 }
 
@@ -98,11 +98,11 @@ public final class OmidEventTrackerWrapper {
     }
 
     public void sendOneTimeCompleteEvent() {
-        if (completeSent || videoEvents == null)
+        if (completeSent || mediaEvents == null)
             return;
 
         try {
-            videoEvents.complete();
+            mediaEvents.complete();
             completeSent = true;
         } catch (Exception e) {
             Logging.out(LOG_TAG, e.toString());
@@ -110,11 +110,11 @@ public final class OmidEventTrackerWrapper {
     }
 
     public void sendOneTimeSkipEvent() {
-        if (skipSent || videoEvents == null)
+        if (skipSent || mediaEvents == null)
             return;
 
         try {
-            videoEvents.skipped();
+            mediaEvents.skipped();
             skipSent = true;
         } catch (Exception e) {
             Logging.out(LOG_TAG, e.toString());
@@ -122,40 +122,51 @@ public final class OmidEventTrackerWrapper {
     }
 
     public void sendVolume(boolean videoMuted) {
-        if (videoEvents == null)
+        if (mediaEvents == null)
             return;
 
         try {
-            videoEvents.volumeChange(videoMuted ? 0 : 1);
+            mediaEvents.volumeChange(videoMuted ? 0 : 1);
         } catch (Exception e) {
             Logging.out(LOG_TAG, e.toString());
         }
     }
 
     public void sendPause() {
-        if (videoEvents == null)
+        if (mediaEvents == null)
             return;
 
         try {
-            videoEvents.pause();
+            mediaEvents.pause();
         } catch (Exception e) {
             Logging.out(LOG_TAG, e.toString());
         }
     }
 
     public void sendResume() {
-        if (videoEvents == null)
+        if (mediaEvents == null)
             return;
 
         try {
-            videoEvents.resume();
+            mediaEvents.resume();
+        } catch (Exception e) {
+            Logging.out(LOG_TAG, e.toString());
+        }
+    }
+
+    public void sendLoaded() {
+        if (adEvents == null)
+            return;
+
+        try {
+            adEvents.loaded();
         } catch (Exception e) {
             Logging.out(LOG_TAG, e.toString());
         }
     }
 
     public void sendLoaded(String skipTime, int duration) {
-        if (videoEvents == null)
+        if (adEvents == null)
             return;
 
         try {
@@ -168,11 +179,11 @@ public final class OmidEventTrackerWrapper {
                     ? vastSkipTimeMillis / 1000f
                     : 0;
 
-            videoEvents.loaded(vastSkipTimeSeconds == 0
-                    ? VastProperties.createVastPropertiesForNonSkippableVideo(
+            adEvents.loaded(vastSkipTimeSeconds == 0
+                    ? VastProperties.createVastPropertiesForNonSkippableMedia(
                     autoPlay,
                     position)
-                    : VastProperties.createVastPropertiesForSkippableVideo(
+                    : VastProperties.createVastPropertiesForSkippableMedia(
                     vastSkipTimeSeconds,
                     autoPlay,
                     position));
@@ -183,11 +194,11 @@ public final class OmidEventTrackerWrapper {
     }
 
     public void sendClicked() {
-        if (videoEvents == null)
+        if (mediaEvents == null)
             return;
 
         try {
-            videoEvents.adUserInteraction(InteractionType.CLICK);
+            mediaEvents.adUserInteraction(InteractionType.CLICK);
         } catch (Exception e) {
             Logging.out(LOG_TAG, e.toString());
         }

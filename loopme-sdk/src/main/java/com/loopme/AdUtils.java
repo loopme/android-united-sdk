@@ -1,9 +1,14 @@
 package com.loopme;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+
+import androidx.browser.customtabs.CustomTabsIntent;
 
 import com.loopme.ad.LoopMeAd;
 import com.loopme.ad.LoopMeAdHolder;
+import com.loopme.utils.Utils;
 import com.loopme.views.activity.BaseActivity;
 
 public class AdUtils {
@@ -33,6 +38,25 @@ public class AdUtils {
 
             loopMeAd.getContext().startActivity(intent);
         }
+    }
+
+    // https://developer.chrome.com/multidevice/android/customtabs
+    public static boolean tryStartCustomTabs(Context context, String uri) {
+        try {
+            CustomTabsIntent customTabsIntent = new CustomTabsIntent
+                    .Builder()
+                    .enableUrlBarHiding()
+                    .build();
+            customTabsIntent.launchUrl(context, Uri.parse(uri));
+
+            // TODO. Refactor.
+            return Utils.isActivityResolved(customTabsIntent.intent, context);
+
+        } catch (Exception e) {
+            Logging.out(LOG_TAG, e.toString());
+        }
+
+        return false;
     }
 
     // TODO. Move.

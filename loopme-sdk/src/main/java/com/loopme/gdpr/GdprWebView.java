@@ -73,21 +73,6 @@ public class GdprWebView extends WebView {
         allowMixedContent();
     }
 
-    private boolean shouldOverrideUrlLoading(String url) {
-        if (url.equalsIgnoreCase(LOOPME_SCHEMA + CLOSE_EVENT)) {
-            onClose();
-            return true;
-        }
-
-        if (url.equalsIgnoreCase(LOOPME_SCHEMA + READY_EVENT))
-            return true;
-
-        if (!TextUtils.isEmpty(url) && url.contains(PRIVACY_PAGE))
-            enableProgressBar(AnimationUtils.AnimationType.IN);
-
-        return false;
-    }
-
     private void configureWebClient() {
         setWebViewClient(new WebViewClientCompat() {
             @Override
@@ -98,12 +83,18 @@ public class GdprWebView extends WebView {
 
             @Override
             public boolean shouldOverrideUrlLoadingCompat(WebView view, String url) {
-                return GdprWebView.this.shouldOverrideUrlLoading(url);
-            }
+                if (url.equalsIgnoreCase(LOOPME_SCHEMA + CLOSE_EVENT)) {
+                    onClose();
+                    return true;
+                }
 
-            @Override
-            protected boolean canHandleCustomScheme(String scheme) {
-                return scheme.equalsIgnoreCase(LOOPME_SCHEMA);
+                if (url.equalsIgnoreCase(LOOPME_SCHEMA + READY_EVENT))
+                    return true;
+
+                if (!TextUtils.isEmpty(url) && url.contains(PRIVACY_PAGE))
+                    enableProgressBar(AnimationUtils.AnimationType.IN);
+
+                return false;
             }
         });
     }

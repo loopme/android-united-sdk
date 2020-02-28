@@ -1,9 +1,6 @@
 package com.loopme.controllers;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -15,15 +12,12 @@ import com.loopme.LoopMeBannerGeneral;
 import com.loopme.MraidOrientation;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
-import com.loopme.ad.LoopMeAdHolder;
 import com.loopme.bridges.mraid.MraidBridge;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
-import com.loopme.utils.InternetUtils;
 import com.loopme.utils.UiUtils;
 import com.loopme.utils.Utils;
 import com.loopme.views.MraidView;
-import com.loopme.views.activity.AdBrowserActivity;
 import com.loopme.views.activity.MraidVideoActivity;
 
 public class MraidController implements MraidBridge.OnMraidBridgeListener {
@@ -91,18 +85,11 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     @Override
     public void open(String url) {
         Logging.out(LOG_TAG, "open " + url);
-        LoopMeAdHolder.putAd(mLoopMeAd);
-        Context context = mMraidView.getContext();
-        if (InternetUtils.isOnline(context)) {
-            Intent intent = new Intent(context, AdBrowserActivity.class);
-            intent.putExtra(Constants.EXTRA_URL, url);
-            intent.putExtra(Constants.AD_ID_TAG, mLoopMeAd.getAdId());
-            intent.putExtra(Constants.FORMAT_TAG, mLoopMeAd.getAdFormat().ordinal());
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
-        } else {
-            Logging.out(LOG_TAG, "No internet connection");
-        }
+
+        mLoopMeAd.onAdClicked();
+
+        if (AdUtils.tryStartCustomTabs(mMraidView.getContext(), url))
+            mLoopMeAd.onAdLeaveApp();
     }
 
     @Override

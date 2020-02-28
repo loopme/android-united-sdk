@@ -251,8 +251,8 @@ public class RequestBuilder implements Serializable {
 
         ext.put(US_PRIVACY, requestUtils.getUSPrivacyString(context));
 
-        if (requestUtils.isSubjectToGdprPresent(context))
-            ext.put(GDPR, requestUtils.getIabConsentSubjectToGdpr(context));
+        if (requestUtils.isIabTcfGdprAppliesPresent(context))
+            ext.put(GDPR, requestUtils.getIabTcfGdprApplies(context));
 
         return regs;
     }
@@ -276,8 +276,8 @@ public class RequestBuilder implements Serializable {
         }
 
         JSONObject ext = new JSONObject();
-        if (requestUtils.isIabConsentCmpPresent(loopMeAd.getContext())) {
-            ext.put(CONSENT, requestUtils.getIabConsentString(loopMeAd.getContext()));
+        if (requestUtils.isIabTcfCmpSdkPresent(loopMeAd.getContext())) {
+            ext.put(CONSENT, requestUtils.getIabTcfTcString(loopMeAd.getContext()));
         } else {
             ext.put(PARAM_CONSENT_TYPE, requestUtils.getConsentType(loopMeAd.getContext()));
             ext.put(CONSENT, requestUtils.getUserConsent(loopMeAd.getContext()));

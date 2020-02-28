@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
+
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.Surface;
@@ -14,6 +16,7 @@ import android.widget.FrameLayout;
 
 import com.iab.omid.library.loopme.adsession.AdEvents;
 import com.iab.omid.library.loopme.adsession.AdSession;
+import com.iab.omid.library.loopme.adsession.FriendlyObstructionPurpose;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.LoopMeBannerGeneral;
@@ -130,11 +133,15 @@ public class DisplayControllerLoopMe
     }
 
     // TODO. Ugly.
-    public void tryAddOmidFriendlyObstruction(View view) {
+    public void tryAddOmidFriendlyObstructionCloseButton(View view) {
         if (omidAdSession == null || view == null)
             return;
 
-        omidAdSession.addFriendlyObstruction(view);
+        try {
+            omidAdSession.addFriendlyObstruction(view, FriendlyObstructionPurpose.CLOSE_AD, null);
+        } catch (RuntimeException ex) {
+            Logging.out(LOG_TAG, ex.toString());
+        }
     }
 
     // TODO. Ugly.
@@ -320,6 +327,8 @@ public class DisplayControllerLoopMe
 
         omidAdSession.registerAdView(wv);
         omidAdSession.start();
+
+        omidEventTrackerWrapper.sendLoaded();
     }
 
     private void injectTrackingJsForWeb() {
@@ -665,11 +674,6 @@ public class DisplayControllerLoopMe
             }
 
             @Override
-            public void onLeaveApp() {
-                onAdLeaveApp();
-            }
-
-            @Override
             public void onJsVideoStretch(boolean b) {
                 handleVideoStretch(b);
             }
@@ -685,12 +689,6 @@ public class DisplayControllerLoopMe
     public void switchToPreviousMode() {
         if (isBanner() && mDisplayModeResolver != null) {
             mDisplayModeResolver.switchToPreviousMode();
-        }
-    }
-
-    private void onAdLeaveApp() {
-        if (mLoopMeAd != null) {
-            mLoopMeAd.onAdLeaveApp();
         }
     }
 
