@@ -1,3 +1,7 @@
+## Version 8.0.1 (16 of April, 2020)
+- OM SDK v1.3.3 update
+- minor fixes
+
 ## Version 8.0.0 (28 of February, 2020)
 - **Breaking change**: AndroidX migration, minor integration changes. See https://github.com/loopme/android-united-sdk/wiki/SDK-Integration#sdk-v800-breaking-changes for details
 - OM SDK v1.3 integration

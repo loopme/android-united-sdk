@@ -578,12 +578,9 @@
 
   mraid.open = function(URL) {
     console.log("mraid.open " + URL)
-    //if (!URL) broadcastEvent(EVENTS.ERROR, 'URL is required.', 'open');
-    //else bridge.executeNativeCall(['open', 'url', URL]);
-//    bridge.executeNativeCall(['open', 'url', URL]);
 
     var iframe = document.createElement("IFRAME");
-    var command = "open?url=" + URL;
+    var command = "open?url=" + encodeURIComponent(URL);
         iframe.setAttribute("src", "mraid://" + command);
         document.documentElement.appendChild(iframe);
         iframe.parentNode.removeChild(iframe);
