@@ -11,9 +11,9 @@ android {
     }
     buildTypes {
         debug {
-            buildConfigField "String", "AD_UNIT_ID_INTERSTITIAL", YOUR_AD_UNIT_ID_INTERSTITIAL
-            buildConfigField "String", "AD_UNIT_ID_REWARDED", YOUR_AD_UNIT_ID_REWARDED
-            buildConfigField "String", "AD_UNIT_ID_BANNER", YOUR_AD_UNIT_ID_BANNER
+            buildConfigField "String", "AD_UNIT_ID_INTERSTITIAL", "\"YOUR_AD_UNIT_ID_INTERSTITIAL\""
+            buildConfigField "String", "AD_UNIT_ID_REWARDED", "\"YOUR_AD_UNIT_ID_REWARDED\""
+            buildConfigField "String", "AD_UNIT_ID_BANNER", "\"YOUR_AD_UNIT_ID_BANNER\""
         }
     }
     compileOptions {
@@ -23,10 +23,12 @@ android {
 }
 
 dependencies {
-    implementation 'com.loopme:loopme-sdk:7.2.1'
+//    implementation 'com.loopme:loopme-sdk:7.2.1'
+//    implementation project(':loopme-sdk')
     implementation('com.mopub:mopub-sdk:5.11.0') {
         transitive = true
         exclude module: 'libAvid-mopub' // To exclude AVID
         exclude module: 'moat-mobile-app-kit' // To exclude Moat
     }
+    implementation project(path: ':loopme-sdk')
 }
