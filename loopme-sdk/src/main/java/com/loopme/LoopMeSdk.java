@@ -40,9 +40,14 @@ public final class LoopMeSdk {
     public static class Configuration {
 
         private GdprChecker.PublisherConsent publisherConsent;
+        private String californiaConsumerPrivacy;
 
         public GdprChecker.PublisherConsent getPublisherConsent() {
             return publisherConsent;
+        }
+
+        public String getUsPrivacy(){
+            return californiaConsumerPrivacy;
         }
 
         /**
@@ -51,6 +56,10 @@ public final class LoopMeSdk {
          */
         public void setPublisherConsent(GdprChecker.PublisherConsent publisherConsent) {
             this.publisherConsent = publisherConsent;
+        }
+
+        public void setUsPrivacy(String californiaConsumerPrivacy){
+            this.californiaConsumerPrivacy = californiaConsumerPrivacy;
         }
     }
 
@@ -72,6 +81,9 @@ public final class LoopMeSdk {
             loopMeSdkInitListener.onSdkInitializationSuccess();
             return;
         }
+
+        if(configuration.getUsPrivacy() != null)
+            IABPreferences.getInstance(activity).setUSPrivacy(configuration.getUsPrivacy());
 
         LoopMeSdk.loopMeSdkInitListener = loopMeSdkInitListener;
 

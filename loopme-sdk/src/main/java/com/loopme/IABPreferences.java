@@ -16,6 +16,7 @@ public final class IABPreferences {
     private static final String IAB_TCF_CMP_SDK_VERSION = "IABTCF_CmpSdkVersion";
     private static final String IAB_TCF_GDPR_APPLIES = "IABTCF_gdprApplies";
 
+    private String usPrivacy;
     private static final String IAB_US_PRIVACY_STRING = "IABUSPrivacy_String";
     private static final String IAB_US_PRIVACY_DOES_NOT_APPLY = "1---";
 
@@ -100,7 +101,12 @@ public final class IABPreferences {
         return false;
     }
 
+    public void setUSPrivacy(String usPrivacy) {
+        this.usPrivacy = usPrivacy;
+    }
+
     public String getUSPrivacyString() {
+        if (usPrivacy != null) return usPrivacy;
         try {
             return prefs.getString(IAB_US_PRIVACY_STRING, IAB_US_PRIVACY_DOES_NOT_APPLY);
         } catch (ClassCastException ex) {
