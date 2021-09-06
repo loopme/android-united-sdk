@@ -16,12 +16,13 @@ public final class IABPreferences {
     private static final String IAB_TCF_CMP_SDK_VERSION = "IABTCF_CmpSdkVersion";
     private static final String IAB_TCF_GDPR_APPLIES = "IABTCF_gdprApplies";
 
-    private String usPrivacy;
     private static final String IAB_US_PRIVACY_STRING = "IABUSPrivacy_String";
     private static final String IAB_US_PRIVACY_DOES_NOT_APPLY = "1---";
 
     private static String FLAG_GDPR;
     private static ConsentType FLAG_CONSENT_TYPE = ConsentType.LOOPME;
+    private String usPrivacy;
+    private boolean coppa;
 
     private final SharedPreferences prefs;
 
@@ -114,5 +115,13 @@ public final class IABPreferences {
         }
 
         return IAB_US_PRIVACY_DOES_NOT_APPLY;
+    }
+
+    public boolean getCoppa() {
+        return coppa;
+    }
+
+    public void setCoppa(boolean coppa) {
+        this.coppa = coppa;
     }
 }

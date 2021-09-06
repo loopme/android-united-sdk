@@ -41,6 +41,7 @@ public final class LoopMeSdk {
 
         private GdprChecker.PublisherConsent publisherConsent;
         private String californiaConsumerPrivacy;
+        private boolean coppa;
 
         public GdprChecker.PublisherConsent getPublisherConsent() {
             return publisherConsent;
@@ -60,6 +61,14 @@ public final class LoopMeSdk {
 
         public void setUsPrivacy(String californiaConsumerPrivacy){
             this.californiaConsumerPrivacy = californiaConsumerPrivacy;
+        }
+
+        public boolean getCoppa() {
+            return coppa;
+        }
+
+        public void setCoppa(boolean coppa) {
+            this.coppa = coppa;
         }
     }
 
@@ -84,6 +93,7 @@ public final class LoopMeSdk {
 
         if(configuration.getUsPrivacy() != null)
             IABPreferences.getInstance(activity).setUSPrivacy(configuration.getUsPrivacy());
+        IABPreferences.getInstance(activity).setCoppa(configuration.getCoppa());
 
         LoopMeSdk.loopMeSdkInitListener = loopMeSdkInitListener;
 
