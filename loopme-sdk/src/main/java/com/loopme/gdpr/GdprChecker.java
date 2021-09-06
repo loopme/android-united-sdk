@@ -46,18 +46,25 @@ public class GdprChecker implements
 
     public static class PublisherConsent {
 
-        private boolean consent;
+        private String consent;
 
-        public PublisherConsent(boolean consent) {
+        public PublisherConsent(String consent) {
             this.consent = consent;
         }
 
-        public boolean getConsent() {
+        public String getConsent() {
             return consent;
         }
 
-        public void setConsent(boolean consent) {
+        /**
+         * if you want to send TCF consent
+         */
+        public void setConsent(String consent) {
             this.consent = consent;
+        }
+
+        public void setConsent(boolean consent) {
+            this.consent = consent ? "1" : "0";
         }
     }
 
@@ -86,7 +93,7 @@ public class GdprChecker implements
         instance.check();
     }
 
-    private void setGdprState(boolean isAccepted, ConsentType consentType) {
+    private void setGdprState(String isAccepted, ConsentType consentType) {
         if (destroyed)
             return;
 
@@ -103,6 +110,10 @@ public class GdprChecker implements
 
         if (listener != null)
             listener.onGdprChecked();
+    }
+
+    private void setGdprState(boolean isAccepted, ConsentType consentType) {
+        setGdprState(isAccepted ? "1" : "0", consentType);
     }
 
     private void destroy() {

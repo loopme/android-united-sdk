@@ -510,9 +510,8 @@ public class RequestUtils {
         }
     }
 
-    int getUserConsent(Context context) {
-        boolean gdprState = IABPreferences.getInstance(context).getGdprState();
-        return gdprState ? 1 : 0;
+    String getUserConsent(Context context) {
+        return IABPreferences.getInstance(context).getGdprState();
     }
 
 

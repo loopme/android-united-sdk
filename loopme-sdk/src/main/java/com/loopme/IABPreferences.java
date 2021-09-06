@@ -19,7 +19,7 @@ public final class IABPreferences {
     private static final String IAB_US_PRIVACY_STRING = "IABUSPrivacy_String";
     private static final String IAB_US_PRIVACY_DOES_NOT_APPLY = "1---";
 
-    private static boolean FLAG_GDPR = false;
+    private static String FLAG_GDPR;
     private static ConsentType FLAG_CONSENT_TYPE = ConsentType.LOOPME;
 
     private final SharedPreferences prefs;
@@ -37,12 +37,17 @@ public final class IABPreferences {
         return instance;
     }
 
-    public void setGdprState(boolean isAccepted, ConsentType consentType) {
-        FLAG_GDPR = isAccepted;
+    public void setGdprState(String consent, ConsentType consentType) {
+        FLAG_GDPR = consent;
         FLAG_CONSENT_TYPE = consentType;
     }
 
-    public boolean getGdprState() {
+    public void setGdprState(boolean consent, ConsentType consentType) {
+        FLAG_GDPR = consent ? "1" : "0";
+        FLAG_CONSENT_TYPE = consentType;
+    }
+
+    public String getGdprState() {
         return FLAG_GDPR;
     }
 
