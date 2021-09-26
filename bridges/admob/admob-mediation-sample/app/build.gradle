@@ -19,5 +19,6 @@ android {
 
 dependencies {
     implementation 'com.google.android.gms:play-services-ads:18.3.0'
-    implementation 'com.loopme:loopme-sdk:7.2.1'
+    implementation project(':loopme-sdk')
+//    implementation 'com.loopme:loopme-sdk:7.2.1'
 }
