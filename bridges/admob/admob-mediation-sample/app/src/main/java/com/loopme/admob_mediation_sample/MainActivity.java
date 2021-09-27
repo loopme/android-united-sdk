@@ -6,14 +6,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.loopme.LoopMeSdk;
 
 public class MainActivity
@@ -53,8 +55,8 @@ public class MainActivity
         mShowButton.setText("Interstitial Not Ready");
         mShowButton.setEnabled(false);
 
-        if (mInterstitialAd.isLoaded()) {
-            mInterstitialAd.show();
+        if (mInterstitialAd != null) {
+            mInterstitialAd.show(this);
         } else {
             Log.d(LOG_TAG, "Interstitial ad was not ready to be shown.");
         }
@@ -63,47 +65,28 @@ public class MainActivity
     private void loadAd() {
         mShowButton.setText("Loading Interstitial...");
         mShowButton.setEnabled(false);
-        AdRequest.Builder builder = new AdRequest.Builder();
-        mInterstitialAd.loadAd(builder.build());
+        AdRequest adRequest = new AdRequest.Builder().build();
+        InterstitialAd.load(this, ADMOB_UNIT_ID, adRequest, new InterstitialAdLoadCallback() {
+            @Override
+            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                toast("onAdLoaded");
+
+                mInterstitialAd = interstitialAd;
+                mShowButton.setText("Show Interstitial");
+                mShowButton.setEnabled(true);
+            }
+
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                // Handle the error
+                toast("onAdFailedToLoad");
+
+                mShowButton.setText("Failed to Receive Ad");
+                mShowButton.setEnabled(false);
+                mInterstitialAd = null;
+            }
+        });
     }
-
-    private AdListener mAdListener = new AdListener() {
-        @Override
-        public void onAdClosed() {
-            super.onAdClosed();
-            toast("onAdClosed");
-        }
-
-        @Override
-        public void onAdFailedToLoad(int errorCode) {
-            super.onAdFailedToLoad(errorCode);
-            toast("onAdFailedToLoad");
-
-            mShowButton.setText("Failed to Receive Ad");
-            mShowButton.setEnabled(false);
-        }
-
-        @Override
-        public void onAdLeftApplication() {
-            super.onAdLeftApplication();
-            toast("onAdLeftApplication");
-        }
-
-        @Override
-        public void onAdOpened() {
-            super.onAdOpened();
-            toast("onAdOpened");
-        }
-
-        @Override
-        public void onAdLoaded() {
-            super.onAdLoaded();
-            toast("onAdLoaded");
-
-            mShowButton.setText("Show Interstitial");
-            mShowButton.setEnabled(true);
-        }
-    };
 
     private void initializeLoopMe() {
         LoopMeSdk.Configuration loopMeConf = new LoopMeSdk.Configuration();
@@ -131,10 +114,6 @@ public class MainActivity
 
     private void initializeAdMob() {
         MobileAds.initialize(this, this);
-
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId(ADMOB_UNIT_ID);
-        mInterstitialAd.setAdListener(mAdListener);
     }
 
     // AdMob.
