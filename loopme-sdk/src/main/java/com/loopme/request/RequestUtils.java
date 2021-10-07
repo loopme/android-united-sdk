@@ -540,7 +540,8 @@ public class RequestUtils {
     }
 
     int getCoppa(Context context) {
-        return IABPreferences.getInstance(context).getCoppa();
+        boolean coppa = IABPreferences.getInstance(context).getCoppa();
+        return coppa ? 1 : 0;
     }
 
     boolean isIabTcfGdprAppliesPresent(Context context) {
