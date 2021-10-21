@@ -76,7 +76,9 @@ protected void onCreate(Bundle savedInstanceState) {
 
 <br><b>Configure Custom Native Network on Mopub dashboard </b>
 <p><img src="images\custom event interstitial.png"  /></p>
-<br> Instead of test_interstitial_p put your LoopMe app key.
+<br>Or you can configure custom native network in line item
+<p><img src="images\custom line interstitial.png"  /></p>
+<br> Instead of test_interstitial_l put your LoopMe app key.
 
 * Download and copy `LoopMeMoPubInterstitial` bridge class to the `com.mopub.mobileads` package in your project. 
 * Load `MoPubInterstitial` as usual
@@ -97,6 +99,8 @@ Displaying `LoopMe` native video ads requires extra integration steps in order t
 
 <br><b>1 Configure Custom Native Network on Mopub dashboard </b>
 <p><img src="images/custom event banner.png"  /></p>
+<br>Or you can configure custom native network in line item
+<p><img src="images\custom line banner.png"  /></p>
 <br> Instead of test_mpu put your LoopMe app key.
 
 * Download and copy `LoopMeMoPubBanner` bridge class to the `com.mopub.mobileads` package in your project. 
