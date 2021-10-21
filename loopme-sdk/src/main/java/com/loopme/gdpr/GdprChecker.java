@@ -52,6 +52,10 @@ public class GdprChecker implements
             this.consent = consent;
         }
 
+        public PublisherConsent(Boolean consent){
+            setConsent(consent);
+        }
+
         public String getConsent() {
             return consent;
         }

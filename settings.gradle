@@ -1,1 +1,1 @@
-include ':loopme-sdk', ':sample-interstitial', ':sample-banner'
+include ':loopme-sdk', ':sample-interstitial', ':sample-banner', ':bridges:mopub:mopub-mediation-sample:app'
