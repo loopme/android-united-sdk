@@ -244,7 +244,7 @@ public class RequestBuilder implements Serializable {
     private static JSONObject createRegsObj(RequestUtils requestUtils, Context context) throws JSONException {
         JSONObject regs = new JSONObject();
 
-        regs.put(COPPA, requestUtils.getCoppa());
+        regs.put(COPPA, requestUtils.getCoppa(context));
 
         JSONObject ext = new JSONObject();
         regs.put(EXT, ext);

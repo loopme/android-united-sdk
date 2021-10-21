@@ -30,13 +30,8 @@ You will need the app key during next steps of integration.
 
 Add the following to your build.gradle:
 ```java
-repositories {
-    jcenter()
-    maven { url 'https://dl.bintray.com/loopme/maven' }
-}
-
 dependencies {
-    implementation 'com.loopme:loopme-sdk:7.0.1'
+        implementation files('libs/loopme-sdk-release.aar')
 }
 ```
 
@@ -80,7 +75,7 @@ protected void onCreate(Bundle savedInstanceState) {
 ## Mediate from Mopub Interstitial to LoopMe Interstitial Ad ##
 
 <br><b>Configure Custom Native Network on Mopub dashboard </b>
-<p><img src="images/mopub interstitial dashboard.png"  /></a>
+<p><img src="images\custom event interstitial.png"  /></p>
 <br> Instead of test_interstitial_p put your LoopMe app key.
 
 * Download and copy `LoopMeMoPubInterstitial` bridge class to the `com.mopub.mobileads` package in your project. 
@@ -101,7 +96,7 @@ mInterstitial.show();
 Displaying `LoopMe` native video ads requires extra integration steps in order to manage ad activity, e.g. to enable video playback or HTML animation.
 
 <br><b>1 Configure Custom Native Network on Mopub dashboard </b>
-<p><img src="images/mopub banner dashboard.png"  /></a>
+<p><img src="images/custom event banner.png"  /></p>
 <br> Instead of test_mpu put your LoopMe app key.
 
 * Download and copy `LoopMeMoPubBanner` bridge class to the `com.mopub.mobileads` package in your project. 
@@ -142,7 +137,7 @@ protected void onResume() {
 
 ## Mediate from Mopub Rewarded Video to LoopMe Rewarded Video Ad ##
 <br><b>Configure Custom Native Network on Mopub dashboard </b>
-<p><img src="images/rewarded_dashboard.png"  /></a>
+<p><img src="images/custom event rewarded.png"  /></p>
 <br> Instead of <b>test_interstitial_l</b> put your LoopMe app key.
 <br> Instead of <b>bitcoin</b> put your rewarded currency.
 <br> Instead of <b>10</b> put your rewarded amount.

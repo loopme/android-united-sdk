@@ -510,9 +510,8 @@ public class RequestUtils {
         }
     }
 
-    int getUserConsent(Context context) {
-        boolean gdprState = IABPreferences.getInstance(context).getGdprState();
-        return gdprState ? 1 : 0;
+    String getUserConsent(Context context) {
+        return IABPreferences.getInstance(context).getGdprState();
     }
 
 
@@ -540,8 +539,9 @@ public class RequestUtils {
         return IABPreferences.getInstance(context).getIabTcfGdprApplies();
     }
 
-    int getCoppa() {
-        return 0;
+    int getCoppa(Context context) {
+        boolean coppa = IABPreferences.getInstance(context).getCoppa();
+        return coppa ? 1 : 0;
     }
 
     boolean isIabTcfGdprAppliesPresent(Context context) {
