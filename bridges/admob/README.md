@@ -27,15 +27,10 @@ You will need the app key during next steps of integration.
 ## Adding LoopMe Android SDK ##
 
 * Add the following to your `build.gradle`:
-```java
-repositories {
-    jcenter()
-    maven { url 'https://dl.bintray.com/loopme/maven' }
-}
-
+```groovy
 dependencies {
-    implementation 'com.loopme:loopme-sdk:7.0.1'
-}
+        implementation files('libs/loopme-sdk-release.aar')
+        }
 ```
 
 ## Adding LoopMe's AdMob Bridge ##
@@ -52,15 +47,15 @@ Make sure `LoopMeSdk` is [initialized](https://github.com/loopme/android-united-
 <b>Configure Ad Network Mediation on AdMob</b>
 <br><b>NOTE:</b> This page assumes you already have account on AdMob and Ad unit(s)
 * Click <b>Edit/Create Mediation Group</b>
-<p><img src="Images/EditOrCreateMediationGroup.png" /></a>
+<p><img src="images/admob_create_group.png" /></p>
 
 * Click <b>Add Custom Event.</b>
-<p><img src="Images/AddCustomEvent.png" /></a><br>
+<p><img src="images/admob_add_event.png" /></p>
 Enter the event name and real eCPM that you have got after LoopMe publisher team approval. Click Continue.<br>
 Note: you find eCPM on the LoopMe Dashboard > Apps & Sites > Ad Spot information.
 
 * Enter the <b>Class Name</b> and <b>Parameter</b>. You will get:
-<p><img src="Images/ConfigureAdUnits.png"  /></a>
+<p><img src="images/ConfigureAdUnits.png"  /></p>
 
 Class Name should be: 'com.integration.admob.LoopMeAdMobBridge'. <br>
 Parameter: enter the app key value you received after registering your Ad Spot on the LoopMe dashboard. <br>E.g. '298f62c196'.<br><br>

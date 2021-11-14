@@ -1,1 +1,1 @@
-include ':loopme-sdk', ':sample-interstitial', ':sample-banner', 'bridges:admob:admob-mediation-sample:app'
+include ':loopme-sdk', ':sample-interstitial', ':sample-banner', 'bridges:admob:admob-mediation-sample:app', 'bridges:mopub:mopub-mediation-sample:app', 'bridges:ironSorce:ironsorce-mediation-sample:app'
