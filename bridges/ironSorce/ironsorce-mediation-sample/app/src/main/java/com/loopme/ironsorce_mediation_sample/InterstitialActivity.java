@@ -28,17 +28,17 @@ public class InterstitialActivity extends Activity {
         LoopMeSdk.initialize(this, new LoopMeSdk.Configuration(), new LoopMeSdk.LoopMeSdkListener() {
             @Override
             public void onSdkInitializationSuccess() {
-                Toast.makeText(InterstitialActivity.this, "go", Toast.LENGTH_LONG).show();
+                Toast.makeText(InterstitialActivity.this, "Loopme has been initialized", Toast.LENGTH_LONG).show();
                 loadButton.setEnabled(true);
             }
 
             @Override
             public void onSdkInitializationFail(int error, String message) {
-                Toast.makeText(InterstitialActivity.this, "g", Toast.LENGTH_LONG).show();
+                Toast.makeText(InterstitialActivity.this, "Loopme failed initialization", Toast.LENGTH_LONG).show();
             }
         });
         LoopmeCustomAdapter.setWeakActivity(this);
-        LoopmeCustomAdapter.setLoopmeAppkey("hello");
+        LoopmeCustomAdapter.setLoopmeAppkey(loopmeAppKey);
         IronSource.init(this, appKey, IronSource.AD_UNIT.INTERSTITIAL);
         IronSource.setAdaptersDebug(true);
 
