@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.Keep;
 import com.google.android.gms.ads.mediation.MediationAdRequest;
 import com.google.android.gms.ads.mediation.customevent.CustomEventInterstitial;
 import com.google.android.gms.ads.mediation.customevent.CustomEventInterstitialListener;
@@ -12,6 +13,7 @@ import com.loopme.IntegrationType;
 import com.loopme.LoopMeInterstitial;
 import com.loopme.common.LoopMeError;
 
+@Keep
 public class LoopMeAdMobBridge implements CustomEventInterstitial {
 
     private static final String LOG_TAG = LoopMeAdMobBridge.class.getSimpleName();

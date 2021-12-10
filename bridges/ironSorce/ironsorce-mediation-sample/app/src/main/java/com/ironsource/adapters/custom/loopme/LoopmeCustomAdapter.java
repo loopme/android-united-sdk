@@ -2,6 +2,7 @@ package com.ironsource.adapters.custom.loopme;
 
 import android.app.Activity;
 import android.content.Context;
+import androidx.annotation.Keep;
 import com.ironsource.mediationsdk.adunit.adapter.BaseAdapter;
 import com.ironsource.mediationsdk.adunit.adapter.listener.NetworkInitializationListener;
 import com.ironsource.mediationsdk.adunit.adapter.utility.AdData;
@@ -11,13 +12,17 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
-public class LoopMeCustomAdapter extends BaseAdapter {
+@Keep
+public class LoopmeCustomAdapter extends BaseAdapter {
 
     private static final String KEY_PUBLISHER_CONSENT =
-            LoopMeCustomAdapter.class.getSimpleName() + ".KEY_PUBLISHER_CONSENT";
+            LoopmeCustomAdapter.class.getSimpleName() + ".KEY_PUBLISHER_CONSENT";
 
     private static WeakReference<Activity> activityWeakReference =
             new WeakReference<>(null);
+
+    private static String loopmeAppkey;
+
 
     @Override
     public void init(AdData adData, Context context, NetworkInitializationListener networkInitializationListener) {
@@ -112,5 +117,13 @@ public class LoopMeCustomAdapter extends BaseAdapter {
             boolean consent) {
 
         moPubConfiguration.put(KEY_PUBLISHER_CONSENT, String.valueOf(consent));
+    }
+
+    public static String getLoopmeAppkey() {
+        return loopmeAppkey;
+    }
+
+    public static void setLoopmeAppkey(String loopmeAppkey) {
+        LoopmeCustomAdapter.loopmeAppkey = loopmeAppkey;
     }
 }

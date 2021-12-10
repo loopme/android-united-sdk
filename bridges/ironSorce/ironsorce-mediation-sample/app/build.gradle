@@ -22,6 +22,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.ironsource.sdk:mediationsdk:7.1.11.1'
+//    implementation 'com.ironsource.sdk:mediationsdk:7.1.13'
+    implementation files('libs/mediationsdk-7.1.13.aar')
     implementation project(path: ':loopme-sdk')
 }
