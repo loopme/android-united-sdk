@@ -3,9 +3,9 @@
 1. **[Overview](#overview)**
 2. **[Register on LoopMe network](#register-on-loopme-network)**
 3. **[Adding LoopMe Android SDK](#adding-loopme-android-sdk)**
-4. **[Adding LoopMe's IronSource Bridge](#adding-loopmes-admob-bridge)**
+4. **[Adding LoopMe's IronSource Bridge](#adding-loopmes-ironsource-bridge)**
 5. **[Initialization](#Initialization)**
-6. **[Mediate from AdMob Interstitial to LoopMe Interstitial Ad](#mediate-from-admob-interstitial-to-loopme-interstitial-ad)**
+6. **[Mediate from IronSource Interstitial to LoopMe Interstitial Ad](#mediate-from-ironsource-interstitial-to-loopme-interstitial-ad)**
 7. **[Sample project](#sample-project)**
 
 ## Overview ##
@@ -13,7 +13,7 @@
 LoopMe is the largest mobile video DSP and Ad Network, reaching over 1 billion consumers world-wide. LoopMe’s full-screen video and rich media ad formats deliver more engaging mobile advertising experiences to consumers on smartphones and tablets.
 LoopMe supports SDK bridges to ad mediation platforms. The LoopMe SDK bridge allows you to control the use of the LoopMe SDK via your existing mediation platform.
 
-`LoopMe Android bridge` allows publishers monetize applications using `AdMob mediation ad platform`.
+`LoopMe Android bridge` allows publishers monetize applications using `IronSource mediation ad platform`.
 
 <b>NOTE:</b> This page assumes you already have account on `IronSource` platform and integrated with the `IronSource` Android SDK
 
@@ -41,7 +41,7 @@ Download `LoopmeCustomAdapter` and `LoopmeCustomInterstitial` classes and move i
 
 Make sure `LoopMeSdk` is [initialized](https://github.com/loopme/android-united-sdk/wiki/Initialization) before using IronSource.
 
-## Mediate from AdMob Interstitial to LoopMe Interstitial Ad ##
+## Mediate from IronSource Interstitial to LoopMe Interstitial Ad ##
 
 <b>Configure Ad Network Mediation on IronSource</b>
 <br><b>NOTE:</b> This page assumes you already have account on IronSource and Ad unit(s)
