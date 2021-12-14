@@ -45,7 +45,7 @@ Make sure `LoopMeSdk` is [initialized](https://github.com/loopme/android-united-
 
 <b>Configure Ad Network Mediation on IronSource</b>
 <br><b>NOTE:</b> This page assumes you already have account on IronSource and Ad unit(s)
-* To enable your account for custom adapters you need to <a href="https://developers.is.com/submit-a-request">contact IS support </a>
+* To enable your account for custom adapters you need to <a href="https://developers.is.com/submit-a-request">contact IS support </a>, custom network configuration must be enabled for the publisher on IronSource backend since it's closed beta.
 <p><img src="images/contact_us_ironsource.png" /></p>
 
 * Click <b>Add Custom Adapter.</b>
