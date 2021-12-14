@@ -3,7 +3,7 @@
 1. **[Overview](#overview)**
 2. **[Register on LoopMe network](#register-on-loopme-network)**
 3. **[Adding LoopMe Android SDK](#adding-loopme-android-sdk)**
-4. **[Adding LoopMe's AdMob Bridge](#adding-loopmes-admob-bridge)**
+4. **[Adding LoopMe's IronSource Bridge](#adding-loopmes-admob-bridge)**
 5. **[Initialization](#Initialization)**
 6. **[Mediate from AdMob Interstitial to LoopMe Interstitial Ad](#mediate-from-admob-interstitial-to-loopme-interstitial-ad)**
 7. **[Sample project](#sample-project)**
@@ -33,9 +33,9 @@ dependencies {
         }
 ```
 
-## Adding LoopMe's AdMob Bridge ##
+## Adding LoopMe's IronSource Bridge ##
 
-Download `LoopmeCustomAdapter` class and move it to `com.ironsource.adapters.custom.loopme` package in your project.
+Download `LoopmeCustomAdapter` and `LoopmeCustomInterstitial` classes and move it to `com.ironsource.adapters.custom.loopme` package in your project.
 
 ## Initialization ##
 
