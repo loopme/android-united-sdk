@@ -12,8 +12,8 @@ import com.loopme.LoopMeSdk;
 import com.loopme.mopub_mediation_sample.R;
 
 public class InterstitialActivity extends Activity {
-    private static final String appKey = "your IS`s appkey";
-    private static final String loopmeAppKey = "your Loopme`s appkey";
+    private static final String appKey = "124e1d38d";
+    private static final String loopmeAppKey = "e166087988";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

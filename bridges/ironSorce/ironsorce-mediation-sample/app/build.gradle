@@ -19,10 +19,13 @@ repositories {
     maven {
         url 'https://android-sdk.is.com/'
     }
+    mavenCentral()
 }
 
 dependencies {
 //    implementation 'com.ironsource.sdk:mediationsdk:7.1.13'
     implementation files('libs/mediationsdk-7.1.13.aar')
     implementation project(path: ':loopme-sdk')
+    implementation "androidx.core:core-ktx:1.6.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
