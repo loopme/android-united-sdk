@@ -57,8 +57,11 @@ Note: you find eCPM on the LoopMe Dashboard > Apps & Sites > Ad Spot information
 * Enter the <b>Class Name</b> and <b>Parameter</b>. You will get:
 <p><img src="images/ConfigureAdUnits.png"  /></p>
 
-Class Name should be: 'com.integration.admob.LoopMeAdMobBridge'. <br>
-Parameter: enter the app key value you received after registering your Ad Spot on the LoopMe dashboard. <br>E.g. '298f62c196'.<br><br>
+__Class Name__ should be: 'com.integration.admob.LoopMeAdMobBridge'. <br>
+__Parameter__: enter the app key value you received after registering your Ad Spot on the LoopMe dashboard. <br>E.g. '298f62c196'.<br>
+* Click __Done__
+* Allocate traffic by entering an eCPM value for the custom event. Your allocation options are the same as they are for ad networks
+* Click __Save__
 
 * Load 
 ```java
