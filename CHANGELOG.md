@@ -1,3 +1,18 @@
+## Version 8.0.5 (14.11.2021)
+- add IronSource adapter
+
+## Version 8.0.4 (21.10.2021)
+- update mopub adapter
+
+## Version 8.0.3 (27.09.2021)
+- update admob adapter
+
+## Version 8.0.2 (05.09.2021)
+- GDPR: Ability to support the consent string
+- CCPA: Ability to support the US Privacy String
+- Coppa: Ability to support determine the value COPPA flag
+- minor fixes
+
 ## Version 8.0.1 (16 of April, 2020)
 - OM SDK v1.3.3 update
 - minor fixes
