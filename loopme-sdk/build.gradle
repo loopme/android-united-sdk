@@ -63,9 +63,9 @@ dependencies {
     implementation "androidx.preference:preference:$preferenceVersion"
 
     implementation "com.google.android.gms:play-services-ads-identifier:$playServicesVersion"
-    implementation "com.google.android.gms:play-services-location:$playServicesVersion"
+    implementation 'com.google.android.gms:play-services-location:18.0.0'
 
     implementation 'com.google.androidbrowserhelper:androidbrowserhelper:1.2.0'
 }
 
-apply from: '../publishing.gradle'
+//apply from: '../publishing.gradle'

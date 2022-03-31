@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.loopme.LoopMeInterstitial;
 import com.loopme.LoopMeSdk;
 import com.loopme.common.LoopMeError;
+import com.loopme.gdpr.GdprChecker;
 
 public class MainActivity
         extends AppCompatActivity
@@ -177,6 +178,7 @@ public class MainActivity
         Toast.makeText(this, "Wait for LoopMe SDK initialization…", Toast.LENGTH_SHORT).show();
 
         LoopMeSdk.Configuration conf = new LoopMeSdk.Configuration();
+        conf.setPublisherConsent(new GdprChecker.PublisherConsent("BO9ZhJEO9ZhJEAAABBENDW-AAAAyPAAA"));
         LoopMeSdk.initialize(this, conf, this);
     }
 }

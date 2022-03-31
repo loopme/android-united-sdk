@@ -1,0 +1,27 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 29
+    defaultConfig {
+        applicationId "com.loopme.admob_mediation_sample"
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.applovin:applovin-sdk:11.1.3'
+    implementation project(':loopme-sdk')
+//    implementation 'com.loopme:loopme-sdk:7.2.1'
+}
+repositories {
+    mavenCentral()
+}
