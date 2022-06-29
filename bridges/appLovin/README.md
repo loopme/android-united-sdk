@@ -74,14 +74,13 @@ Parameter: enter the app key value you received after registering your Ad Spot o
 * Load
 
 ```java
-AdRequest adRequest=new AdRequest.Builder().build();
-        InterstitialAd.load(this,ADMOB_UNIT_ID,adRequest,interstitialAdLoadCallback)
+interstitialAd = new MaxInterstitialAd(APPLOVIN_UNIT_ID, this);
 ```
 
 * Show
 
 ```java
-mInterstitialAd.show();
+interstitialAd.showAd();
 ```
 
 ## Sample project ##
