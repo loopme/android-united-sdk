@@ -21,7 +21,7 @@ If you have questions please contact us at support@loopme.com.
 
 ## Register on LoopMe network ##
 
-To use and setup the SDK bridge, register your app on the LoopMe network via the LoopMe Dashboard to retrieve a unique LoopMe app key for your app. The app key uniquely identifies your app in the LoopMe ad network (Example app key: 51bb33e7cb). To get an appKey visit the **[LoopMe Dashboard](https://supply.loopme.com/)**, and follow **[instruction](https://docs.google.com/document/d/1No1rVSpD2XLvG6nniwGjRb48Q0kVmYIkSgnlbhRXx5M/edit#)**.<br>
+To use and setup the SDK bridge, register your app on the LoopMe network via the LoopMe Dashboard to retrieve a unique LoopMe app key for your app. The app key uniquely identifies your app in the LoopMe ad network (Example app key: 51bb33e7cb). Please ask POC in Loopme to register your app/placement and provide the appKey.<br>
 You will need the app key during next steps of integration.
 
 ## Adding LoopMe Android SDK ##
