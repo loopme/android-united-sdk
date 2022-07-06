@@ -15,7 +15,6 @@ import com.applovin.mediation.adapter.parameters.MaxAdapterInitializationParamet
 import com.applovin.mediation.adapter.parameters.MaxAdapterResponseParameters;
 import com.applovin.mediation.adapters.MediationAdapterBase;
 import com.applovin.sdk.AppLovinSdk;
-import com.loopme.IntegrationType;
 import com.loopme.LoopMeBanner;
 import com.loopme.LoopMeInterstitial;
 import com.loopme.LoopMeSdk;
@@ -38,10 +37,12 @@ public class LoopmeMediationAdapter extends MediationAdapterBase implements MaxI
 
     @Override
     public void initialize(MaxAdapterInitializationParameters maxAdapterInitializationParameters, Activity activity, final OnCompletionListener onCompletionListener) {
+        Log.d("loopmeAdapter", "initialization");
         LoopMeSdk.Configuration loopMeConf = new LoopMeSdk.Configuration();
-        if (LoopMeSdk.isInitialized())
+        if (LoopMeSdk.isInitialized()) {
             onCompletionListener.onCompletion(InitializationStatus.INITIALIZED_SUCCESS, LoopmeMediationAdapter.class.getSimpleName());
-        else
+            return;
+        } else
             onCompletionListener.onCompletion(InitializationStatus.INITIALIZING, LoopmeMediationAdapter.class.getSimpleName());
         LoopMeSdk.initialize(activity, loopMeConf, new LoopMeSdk.LoopMeSdkListener() {
 
@@ -64,10 +65,15 @@ public class LoopmeMediationAdapter extends MediationAdapterBase implements MaxI
 
         String appkey = maxAdapterResponseParameters.getThirdPartyAdPlacementId();
         mInterstitialListener = maxInterstitialAdapterListener;
-
         mInterstitial = LoopMeInterstitial.getInstance(appkey, activity);
         mInterstitial.setListener(mLoopMeListener);
-        mInterstitial.load(IntegrationType.ADMOB);
+        mInterstitial.setAutoLoading(false);
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mInterstitial.load();
+            }
+        });
     }
 
     @Override
@@ -136,11 +142,13 @@ public class LoopmeMediationAdapter extends MediationAdapterBase implements MaxI
         @Override
         public void onLoopMeInterstitialLoadFail(LoopMeInterstitial arg0,
                                                  LoopMeError arg1) {
+            Log.d(LOG_TAG, "loopme's ad loading failed");
             mInterstitialListener.onInterstitialAdLoadFailed(new MaxAdapterError(arg1.getErrorCode()));
         }
 
         @Override
         public void onLoopMeInterstitialLoadSuccess(LoopMeInterstitial arg0) {
+            Log.d(LOG_TAG, "loopme's ad loaded");
             mInterstitialListener.onInterstitialAdLoaded();
         }
 

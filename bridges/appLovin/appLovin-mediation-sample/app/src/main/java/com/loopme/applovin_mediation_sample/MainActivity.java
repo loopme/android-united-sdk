@@ -9,11 +9,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.applovin.mediation.MaxAd;
 import com.applovin.mediation.MaxAdListener;
 import com.applovin.mediation.MaxError;
+import com.applovin.mediation.MaxMediatedNetworkInfo;
 import com.applovin.mediation.ads.MaxInterstitialAd;
+import com.applovin.sdk.AppLovinMediationProvider;
 import com.applovin.sdk.AppLovinSdk;
 import com.applovin.sdk.AppLovinSdkConfiguration;
 import com.loopme.LoopMeSdk;
 import com.loopme.admob_mediation_sample.R;
+
+import java.util.List;
 
 public class MainActivity
         extends AppCompatActivity
@@ -65,6 +69,7 @@ public class MainActivity
         mShowButton.setEnabled(false);
         interstitialAd = new MaxInterstitialAd(APPLOVIN_UNIT_ID, this);
         interstitialAd.setListener(this);
+        interstitialAd.loadAd();
     }
 
     private void initializeLoopMe() {
@@ -92,7 +97,11 @@ public class MainActivity
     }
 
     private void initializeAppLovin() {
-        AppLovinSdk.getInstance(this).setMediationProvider("max");
+        for(MaxMediatedNetworkInfo network : AppLovinSdk.getInstance(this).getAvailableMediatedNetworks()){
+            System.out.println(network.getAdapterClassName());
+        }
+//        AppLovinSdk.getInstance( this ).setMediationProvider( "max" );
+        //AppLovinSdk.getInstance(this).setMediationProvider();
         AppLovinSdk.initializeSdk(this, new AppLovinSdk.SdkInitializationListener() {
             @Override
             public void onSdkInitialized(final AppLovinSdkConfiguration configuration) {
@@ -115,9 +124,13 @@ public class MainActivity
 
     @Override
     public void onAdLoaded(MaxAd ad) {
-        toast("onAdLoaded");
 
-        interstitialAd = interstitialAd;
+        if (ad.getNetworkName().equalsIgnoreCase("loopme")){
+            toast("loopme onAdLoaded");
+        }else{
+            toast("onAdLoaded");
+        }
+
         mShowButton.setText("Show Interstitial");
         mShowButton.setEnabled(true);
     }
