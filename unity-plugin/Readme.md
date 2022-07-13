@@ -23,11 +23,11 @@ You will need the app key during next steps of integration.
 
 ## Manual adding LoopMe Android SDK ##
 
-Download and add [LoopMeSDKWithDependencies.unitypackage](https://github.com/loopme/android-united-sdk/blob/master/unity-plugin/LoopMeSDKWithDependencies.unitypackage) to your unity project
+Download and add [LoopMeSDKWithDependencies.unitypackage](https://github.com/loopme/android-united-sdk/raw/master/unity-plugin/LoopMeSDKWithDependencies.unitypackage) to your unity project
 
 
 ## EDM4U adding LoopMe Android SDK ##
-if you use [EDM4U](https://github.com/googlesamples/unity-jar-resolver#overview) in your project, you need to add LoopMeSDK-Unity folowed dependency to your dependencies file, and download [LoopMeSDKPackage.unitypackage](https://github.com/loopme/android-united-sdk/blob/master/unity-plugin/LoopMeSDKPackage.unitypackage):
+if you use [EDM4U](https://github.com/googlesamples/unity-jar-resolver#overview) in your project, you need to add LoopMeSDK-Unity folowed dependency to your dependencies file, and download [LoopMeSDKPackage.unitypackage](https://github.com/loopme/android-united-sdk/raw/master/unity-plugin/LoopMeSDKWithDependencies.unitypackage):
 
 ```xml
     <androidPackages>
