@@ -1,3 +1,7 @@
+## Version 8.0.7 (13.07.2021)
+- add Unity plugin
+## Version 8.0.6 (29.06.2021)
+- add AppLovin adapter
 ## Version 8.0.5 (14.11.2021)
 - add IronSource adapter
 
