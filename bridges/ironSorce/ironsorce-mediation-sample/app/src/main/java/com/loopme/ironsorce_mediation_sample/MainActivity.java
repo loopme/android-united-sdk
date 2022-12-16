@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private void enableButtons() {
         findViewById(R.id.interstitial).setEnabled(true);
         findViewById(R.id.rewarded).setEnabled(true);
-        findViewById(R.id.banner).setEnabled(true);
+        findViewById(R.id.banner).setEnabled(false);
     }
 
     public void openActivity(View view) {
@@ -35,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.interstitial:
                 intent = new Intent(this, InterstitialActivity.class);
+                break;
+            case R.id.rewarded:
+                intent = new Intent(this, RewardedVideoActivity.class);
                 break;
         }
 
