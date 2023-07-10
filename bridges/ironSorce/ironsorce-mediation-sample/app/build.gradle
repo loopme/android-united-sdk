@@ -4,7 +4,7 @@ android {
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.loopme.mopub_mediation_sample"
-        minSdkVersion 21
+        minSdkVersion 26
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.ironsource.sdk:mediationsdk:7.2.6'
+    implementation 'com.ironsource.sdk:mediationsdk:7.3.1.1'
   //  implementation files('libs/mediationsdk-7.1.13.aar')
     implementation project(path: ':loopme-sdk')
     implementation "androidx.core:core-ktx:1.6.0"
