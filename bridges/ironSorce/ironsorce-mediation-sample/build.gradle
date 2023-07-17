@@ -16,10 +16,9 @@ buildscript {
 
 allprojects {
     repositories {
+        mavenCentral()
         google()
         jcenter()
-        maven { url 'https://dl.bintray.com/loopme/maven' }
-        maven { url "https://s3.amazonaws.com/moat-sdk-builds" }
     }
 }
 

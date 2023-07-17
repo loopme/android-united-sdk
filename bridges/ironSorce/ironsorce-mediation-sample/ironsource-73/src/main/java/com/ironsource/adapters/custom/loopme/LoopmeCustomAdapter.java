@@ -2,7 +2,9 @@ package com.ironsource.adapters.custom.loopme;
 
 import android.app.Activity;
 import android.content.Context;
+
 import androidx.annotation.Keep;
+
 import com.ironsource.mediationsdk.adunit.adapter.BaseAdapter;
 import com.ironsource.mediationsdk.adunit.adapter.listener.NetworkInitializationListener;
 import com.ironsource.mediationsdk.adunit.adapter.utility.AdData;
@@ -57,7 +59,7 @@ public class LoopmeCustomAdapter extends BaseAdapter {
 
     @Override
     public String getAdapterVersion() {
-        return "1.0.0";
+        return "7.1.0.0";
     }
 
     private static void tryInitializeLoopMeSdk(
