@@ -9,7 +9,7 @@ import com.ironsource.mediationsdk.IronSource;
 import com.ironsource.mediationsdk.logger.IronSourceError;
 import com.ironsource.mediationsdk.sdk.InterstitialListener;
 import com.loopme.LoopMeSdk;
-import com.loopme.mopub_mediation_sample.R;
+import com.loopme.ironsorce_72.R;
 
 public class InterstitialActivity extends Activity {
     private static final String appKey = "124e1d38d";
