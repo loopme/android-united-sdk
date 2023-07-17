@@ -35,7 +35,7 @@ dependencies {
 
 ## Adding LoopMe's IronSource Bridge ##
 
-Download `LoopmeCustomAdapter` and `LoopmeCustomInterstitial` classes and move it to `com.ironsource.adapters.custom.loopme` package in your project.
+Download `LoopmeCustomAdapter`, `LoopmeCustomRewardVideo` and `LoopmeCustomInterstitial` classes and move it to `com.ironsource.adapters.custom.loopme` package in your project.
 
 ## Initialization ##
 
