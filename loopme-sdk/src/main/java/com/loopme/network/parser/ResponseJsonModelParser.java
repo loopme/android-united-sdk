@@ -98,16 +98,57 @@ public class ResponseJsonModelParser extends BaseJSONParser {
     }
 
     private Bid parseBid(JSONObject jsonObject) throws JSONException {
-        Ext ext = parseExt(jsonObject.getJSONObject(PARAM_EXT));
+        String adm = getString(jsonObject, PARAM_ADM, true);
+        Ext ext;
+        if (jsonObject.has(PARAM_EXT)) {
+            ext = parseExt(jsonObject.getJSONObject(PARAM_EXT));
+        } else {
+            ext = getDefaultExt(adm);
+        }
         String id = getString(jsonObject, PARAM_ID, false);
         String impid = getString(jsonObject, PARAM_IMP_ID, false);
         String adid = getString(jsonObject, PARAM_AD_ID, false);
-        String adm = getString(jsonObject, PARAM_ADM, true);
         List<String> adomainList = parseStringsList(jsonObject, PARAM_A_DOMAIN);
         String iurl = getString(jsonObject, PARAM_I_URL, false);
         String cid = getString(jsonObject, PARAM_C_ID, false);
         String crid = getString(jsonObject, PARAM_CR_ID, false);
         return new Bid(ext, id, impid, adid, adm, adomainList, iurl, cid, crid);
+    }
+
+    private Ext getDefaultExt(String adm) {
+        int v360 = -1;
+        int debug = -1;
+        String advertiser = "";
+        String lineitem = "";
+        String appname = "";
+        /*
+            case vpaid = "VPAID"
+            case vast = "VAST"
+            case loopme = "HTML"
+            case mraid = "MRAID"
+         */
+        String crtype = "";
+        if (adm.trim().toUpperCase().startsWith("<VAST")) {
+            crtype = "VAST";
+        } else {
+            crtype = "MRAID";
+        }
+        /*
+            case undefined
+            case portrait
+            case landscape
+         */
+        String orientation = "portrait";
+        if (crtype.equals("VAST")) {
+            orientation = "landscape";
+        }
+        String campaign = "";
+        String developer = "";
+        String company = "";
+        List<String> measurePartners = new ArrayList<>();
+        List<String> package_ids = new ArrayList<>();
+        int autoloading = Constants.AUTO_LOADING_ABSENCE;
+        return new Ext(advertiser, v360, orientation, debug, lineitem, appname, crtype, campaign, measurePartners, autoloading, package_ids, developer, company);
     }
 
     private Ext parseExt(JSONObject jsonObject) throws JSONException {
