@@ -3,6 +3,7 @@ package com.loopme.ironsource_73;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.ironsource.adapters.custom.loopme.LoopmeCustomAdapter;
@@ -15,8 +16,6 @@ import com.loopme.LoopMeSdk;
 
 public class InterstitialActivity extends Activity {
     private static final String appKey = "124e1d38d";
-    private static final String loopmeAppKey = "e166087988";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,8 +38,6 @@ public class InterstitialActivity extends Activity {
                 Toast.makeText(InterstitialActivity.this, "Loopme failed initialization", Toast.LENGTH_LONG).show();
             }
         });
-        LoopmeCustomAdapter.setWeakActivity(this);
-        LoopmeCustomAdapter.setLoopmeAppkey(loopmeAppKey);
         IronSource.init(this, appKey, IronSource.AD_UNIT.INTERSTITIAL);
         IronSource.setAdaptersDebug(true);
 
@@ -113,6 +110,9 @@ public class InterstitialActivity extends Activity {
     }
 
     public void onLoadClicked(View view) {
+        String appkey = ((EditText)findViewById(R.id.appkey_et)).getText().toString();
+        LoopmeCustomAdapter.setWeakActivity(this);
+        LoopmeCustomAdapter.setLoopmeAppkey(appkey);
         IronSource.loadInterstitial();
     }
 
