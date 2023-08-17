@@ -110,9 +110,9 @@ public class InterstitialActivity extends Activity {
     }
 
     public void onLoadClicked(View view) {
-        String appkey = ((EditText)findViewById(R.id.appkey_et)).getText().toString();
+        String loopmeAppkey = ((EditText)findViewById(R.id.appkey_et)).getText().toString();
         LoopmeCustomAdapter.setWeakActivity(this);
-        LoopmeCustomAdapter.setLoopmeAppkey(appkey);
+        LoopmeCustomAdapter.setLoopmeAppkey(loopmeAppkey);
         IronSource.loadInterstitial();
     }
 
