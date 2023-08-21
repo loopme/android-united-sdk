@@ -1,4 +1,4 @@
-You can find integration guide in our github [wiki](https://github.com/loopme/android-united-sdk/wiki) page.
+You can find integration guide on [wiki](https://loopme-ltd.gitbook.io/docs-public/android-sdk) page.
 
 ## What's new ##
 
