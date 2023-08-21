@@ -1,3 +1,5 @@
+## Version 8.0.8 (21.08.2023)
+- add possibility to get SDK version
 ## Version 8.0.7 (13.07.2021)
 - add Unity plugin
 ## Version 8.0.6 (29.06.2021)

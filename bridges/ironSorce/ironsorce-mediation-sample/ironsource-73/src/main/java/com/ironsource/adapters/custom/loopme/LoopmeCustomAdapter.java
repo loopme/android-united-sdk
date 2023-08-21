@@ -54,7 +54,7 @@ public class LoopmeCustomAdapter extends BaseAdapter {
 
     @Override
     public String getNetworkSDKVersion() {
-        return "7.1.0";
+        return LoopMeSdk.getVersion();
     }
 
     @Override

@@ -2,9 +2,8 @@ You can find integration guide on [wiki](https://loopme-ltd.gitbook.io/docs-publ
 
 ## What's new ##
 
-**Version 8.0.1**
-- OM SDK 1.3.3 update
-- minor fixes
+**Version 8.0.8**
+- add possibility to get SDK version
 
 Please view the [changelog](CHANGELOG.md) for details.
 
