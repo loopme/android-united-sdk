@@ -31,7 +31,7 @@ public class HtmlParser {
     public HtmlParser(String html) {
         this.mHtml = html;
         try {
-            mJsonScript = mHtml.substring(mHtml.indexOf("{"), mHtml.lastIndexOf("}"));
+            mJsonScript = mHtml.substring(mHtml.indexOf("{"), mHtml.lastIndexOf("}") + 1);
         } catch (Exception e) {
             Logging.out(LOG_TAG, "Not appropriate ad type or response format, dimensions are taken by default ");
         }
