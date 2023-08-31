@@ -63,7 +63,7 @@ public class GdprWebView extends WebView {
         webSettings.setSupportZoom(false);
         webSettings.setDomStorageEnabled(true);
         // TODO.
-        webSettings.setAppCacheEnabled(false);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
         // TODO.

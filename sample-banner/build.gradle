@@ -1,13 +1,12 @@
 apply plugin: 'com.android.application'
 
 repositories {
-    jcenter()
+    mavenCentral()
     google()
 }
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    buildToolsVersion = rootProject.buildToolsVersion
     defaultConfig {
         applicationId "com.loopme.sample_banner"
         minSdkVersion rootProject.minSdkVersion
@@ -39,6 +38,7 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/MANIFEST.MF'
     }
+    namespace 'com.loopme.banner_sample.app'
 }
 
 dependencies {
