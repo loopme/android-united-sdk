@@ -7,7 +7,6 @@ repositories {
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    buildToolsVersion = rootProject.buildToolsVersion
     defaultConfig {
         applicationId "com.loopme.interstitial_sample"
         minSdkVersion rootProject.minSdkVersion
@@ -39,6 +38,7 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/MANIFEST.MF'
     }
+    namespace 'com.loopme.interstitial_sample'
 }
 
 dependencies {

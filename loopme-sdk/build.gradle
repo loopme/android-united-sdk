@@ -2,12 +2,9 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    buildToolsVersion = rootProject.buildToolsVersion
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 18
-        versionName '8.0.1'
     }
 
     buildTypes {
@@ -18,15 +15,11 @@ android {
             buildConfigField "String", "LOOPME_GDPR_URL", LOOPME_GDPR_URL
             buildConfigField "String", "OM_SDK_JS_URL", OM_SDK_JS_URL
             buildConfigField "String", "OM_SDK_PARTNER", OM_SDK_PARTNER
+            buildConfigField "String", "VERSION_NAME", "\"8.0.1\""
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             minifyEnabled false
-            debuggable false
         }
         debug.initWith(buildTypes.release)
-        debug {
-            versionNameSuffix "-debug"
-            debuggable true
-        }
     }
 
     compileOptions {
@@ -50,6 +43,7 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/MANIFEST.MF'
     }
+    namespace 'com.loopme'
 }
 
 dependencies {
