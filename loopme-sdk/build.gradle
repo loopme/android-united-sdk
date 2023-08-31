@@ -15,7 +15,7 @@ android {
             buildConfigField "String", "LOOPME_GDPR_URL", LOOPME_GDPR_URL
             buildConfigField "String", "OM_SDK_JS_URL", OM_SDK_JS_URL
             buildConfigField "String", "OM_SDK_PARTNER", OM_SDK_PARTNER
-            buildConfigField "String", "VERSION_NAME", "\"8.0.1\""
+            buildConfigField "String", "VERSION_NAME", VERSION_NAME
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             minifyEnabled false
         }
