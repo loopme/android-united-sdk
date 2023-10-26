@@ -1,2 +1,3 @@
 include ':loopme-sdk', ':sample-interstitial', ':sample-banner', 'bridges:admob:admob-mediation-sample:app', 'bridges:mopub:mopub-mediation-sample:app', 'bridges:ironSorce:ironsorce-mediation-sample:ironsource-72', 'bridges:appLovin:appLovin-mediation-sample:app'
 include ':bridges:ironSorce:ironsorce-mediation-sample:ironsource-73'
+include ':bridges:ironSorce:ironsorce-mediation-sample:ironsource-75'
