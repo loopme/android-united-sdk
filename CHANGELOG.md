@@ -1,3 +1,5 @@
+## Version 8.0.9 (10.11.2023)
+- minor fixes
 ## Version 8.0.8 (21.08.2023)
 - add possibility to get SDK version
 ## Version 8.0.7 (13.07.2021)

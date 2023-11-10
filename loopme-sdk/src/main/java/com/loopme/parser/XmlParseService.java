@@ -185,7 +185,7 @@ public class XmlParseService {
 
     private static void setParamEndCardRedirectUrl(Companion companion) {
         CompanionClickThrough clickThrough = companion.getCompanionClickThrough();
-        if (clickThrough != null) {
+        if (clickThrough != null && clickThrough.getText() != null) {
             String redirectUrl = clickThrough.getText().trim();
             sAdParams.setEndCardRedirectUrl(redirectUrl);
         }
