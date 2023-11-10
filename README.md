@@ -2,8 +2,8 @@ You can find integration guide on [wiki](https://loopme-ltd.gitbook.io/docs-publ
 
 ## What's new ##
 
-**Version 8.0.8**
-- add possibility to get SDK version
+**Version 8.0.9**
+- minor fixes
 
 Please view the [changelog](CHANGELOG.md) for details.
 

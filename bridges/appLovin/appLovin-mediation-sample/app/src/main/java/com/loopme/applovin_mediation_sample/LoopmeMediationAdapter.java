@@ -86,12 +86,12 @@ public class LoopmeMediationAdapter extends MediationAdapterBase implements MaxI
 
     @Override
     public String getSdkVersion() {
-        return "8.0.1";
+        return "8.0.9";
     }
 
     @Override
     public String getAdapterVersion() {
-        return "8.0.1";
+        return "8.0.9";
     }
 
     @Override
