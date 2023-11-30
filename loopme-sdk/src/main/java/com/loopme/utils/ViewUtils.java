@@ -13,8 +13,9 @@ public final class ViewUtils {
         if (views == null || e == null)
             return null;
 
-        int x = Math.round(e.getRawX());
-        int y = Math.round(e.getRawY());
+        // TODO: It was an issue with getRawX() and getRawY() in the original code.
+        int x = Math.round(e.getX());
+        int y = Math.round(e.getY());
 
         for (View v : views) {
             Rect r = new Rect();
