@@ -1,9 +1,0 @@
-<resources>
-    <string name="app_name">ironsource-75</string>
-    <string name="interstitial">Interstitial</string>
-    <string name="banner">banner</string>
-    <string name="rewarded">rewarded</string>
-    <string name="load">Load</string>
-    <string name="show">Show</string>
-    <string name="hide">hide</string>
-</resources>
