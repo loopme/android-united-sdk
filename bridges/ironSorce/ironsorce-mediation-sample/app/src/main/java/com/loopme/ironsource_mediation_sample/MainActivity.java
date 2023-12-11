@@ -1,4 +1,4 @@
-package com.loopme.ironsource_76;
+package com.loopme.ironsource_mediation_sample;
 
 import android.content.Intent;
 import android.os.Bundle;
