@@ -3,6 +3,8 @@ package com.loopme.controllers.view;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
+
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -109,7 +111,7 @@ public class PlayerLayout extends FrameLayout
 
     private void configureProgressBar() {
         mProgressBar = new ProgressBar(getContext(), null, android.R.style.Widget_ProgressBar_Horizontal);
-        mProgressBar.setProgressDrawable(getContext().getResources().getDrawable(R.drawable.l_progress_bar));
+        mProgressBar.setProgressDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.l_progress_bar, null));
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, PROGRESS_HEIGHT, Gravity.BOTTOM);
         mProgressBar.setLayoutParams(params);
     }

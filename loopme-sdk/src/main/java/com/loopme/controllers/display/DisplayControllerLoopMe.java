@@ -1,5 +1,6 @@
 package com.loopme.controllers.display;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
@@ -94,6 +95,7 @@ public class DisplayControllerLoopMe
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void initLoopMeControllers() {
         onMessage(Message.LOG, "initLoopMeSdkController");
         mAdView = new AdView(mLoopMeAd.getContext(), createAdReadyListener());
