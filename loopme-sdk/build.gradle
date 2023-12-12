@@ -53,6 +53,7 @@ dependencies {
 
     api "androidx.appcompat:appcompat:$appCompatVersion"
     api "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+    api "androidx.annotation:annotation:1.7.0"
 
     implementation "androidx.preference:preference:$preferenceVersion"
 
