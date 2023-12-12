@@ -288,17 +288,12 @@ public class RequestUtils {
     }
 
     String getChargeLevel(Context context) {
-        if (ApiLevel.isApi21AndHigher()) {
-            BatteryManager bm = (BatteryManager) context.getSystemService(BATTERY_SERVICE);
-            int level = 1;
-            if (bm != null) {
-                level = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-            }
-            return String.valueOf(level);
-        } else {
-            String[] batteryInfo = RequestParamsUtils.getBatteryInfo(context);
-            return batteryInfo[0];
+        BatteryManager bm = (BatteryManager) context.getSystemService(BATTERY_SERVICE);
+        int level = 1;
+        if (bm != null) {
+            level = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
         }
+        return String.valueOf(level);
     }
 
     int getPlugin() {

@@ -46,9 +46,7 @@ public class LoopMeWebView extends WebView {
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         webSettings.setSupportZoom(false);
         webSettings.setDomStorageEnabled(true);
-        if (ApiLevel.isApi21AndHigher()) {
-            webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
-        }
+        webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
         setDebugConfig();
@@ -58,9 +56,7 @@ public class LoopMeWebView extends WebView {
     private void allowCookies() {
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
-        if (ApiLevel.isApi21AndHigher()) {
-            cookieManager.setAcceptThirdPartyCookies(this, true);
-        }
+        cookieManager.setAcceptThirdPartyCookies(this, true);
     }
 
     private void setDebugConfig() {

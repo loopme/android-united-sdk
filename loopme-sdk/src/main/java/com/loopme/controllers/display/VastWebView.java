@@ -41,9 +41,7 @@ public class VastWebView extends WebView {
     private void allowCookies() {
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
-        if (ApiLevel.isApi21AndHigher()) {
-            cookieManager.setAcceptThirdPartyCookies(this, true);
-        }
+        cookieManager.setAcceptThirdPartyCookies(this, true);
     }
 
     // TODO. Refactor. Duplicate of LoopMeWebView.

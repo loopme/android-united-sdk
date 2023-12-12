@@ -51,7 +51,6 @@ public class MD360VideoTexture extends MD360Texture {
         onCreateSurface(glSurfaceTexture);
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void onCreateSurface(int glSurfaceTextureId) {
         if ( mSurfaceTexture == null ) {
             //attach the texture to a surface.
@@ -68,12 +67,9 @@ public class MD360VideoTexture extends MD360Texture {
     @Override
     protected void onResize(int width, int height) {
         if (mSurfaceTexture != null)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                mSurfaceTexture.setDefaultBufferSize(width,height);
-            }
+            mSurfaceTexture.setDefaultBufferSize(width,height);
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public synchronized void syncDrawInContext(ISyncDrawCallback callback){
         int glSurfaceTexture = getCurrentTextureId();

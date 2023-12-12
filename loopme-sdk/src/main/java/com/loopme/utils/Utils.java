@@ -564,10 +564,6 @@ public class Utils {
                 PackageManager.MATCH_DEFAULT_ONLY) != null;
     }
 
-    public static boolean isApi19() {
-        return Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT;
-    }
-
     public static ViewGroup.LayoutParams createMatchParentLayoutParams() {
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         params.gravity = Gravity.CENTER;

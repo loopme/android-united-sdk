@@ -43,7 +43,7 @@ public abstract class AdConfig implements AdTargeting {
     }
 
     public boolean isAutoLoadingEnabled() {
-        return mFirstLoopMeAd != null && mFirstLoopMeAd.isAutoLoadingEnabled() && !isApi19();
+        return mFirstLoopMeAd != null && mFirstLoopMeAd.isAutoLoadingEnabled();
     }
 
     public void setAutoLoading(boolean autoLoadingEnabled) {
@@ -107,10 +107,6 @@ public abstract class AdConfig implements AdTargeting {
         if (mFirstLoopMeAd != null) {
             Utils.clearCache(mFirstLoopMeAd.getContext());
         }
-    }
-
-    private boolean isApi19() {
-        return Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT;
     }
 
     public void setPreferredAd(LoopMeAd.Type type) {

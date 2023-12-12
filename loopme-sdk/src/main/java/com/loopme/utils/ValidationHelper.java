@@ -62,11 +62,6 @@ public class ValidationHelper {
             Logging.out(LOG_TAG, error);
             loopMeAd.onAdLoadFail(new LoopMeError(error));
             return false;
-        } else if (!isProperlyAndroidVersion()) {
-            error = "Not supported Android version. Expected 5+";
-            Logging.out(LOG_TAG, error);
-            loopMeAd.onAdLoadFail(new LoopMeError(error));
-            return false;
         } else if (loopMeAd.isCustomBannerHtml() || loopMeAd.isExpandBannerVideo()) {
             error = "Container size is not valid for chosen ad type";
             Logging.out(LOG_TAG, error);
@@ -90,9 +85,5 @@ public class ValidationHelper {
 
     private static boolean isCorrectIntegrationType(IntegrationType integrationType) {
         return Arrays.asList(IntegrationType.values()).contains(integrationType);
-    }
-
-    public static boolean isProperlyAndroidVersion() {
-        return ApiLevel.isApi21AndHigher();
     }
 }
