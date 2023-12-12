@@ -5,7 +5,7 @@
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@android:color/white">
 
         <ImageView
@@ -21,8 +21,8 @@
             android:layout_height="250dp"
             android:layout_below="@id/header_picture"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="15dp"
-            android:layout_marginTop="15dp" />
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp" />
 
         <RelativeLayout
             android:id="@+id/movie_item1"
@@ -36,9 +36,9 @@
                 android:layout_width="90dp"
                 android:layout_height="100dp"
                 android:layout_centerVertical="true"
-                android:layout_marginBottom="5dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/poster1" />
 
@@ -67,4 +67,5 @@
         </RelativeLayout>
 
     </RelativeLayout>
+
 </ScrollView>
