@@ -48,11 +48,6 @@ public class AdView extends LoopMeWebView implements BridgeInterface, Bridge.Lis
         getSettings().setUserAgentString(modifiedUserString);
     }
 
-    /*@Override
-    public boolean performClick() {
-        return super.performClick();
-    }*/
-
     @Override
     public void setFullscreenMode(boolean mode) {
         String command = BridgeCommandBuilder.fullscreenMode(mode);

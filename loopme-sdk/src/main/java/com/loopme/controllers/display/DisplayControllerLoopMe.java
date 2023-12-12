@@ -95,7 +95,6 @@ public class DisplayControllerLoopMe
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     private void initLoopMeControllers() {
         onMessage(Message.LOG, "initLoopMeSdkController");
         mAdView = new AdView(mLoopMeAd.getContext(), createAdReadyListener());
