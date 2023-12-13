@@ -470,7 +470,7 @@ public class Utils {
         if (sAudioManager != null) {
             int volume_level = sAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
             int max = sAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-            int percent = Math.round(volume_level * HUNDRED_PERCENTS / max);
+            int percent = Math.round((float) (volume_level * HUNDRED_PERCENTS) / max);
             return (float) percent / HUNDRED_PERCENTS;
         } else {
             return DEFAULT_VOLUME;
