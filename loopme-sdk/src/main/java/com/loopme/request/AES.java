@@ -9,10 +9,11 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class AES {
 
-
+    //TODO: Consider changing encryption method
     private static final String TRANSFORMATION = "AES/ECB/PKCS5Padding";
     private static final String ALGORITHM = "AES";
 
+    //TODO: Check if hardcoding encryption secrets is intended
     private static final byte[] SECRET_KEY_SDK = new byte[]{
             (byte) 0xfa, (byte) 0x62, (byte) 0x44, (byte) 0xa2,
             (byte) 0x97, (byte) 0xa4, (byte) 0xba, (byte) 0x03,
