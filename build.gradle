@@ -1,14 +1,14 @@
 buildscript {
     ext {
         minSdkVersion = 21
-        targetSdkVersion = 33
-        compileSdkVersion = 33
+        targetSdkVersion = 34
+        compileSdkVersion = 34
         buildToolsVersion = '29.0.2'
         kotlinVersion = '1.6.21'
         navigationVersion = '2.7.1'
         roomVersion = '2.2.5'
         lifecycleKtxVersion = '2.2.0'
-        appCompatVersion = '1.1.0'
+        appCompatVersion = '1.6.1'
         playServicesVersion = '18.0.0'
         recyclerViewVersion = '1.1.0'
         preferenceVersion = '1.1.0'
