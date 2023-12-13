@@ -12,9 +12,7 @@ public class ResponseJsonModel implements Serializable, Parcelable {
     private String id;
     private List<Seatbid> seatbid = null;
     public final static Parcelable.Creator<ResponseJsonModel> CREATOR = new Creator<ResponseJsonModel>() {
-        @SuppressWarnings({
-            "unchecked"
-        })
+
         public ResponseJsonModel createFromParcel(Parcel in) {
             ResponseJsonModel instance = new ResponseJsonModel();
             instance.id = ((String) in.readValue((String.class.getClassLoader())));
