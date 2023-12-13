@@ -6,10 +6,10 @@ repositories {
 }
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
     defaultConfig {
         applicationId "com.loopme.sample_banner"
         minSdkVersion rootProject.minSdkVersion
+        compileSdk rootProject.compileSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 1
         versionName "1.0"
