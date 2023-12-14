@@ -222,8 +222,7 @@ public class AdFetchTask implements Runnable, Observer {
 
     @Override
     public void update(Observable observable, Object arg) {
-        if (observable != null && observable instanceof Timers
-                && arg != null && arg instanceof TimersType) {
+        if (observable instanceof Timers && arg instanceof TimersType) {
             if ((arg == TimersType.REQUEST_TIMER)) {
                 onRequestTimeout();
             }

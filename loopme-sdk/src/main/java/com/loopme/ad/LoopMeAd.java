@@ -409,8 +409,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     @Override
     public void update(Observable observable, Object arg) {
-        if (observable != null && observable instanceof Timers
-                && arg != null && arg instanceof TimersType) {
+        if (observable instanceof Timers && arg instanceof TimersType) {
             switch ((TimersType) arg) {
                 case FETCHER_TIMER: {
                     onInternalLoadFail(Errors.AD_PROCESSING_TIMEOUT);
