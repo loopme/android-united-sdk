@@ -55,8 +55,7 @@ public class LoopMeTracker {
     }
 
     private static String buildRequest(String errorType, String errorMessage) {
-        Map<String, String> params = new HashMap<>();
-        params.putAll(getGeneralInfo());
+        Map<String, String> params = new HashMap<>(getGeneralInfo());
         params.put(Params.MSG, Constants.SDK_ERROR_MSG);
         params.put(Params.ERROR_TYPE, errorType);
         params.put(Params.ERROR_MSG, errorMessage);
@@ -108,8 +107,7 @@ public class LoopMeTracker {
     }
 
     private static String buildDebugRequest(String param, String value) {
-        Map<String, String> params = new HashMap<>();
-        params.putAll(getGeneralInfo());
+        Map<String, String> params = new HashMap<>(getGeneralInfo());
         params.put(Params.ERROR_TYPE, Constants.ErrorType.CUSTOM);
         params.put(param, value);
         return obtainRequestString(params);
