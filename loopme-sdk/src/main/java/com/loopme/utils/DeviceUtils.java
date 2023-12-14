@@ -24,16 +24,16 @@ public class DeviceUtils {
     public static long getAvailableInternalSpace() {
         File path = Environment.getDataDirectory();
         StatFs stat = new StatFs(path.getPath());
-        long blockSize = stat.getBlockSize();
-        long availableBlocks = stat.getAvailableBlocks();
+        long blockSize = stat.getBlockSizeLong();
+        long availableBlocks = stat.getAvailableBlocksLong();
         return availableBlocks * blockSize;
     }
 
     private static long getTotalSizeOfStorage(){
         File path = Environment.getDataDirectory();
         StatFs stat = new StatFs(path.getPath());
-        long blockSize = stat.getBlockSize();
-        long totalBlocks = stat.getBlockCount();
+        long blockSize = stat.getBlockSizeLong();
+        long totalBlocks = stat.getBlockCountLong();
         return totalBlocks * blockSize;
     }
 
