@@ -589,7 +589,7 @@ public class Utils {
 
             blackArea = resizeHeight - layoutParams.height;
             if (layoutParams.height != 0) {
-                percent = blackArea * HUNDRED_PERCENTS / layoutParams.height;
+                percent = (float) (blackArea * HUNDRED_PERCENTS) / layoutParams.height;
             }
         } else {
             layoutParams.height = resizeHeight;
@@ -597,7 +597,7 @@ public class Utils {
 
             blackArea = resizeWidth - layoutParams.width;
             if (layoutParams.width != 0) {
-                percent = blackArea * HUNDRED_PERCENTS / layoutParams.width;
+                percent = (float) (blackArea * HUNDRED_PERCENTS) / layoutParams.width;
             }
         }
         return percent;
