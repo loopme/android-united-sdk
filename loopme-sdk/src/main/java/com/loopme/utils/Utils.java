@@ -287,7 +287,6 @@ public class Utils {
     public static List<TrackingEvent> createProgressPoints(int duration, AdParams adParams) {
         List<TrackingEvent> trackingEventsList = new ArrayList<>();
 
-        trackingEventsList.clear();
         for (String url : adParams.getImpressionsList()) {
             trackingEventsList.add(new TrackingEvent(url));
         }
