@@ -235,10 +235,6 @@ public class Utils {
     public static int getOrientationForSquareScreens(int rotation) {
         int orientation;
         switch (rotation) {
-            case Surface.ROTATION_0: {
-                orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-                break;
-            }
             case Surface.ROTATION_90: {
                 orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
                 break;
@@ -619,10 +615,6 @@ public class Utils {
     private static int getOrientationForRectangleScreens(int rotation) {
         int orientation;
         switch (rotation) {
-            case Surface.ROTATION_0: {
-                orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-                break;
-            }
             case Surface.ROTATION_90: {
                 orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
                 break;
