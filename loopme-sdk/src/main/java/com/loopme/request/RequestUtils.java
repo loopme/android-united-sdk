@@ -19,7 +19,6 @@ import com.loopme.R;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.gdpr.ConsentType;
 import com.loopme.location.GoogleLocationService;
-import com.loopme.utils.ApiLevel;
 import com.loopme.utils.StringUtils;
 
 import org.json.JSONArray;
@@ -552,7 +551,7 @@ public class RequestUtils {
         AudioManager manager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         List<String> outputs = new ArrayList<>();
         if (manager != null) {
-            boolean wiredHeadsetOn = manager.isWiredHeadsetOn();
+            boolean wiredHeadsetOn = manager.isWiredHeadsetOn(); //TODO: Change implementation after min API has been raised to at least 23
             if (wiredHeadsetOn) {
                 outputs.add(HEADPHONES);
             }
