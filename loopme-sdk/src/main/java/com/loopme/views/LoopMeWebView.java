@@ -40,7 +40,6 @@ public class LoopMeWebView extends WebView {
         WebSettings webSettings = getSettings();
         webSettings.setMediaPlaybackRequiresUserGesture(false);
         webSettings.setJavaScriptEnabled(true);
-        webSettings.setPluginState(WebSettings.PluginState.ON);
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setUseWideViewPort(false);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
