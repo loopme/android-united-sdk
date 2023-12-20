@@ -39,6 +39,16 @@ allprojects {
 subprojects {
     apply plugin: 'maven-publish'
     tasks.withType(Javadoc).all { enabled = false }
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                groupId project.group
+                artifactId project.name
+                version project.version
+            }
+        }
+    }
 }
 
 /*
