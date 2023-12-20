@@ -74,4 +74,18 @@ dependencies {
     implementation 'com.google.androidbrowserhelper:androidbrowserhelper:1.2.0'
 }
 
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = 'com.github.loopme'
+            artifactId = 'SDK'
+            version = '8.0.9'
+
+            afterEvaluate {
+                from components.release
+            }
+        }
+    }
+}
+
 //apply from: '../publishing.gradle'
