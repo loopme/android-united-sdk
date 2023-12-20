@@ -4,7 +4,7 @@ buildscript {
         targetSdkVersion = 33
         compileSdkVersion = 33
         buildToolsVersion = '29.0.2'
-        kotlinVersion = '1.6.21'
+        kotlinVersion = '1.9.20'
         navigationVersion = '2.7.1'
         roomVersion = '2.2.5'
         lifecycleKtxVersion = '2.2.0'
@@ -37,8 +37,8 @@ allprojects {
 }
 
 subprojects {
-    tasks.withType(Javadoc).all { enabled = false }
     apply plugin: 'maven-publish'
+    tasks.withType(Javadoc).all { enabled = false }
 }
 
 task clean(type: Delete) {
