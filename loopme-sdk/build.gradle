@@ -1,5 +1,7 @@
-apply plugin: 'com.android.library'
-apply plugin: 'maven-publish'
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+}
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -34,6 +36,15 @@ android {
 
     testOptions {
         unitTests.returnDefaultValues = true
+    }
+
+    publishing {
+        publishing {
+            singleVariant("release") {
+                withSourcesJar()
+                withJavadocJar()
+            }
+        }
     }
 
     packagingOptions {
