@@ -38,6 +38,7 @@ allprojects {
 
 subprojects {
     tasks.withType(Javadoc).all { enabled = false }
+    apply plugin: 'maven-publish'
 }
 
 task clean(type: Delete) {
