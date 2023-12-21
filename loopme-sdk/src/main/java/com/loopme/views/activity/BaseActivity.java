@@ -6,6 +6,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import android.view.View;
 import android.view.Window;
@@ -273,7 +274,7 @@ public final class BaseActivity extends FragmentActivity
         filter.addAction(Constants.DESTROY_INTENT);
         filter.addAction(Constants.CLICK_INTENT);
 
-        registerReceiver(mAdReceiver, filter);
+        ContextCompat.registerReceiver(this, mAdReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
     private void unregisterDestroyReceiver() {
@@ -289,7 +290,7 @@ public final class BaseActivity extends FragmentActivity
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.MRAID_NEED_CLOSE_BUTTON);
 
-        registerReceiver(mMraidCloseButtonReceiver, intentFilter);
+        ContextCompat.registerReceiver(this, mMraidCloseButtonReceiver, intentFilter, ContextCompat.RECEIVER_NOT_EXPORTED);
     }
 
     private void unregisterMraidCloseButtonReceiver() {
