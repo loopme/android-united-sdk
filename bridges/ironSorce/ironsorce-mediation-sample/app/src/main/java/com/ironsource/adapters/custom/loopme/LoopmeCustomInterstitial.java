@@ -30,7 +30,7 @@ public class LoopmeCustomInterstitial extends BaseInterstitial<LoopmeCustomAdapt
     public void loadAd(AdData adData, Activity activity, InterstitialAdListener interstitialAdListener) {
         try {
             this.mInterstitialListener = interstitialAdListener;
-            String appkey = ((LoopmeCustomAdapter) getNetworkAdapter()).getLoopmeAppkey();
+            String appkey = adData.getConfiguration().get("instancekey").toString();
             mInterstitial = LoopMeInterstitial.getInstance(appkey, activity);
             mInterstitial.setAutoLoading(false);
             mInterstitial.setListener(new LoopMeInterstitial.Listener() {
