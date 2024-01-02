@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -25,4 +26,18 @@ dependencies {
 }
 repositories {
     mavenCentral()
+}
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = 'com.github.loopme'
+            artifactId = 'applovin-mediation'
+            version = '1.0.0'
+
+            afterEvaluate {
+                from components.findByName('release')
+            }
+        }
+    }
 }
