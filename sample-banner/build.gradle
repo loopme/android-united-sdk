@@ -40,6 +40,16 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/MANIFEST.MF'
     }
+
+    publishing {
+        publishing {
+            singleVariant("release") {
+                withSourcesJar()
+                withJavadocJar()
+            }
+        }
+    }
+
     namespace 'com.loopme.banner_sample.app'
 }
 
@@ -56,7 +66,7 @@ publishing {
             version = '1.0.0'
 
             afterEvaluate {
-                from components.findByName('release')
+                from components.release
             }
         }
     }

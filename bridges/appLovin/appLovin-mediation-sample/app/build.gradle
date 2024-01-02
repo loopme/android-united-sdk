@@ -16,6 +16,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    publishing {
+        publishing {
+            singleVariant("release") {
+                withSourcesJar()
+                withJavadocJar()
+            }
+        }
+    }
+
     namespace 'com.loopme.admob_mediation_sample'
 }
 
@@ -36,7 +46,7 @@ publishing {
             version = '1.0.0'
 
             afterEvaluate {
-                from components.findByName('release')
+                from components.release
             }
         }
     }
