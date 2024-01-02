@@ -78,7 +78,7 @@ publishing {
     publications {
         release(MavenPublication) {
             groupId = 'com.github.loopme'
-            artifactId = 'SDK'
+            artifactId = 'loopme-sdk'
             version = '8.0.9'
 
             afterEvaluate {

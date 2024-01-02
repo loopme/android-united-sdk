@@ -1,5 +1,7 @@
-apply plugin: 'com.android.application'
-
+plugins {
+    id 'com.android.application'
+    id 'maven-publish'
+}
 repositories {
     mavenCentral()
     google()
@@ -44,4 +46,18 @@ android {
 dependencies {
     implementation project(':loopme-sdk')
     implementation 'androidx.cardview:cardview:1.0.0'
+}
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = 'com.github.loopme'
+            artifactId = 'sample-banner'
+            version = '1.0.0'
+
+            /*afterEvaluate {
+                from components.release
+            }*/
+        }
+    }
 }
