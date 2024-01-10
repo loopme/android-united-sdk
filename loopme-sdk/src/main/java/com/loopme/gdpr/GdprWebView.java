@@ -111,8 +111,7 @@ public class GdprWebView extends WebView {
     }
 
     private void allowMixedContent() {
-        if (ApiLevel.isApi21AndHigher())
-            getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+        getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
     }
 
     private void onClose() {

@@ -15,7 +15,6 @@ public class MainActivity
         extends AppCompatActivity
         implements
         LoopMeInterstitial.Listener,
-        View.OnClickListener,
         LoopMeSdk.LoopMeSdkListener {
 
     private LoopMeInterstitial mInterstitial;
@@ -31,8 +30,18 @@ public class MainActivity
     }
 
     private void initViews() {
-        findViewById(R.id.show_button).setOnClickListener(this);
-        findViewById(R.id.load_button).setOnClickListener(this);
+        findViewById(R.id.show_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onShowClicked();
+            }
+        });
+        findViewById(R.id.load_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onLoadClicked();
+            }
+        });
         initProgressDialog();
     }
 
@@ -48,20 +57,6 @@ public class MainActivity
         // Clean up resources
         destroyInterstitial();
         super.onDestroy();
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.show_button: {
-                onShowClicked();
-                break;
-            }
-            case R.id.load_button: {
-                onLoadClicked();
-            }
-        }
-
     }
 
     private void onLoadClicked() {

@@ -1,5 +1,6 @@
 package com.loopme.controllers.display;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;

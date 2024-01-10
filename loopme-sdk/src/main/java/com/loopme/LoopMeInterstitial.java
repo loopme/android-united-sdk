@@ -53,7 +53,7 @@ public final class LoopMeInterstitial extends AdWrapper {
      */
     @Nullable
     public static LoopMeInterstitial getInstance(String appKey, Activity activity) {
-        return LoopMeSdk.isInitialized() && ApiLevel.isApi21AndHigher()
+        return LoopMeSdk.isInitialized()
                 ? new LoopMeInterstitial(activity, appKey)
                 : null;
     }

@@ -56,7 +56,7 @@ public final class LoopMeBanner extends AdWrapper {
      */
     @Nullable
     public static LoopMeBanner getInstance(String appKey, Activity activity) {
-        return LoopMeSdk.isInitialized() && ApiLevel.isApi21AndHigher()
+        return LoopMeSdk.isInitialized()
                 ? new LoopMeBanner(activity, appKey)
                 : null;
     }

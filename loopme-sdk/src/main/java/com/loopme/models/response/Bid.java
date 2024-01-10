@@ -19,11 +19,7 @@ public class Bid implements Serializable, Parcelable {
     private String crid;
     public final static Parcelable.Creator<Bid> CREATOR = new Creator<Bid>() {
 
-
-        @SuppressWarnings({
-            "unchecked"
-        })
-        public Bid createFromParcel(Parcel in) {
+    public Bid createFromParcel(Parcel in) {
             Bid instance = new Bid();
             instance.ext = ((Ext) in.readValue((Ext.class.getClassLoader())));
             instance.id = ((String) in.readValue((String.class.getClassLoader())));

@@ -487,10 +487,7 @@ public class IasTracker implements Tracker {
                     break;
                 }
 
-                case END_SESSION: {
-                    unregisterAndEndSession();
-                    break;
-                }
+                case END_SESSION:
                 case CLOSE: {
                     unregisterAndEndSession();
                     break;

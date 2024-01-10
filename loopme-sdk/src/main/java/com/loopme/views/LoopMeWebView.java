@@ -40,15 +40,12 @@ public class LoopMeWebView extends WebView {
         WebSettings webSettings = getSettings();
         webSettings.setMediaPlaybackRequiresUserGesture(false);
         webSettings.setJavaScriptEnabled(true);
-        webSettings.setPluginState(WebSettings.PluginState.ON);
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setUseWideViewPort(false);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         webSettings.setSupportZoom(false);
         webSettings.setDomStorageEnabled(true);
-        if (ApiLevel.isApi21AndHigher()) {
-            webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
-        }
+        webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
         setDebugConfig();
@@ -58,9 +55,7 @@ public class LoopMeWebView extends WebView {
     private void allowCookies() {
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
-        if (ApiLevel.isApi21AndHigher()) {
-            cookieManager.setAcceptThirdPartyCookies(this, true);
-        }
+        cookieManager.setAcceptThirdPartyCookies(this, true);
     }
 
     private void setDebugConfig() {

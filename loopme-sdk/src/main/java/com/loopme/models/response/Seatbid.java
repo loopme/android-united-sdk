@@ -12,10 +12,6 @@ public class Seatbid implements Serializable, Parcelable {
     private List<Bid> bid = null;
     public final static Parcelable.Creator<Seatbid> CREATOR = new Creator<Seatbid>() {
 
-
-        @SuppressWarnings({
-            "unchecked"
-        })
         public Seatbid createFromParcel(Parcel in) {
             Seatbid instance = new Seatbid();
             in.readList(instance.bid, (Bid.class.getClassLoader()));

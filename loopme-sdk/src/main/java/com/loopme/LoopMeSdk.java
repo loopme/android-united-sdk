@@ -82,12 +82,6 @@ public final class LoopMeSdk {
         if (Looper.getMainLooper() != Looper.myLooper())
             throw new IllegalStateException("Must be called on the main thread");
 
-        if (!ApiLevel.isApi21AndHigher()) {
-            loopMeSdkInitListener.onSdkInitializationFail(
-                    ERROR_INCOMPATIBLE_ANDROID_API_LEVEL, "");
-            return;
-        }
-
         if (isInitialized()) {
             loopMeSdkInitListener.onSdkInitializationSuccess();
             return;

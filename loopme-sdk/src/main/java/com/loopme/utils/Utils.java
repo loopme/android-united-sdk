@@ -235,10 +235,6 @@ public class Utils {
     public static int getOrientationForSquareScreens(int rotation) {
         int orientation;
         switch (rotation) {
-            case Surface.ROTATION_0: {
-                orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-                break;
-            }
             case Surface.ROTATION_90: {
                 orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
                 break;
@@ -287,7 +283,6 @@ public class Utils {
     public static List<TrackingEvent> createProgressPoints(int duration, AdParams adParams) {
         List<TrackingEvent> trackingEventsList = new ArrayList<>();
 
-        trackingEventsList.clear();
         for (String url : adParams.getImpressionsList()) {
             trackingEventsList.add(new TrackingEvent(url));
         }
@@ -470,7 +465,7 @@ public class Utils {
         if (sAudioManager != null) {
             int volume_level = sAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
             int max = sAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-            int percent = Math.round(volume_level * HUNDRED_PERCENTS / max);
+            int percent = Math.round((float) (volume_level * HUNDRED_PERCENTS) / max);
             return (float) percent / HUNDRED_PERCENTS;
         } else {
             return DEFAULT_VOLUME;
@@ -564,10 +559,6 @@ public class Utils {
                 PackageManager.MATCH_DEFAULT_ONLY) != null;
     }
 
-    public static boolean isApi19() {
-        return Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT;
-    }
-
     public static ViewGroup.LayoutParams createMatchParentLayoutParams() {
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         params.gravity = Gravity.CENTER;
@@ -593,7 +584,7 @@ public class Utils {
 
             blackArea = resizeHeight - layoutParams.height;
             if (layoutParams.height != 0) {
-                percent = blackArea * HUNDRED_PERCENTS / layoutParams.height;
+                percent = (float) (blackArea * HUNDRED_PERCENTS) / layoutParams.height;
             }
         } else {
             layoutParams.height = resizeHeight;
@@ -601,7 +592,7 @@ public class Utils {
 
             blackArea = resizeWidth - layoutParams.width;
             if (layoutParams.width != 0) {
-                percent = blackArea * HUNDRED_PERCENTS / layoutParams.width;
+                percent = (float) (blackArea * HUNDRED_PERCENTS) / layoutParams.width;
             }
         }
         return percent;
@@ -624,10 +615,6 @@ public class Utils {
     private static int getOrientationForRectangleScreens(int rotation) {
         int orientation;
         switch (rotation) {
-            case Surface.ROTATION_0: {
-                orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-                break;
-            }
             case Surface.ROTATION_90: {
                 orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
                 break;

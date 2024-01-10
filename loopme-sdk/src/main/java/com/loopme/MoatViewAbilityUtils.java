@@ -241,9 +241,7 @@ public class MoatViewAbilityUtils {
         float lvElev = lastView.getElevation();
         float cvElev = checkedView.getElevation();
 
-        return lvElev > cvElev ||
-                checkedViewFound && lvElev == cvElev ||
-                checkedViewFound;
+        return lvElev > cvElev || checkedViewFound;
     }
 
     public static class ViewAbilityInfo {
