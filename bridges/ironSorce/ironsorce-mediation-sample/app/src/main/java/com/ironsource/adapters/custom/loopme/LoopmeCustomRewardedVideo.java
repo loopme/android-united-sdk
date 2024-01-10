@@ -32,7 +32,7 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
     public void loadAd(AdData adData, Activity activity, @NotNull RewardedVideoAdListener rewardedVideoAdListener) {
         try {
             this.rewardedVideoAdListener = rewardedVideoAdListener;
-            String appkey = ((LoopmeCustomAdapter) getNetworkAdapter()).getLoopmeAppkey();
+            String appkey = adData.getConfiguration().get("instancekey").toString();
             mInterstitial = LoopMeInterstitial.getInstance(appkey, activity);
             mInterstitial.setAutoLoading(false);
             mInterstitial.setListener(new LoopMeInterstitial.Listener() {
