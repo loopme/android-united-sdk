@@ -236,8 +236,8 @@ public class EventManager implements AdEvents {
 
     private void onAdDurationChangedEvent(int position, int videoDuration) {
         if (mTrackerManager != null) {
-            String adDuration = "" + position;
-            String adRemainingTime = "" + (videoDuration - position);
+            String adDuration = String.valueOf(position);
+            String adRemainingTime = String.valueOf(videoDuration - position);
             mTrackerManager.track(Event.DURATION_CHANGED, adDuration, adRemainingTime);
         }
     }

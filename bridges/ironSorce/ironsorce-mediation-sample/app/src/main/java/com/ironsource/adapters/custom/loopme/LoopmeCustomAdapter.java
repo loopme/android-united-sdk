@@ -96,8 +96,13 @@ public class LoopmeCustomAdapter extends BaseAdapter {
             CountDownLatch latch,
             boolean success) {
 
-        if (networkInitializationListener != null)
-            networkInitializationListener.onInitSuccess();
+        if (networkInitializationListener != null) {
+            if (success) {
+                networkInitializationListener.onInitSuccess();
+            } else {
+                networkInitializationListener.onInitFailed(-1, null);
+            }
+        }
 
         if (latch != null)
             latch.countDown();

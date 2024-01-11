@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class StringUtils {
@@ -81,7 +82,7 @@ public class StringUtils {
 
     private static String getTimeInIso8061Format() {
         TimeZone tz = TimeZone.getDefault();
-        SimpleDateFormat dateFormat = new SimpleDateFormat(ISO_8601_TIME_FORMAT);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(ISO_8601_TIME_FORMAT, Locale.US);
         dateFormat.setTimeZone(tz);
         return dateFormat.format(new Date());
     }

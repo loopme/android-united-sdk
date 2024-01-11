@@ -1,9 +1,9 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
+        compileSdk rootProject.compileSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
     }
 
@@ -53,6 +53,7 @@ dependencies {
 
     api "androidx.appcompat:appcompat:$appCompatVersion"
     api "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+    api "androidx.annotation:annotation:1.7.0"
 
     implementation "androidx.preference:preference:$preferenceVersion"
 

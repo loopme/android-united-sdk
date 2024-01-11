@@ -7,7 +7,7 @@ public abstract class AutoLoadingConfig {
     private boolean sUserAutoLoadingValue = true;
 
     public boolean isAutoLoadingEnabled() {
-        return sUserAutoLoadingValue && sBackendAutoLoadingValue && !Utils.isApi19();
+        return sUserAutoLoadingValue && sBackendAutoLoadingValue;
     }
 
     public void setAutoLoading(boolean autoLoadingEnabled) {

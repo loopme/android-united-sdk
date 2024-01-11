@@ -68,7 +68,7 @@ public class Timers extends Observable {
             }
         };
         mFetcherTimer = new AdTimer(Constants.FETCH_TIMEOUT, mFetcherTimerListener);
-        float fetchTimeout = Constants.FETCH_TIMEOUT / (1000 * 60);
+        float fetchTimeout = (float) Constants.FETCH_TIMEOUT / Constants.ONE_MINUTE_IN_MILLIS;
         Logging.out(LOG_TAG, "Fetch timeout: " + fetchTimeout + " minutes");
     }
 

@@ -116,6 +116,7 @@ public class InternetUtils {
         NetworkInfo wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         NetworkInfo mobileInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 
+        //TODO: Use ConnectivityManager.NetworkCallback instead of deprecated method
         return mobileInfo != null && mobileInfo.isConnected() && (wifiInfo == null || !wifiInfo.isConnected());
     }
 
@@ -130,6 +131,8 @@ public class InternetUtils {
         }
 
         NetworkInfo info = cm.getActiveNetworkInfo();
+
+        //TODO: See above
         return info != null && info.isConnected();
     }
 
@@ -145,6 +148,7 @@ public class InternetUtils {
 
             final NetworkInfo activeNetwork = conMgr.getActiveNetworkInfo();
 
+            //TODO: See above
             return activeNetwork != null && activeNetwork.isConnected()
                     && activeNetwork.isAvailable();
         } catch (Exception e) {

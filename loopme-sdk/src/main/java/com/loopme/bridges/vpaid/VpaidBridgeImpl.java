@@ -8,6 +8,8 @@ import com.loopme.ad.*;
 import com.loopme.tracker.constants.EventConstants;
 import com.loopme.CreativeParams;
 
+import java.util.Locale;
+
 @Keep
 @SuppressWarnings("unused")
 public class VpaidBridgeImpl implements VpaidBridge {
@@ -99,7 +101,7 @@ public class VpaidBridgeImpl implements VpaidBridge {
                 "%4$s," + // desiredBitrate
                 "%5$s," + // creativeData
                 "%6$s)"; // environmentVars
-        String requestFinal = String.format(requestTemplate,
+        String requestFinal = String.format(Locale.US, requestTemplate,
                 mCreativeParams.getWidth(),
                 mCreativeParams.getHeight(),
                 mCreativeParams.getViewMode(),

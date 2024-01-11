@@ -171,7 +171,7 @@ public abstract class AdWrapper extends AdConfig {
     private void sleep() {
         if (mSleepLoadTimer == null) {
             mSleepLoadTimer = initSleepLoadTimer();
-            float sleepTimeout = Constants.SLEEP_TIME / Constants.ONE_MINUTE_IN_MILLIS;
+            float sleepTimeout = (float) Constants.SLEEP_TIME / Constants.ONE_MINUTE_IN_MILLIS;
             Logging.out(LOG_TAG, "Sleep timeout: " + sleepTimeout + " minutes");
             mSleepLoadTimer.start();
             mIsAutoLoadingPaused = true;
