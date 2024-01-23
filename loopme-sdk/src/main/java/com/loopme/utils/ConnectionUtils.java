@@ -51,7 +51,7 @@ public class ConnectionUtils {
                 return Constants.ConnectionType.UNKNOWN;
             }
 
-            int networkType = telephonyManager.getNetworkType();
+            int networkType = telephonyManager.getDataNetworkType();
             switch (networkType) {
                 case TelephonyManager.NETWORK_TYPE_GPRS:
                 case TelephonyManager.NETWORK_TYPE_EDGE:
