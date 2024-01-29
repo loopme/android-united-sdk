@@ -39,13 +39,6 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
         if (mLoopMeAd.isBanner()) {
             setAdContainerSize(loopMeAd.getAdParams().getAdSpotDimensions());
         }
-
-        /*try {
-            Thread.sleep(1000);
-            onLoadSuccess();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
     }
 
     public void setMraidView(MraidView mraidView) {
