@@ -107,11 +107,11 @@ public class AdFetchTask implements Runnable, Observer {
         } catch (Exception e) {
             Logging.out(LOG_TAG, e.toString());
             stopRequestTimer();
-            handelBadResponse(e.getMessage());
+            handleBadResponse(e.getMessage());
         }
     }
 
-    protected void handelBadResponse(String message) {
+    protected void handleBadResponse(String message) {
         if (!TextUtils.isEmpty(message) && message.contains(UNEXPECTED)) {
             onErrorResult(Errors.SYNTAX_ERROR_IN_RESPONSE);
         } else {

@@ -23,7 +23,7 @@ public class AdFetchTaskByUrl extends AdFetchTask {
             parseResponse(response);
         } catch (Exception e) {
             stopRequestTimer();
-            handelBadResponse(e.getMessage());
+            handleBadResponse(e.getMessage());
         }
     }
 }
