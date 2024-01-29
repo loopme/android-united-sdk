@@ -170,7 +170,7 @@
   };
 
   bridge.notifyErrorEvent = function(message, action) {
-    console.log('notifyErrorEvent');
+    console.log('notifyErrorEvent: ', message, action);
     broadcastEvent(EVENTS.ERROR, message, action);
   };
 
