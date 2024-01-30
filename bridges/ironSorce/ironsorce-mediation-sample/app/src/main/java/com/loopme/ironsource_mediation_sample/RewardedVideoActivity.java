@@ -86,9 +86,7 @@ public class RewardedVideoActivity extends Activity {
     }
 
     public void onLoadClicked(View view) {
-        String loopmeAppkey = ((EditText) findViewById(R.id.appkey_et)).getText().toString();
         LoopmeCustomAdapter.setWeakActivity(this);
-        LoopmeCustomAdapter.setLoopmeAppkey(loopmeAppkey);
         IronSource.loadRewardedVideo();
     }
 

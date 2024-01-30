@@ -2,10 +2,13 @@ package com.ironsource.adapters.custom.loopme;
 
 import android.app.Activity;
 import android.util.Log;
+import android.widget.FrameLayout;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 
+import com.ironsource.adapters.custom.loopme.exception.BannerContainerProviderNotImplementedException;
+import com.ironsource.adapters.custom.loopme.provider.IBannerContainerProvider;
 import com.ironsource.mediationsdk.ISBannerSize;
 import com.ironsource.mediationsdk.adunit.adapter.BaseBanner;
 import com.ironsource.mediationsdk.adunit.adapter.listener.BannerAdListener;
@@ -29,24 +32,35 @@ public class LoopmeCustomBanner extends BaseBanner<LoopmeCustomAdapter> {
     @Override
     public void loadAd(@NonNull AdData adData, @NonNull Activity activity, @NonNull ISBannerSize isBannerSize, @NonNull BannerAdListener listener) {
         try {
-            String appkey = ((LoopmeCustomAdapter) getNetworkAdapter()).getLoopmeAppkey();
+            if (!(activity instanceof IBannerContainerProvider)) {
+                throw new BannerContainerProviderNotImplementedException(activity.getClass().getSimpleName());
+            }
+
+            String appkey = adData.getConfiguration().get("instancekey").toString();
             mBanner = LoopMeBanner.getInstance(appkey, activity);
+            FrameLayout container = ((IBannerContainerProvider) activity).getBannerContainer();
+            mBanner.bindView(container);
             mBanner.setAutoLoading(false);
             mBanner.setListener(new LoopMeBanner.Listener() {
                 @Override
                 public void onLoopMeBannerLoadSuccess(LoopMeBanner banner) {
                     Log.d(LOG_TAG, "onLoopMeBannerLoadSuccess");
+                    mBanner.show();
                     listener.onAdLoadSuccess();
                 }
 
                 @Override
                 public void onLoopMeBannerLoadFail(LoopMeBanner banner, LoopMeError error) {
                     Log.d(LOG_TAG, "onLoopMeBannerLoadFail");
+                    listener.onAdLoadFailed(AdapterErrorType.ADAPTER_ERROR_TYPE_INTERNAL,
+                            -2,
+                            error.getErrorType() + ": " + error.getMessage());
                 }
 
                 @Override
                 public void onLoopMeBannerShow(LoopMeBanner banner) {
                     Log.d(LOG_TAG, "onLoopMeBannerShow");
+                    listener.onAdOpened();
                 }
 
                 @Override
@@ -57,6 +71,7 @@ public class LoopmeCustomBanner extends BaseBanner<LoopmeCustomAdapter> {
                 @Override
                 public void onLoopMeBannerClicked(LoopMeBanner banner) {
                     Log.d(LOG_TAG, "onLoopMeBannerClicked");
+                    listener.onAdClicked();
                 }
 
                 @Override
@@ -76,6 +91,7 @@ public class LoopmeCustomBanner extends BaseBanner<LoopmeCustomAdapter> {
             });
             mBanner.load();
         } catch (Exception e) {
+            Log.e(LOG_TAG, e.getMessage());
             listener.onAdLoadFailed(AdapterErrorType.ADAPTER_ERROR_TYPE_INTERNAL, -1, e.getMessage());
         }
     }

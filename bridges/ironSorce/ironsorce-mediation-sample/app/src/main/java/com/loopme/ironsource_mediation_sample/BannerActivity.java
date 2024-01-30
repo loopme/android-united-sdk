@@ -4,10 +4,11 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.ironsource.adapters.custom.loopme.LoopmeCustomAdapter;
+import com.ironsource.adapters.custom.loopme.provider.IBannerContainerProvider;
 import com.ironsource.mediationsdk.ISBannerSize;
 import com.ironsource.mediationsdk.IronSource;
 import com.ironsource.mediationsdk.IronSourceBannerLayout;
@@ -18,24 +19,19 @@ import com.ironsource.mediationsdk.logger.LogListener;
 import com.ironsource.mediationsdk.sdk.LevelPlayBannerListener;
 import com.loopme.LoopMeSdk;
 
-public class BannerActivity extends Activity {
-     private static final String appKey = "124e1d38d";
-    private static final String loopmeAppKey = "f5826542ae";
-
+public class BannerActivity extends Activity implements IBannerContainerProvider {
+    private static final String appKey = "124e1d38d";
     IronSourceBannerLayout banner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_banner);
-        View loadButton = findViewById(R.id.load_button);
-        loadButton.setEnabled(false);
 
         LoopMeSdk.initialize(this, new LoopMeSdk.Configuration(), new LoopMeSdk.LoopMeSdkListener() {
             @Override
             public void onSdkInitializationSuccess() {
                 Toast.makeText(BannerActivity.this, "Loopme has been initialized", Toast.LENGTH_LONG).show();
-                loadButton.setEnabled(true);
             }
 
             @Override
@@ -43,25 +39,6 @@ public class BannerActivity extends Activity {
                 Toast.makeText(BannerActivity.this, "Loopme failed initialization", Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        IronSource.onResume(this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        IronSource.onPause(this);
-    }
-
-    public void onShowClicked(View view) {
-        IronSource.loadBanner(banner);
-    }
-
-    public void onLoadClicked(View view) {
 
         try {
             IronSource.init(this, appKey, IronSource.AD_UNIT.BANNER);
@@ -121,10 +98,32 @@ public class BannerActivity extends Activity {
             }
         });
 
-        LinearLayout parent = findViewById(R.id.parent_layout);
-        parent.addView(banner, 2);
+        FrameLayout bannerContainer = findViewById(R.id.banner_container);
 
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT);
+        bannerContainer.addView(banner, 0, layoutParams);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IronSource.onResume(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        IronSource.onPause(this);
+    }
+
+    @Override
+    public IronSourceBannerLayout getBannerContainer() {
+        return banner;
+    }
+
+    public void onLoadClicked(View view) {
         LoopmeCustomAdapter.setWeakActivity(this);
-        LoopmeCustomAdapter.setLoopmeAppkey(loopmeAppKey);
+        IronSource.loadBanner(banner);
     }
 }
