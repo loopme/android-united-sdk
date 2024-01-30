@@ -146,7 +146,7 @@ public class BridgeCommandBuilder {
         builder.append(MRAID_PREFIX)
                 .append("notifySizeChangeEvent(")
                 .append(width)
-                .append(",")
+                .append(", ")
                 .append(height)
                 .append(");");
         return builder.toString();
@@ -162,7 +162,7 @@ public class BridgeCommandBuilder {
     public static String mraidNativeCallComplete() {
         StringBuilder builder = new StringBuilder();
         builder.append(MRAID_PREFIX)
-                .append("nativeCallComplete()");
+                .append("nativeCallComplete();");
         return builder.toString();
     }
 }
