@@ -62,7 +62,7 @@ public class MainActivity
     private void onLoadClicked() {
         // Create new interstitial object
         if (mInterstitial == null) {
-            mInterstitial = LoopMeInterstitial.getInstance(LoopMeInterstitial.TEST_LAND_INTERSTITIAL, this);
+            mInterstitial = LoopMeInterstitial.getInstance(LoopMeInterstitial.TEST_PORT_INTERSTITIAL, this);
             mInterstitial.setAutoLoading(false);
         }
 
