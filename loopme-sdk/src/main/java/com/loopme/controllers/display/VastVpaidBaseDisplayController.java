@@ -466,10 +466,6 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
             return vendor;
         }
 
-        public void setVendor(String vendor) {
-            this.vendor = vendor;
-        }
-
         public String getJavaScriptResourceUrl() {
             return javaScriptResourceUrl;
         }
