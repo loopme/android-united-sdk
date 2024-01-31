@@ -15,14 +15,11 @@ import com.loopme.models.response.Ext;
 import com.loopme.models.response.ResponseJsonModel;
 import com.loopme.tracker.AdIds;
 import com.loopme.tracker.partners.LoopMeTracker;
-import com.loopme.utils.ValidationHelper;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParseService extends JsonParser {
+public class ParseService {
 
     private static final String DEFAULT = "default";
     private static final String PORTRAIT = "portrait";
