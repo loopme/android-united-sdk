@@ -45,6 +45,7 @@ public class LoopmeCustomBanner extends BaseBanner<LoopmeCustomAdapter> {
             mBanner.setListener(new LoopMeBanner.Listener() {
                 @Override
                 public void onLoopMeBannerLoadSuccess(LoopMeBanner banner) {
+                    Toast.makeText(activity, "Successfully loaded LoopMe banner", Toast.LENGTH_LONG).show();
                     Log.d(LOG_TAG, "onLoopMeBannerLoadSuccess");
                     mBanner.show();
                     listener.onAdLoadSuccess();
