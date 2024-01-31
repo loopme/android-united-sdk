@@ -3,6 +3,7 @@ package com.ironsource.adapters.custom.loopme;
 import android.app.Activity;
 import android.util.Log;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
@@ -52,6 +53,7 @@ public class LoopmeCustomBanner extends BaseBanner<LoopmeCustomAdapter> {
                 @Override
                 public void onLoopMeBannerLoadFail(LoopMeBanner banner, LoopMeError error) {
                     Log.d(LOG_TAG, "onLoopMeBannerLoadFail");
+                    Toast.makeText(activity, "Failed to load LoopMe banner: " + error.getMessage(), Toast.LENGTH_LONG).show();
                     listener.onAdLoadFailed(AdapterErrorType.ADAPTER_ERROR_TYPE_INTERNAL,
                             -2,
                             error.getErrorType() + ": " + error.getMessage());
