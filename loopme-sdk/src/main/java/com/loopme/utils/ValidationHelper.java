@@ -1,16 +1,11 @@
 package com.loopme.utils;
 
 import android.app.Activity;
-import android.text.TextUtils;
-
 import com.loopme.Constants;
 import com.loopme.IntegrationType;
 import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
-
-import org.json.JSONObject;
-
 import java.util.Arrays;
 
 /**
@@ -20,20 +15,8 @@ import java.util.Arrays;
 public class ValidationHelper {
 
     private static final String LOG_TAG = ValidationHelper.class.getSimpleName();
-    private OnValidationHelperListener mOnValidationHelperListener;
 
-    public ValidationHelper(OnValidationHelperListener onValidationHelperListener) {
-        this.mOnValidationHelperListener = onValidationHelperListener;
-    }
-
-    public interface OnValidationHelperListener {
-        void onError(LoopMeError error);
-
-        void onSuccess();
-    }
-
-    public static boolean isValidResponse(JSONObject result) {
-        return !TextUtils.isEmpty(result.toString());
+    public ValidationHelper() {
     }
 
     public static boolean isValidFormat(String format) {
@@ -69,18 +52,6 @@ public class ValidationHelper {
             return false;
         }
         return true;
-    }
-
-    private void onSuccess() {
-        if (mOnValidationHelperListener != null) {
-            mOnValidationHelperListener.onSuccess();
-        }
-    }
-
-    private void onError(LoopMeError error) {
-        if (mOnValidationHelperListener != null) {
-            mOnValidationHelperListener.onError(error);
-        }
     }
 
     private static boolean isCorrectIntegrationType(IntegrationType integrationType) {

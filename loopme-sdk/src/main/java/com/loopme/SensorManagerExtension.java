@@ -25,7 +25,7 @@ public class SensorManagerExtension {
             float y = sensorEvent.values[1];
             float z = sensorEvent.values[2];
             mLastAcceleration = mCurrentAcceleration;
-            mCurrentAcceleration = (float) Math.sqrt((double) (x * x + y * y + z * z));
+            mCurrentAcceleration = (float) Math.sqrt(x * x + y * y + z * z);
             float delta = mCurrentAcceleration - mLastAcceleration;
             mAcceleration = mAcceleration * 0.9f + delta;
             if (delta > 5) {

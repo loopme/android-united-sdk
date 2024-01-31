@@ -18,7 +18,6 @@ import com.loopme.utils.ApiLevel;
  * when an ad has been presented or dismissed from the screen, and when an ad has expired or received a tap.
  */
 public final class LoopMeInterstitial extends AdWrapper {
-    public static final String TEST_PORT_INTERSTITIAL = "test_interstitial_p";
     public static final String TEST_LAND_INTERSTITIAL = "test_interstitial_l";
 
     private static final String LOG_TAG = LoopMeInterstitial.class.getSimpleName();

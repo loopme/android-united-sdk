@@ -399,12 +399,6 @@ public class IasTracker implements Tracker {
                     mIsThirdQuartileTracked = true;
 
                 }
-
-                // do we need to send this 100500 times per second?
-//                int adRemainingTime = adDuration - currentPosition;
-//                if (mAvidVideoPlaybackListener != null) {
-//                    mAvidVideoPlaybackListener.recordAdDurationChangeEvent(String.valueOf(adDuration), String.valueOf(adRemainingTime));
-//                }
             }
         }
 
@@ -601,7 +595,4 @@ public class IasTracker implements Tracker {
         return isBanner() && isFullscreenMode();
     }
 
-    private boolean isBannerGoingFromFullscreen() {
-        return isBanner() && !isFullscreenMode();
-    }
 }

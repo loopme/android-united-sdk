@@ -1,7 +1,5 @@
 package com.loopme;
 
-import android.os.Build;
-
 import com.loopme.ad.LoopMeAd;
 import com.loopme.utils.Utils;
 

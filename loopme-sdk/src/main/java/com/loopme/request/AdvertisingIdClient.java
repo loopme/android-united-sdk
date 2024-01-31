@@ -22,9 +22,6 @@ public final class AdvertisingIdClient {
         private String mAdvertisingId;
         private boolean mLimitAdTrackingEnabled;
 
-        private AdInfo() {
-        }
-
         private AdInfo(String advertisingId, boolean limitAdTrackingEnabled) {
             mAdvertisingId = advertisingId;
             mLimitAdTrackingEnabled = limitAdTrackingEnabled;

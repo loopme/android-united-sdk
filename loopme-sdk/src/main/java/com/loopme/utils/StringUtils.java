@@ -37,14 +37,6 @@ public class StringUtils {
         return Build.UNKNOWN;
     }
 
-    public static boolean hasMp4Extension(String videoUrl) {
-        if (TextUtils.isEmpty(videoUrl)) {
-            return false;
-        }
-        String[] tokens = videoUrl.split("\\.");
-        return TextUtils.equals(tokens[tokens.length - 1], Constants.MP4_FORMAT_EXT);
-    }
-
     public static String setErrorCode(String vastErrorUrl, String vastErrorCode) {
         return replace(vastErrorUrl, ERROR_CODE, vastErrorCode);
     }
@@ -102,13 +94,6 @@ public class StringUtils {
     private static String deleteLastCharacter(String encryptedString) {
         if (!TextUtils.isEmpty(encryptedString)) {
             return encryptedString.substring(0, encryptedString.length() - 1);
-        }
-        return "";
-    }
-
-    public static String removeFirstSymbol(String message) {
-        if (!TextUtils.isEmpty(message)) {
-            return message.substring(1, message.length());
         }
         return "";
     }

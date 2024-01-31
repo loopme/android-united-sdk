@@ -49,7 +49,7 @@ public class AdUtils {
                     .build();
             customTabsIntent.launchUrl(context, Uri.parse(uri));
 
-            // TODO. Refactor.
+            // TODO. Refactor - Why Refactor? What does it mean?
             return Utils.isActivityResolved(customTabsIntent.intent, context);
 
         } catch (Exception e) {
@@ -59,7 +59,7 @@ public class AdUtils {
         return false;
     }
 
-    // TODO. Move.
+    // TODO. Move. Why? What does it mean?
     public static void setDebugObstructionEnabled(boolean debugOstructionEnabled) {
         AdUtils.debugObstructionEnabled = debugOstructionEnabled;
     }
