@@ -13,10 +13,9 @@ import android.hardware.SensorManager;
 public class SensorManagerExtension {
 
     private SensorManager mSensorManager;
-    private float mAcceleration;
+    //private float mAcceleration;
     private float mCurrentAcceleration;
     private float mLastAcceleration;
-    private OnLoopMeSensorListener mOnSensorListener;
 
     private final SensorEventListener mSensorListener = new SensorEventListener() {
 
@@ -27,7 +26,6 @@ public class SensorManagerExtension {
             mLastAcceleration = mCurrentAcceleration;
             mCurrentAcceleration = (float) Math.sqrt(x * x + y * y + z * z);
             float delta = mCurrentAcceleration - mLastAcceleration;
-            mAcceleration = mAcceleration * 0.9f + delta;
             if (delta > 5) {
                 onAdShake();
             }
@@ -43,7 +41,6 @@ public class SensorManagerExtension {
 
     public SensorManagerExtension initSensor(Context context, OnLoopMeSensorListener listener) {
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        mAcceleration = 0.00f;
         mCurrentAcceleration = android.hardware.SensorManager.GRAVITY_EARTH;
         mLastAcceleration = android.hardware.SensorManager.GRAVITY_EARTH;
         return this;
