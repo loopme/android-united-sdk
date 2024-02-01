@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
 
 android {
     defaultConfig {
@@ -31,6 +32,15 @@ android {
         abortOnError false
     }
 
+    publishing {
+        publishing {
+            singleVariant("release") {
+                withSourcesJar()
+                withJavadocJar()
+            }
+        }
+    }
+
     testOptions {
         unitTests.returnDefaultValues = true
         unitTests.all {
@@ -47,8 +57,16 @@ android {
         exclude 'META-INF/MANIFEST.MF'
     }
     namespace 'com.loopme'
+}
 
-
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+            }
+        }
+    }
 }
 
 dependencies {
