@@ -42,6 +42,10 @@ afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
+                groupId = 'com.ironsource.adapters.custom'
+                artifactId = 'loopme'
+                version = '8.0.9'
+
                 from components.release
             }
         }
