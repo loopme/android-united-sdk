@@ -38,8 +38,6 @@ import java.util.Map;
 public class XmlParseService {
 
     private static final String LOG_TAG = XmlParseService.class.getSimpleName();
-    private static final String MEDIA_FILE_TYPE_MP4 = "video/mp4";
-    private static final String MEDIA_FILE_TYPE_WEBM = "video/webm";
     private static final int FIRST_ELEMENT = 0;
     private static AdParams sAdParams = new AdParams();
 
@@ -291,7 +289,7 @@ public class XmlParseService {
         if (inLine != null) {
             return inLine.getCreatives().getCreativeList();
         } else {
-            return new ArrayList<Creative>();
+            return new ArrayList<>();
         }
     }
 

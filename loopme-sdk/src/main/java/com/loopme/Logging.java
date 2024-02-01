@@ -34,15 +34,8 @@ public class Logging {
         LiveDebug.handle(logTag, text, forceSave);
     }
 
-    // TODO. Refactor. Duplicate code.
     public static void out(final String tag, final String text) {
-        if (TextUtils.isEmpty(text))
-            return;
-
-        final String logTag = createDebugTag(tag);
-        log(logTag, text);
-
-        LiveDebug.handle(logTag, text, false);
+        out(tag, text, false);
     }
 
     public static void out(final String text) {

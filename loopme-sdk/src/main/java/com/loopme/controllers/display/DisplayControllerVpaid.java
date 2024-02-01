@@ -34,7 +34,6 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         Vast4WebViewClient.OnPageLoadedListener {
 
     private static final String LOG_TAG = DisplayControllerVpaid.class.getSimpleName();
-    private static final double VIDEO_25_WITH_SPARE_TIME_COEFFICIENT = 0.35;
     private static final String HTML_SOURCE_FILE = "loopmeAd.html";
     private static final String VPAID_CREATIVE_URL_STRING = "[VPAID_CREATIVE_URL]";
     private static final String ANDROID_JS_INTERFACE = "android";

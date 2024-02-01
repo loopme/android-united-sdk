@@ -22,7 +22,6 @@ import com.loopme.tracker.partners.LoopMeTracker;
 public class LoopMeBannerGeneral extends LoopMeAd {
 
     private static final String LOG_TAG = LoopMeBannerGeneral.class.getSimpleName();
-    public static final String TEST_MPU_BANNER = "test_mpu";
     private Listener mAdListener;
 
     private volatile FrameLayout mBannerView;

@@ -38,7 +38,6 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
     // TODO. Move?
     private static final String VAST_VERIFICATION_API_FRAMEWORK_OMID = "omid";
     private static final String VAST_EVENT_VERIFICATION_NOT_EXECUTED = "verificationNotExecuted";
-    protected static final int VAST_MACROS_REASON_REJECTED = 1;
     protected static final int VAST_MACROS_REASON_NOT_SUPPORTED = 2;
     protected static final int VAST_MACROS_REASON_LOAD_ERROR = 3;
 
@@ -467,32 +466,17 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
             return vendor;
         }
 
-        public void setVendor(String vendor) {
-            this.vendor = vendor;
-        }
-
         public String getJavaScriptResourceUrl() {
             return javaScriptResourceUrl;
-        }
-
-        public void setJavaScriptResourceUrl(String javaScriptResourceUrl) {
-            this.javaScriptResourceUrl = javaScriptResourceUrl;
         }
 
         public List<String> getVerificationNotExecutedUrlList() {
             return verificationNotExecutedUrlList;
         }
 
-        public void setVerificationNotExecutedUrlList(List<String> verificationNotExecutedUrlList) {
-            this.verificationNotExecutedUrlList = verificationNotExecutedUrlList;
-        }
-
         public String getVerificationParameters() {
             return verificationParameters;
         }
 
-        public void setVerificationParameters(String verificationParameters) {
-            this.verificationParameters = verificationParameters;
-        }
     }
 }

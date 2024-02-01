@@ -2,14 +2,12 @@ package com.loopme.request;
 
 public class RequestConstants {
     public static final String ANDROID_OS = "android";
-    public static final String MOBILE_MARK = "mobile";
     public static final String PHONE = "phone";
     public static final String TABLET = "tablet";
     public static final String IAB25_3 = "IAB25-3";
     public static final String IAB25 = "IAB25";
     public static final String IAB26 = "IAB26";
     public static final String LOOPME_SDK = "LOOPME_SDK";
-    public static final String VIDEO_3GPP = "video/3gpp";
     public static final String VIDEO_MP4 = "video/mp4";
     public static final String DEVICE_BLUETOOTH_NAME = "bluetooth_name";
     public static final int DEFAULT_MAX_DURATION = 999;
@@ -31,11 +29,6 @@ public class RequestConstants {
     public static final int LINEAR_IN_STREAM = 1;
     public static final float BID_FLOOR_DEFAULT_VALUE = 0;
 
-    public static final int DEVICE_TYPE_MOBILE_TABLET = 1;
-    public static final int DEVICE_TYPE_PERSONAL_COMPUTER = 2;
-    public static final int DEVICE_TYPE_CONNECTED_TV = 3;
     public static final int DEVICE_TYPE_PHONE = 4;
     public static final int DEVICE_TYPE_TABLET = 5;
-    public static final int DEVICE_TYPE_CONNECTED_DEVICE = 6;
-    public static final int DEVICE_TYPE_SET_TOP_BOX = 7;
 }

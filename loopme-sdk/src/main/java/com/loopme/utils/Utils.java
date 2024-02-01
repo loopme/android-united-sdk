@@ -2,15 +2,12 @@ package com.loopme.utils;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.Vibrator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,8 +18,6 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
-import android.view.Surface;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.WebSettings;
@@ -178,11 +173,6 @@ public class Utils {
         }
     }
 
-    public static String getStringFromStream(InputStream inputStream) {
-        return getStringBuilderFromStream(inputStream).toString();
-    }
-
-
     public static StringBuilder getStringBuilderFromStream(InputStream inputStream) {
         int numberBytesRead;
         StringBuilder out = new StringBuilder();
@@ -212,47 +202,6 @@ public class Utils {
             }
         }
         return false;
-    }
-
-    public static int getScreenOrientation() {
-        if (sWindowManager == null || sWindowManager.getDefaultDisplay() == null) {
-            return ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-        }
-        DisplayMetrics displayMetrics = getDisplayMetrics();
-        int width = displayMetrics.widthPixels;
-        int height = displayMetrics.heightPixels;
-        int orientation;
-
-        int rotation = sWindowManager.getDefaultDisplay().getRotation();
-        if (isDeviceNaturalOrientationPortrait(rotation, width, height)) {
-            orientation = getOrientationForRectangleScreens(rotation);
-        } else {
-            orientation = getOrientationForSquareScreens(rotation);
-        }
-        return orientation;
-    }
-
-    public static int getOrientationForSquareScreens(int rotation) {
-        int orientation;
-        switch (rotation) {
-            case Surface.ROTATION_90: {
-                orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-                break;
-            }
-            case Surface.ROTATION_180: {
-                orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
-                break;
-            }
-            case Surface.ROTATION_270: {
-                orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
-                break;
-            }
-            default: {
-                orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-                break;
-            }
-        }
-        return orientation;
     }
 
     public static FrameLayout.LayoutParams calculateNewLayoutParams(
@@ -372,10 +321,6 @@ public class Utils {
         return String.format(Locale.US, "%02d:%02d", minutes, seconds);
     }
 
-    public static boolean isUrl(String event) {
-        return !TextUtils.isEmpty(event) && event.contains(Constants.HTTP_PROTOCOL);
-    }
-
     public static boolean isBooleanString(String value) {
         return !TextUtils.isEmpty(value) && (value.equalsIgnoreCase(Boolean.TRUE.toString()) || value.equalsIgnoreCase(Boolean.FALSE.toString()));
     }
@@ -455,12 +400,6 @@ public class Utils {
         return new ArrayList<>();
     }
 
-    public static void animateAppear(View view) {
-        if (view != null) {
-            view.animate().setDuration(500).alpha(1.0f);
-        }
-    }
-
     public static float getSystemVolume() {
         if (sAudioManager != null) {
             int volume_level = sAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -500,20 +439,6 @@ public class Utils {
             packagesAsString.add(packageInfo.packageName);
         }
         return packagesAsString;
-    }
-
-    public static MediaPlayer convertToMediaPlayer(Object object) {
-        if (object instanceof MediaPlayer) {
-            return (MediaPlayer) object;
-        }
-        return null;
-    }
-
-    public static View convertToView(Object object) {
-        if (object instanceof View) {
-            return (View) object;
-        }
-        return null;
     }
 
     private static String getInstalledPackagesAsString() {
@@ -612,34 +537,6 @@ public class Utils {
         return string;
     }
 
-    private static int getOrientationForRectangleScreens(int rotation) {
-        int orientation;
-        switch (rotation) {
-            case Surface.ROTATION_90: {
-                orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-                break;
-            }
-            case Surface.ROTATION_180: {
-                orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT;
-                break;
-            }
-            case Surface.ROTATION_270: {
-                orientation = ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
-                break;
-            }
-            default: {
-                orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-                break;
-            }
-        }
-        return orientation;
-    }
-
-    private static boolean isDeviceNaturalOrientationPortrait(int rotation, int width, int height) {
-        return (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) && height > width
-                || (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) && width > height;
-    }
-
     private static String getFileNameFromUrl(String source) {
         if (TextUtils.isEmpty(source)) {
             return "";
@@ -652,10 +549,6 @@ public class Utils {
         if (view != null && view.getParent() != null) {
             ((ViewGroup) view.getParent()).removeView(view);
         }
-    }
-
-    public static boolean isLandscape() {
-        return ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE == getScreenOrientation();
     }
 
     public static boolean isCustomBannerSize(int width, int height) {
@@ -745,17 +638,6 @@ public class Utils {
     public static boolean isThirdQuartile(int adDuration, int currentPosition) {
         int event75 = adDuration * 3 / 4;
         return currentPosition >= event75;
-    }
-
-    public static boolean hasFloat(Object[] args) {
-        if (isNotNull(args)) {
-            for (Object object : args) {
-                if (!(object instanceof Float)) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     public static boolean isFloat(Object obj) {

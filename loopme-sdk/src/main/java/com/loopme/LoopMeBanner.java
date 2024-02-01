@@ -19,7 +19,9 @@ import com.loopme.utils.ApiLevel;
  * when an ad has been presented or dismissed from the screen, and when an ad has expired or received a tap.
  */
 public final class LoopMeBanner extends AdWrapper {
+    // TODO: Remove. Why we need hardcoded test_mpu? We don't have such app keys in dashboard.
     public static final String TEST_MPU_BANNER = "test_mpu";
+    // TODO: What the reason of FIRST_BANNER and SECOND_BANNER? It's does not describe any logic.
     private static final String FIRST_BANNER = "FIRST_BANNER";
     private static final String SECOND_BANNER = "SECOND_BANNER";
     private static final String LOG_TAG = LoopMeBanner.class.getSimpleName();

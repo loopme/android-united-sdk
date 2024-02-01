@@ -15,16 +15,12 @@ import com.loopme.models.response.Ext;
 import com.loopme.models.response.ResponseJsonModel;
 import com.loopme.tracker.AdIds;
 import com.loopme.tracker.partners.LoopMeTracker;
-import com.loopme.utils.ValidationHelper;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParseService extends JsonParser {
+public class ParseService {
 
-    private static final String V360 = "v360";
     private static final String DEFAULT = "default";
     private static final String PORTRAIT = "portrait";
 
@@ -124,7 +120,7 @@ public class ParseService extends JsonParser {
         int autoLoadingValue = 1;
 
         try {
-            autoLoadingValue = (int) bidObject.getExt().getAutoLoading();
+            autoLoadingValue = bidObject.getExt().getAutoLoading();
         } catch (IllegalStateException | NullPointerException ex) {
             ex.printStackTrace();
         }
@@ -234,17 +230,6 @@ public class ParseService extends JsonParser {
             ex.printStackTrace();
         }
         return "";
-    }
-
-    private static boolean getVideo360(JSONObject settings) {
-        int video360Value = getInt(settings, V360);
-        return video360Value == 1;
-    }
-
-    private static void checkFormat(String format) {
-        if (!ValidationHelper.isValidFormat(format)) {
-            LoopMeTracker.post("Broken response [wrong format parameter: " + format + "]", Constants.ErrorType.SERVER);
-        }
     }
 
     private static String parseCreativeTypeFromModel(ResponseJsonModel responseModel) {

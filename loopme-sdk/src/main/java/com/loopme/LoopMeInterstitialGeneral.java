@@ -23,8 +23,6 @@ import com.loopme.utils.Utils;
 public class LoopMeInterstitialGeneral extends LoopMeAd {
 
     private static final String LOG_TAG = LoopMeInterstitialGeneral.class.getSimpleName();
-    public static final String TEST_PORT_INTERSTITIAL = "test_interstitial_p";
-    public static final String TEST_LAND_INTERSTITIAL = "test_interstitial_l";
 
     private transient Listener mAdListener;
 

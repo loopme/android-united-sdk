@@ -27,11 +27,7 @@ public class LoopMeGestureListener implements View.OnTouchListener {
                 if (verticalOffset > MAX_ACCEPTABLE_VERTICAL_OFFSET_FOR_HORIZONTAL_SWIPE) {
                     return false;
                 }
-                if (firstTap.getX() < lastTap.getX()) {
-                    onSwipe(true);
-                } else {
-                    onSwipe(false);
-                }
+                onSwipe(firstTap.getX() < lastTap.getX());
                 return true;
             }
 
