@@ -65,10 +65,6 @@ afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
-                groupId = 'com.loopme'
-                artifactId = 'loopme-sdk'
-                version = '8.0.9'
-
                 from components.release
             }
         }
