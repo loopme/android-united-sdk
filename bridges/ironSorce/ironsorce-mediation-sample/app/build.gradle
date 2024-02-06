@@ -4,6 +4,9 @@ plugins {
     id 'maven-publish'
 }
 
+group 'com.ironsource.adapters'
+version '8.0.9'
+
 android {
     defaultConfig {
         //applicationId "com.loopme.ironsource_mediation_sample"
