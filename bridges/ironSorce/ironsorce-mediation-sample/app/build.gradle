@@ -4,9 +4,6 @@ plugins {
     id 'maven-publish'
 }
 
-group 'com.ironsource.adapters'
-version '8.0.9'
-
 android {
     defaultConfig {
         //applicationId "com.loopme.ironsource_mediation_sample"
@@ -46,9 +43,8 @@ afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
-                groupId = 'com.ironsource.adapters'
-                artifactId = 'loopmeeeeee'
-                version = '8.0.2'
+                artifactId = 'ironsource-adapter'
+                version = '0.1.0'
             }
         }
     }
@@ -67,6 +63,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.10.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.ironsource.sdk:mediationsdk:7.7.0'
+    implementation project(path: ':loopme-sdk')
     implementation project(path: ':loopme-sdk')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

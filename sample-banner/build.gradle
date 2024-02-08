@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'maven-publish'
 
 repositories {
     mavenCentral()
@@ -31,15 +30,6 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    publishing {
-        publishing {
-            singleVariant("release") {
-                withSourcesJar()
-                withJavadocJar()
-            }
-        }
-    }
-
     packagingOptions {
         exclude 'META-INF/ASL2.0'
         exclude 'META-INF/LICENSE'
@@ -49,16 +39,6 @@ android {
         exclude 'META-INF/MANIFEST.MF'
     }
     namespace 'com.loopme.banner_sample.app'
-}
-
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-            }
-        }
-    }
 }
 
 dependencies {
