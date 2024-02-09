@@ -59,7 +59,7 @@ public class LoopmeCustomAdapter extends BaseAdapter {
 
     @Override
     public String getAdapterVersion() {
-        return "7.1.0.0";
+        return "0.1.0";
     }
 
     private static void tryInitializeLoopMeSdk(
