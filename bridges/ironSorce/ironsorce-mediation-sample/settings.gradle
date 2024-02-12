@@ -1,2 +1,2 @@
-include ':ironsource-76'
+include ':app'
 include ':loopme-sdk'

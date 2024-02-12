@@ -29,7 +29,7 @@ public final class LoopMeSdk {
      */
     public static final int ERROR_OMID_FAILED_TO_INITIALIZE = 1;
 
-    private static final String LOOPME_SDK_VERSION = "8.0.12";
+    private static final String LOOPME_SDK_VERSION = BuildConfig.VERSION_NAME;
 
     private static LoopMeSdkListener loopMeSdkInitListener;
 
