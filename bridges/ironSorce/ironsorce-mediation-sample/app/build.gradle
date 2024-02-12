@@ -1,5 +1,5 @@
 plugins {
-    //id 'com.android.application'
+    //id 'com.android.application' //Uncomment this and comment the next line if you want to build the sample app
     id 'com.android.library'
     id 'maven-publish'
 }
@@ -44,7 +44,6 @@ afterEvaluate {
         publications {
             release(MavenPublication) {
                 artifactId = 'ironsource-adapter'
-                version = '0.1.0'
 
                 from components.release
             }
