@@ -24,7 +24,6 @@ public class MraidBridge extends WebViewClientCompat {
 
     private static final String LOOPME_SCHEME = "loopme";
     private static final String MRAID_SCHEME = "mraid";
-
     private static final String QUERY_PARAMETER_URL = "url";
     private static final String QUERY_PARAMETER_URI = "uri";
     private static final String QUERY_PARAMETER_WIDTH = "width";
@@ -81,6 +80,13 @@ public class MraidBridge extends WebViewClientCompat {
 
         onOpen(url);
         return true;
+    }
+
+    @Override
+    public void onPageFinished(WebView view, String url) {
+        super.onPageFinished(view, url);
+
+        onLoadSuccess();
     }
 
     private void notifyError(View view, String errorMessage) {

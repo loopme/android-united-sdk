@@ -6,7 +6,6 @@ import androidx.annotation.Nullable;
 
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
-import com.loopme.utils.ApiLevel;
 
 /**
  * The `LoopMeInterstitial` class provides the facilities to display a full-screen ad
@@ -19,7 +18,6 @@ import com.loopme.utils.ApiLevel;
  */
 public final class LoopMeInterstitial extends AdWrapper {
     public static final String TEST_PORT_INTERSTITIAL = "test_interstitial_p";
-    public static final String TEST_LAND_INTERSTITIAL = "test_interstitial_l";
 
     private static final String LOG_TAG = LoopMeInterstitial.class.getSimpleName();
     private Listener mMainAdListener;

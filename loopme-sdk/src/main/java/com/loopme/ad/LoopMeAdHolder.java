@@ -46,16 +46,6 @@ public class LoopMeAdHolder {
         }
     }
 
-    public static LoopMeBannerGeneral createBanner(String appKey, Activity activity) {
-        if (activity == null || TextUtils.isEmpty(appKey)) {
-            return null;
-        } else {
-            LoopMeBannerGeneral banner = new LoopMeBannerGeneral(activity, appKey);
-            mNewImplBannerMap.put(banner.getAdId(), banner);
-            return banner;
-        }
-    }
-
     private static LoopMeBannerGeneral findBanner(int adId) {
         if (mNewImplBannerMap.containsKey(adId)) {
             return mNewImplBannerMap.get(adId);

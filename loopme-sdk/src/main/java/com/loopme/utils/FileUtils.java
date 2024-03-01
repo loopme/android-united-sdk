@@ -20,58 +20,9 @@ import java.security.MessageDigest;
 public class FileUtils {
 
     private static final String LOG_TAG = FileUtils.class.getSimpleName();
-    private static final String NEW_LINE = "\n";
     private static final int ZERO = 0;
-    private static final int MAX_FILE_NAME_LENGTH = 127 - 4;
-
 
     private FileUtils() {
-    }
-
-    public static void logToFile(String message, boolean append) {
-        if (isExternalStorageAvailable() && !isExternalStorageReadOnly()) {
-            File file = getCachedLogFile();
-            try (FileWriter writer = new FileWriter(file, append)) {
-                writer.write(message + NEW_LINE);
-            } catch (IOException e) {
-                Log.i(LOG_TAG, "Couldn't write log. Read-only file system.");
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private static boolean isExternalStorageReadOnly() {
-        String extStorageState = Environment.getExternalStorageState();
-        return Environment.MEDIA_MOUNTED_READ_ONLY.equals(extStorageState);
-    }
-
-    private static boolean isExternalStorageAvailable() {
-        String extStorageState = Environment.getExternalStorageState();
-        return Environment.MEDIA_MOUNTED.equals(extStorageState);
-    }
-
-    public static File getCachedLogFile() {
-        File directoryPath = new File(Constants.sCacheDirectory);
-        createDirectory(directoryPath);
-        File logFile = new File(directoryPath, Constants.CACHED_LOG_FILE_NAME);
-        createNewFile(logFile);
-        return logFile;
-    }
-
-    private static void createDirectory(File directory) {
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-    }
-
-    private static void createNewFile(File file) {
-        try {
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public static void deleteExpiredFiles(Context context) {

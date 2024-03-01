@@ -89,16 +89,8 @@ public abstract class TimerWithPause {
         return millisUntilFinished;
     }
 
-    public long totalCountdown() {
-        return mTotalCountdown;
-    }
-
     public long timePassed() {
         return mTotalCountdown - timeLeft();
-    }
-
-    public boolean hasBeenStarted() {
-        return (mPauseTimeRemaining <= mMillisInFuture);
     }
 
     private synchronized void handleTimerMessage() {

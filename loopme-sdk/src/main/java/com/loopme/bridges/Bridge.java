@@ -40,7 +40,7 @@ public class Bridge extends WebViewClientCompat {
     private static final String QUERY_PARAM_FULLSCREEN_MODE = "mode";
 
     private Listener mListener;
-    private com.loopme.listener.Listener adReadyListener;
+    private final com.loopme.listener.Listener adReadyListener;
 
     // TODO. Refactor.
     public Bridge(

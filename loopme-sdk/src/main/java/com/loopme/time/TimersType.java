@@ -5,7 +5,6 @@ package com.loopme.time;
  */
 
 public enum TimersType {
-    LOADING_TIMER(0),
     FETCHER_TIMER(1),
     PREPARE_VPAID_JS_TIMER(2),
     EXPIRATION_TIMER(3),

@@ -10,6 +10,7 @@ import com.loopme.tracker.partners.LoopMeTracker;
  * Deprecated since sdk version 6.0. Use {@link FrameLayout} instead.
  */
 
+// TODO: Remove deprecated class
 @Deprecated
 public class LoopMeBannerView extends FrameLayout {
 

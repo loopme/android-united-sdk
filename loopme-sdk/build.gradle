@@ -1,4 +1,7 @@
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+}
 
 android {
     defaultConfig {
@@ -31,8 +34,20 @@ android {
         abortOnError false
     }
 
+    publishing {
+        publishing {
+            singleVariant("release") {
+                withSourcesJar()
+                withJavadocJar()
+            }
+        }
+    }
+
     testOptions {
         unitTests.returnDefaultValues = true
+        unitTests.all {
+            useJUnitPlatform()
+        }
     }
 
     packagingOptions {
@@ -44,6 +59,16 @@ android {
         exclude 'META-INF/MANIFEST.MF'
     }
     namespace 'com.loopme'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+            }
+        }
+    }
 }
 
 dependencies {
@@ -61,6 +86,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:18.0.0'
 
     implementation 'com.google.androidbrowserhelper:androidbrowserhelper:1.2.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
 }
 
 //apply from: '../publishing.gradle'

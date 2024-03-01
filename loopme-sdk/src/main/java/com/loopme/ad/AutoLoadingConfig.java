@@ -1,7 +1,5 @@
 package com.loopme.ad;
 
-import com.loopme.utils.Utils;
-
 public abstract class AutoLoadingConfig {
     private boolean sBackendAutoLoadingValue = true;
     private boolean sUserAutoLoadingValue = true;

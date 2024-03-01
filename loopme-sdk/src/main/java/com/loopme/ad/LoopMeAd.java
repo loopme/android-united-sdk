@@ -523,18 +523,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         VIDEO,
         ALL;
 
-        public static Type fromString(String type) {
-            if (TextUtils.isEmpty(type)) {
-                return ALL;
-            }
-            if (HTML.name().equalsIgnoreCase(type)) {
-                return HTML;
-            } else if (VIDEO.name().equalsIgnoreCase(type)) {
-                return VIDEO;
-            } else {
-                return ALL;
-            }
-        }
     }
 
     public boolean isCustomBannerHtml() {

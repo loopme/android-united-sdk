@@ -15,7 +15,6 @@ import java.util.List;
 
 public class TrackerManager {
 
-    private static final String LOG_TAG = TrackerManager.class.getSimpleName();
     private final List<Tracker> mTrackers = new ArrayList<>();
     private List<String> mTrackersNamesList = new ArrayList<>();
     private LoopMeAd mLoopMeAd;
@@ -74,7 +73,7 @@ public class TrackerManager {
                 break;
             }
             case DV: {
-                tracker = new DvTracker(adType);
+                tracker = new DvTracker();
                 break;
             }
         }
