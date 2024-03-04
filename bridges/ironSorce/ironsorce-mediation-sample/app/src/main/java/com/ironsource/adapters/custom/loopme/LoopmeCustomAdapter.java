@@ -23,9 +23,6 @@ public class LoopmeCustomAdapter extends BaseAdapter {
     private static WeakReference<Activity> activityWeakReference =
             new WeakReference<>(null);
 
-    private static String loopmeAppkey;
-
-
     @Override
     public void init(AdData adData, Context context, NetworkInitializationListener networkInitializationListener) {
         Activity activity = activityWeakReference.get();
@@ -126,11 +123,4 @@ public class LoopmeCustomAdapter extends BaseAdapter {
         moPubConfiguration.put(KEY_PUBLISHER_CONSENT, String.valueOf(consent));
     }
 
-    public static String getLoopmeAppkey() {
-        return loopmeAppkey;
-    }
-
-    public static void setLoopmeAppkey(String loopmeAppkey) {
-        LoopmeCustomAdapter.loopmeAppkey = loopmeAppkey;
-    }
 }
