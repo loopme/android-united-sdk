@@ -1,4 +1,4 @@
-package com.ironsource.adapters.custom.loopme;
+package com.ironsource.adapters.loopme;
 
 import android.app.Activity;
 

@@ -53,7 +53,7 @@ Make sure `LoopMeSdk` is [initialized](https://github.com/loopme/android-united-
 network key is 15bd4aa9d
 <p><img src="images/create_custom_ironsource.png" /></p>
 
-Class Name should be: 'com.ironsource.adapters.custom.loopme.LoopmeCustomAdapter'. <br>
+Class Name should be: 'com.loopme.LoopmeCustomAdapter'. <br>
 Parameter: enter the app key value you received after registering your Ad Spot on the LoopMe dashboard. <br>E.g. '298f62c196'.<br><br>
 
 * Load

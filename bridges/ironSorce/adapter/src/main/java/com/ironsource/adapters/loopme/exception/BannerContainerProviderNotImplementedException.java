@@ -1,8 +1,8 @@
-package com.ironsource.adapters.custom.loopme.exception;
+package com.ironsource.adapters.loopme.exception;
 
 import androidx.annotation.Nullable;
 
-import com.ironsource.adapters.custom.loopme.provider.IBannerContainerProvider;
+import com.ironsource.adapters.loopme.provider.IBannerContainerProvider;
 
 public class BannerContainerProviderNotImplementedException extends NoSuchMethodException {
 
