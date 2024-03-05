@@ -1,4 +1,4 @@
-package com.ironsource.adapters.loopme;
+package com.ironsource.adapters.custom.loopme;
 
 import android.app.Activity;
 import android.util.Log;
@@ -8,8 +8,8 @@ import android.widget.Toast;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 
-import com.ironsource.adapters.loopme.exception.BannerContainerProviderNotImplementedException;
-import com.ironsource.adapters.loopme.provider.IBannerContainerProvider;
+import com.ironsource.adapters.custom.loopme.exception.BannerContainerProviderNotImplementedException;
+import com.ironsource.adapters.custom.loopme.provider.IBannerContainerProvider;
 import com.ironsource.mediationsdk.ISBannerSize;
 import com.ironsource.mediationsdk.adunit.adapter.BaseBanner;
 import com.ironsource.mediationsdk.adunit.adapter.listener.BannerAdListener;

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'com.ironsource.adapters.custom'
+    namespace 'com.ironsource.adapters.custom.loopme'
     compileSdk 34
 
     defaultConfig {

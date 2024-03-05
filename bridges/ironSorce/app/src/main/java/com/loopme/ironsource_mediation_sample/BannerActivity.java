@@ -7,8 +7,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.ironsource.adapters.loopme.LoopmeCustomAdapter;
-import com.ironsource.adapters.loopme.provider.IBannerContainerProvider;
+import com.ironsource.adapters.custom.loopme.LoopmeCustomAdapter;
+import com.ironsource.adapters.custom.loopme.provider.IBannerContainerProvider;
 import com.ironsource.mediationsdk.ISBannerSize;
 import com.ironsource.mediationsdk.IronSource;
 import com.ironsource.mediationsdk.IronSourceBannerLayout;

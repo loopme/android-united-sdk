@@ -1,6 +1,6 @@
-package com.ironsource.adapters.loopme.provider;
+package com.ironsource.adapters.custom.loopme.provider;
 
-import com.ironsource.adapters.loopme.LoopmeCustomBanner;
+import com.ironsource.adapters.custom.loopme.LoopmeCustomBanner;
 import com.ironsource.mediationsdk.IronSourceBannerLayout;
 
 /**
