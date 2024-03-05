@@ -1,6 +1,6 @@
 plugins {
-    //id 'com.android.application' //Uncomment this and comment the next line if you want to build the sample app
-    id 'com.android.library'
+    id 'com.android.application' //Uncomment this and comment the next line if you want to build the sample app
+    //id 'com.android.library'
     id 'maven-publish'
 }
 
