@@ -36,13 +36,12 @@ repositories {
 }
 
 dependencies {
-
+    implementation project(path: ':bridges:ironSource:adapter')
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.10.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.ironsource.sdk:mediationsdk:7.7.0'
     implementation project(path: ':loopme-sdk')
-    implementation project(path: ':bridges:ironSource:adapter')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
