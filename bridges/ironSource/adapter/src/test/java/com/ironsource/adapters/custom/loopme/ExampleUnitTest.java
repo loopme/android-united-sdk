@@ -1,4 +1,4 @@
-package com.loopme.adapter;
+package com.ironsource.adapters.custom.loopme;
 
 import org.junit.Test;
 
