@@ -79,6 +79,7 @@ public class LoopmeCustomBanner extends BaseBanner<LoopmeCustomAdapter> {
                 @Override
                 public void onLoopMeBannerLeaveApp(LoopMeBanner banner) {
                     Log.d(LOG_TAG, "onLoopMeBannerLeaveApp");
+                    listener.onAdLeftApplication();
                 }
 
                 @Override
