@@ -8,7 +8,6 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.ironsource.adapters.custom.loopme.LoopmeCustomAdapter;
-import com.ironsource.adapters.custom.loopme.provider.IBannerContainerProvider;
 import com.ironsource.mediationsdk.ISBannerSize;
 import com.ironsource.mediationsdk.IronSource;
 import com.ironsource.mediationsdk.IronSourceBannerLayout;
@@ -19,7 +18,7 @@ import com.ironsource.mediationsdk.logger.LogListener;
 import com.ironsource.mediationsdk.sdk.LevelPlayBannerListener;
 import com.loopme.LoopMeSdk;
 
-public class BannerActivity extends Activity implements IBannerContainerProvider {
+public class BannerActivity extends Activity {
     private static final String appKey = "124e1d38d";
     IronSourceBannerLayout banner;
 
@@ -115,11 +114,6 @@ public class BannerActivity extends Activity implements IBannerContainerProvider
     protected void onPause() {
         super.onPause();
         IronSource.onPause(this);
-    }
-
-    @Override
-    public IronSourceBannerLayout getBannerContainer() {
-        return banner;
     }
 
     public void onLoadClicked(View view) {
