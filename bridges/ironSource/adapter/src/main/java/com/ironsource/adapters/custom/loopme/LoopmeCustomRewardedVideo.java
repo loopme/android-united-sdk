@@ -47,6 +47,7 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
 
                 @Override
                 public void onLoopMeInterstitialHide(LoopMeInterstitial arg0) {
+                    rewardedVideoAdListener.onAdClosed();
                 }
 
                 @Override
@@ -66,6 +67,7 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
                 @Override
                 public void onLoopMeInterstitialShow(LoopMeInterstitial arg0) {
                     rewardedVideoAdListener.onAdShowSuccess();
+                    rewardedVideoAdListener.onAdVisible();
                 }
 
                 @Override
@@ -82,7 +84,11 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
 
     @Override
     public void showAd(AdData adData, RewardedVideoAdListener rewardedVideoAdListener) {
-        mInterstitial.show();
+        if (isAdAvailable(adData)) {
+            mInterstitial.show();
+        } else {
+            rewardedVideoAdListener.onAdShowFailed(-2, "adShowFailed");
+        }
     }
 
     @Override

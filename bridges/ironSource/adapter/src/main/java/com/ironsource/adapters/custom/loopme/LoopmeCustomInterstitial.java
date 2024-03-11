@@ -45,6 +45,7 @@ public class LoopmeCustomInterstitial extends BaseInterstitial<LoopmeCustomAdapt
 
                 @Override
                 public void onLoopMeInterstitialHide(LoopMeInterstitial arg0) {
+                    mInterstitialListener.onAdClosed();
                 }
 
                 @Override
@@ -63,11 +64,13 @@ public class LoopmeCustomInterstitial extends BaseInterstitial<LoopmeCustomAdapt
 
                 @Override
                 public void onLoopMeInterstitialShow(LoopMeInterstitial arg0) {
+                    mInterstitialListener.onAdOpened();
                     mInterstitialListener.onAdShowSuccess();
                 }
 
                 @Override
                 public void onLoopMeInterstitialVideoDidReachEnd(LoopMeInterstitial interstitial) {
+                    mInterstitialListener.onAdEnded();
                 }
             });
             mInterstitial.load(IntegrationType.NORMAL);
@@ -78,7 +81,11 @@ public class LoopmeCustomInterstitial extends BaseInterstitial<LoopmeCustomAdapt
 
     @Override
     public void showAd(AdData adData, InterstitialAdListener interstitialAdListener) {
-        mInterstitial.show();
+        if (isAdAvailable(adData)) {
+            mInterstitial.show();
+        } else {
+            mInterstitialListener.onAdShowFailed(-2, "adShowFailed");
+        }
     }
 
     @Override
