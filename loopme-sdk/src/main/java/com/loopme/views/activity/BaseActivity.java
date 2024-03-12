@@ -259,7 +259,7 @@ public final class BaseActivity extends FragmentActivity
 
     @Override
     public void onCloseButtonVisibilityChanged(boolean customCloseButton) {
-        mMraidCloseButton.setAlpha(customCloseButton ? 0 : 1);
+        mMraidCloseButton.setVisibility((mLoopMeAd.isMraidAd() || !customCloseButton) ? View.VISIBLE : View.GONE);
     }
 
     @Override
