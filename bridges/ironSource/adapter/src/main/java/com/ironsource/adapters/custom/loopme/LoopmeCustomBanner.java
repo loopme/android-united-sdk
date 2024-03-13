@@ -40,7 +40,6 @@ public class LoopmeCustomBanner extends BaseBanner<LoopmeCustomAdapter> {
             mBanner.setListener(new LoopMeBanner.Listener() {
                 @Override
                 public void onLoopMeBannerLoadSuccess(LoopMeBanner banner) {
-                    Toast.makeText(activity, "Successfully loaded LoopMe banner", Toast.LENGTH_LONG).show();
                     listener.onAdLoadSuccess(mBanner.getBannerView(), new FrameLayout.LayoutParams(
                             FrameLayout.LayoutParams.WRAP_CONTENT,
                             FrameLayout.LayoutParams.MATCH_PARENT,
@@ -53,7 +52,6 @@ public class LoopmeCustomBanner extends BaseBanner<LoopmeCustomAdapter> {
                 @Override
                 public void onLoopMeBannerLoadFail(LoopMeBanner banner, LoopMeError error) {
                     Log.d(LOG_TAG, "onLoopMeBannerLoadFail");
-                    Toast.makeText(activity, "Failed to load LoopMe banner: " + error.getMessage(), Toast.LENGTH_LONG).show();
                     listener.onAdLoadFailed(AdapterErrorType.ADAPTER_ERROR_TYPE_INTERNAL,
                             -2,
                             error.getErrorType() + ": " + error.getMessage());
