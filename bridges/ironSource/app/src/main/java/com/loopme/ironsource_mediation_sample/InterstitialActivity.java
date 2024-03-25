@@ -13,7 +13,7 @@ import com.ironsource.mediationsdk.sdk.LevelPlayInterstitialListener;
 import com.loopme.LoopMeSdk;
 
 public class InterstitialActivity extends Activity {
-    private static final String appKey = "124e1d38d";
+    private static final String appKey = "f7a719b9";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

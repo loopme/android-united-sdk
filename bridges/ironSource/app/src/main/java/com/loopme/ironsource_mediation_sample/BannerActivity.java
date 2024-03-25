@@ -19,7 +19,7 @@ import com.ironsource.mediationsdk.sdk.LevelPlayBannerListener;
 import com.loopme.LoopMeSdk;
 
 public class BannerActivity extends Activity {
-    private static final String appKey = "124e1d38d";
+    private static final String appKey = "f7a719b9";
     IronSourceBannerLayout banner;
 
     @Override
