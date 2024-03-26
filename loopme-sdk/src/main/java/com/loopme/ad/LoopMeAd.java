@@ -522,7 +522,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         HTML,
         VIDEO,
         ALL;
-
     }
 
     public boolean isCustomBannerHtml() {
