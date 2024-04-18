@@ -75,15 +75,15 @@ dependencies {
 
     api "androidx.appcompat:appcompat:$appCompatVersion"
     api "androidx.recyclerview:recyclerview:$recyclerViewVersion"
-    api "androidx.annotation:annotation:1.7.0"
+    api 'androidx.annotation:annotation:1.7.1'
 
     implementation "androidx.preference:preference:$preferenceVersion"
 
     implementation "com.google.android.gms:play-services-ads-identifier:$playServicesVersion"
-    implementation 'com.google.android.gms:play-services-location:18.0.0'
+    implementation 'com.google.android.gms:play-services-location:21.2.0'
 
-    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:1.2.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
 }
 
 //apply from: '../publishing.gradle'
