@@ -25,7 +25,7 @@ public class MainActivity
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    private static final String APPLOVIN_UNIT_ID = "00a4102a0500a881";
+    private static final String APPLOVIN_UNIT_ID = "114e4121c286d22a";
 
     private MaxInterstitialAd interstitialAd;
     private int retryAttempt;

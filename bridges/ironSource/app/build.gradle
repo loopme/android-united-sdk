@@ -1,12 +1,12 @@
 plugins {
-    id 'com.android.library'        //Comment this line and uncomment the next if you want to build the app
-    //id 'com.android.application
+//    id 'com.android.library'        //Comment this line and uncomment the next if you want to build the app
+    id 'com.android.application'
     id 'maven-publish'
 }
 
 android {
     defaultConfig {
-        //applicationId "com.loopme.ironsource_mediation_sample"
+        applicationId "com.loopme.ironsource_mediation_sample"
         minSdkVersion 24
         compileSdk 34
         targetSdkVersion 34
