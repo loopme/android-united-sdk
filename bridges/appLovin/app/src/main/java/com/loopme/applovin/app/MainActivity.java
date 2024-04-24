@@ -24,7 +24,9 @@ public class MainActivity
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    private static final String APPLOVIN_UNIT_ID = "114e4121c286d22a";
+//    private static final String APPLOVIN_UNIT_ID = "114e4121c286d22a";
+    private static final String APPLOVIN_UNIT_ID = "9dd28ead1f9f70a5";
+
 
     private MaxInterstitialAd interstitialAd;
     private Button mLoadButton;
@@ -98,7 +100,7 @@ public class MainActivity
         for(MaxMediatedNetworkInfo network : AppLovinSdk.getInstance(this).getAvailableMediatedNetworks()){
             System.out.println(network.getAdapterClassName());
         }
-        // AppLovinSdk.getInstance( this ).setMediationProvider( "max" );
+        AppLovinSdk.getInstance( this ).setMediationProvider( "max" );
         // AppLovinSdk.getInstance(this).setMediationProvider();
         AppLovinSdk.initializeSdk(this, new AppLovinSdk.SdkInitializationListener() {
             @Override
@@ -151,7 +153,6 @@ public class MainActivity
     @Override
     public void onAdLoadFailed(@NonNull String adUnitId, @NonNull MaxError error) {
         toast("onAdFailedToLoad");
-
         mShowButton.setText("Failed to Receive Ad");
         mShowButton.setEnabled(false);
         interstitialAd = null;
