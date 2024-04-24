@@ -24,6 +24,6 @@
 
         <!-- Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713 -->
         <meta-data android:name="applovin.sdk.key"
-            android:value="Tiw7_9owb-RJ1hBTZZWUd5zaFz2-2Tkk4-yLsSvKGwQd6OK5K8qTl5St0WclI4TMsT00hac103i8ld0zgpr8Ar"/>
+            android:value="mS4u2IXJUmLuQxVgAfXAOAlRr_EkaXTz88uiE5HHG5RJ3OlVC81NmdXhl5H3bINKhAe3oufK2FD9rXC6xpIJd9"/>
     </application>
 </manifest>
