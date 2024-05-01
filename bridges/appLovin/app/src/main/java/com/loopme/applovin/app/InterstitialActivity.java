@@ -18,45 +18,35 @@ import com.applovin.sdk.AppLovinSdk;
 import com.applovin.sdk.AppLovinSdkConfiguration;
 import com.loopme.LoopMeSdk;
 
-public class InterstitialActivity
-        extends AppCompatActivity
-        implements View.OnClickListener, MaxAdListener, LoopMeSdk.LoopMeSdkListener {
-
+public class InterstitialActivity extends AppCompatActivity implements MaxAdListener {
     private static final String LOG_TAG = InterstitialActivity.class.getSimpleName();
-
-    //    private static final String APPLOVIN_UNIT_ID = "114e4121c286d22a";
+    // private static final String APPLOVIN_UNIT_ID = "114e4121c286d22a";
     private static final String APPLOVIN_UNIT_ID = "9dd28ead1f9f70a5";
-
-
     private MaxInterstitialAd interstitialAd;
     private Button mLoadButton;
     private Button mShowButton;
+    private void toast(String message) {
+        Toast.makeText(InterstitialActivity.this, message, Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_interstitial);
 
-        initializeLoopMe();
-    }
+        mLoadButton = findViewById(R.id.load_button);
+        mLoadButton.setEnabled(true);
+        mLoadButton.setOnClickListener((view) -> loadAd());
 
-    private void toast(String mess) {
-        Toast.makeText(InterstitialActivity.this, mess, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onClick(View view) {
-        if (view == mLoadButton) {
-            loadAd();
-        } else if (view == mShowButton) {
-            showAd();
-        }
+        mShowButton = findViewById(R.id.show_button);
+        mShowButton.setText("Interstitial Not Ready");
+        mShowButton.setEnabled(false);
+        mShowButton.setOnClickListener((view) -> showAd());
     }
 
     private void showAd() {
         mShowButton.setText("Interstitial Not Ready");
         mShowButton.setEnabled(false);
-
         if (interstitialAd != null) {
             interstitialAd.showAd();
         } else {
@@ -72,94 +62,24 @@ public class InterstitialActivity
         interstitialAd.loadAd();
     }
 
-    private void initializeLoopMe() {
-        LoopMeSdk.Configuration loopMeConf = new LoopMeSdk.Configuration();
-
-        // Use this method in case if you Publisher is willing to ask GDPR consent
-        // with your own or AdMob dialog
-        // AND don't want LoopMe consent dialog to be shown,
-        // pass GDPR consent to this method.
-        //loopMeConf.setPublisherConsent(new GdprChecker.PublisherConsent(publisherConsentResult));
-
-        LoopMeSdk.initialize(this, loopMeConf, this);
-    }
-
-    // LoopMe.
-    @Override
-    public void onSdkInitializationSuccess() {
-        initializeAppLovin();
-    }
-
-    // LoopMe.
-    @Override
-    public void onSdkInitializationFail(int error, String message) {
-        initializeAppLovin();
-    }
-
-    private void initializeAppLovin() {
-        for(MaxMediatedNetworkInfo network : AppLovinSdk.getInstance(this).getAvailableMediatedNetworks()){
-            System.out.println(network.getAdapterClassName());
-        }
-        AppLovinSdk.getInstance( this ).setMediationProvider( "max" );
-        // AppLovinSdk.getInstance(this).setMediationProvider();
-        AppLovinSdk.initializeSdk(this, new AppLovinSdk.SdkInitializationListener() {
-            @Override
-            public void onSdkInitialized(final AppLovinSdkConfiguration configuration) {
-                initButtons();
-            }
-        });
-    }
-
-    private void initButtons() {
-        mLoadButton = findViewById(R.id.load_button);
-        mLoadButton.setEnabled(true);
-
-        mShowButton = findViewById(R.id.show_button);
-        mShowButton.setText("Interstitial Not Ready");
-        mShowButton.setEnabled(false);
-
-        mLoadButton.setOnClickListener(this);
-        mShowButton.setOnClickListener(this);
-    }
-
     @Override
     public void onAdLoaded(MaxAd ad) {
-
-        if (ad.getNetworkName().equalsIgnoreCase("loopme")){
-            toast("loopme onAdLoaded");
-        }else{
-            toast("onAdLoaded");
-        }
-
-        mShowButton.setText("Show Interstitial");
+        mShowButton.setText(String.format("Show Interstitial [%s]", ad.getNetworkName()));
         mShowButton.setEnabled(true);
     }
-
-    @Override
-    public void onAdDisplayed(@NonNull MaxAd ad) {
-
-    }
-
-    @Override
-    public void onAdHidden(@NonNull MaxAd ad) {
-
-    }
-
-    @Override
-    public void onAdClicked(@NonNull MaxAd ad) {
-
-    }
-
     @Override
     public void onAdLoadFailed(@NonNull String adUnitId, @NonNull MaxError error) {
-        toast("onAdFailedToLoad");
-        mShowButton.setText("Failed to Receive Ad");
+        mShowButton.setText(String.format("Failed to Receive Ad:\n%s", error.getMessage()));
         mShowButton.setEnabled(false);
         interstitialAd = null;
     }
 
     @Override
-    public void onAdDisplayFailed(@NonNull MaxAd ad, @NonNull MaxError error) {
-
-    }
+    public void onAdDisplayed(@NonNull MaxAd ad) { toast("Interstitial Displayed"); }
+    @Override
+    public void onAdHidden(@NonNull MaxAd ad) { toast("Interstitial Hidden"); }
+    @Override
+    public void onAdClicked(@NonNull MaxAd ad) { toast("Interstitial Clicked"); }
+    @Override
+    public void onAdDisplayFailed(@NonNull MaxAd ad, @NonNull MaxError error) { toast("Interstitial Failed to Display"); }
 }
