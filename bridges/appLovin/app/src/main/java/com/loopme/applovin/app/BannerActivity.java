@@ -2,32 +2,40 @@ package com.loopme.applovin.app;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.Toast;
 
-import com.loopme.LoopMeSdk;
+import androidx.annotation.NonNull;
 
-public class BannerActivity extends Activity {
+import com.applovin.mediation.MaxAd;
+import com.applovin.mediation.MaxAdViewAdListener;
+import com.applovin.mediation.MaxError;
+import com.applovin.mediation.ads.MaxAdView;
+
+public class BannerActivity
+        extends Activity
+        implements MaxAdViewAdListener {
+    private MaxAdView bigAdView;
+    private MaxAdView smallAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_banner);
+        bigAdView = findViewById(R.id.big_banner_ad_view);
+        bigAdView.setListener(this);
+        bigAdView.loadAd();
 
-        LoopMeSdk.initialize(this, new LoopMeSdk.Configuration(), new LoopMeSdk.LoopMeSdkListener() {
-            @Override
-            public void onSdkInitializationSuccess() {
-                Toast.makeText(BannerActivity.this, "Loopme has been initialized", Toast.LENGTH_LONG).show();
-            }
+        smallAdView = findViewById(R.id.small_banner_ad_view);
+        smallAdView.setListener(this);
+        smallAdView.loadAd();
+    }
 
-            @Override
-            public void onSdkInitializationFail(int error, String message) {
-                Toast.makeText(BannerActivity.this, "Loopme failed initialization", Toast.LENGTH_LONG).show();
-            }
-        });
+    protected void onDestroy()
+    {
+        super.onDestroy();
 
+        bigAdView.destroy();
+        smallAdView.destroy();
     }
 
     @Override
@@ -41,6 +49,46 @@ public class BannerActivity extends Activity {
     }
 
     public void onLoadClicked(View view) {
+
+    }
+
+    @Override
+    public void onAdExpanded(@NonNull MaxAd maxAd) {
+
+    }
+
+    @Override
+    public void onAdCollapsed(@NonNull MaxAd maxAd) {
+
+    }
+
+    @Override
+    public void onAdLoaded(@NonNull MaxAd maxAd) {
+
+    }
+
+    @Override
+    public void onAdDisplayed(@NonNull MaxAd maxAd) {
+
+    }
+
+    @Override
+    public void onAdHidden(@NonNull MaxAd maxAd) {
+
+    }
+
+    @Override
+    public void onAdClicked(@NonNull MaxAd maxAd) {
+
+    }
+
+    @Override
+    public void onAdLoadFailed(@NonNull String s, @NonNull MaxError maxError) {
+
+    }
+
+    @Override
+    public void onAdDisplayFailed(@NonNull MaxAd maxAd, @NonNull MaxError maxError) {
 
     }
 }
