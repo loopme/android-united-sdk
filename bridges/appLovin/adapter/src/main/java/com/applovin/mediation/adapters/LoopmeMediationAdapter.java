@@ -166,7 +166,7 @@ public class LoopmeMediationAdapter
                     Log.d(LOG_TAG, "onLoopMeBannerExpired");
                 }
             });
-            mBanner.load();
+            activity.runOnUiThread(() -> mBanner.load());
         } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage());
             maxAdViewAdapterListener.onAdViewAdLoadFailed(MaxAdapterError.INTERNAL_ERROR);
