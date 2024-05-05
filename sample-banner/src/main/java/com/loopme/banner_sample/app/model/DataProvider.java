@@ -1,8 +1,6 @@
 package com.loopme.banner_sample.app.model;
 
-import com.loopme.banner_sample.app.R;
-import com.loopme.banner_sample.app.model.Constants;
-import com.loopme.banner_sample.app.model.CustomListItem;
+import com.loopme.banner_sample.R;
 
 import java.util.ArrayList;
 import java.util.List;

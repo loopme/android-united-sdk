@@ -1,12 +1,14 @@
 package com.loopme.banner_sample.app;
 
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.loopme.LoopMeSdk;
+import com.loopme.banner_sample.R;
 import com.loopme.banner_sample.app.model.Constants;
 import com.loopme.banner_sample.app.views.MainFeaturesFragment;
 import com.loopme.banner_sample.app.views.RecyclerViewFragment;
