@@ -107,7 +107,9 @@ public class RequestParamsUtils {
                             adSizeArray[0] = currentWidthInDp;
                             adSizeArray[1] = currentHeightInDp;
 
-                            // Update the size in the map
+                            // Round the size before updating the map
+                            Utils.roundBannersSize(adSizeArray, Constants.Banner.EXPANDABLE_BANNER_SIZE);
+                            Utils.roundBannersSize(adSizeArray, Constants.Banner.MPU_BANNER_SIZE);
                             adSizes.put(appKey, adSizeArray);
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
