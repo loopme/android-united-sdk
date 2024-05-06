@@ -287,6 +287,8 @@ public class LoopmeMediationAdapter
         @Override
         public void onLoopMeInterstitialLeaveApp(LoopMeInterstitial arg0) { }
         @Override
-        public void onLoopMeInterstitialVideoDidReachEnd(LoopMeInterstitial interstitial) { }
+        public void onLoopMeInterstitialVideoDidReachEnd(LoopMeInterstitial interstitial) {
+            mRewardedListener.onUserRewarded(getReward());
+        }
     }
 }
