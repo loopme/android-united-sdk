@@ -30,7 +30,7 @@ public class SimpleBannerFragment extends Fragment implements LoopMeBanner.Liste
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        LoopMeBannerView containerView = (LoopMeBannerView) view.findViewById(R.id.video_ad_spot);
+        LoopMeBannerView containerView = view.findViewById(R.id.video_ad_spot);
         initBanner(containerView);
     }
 

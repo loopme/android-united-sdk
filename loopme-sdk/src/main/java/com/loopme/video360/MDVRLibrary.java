@@ -23,14 +23,14 @@ public class MDVRLibrary {
 
     private static final String LOG_TAG = MDVRLibrary.class.getSimpleName();
 
-    private InteractiveModeManager mInteractiveModeManager;
-    private DisplayModeManager mDisplayModeManager;
+    private final InteractiveModeManager mInteractiveModeManager;
+    private final DisplayModeManager mDisplayModeManager;
 
-    private List<MD360Director> mDirectorList;
-    private List<GLSurfaceView> mGLSurfaceViewList;
-    private MD360Texture mSurface;
-    private MDStatusManager mMDStatusManager;
-    private int mContentType;
+    private final List<MD360Director> mDirectorList;
+    private final List<GLSurfaceView> mGLSurfaceViewList;
+    private final MD360Texture mSurface;
+    private final MDStatusManager mMDStatusManager;
+    private final int mContentType;
     private boolean mIsPaused = true;
 
     private MDVRLibrary(Builder builder) {
@@ -140,7 +140,7 @@ public class MDVRLibrary {
 
     public static class Builder {
         private GLSurfaceView glSurfaceView;
-        private Context context;
+        private final Context context;
         private int contentType = ContentType.VIDEO;
         private MD360Texture texture;
 

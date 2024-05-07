@@ -15,7 +15,7 @@ public class AdTargetingData implements Serializable {
     private int mYearOfBirth;
     private String mGender;
 
-    private List<CustomRequestParameter> mCustomParams = new ArrayList<CustomRequestParameter>();
+    private final List<CustomRequestParameter> mCustomParams = new ArrayList<CustomRequestParameter>();
 
     public void clear() {
         mKeywords = null;

@@ -39,15 +39,15 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     private static final String ANDROID_JS_INTERFACE = "android";
     private static final int IMPRESSION_TIMER = 2000;
 
-    private VpaidBridge mVpaidBridge;
-    private ViewControllerVpaid mViewControllerVpaid;
+    private final VpaidBridge mVpaidBridge;
+    private final ViewControllerVpaid mViewControllerVpaid;
 
     private boolean mIsWaitingForSkippableState;
     private boolean mIsWaitingForWebView;
     private boolean mIsStarted;
     private SimpleTimer mImpressionTimer;
     private volatile String mCurrentVideoTime;
-    private int mVideoDuration;
+    private final int mVideoDuration;
     private boolean mIsFirstLaunch = true;
     private CreativeType mCreativeType = CreativeType.NONE_VIDEO;
 
@@ -389,7 +389,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     }
 
     private class CallBridgeRunnable implements Runnable {
-        private BridgeMethods mMethod;
+        private final BridgeMethods mMethod;
 
         private CallBridgeRunnable(BridgeMethods method) {
             mMethod = method;
@@ -419,7 +419,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
                 }
                 case VPAID_RESIZE_AD: {
                     mVpaidBridge.resizeAd(Utils.getWidth(),
-                            Utils.getHeight(), "\'fullscreen\'");
+                            Utils.getHeight(), "'fullscreen'");
                     break;
                 }
                 case VPAID_STOP_AD: {

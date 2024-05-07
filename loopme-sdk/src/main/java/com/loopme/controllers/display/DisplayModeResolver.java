@@ -21,10 +21,10 @@ public class DisplayModeResolver {
     private boolean mIsFirstFullScreenCommand = true;
     private Constants.DisplayMode mCurrentDisplayMode = Constants.DisplayMode.NORMAL;
     private Constants.DisplayMode mPreviousDisplayMode = Constants.DisplayMode.NORMAL;
-    private LoopMeAd mLoopMeAd;
+    private final LoopMeAd mLoopMeAd;
     private FrameLayout mMinimizedView;
     private MinimizedMode mMinimizedMode;
-    private DisplayControllerLoopMe mDisplayControllerLoopMe;
+    private final DisplayControllerLoopMe mDisplayControllerLoopMe;
 
     public DisplayModeResolver(DisplayControllerLoopMe controllerLoopMe, LoopMeAd loopMeAd) {
         mDisplayControllerLoopMe = controllerLoopMe;

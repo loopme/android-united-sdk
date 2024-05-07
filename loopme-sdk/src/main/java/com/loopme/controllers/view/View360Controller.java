@@ -25,7 +25,7 @@ public class View360Controller implements IViewController {
     private static final String GYRO = "Gyroscope";
 
     private GLSurfaceView mGLSurfaceView;
-    private Callback mCallback;
+    private final Callback mCallback;
     private MDVRLibrary mVRLibrary;
 
     public interface Callback {

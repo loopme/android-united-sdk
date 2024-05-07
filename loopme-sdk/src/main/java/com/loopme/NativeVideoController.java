@@ -17,15 +17,15 @@ class NativeVideoController {
 
     private static final int FIRST_POSITION = 0;
     private int mItemCount;
-    private Activity mActivity;
+    private final Activity mActivity;
     private MinimizedMode mMinimizedMode;
     private LoopMeBanner.Listener mAdListener;
     private NativeVideoBinder mNativeBinder;
-    private SparseArray<View> mViewMap = new SparseArray<View>();
-    private SparseArray<String> mAppKeysMap = new SparseArray<String>();
-    private SparseArray<LoopMeBanner> mAdsMap = new SparseArray<LoopMeBanner>();
+    private final SparseArray<View> mViewMap = new SparseArray<View>();
+    private final SparseArray<String> mAppKeysMap = new SparseArray<String>();
+    private final SparseArray<LoopMeBanner> mAdsMap = new SparseArray<LoopMeBanner>();
     private DataChangeListener mDataChangeListener;
-    private AdChecker mAdChecker;
+    private final AdChecker mAdChecker;
 
     public NativeVideoController(Activity activity, AdChecker checker) {
         mActivity = activity;
@@ -114,7 +114,7 @@ class NativeVideoController {
 
     private void bindDataToView(View row, NativeVideoBinder binder, final int position) {
         Logging.out(LOG_TAG, "bindDataToView");
-        LoopMeBannerView video = (LoopMeBannerView) row.findViewById(binder.getBannerViewId());
+        LoopMeBannerView video = row.findViewById(binder.getBannerViewId());
         int index = mAdsMap.indexOfKey(position);
         LoopMeBanner banner = mAdsMap.valueAt(index);
         banner.bindView(video);

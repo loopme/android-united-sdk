@@ -55,11 +55,11 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.CustomViewHold
     }
 
     protected class CustomViewHolder extends RecyclerView.ViewHolder {
-        private TextView textView;
+        private final TextView textView;
 
         private CustomViewHolder(View view) {
             super(view);
-            this.textView = (TextView) view.findViewById(R.id.title);
+            this.textView = view.findViewById(R.id.title);
         }
     }
 }

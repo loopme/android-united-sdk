@@ -25,7 +25,7 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     private static final String LOG_TAG = MraidController.class.getSimpleName();
     private static final String EXTRAS_VIDEO_URL = "videoUrl";
 
-    private LoopMeAd mLoopMeAd;
+    private final LoopMeAd mLoopMeAd;
     private MraidView mMraidView;
 
     private int mWidth;

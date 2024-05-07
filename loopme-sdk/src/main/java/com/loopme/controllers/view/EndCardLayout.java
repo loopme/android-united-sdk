@@ -24,7 +24,7 @@ public class EndCardLayout extends FrameLayout implements GestureDetector.OnGest
     private ImageView mReplayImageView;
     private View[] buttonViews;
 
-    private OnEndCardListener mListener;
+    private final OnEndCardListener mListener;
 
     public EndCardLayout(@NonNull Context context, OnEndCardListener listener) {
         super(context);
@@ -49,7 +49,7 @@ public class EndCardLayout extends FrameLayout implements GestureDetector.OnGest
         buttonViews = new View[]{mReplayImageView, mCloseImageView};
     }
 
-    private GestureDetector gestureDetector = new GestureDetector(getContext(), this);
+    private final GestureDetector gestureDetector = new GestureDetector(getContext(), this);
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {

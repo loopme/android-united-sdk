@@ -107,8 +107,8 @@ public class GLUtil {
                 String texture = textures.get(Integer.parseInt(faceComponent[1]) - 1);
                 //String normal   = normals.get(Integer.parseInt(faceComponent[2]) - 1);
 
-                String vertexComp[] = vertex.split(" ");
-                String textureComp[] = texture.split(" ");
+                String[] vertexComp = vertex.split(" ");
+                String[] textureComp = texture.split(" ");
                 //String normalComp[]     = normal.split(" ");
 
                 for (String v : vertexComp) vertexBuffer[vertexIndex++] = Float.parseFloat(v);

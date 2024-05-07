@@ -32,15 +32,15 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
     private static final int BUFFERING_COUNTDOWN_INTERVAL = 500;
     private static final int START = 10;
 
-    private AdView mAdView;
+    private final AdView mAdView;
     private Surface mSurface;
     private Runnable mCurrentTimePoster;
     private Callback mCallback;
-    private Constants.AdFormat mAdFormat;
+    private final Constants.AdFormat mAdFormat;
     private CountDownTimer mBufferingTimer;
     private volatile LoopMeMediaPlayer mLoopMePlayer;
-    private Map<String, Integer> mQuartileEventsMap;
-    private Handler mHandler = new Handler(Looper.getMainLooper());
+    private final Map<String, Integer> mQuartileEventsMap;
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
 
     private String mFileRest;
     private int mVideoDuration;

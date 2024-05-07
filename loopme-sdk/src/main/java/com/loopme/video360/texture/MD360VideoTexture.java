@@ -20,7 +20,7 @@ public class MD360VideoTexture extends MD360Texture {
 
     private Surface mSurface;
     private SurfaceTexture mSurfaceTexture;
-    private MDVRLibrary.IOnSurfaceReadyCallback mOnSurfaceReadyListener;
+    private final MDVRLibrary.IOnSurfaceReadyCallback mOnSurfaceReadyListener;
 
     public MD360VideoTexture(MDVRLibrary.IOnSurfaceReadyCallback onSurfaceReadyListener) {
         mOnSurfaceReadyListener = onSurfaceReadyListener;

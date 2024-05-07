@@ -216,7 +216,7 @@ public class ParseService {
 
     private static boolean retrieveV360(Bid bidObject) {
         try {
-            return (int) bidObject.getExt().getV360() == 1;
+            return bidObject.getExt().getV360() == 1;
         } catch (IllegalStateException | NullPointerException ex) {
             ex.printStackTrace();
         }

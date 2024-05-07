@@ -18,7 +18,7 @@ import java.util.List;
 public class CustomRecyclerViewAdapter extends RecyclerView.Adapter<CustomRecyclerViewAdapter.CustomViewHolder> {
 
     private final List<CustomListItem> mData = new ArrayList<>();
-    private Context mContext;
+    private final Context mContext;
 
     public CustomRecyclerViewAdapter(Context context, ArrayList<CustomListItem> list) {
         mData.addAll(list);
@@ -54,13 +54,13 @@ public class CustomRecyclerViewAdapter extends RecyclerView.Adapter<CustomRecycl
     }
 
     protected class CustomViewHolder extends RecyclerView.ViewHolder {
-        private ImageView imageView;
-        private TextView textView;
+        private final ImageView imageView;
+        private final TextView textView;
 
         private CustomViewHolder(View view) {
             super(view);
-            this.imageView = (ImageView) view.findViewById(R.id.thumbnail);
-            this.textView = (TextView) view.findViewById(R.id.title);
+            this.imageView = view.findViewById(R.id.thumbnail);
+            this.textView = view.findViewById(R.id.title);
         }
     }
 }

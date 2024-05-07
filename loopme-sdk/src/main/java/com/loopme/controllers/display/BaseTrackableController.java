@@ -28,7 +28,7 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     private static final long DELAY_UNTIL_EXECUTE = 100;
     protected String mLogTag;
     private EventManager mEventManager;
-    private LoopMeAd mLoopMeAd;
+    private final LoopMeAd mLoopMeAd;
     private boolean mIsImpressionTracked;
     private String mOrientation;
 

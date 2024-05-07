@@ -41,7 +41,7 @@ public class MainFeaturesFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.main_list_recycler_view);
+        RecyclerView recyclerView = view.findViewById(R.id.main_list_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         MainAdapter adapter = new MainAdapter(DataProvider.getSimpleStringsList());
         adapter.setListener(initOnItemClickListener());

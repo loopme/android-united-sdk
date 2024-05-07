@@ -196,7 +196,7 @@ public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCoun
 
  在合适的生命周期方法中触发 `LoopMeBanner`的pause()和`show()`方法
  它能暂停/继续横幅广告里的任何行为（例如：暂停视频回放）
- ```java
+```java
  	@Override
  	protected void onPause() {
  		mBanner.pause();
@@ -205,11 +205,11 @@ public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCoun
 
 
  	@Override
- 	protected void onResume() {
+    private void onResume() {
  		mBanner.show(mCustomAdapter, mListView);
  		super.onResume();
  	}
- ```
+```
 
  * 清除横幅（原生视频广告）.
 

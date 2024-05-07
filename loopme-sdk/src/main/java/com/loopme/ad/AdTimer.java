@@ -6,7 +6,7 @@ public class AdTimer extends CountDownTimer {
 
     private static final int COUNTDOWN_INTERVAL = 1000 * 60;
 
-    private Listener mListener;
+    private final Listener mListener;
 
     public interface Listener {
         void onTimeout();

@@ -15,7 +15,7 @@ import com.loopme.utils.Utils;
 public class ViewControllerVast {
 
     private final DisplayControllerVast mDisplayControllerVast;
-    private ViewControllerVastListener mListener;
+    private final ViewControllerVastListener mListener;
     private FrameLayout mContainerView;
     private PlayerLayout mPlayerLayout;
     private EndCardLayout mEndCardLayout;

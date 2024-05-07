@@ -8,7 +8,7 @@ import com.loopme.video360.strategy.IModeStrategy;
 import java.util.List;
 
 public abstract class AbsDisplayStrategy implements IModeStrategy, IDisplayMode {
-    private List<GLSurfaceView> mGLSurfaceViewList;
+    private final List<GLSurfaceView> mGLSurfaceViewList;
 
     public AbsDisplayStrategy(List<GLSurfaceView> glSurfaceViewList) {
         this.mGLSurfaceViewList = glSurfaceViewList;

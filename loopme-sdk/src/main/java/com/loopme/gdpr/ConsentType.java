@@ -8,7 +8,7 @@ public enum ConsentType {
     PUBLISHER(1),
     USER_RESTRICTED(2);
 
-    private int mType;
+    private final int mType;
 
     ConsentType(int type) {
         mType = type;

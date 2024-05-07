@@ -8,6 +8,7 @@ import com.loopme.request.AES;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -29,12 +30,7 @@ public class StringUtils {
     }
 
     public static String getUrlEncodedString(String stringToEncode) {
-        try {
-            return URLEncoder.encode(stringToEncode, Constants.UTF_8);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return Build.UNKNOWN;
+        return URLEncoder.encode(stringToEncode, StandardCharsets.UTF_8);
     }
 
     public static String setErrorCode(String vastErrorUrl, String vastErrorCode) {

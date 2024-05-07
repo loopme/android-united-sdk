@@ -6,7 +6,7 @@ class MDStatusManager {
     public static final int STATUS_INIT  = 0;
     public static final int STATUS_READY = 1;
     private int mStatus = STATUS_INIT;
-    private SparseBooleanArray mReadyList = new SparseBooleanArray();
+    private final SparseBooleanArray mReadyList = new SparseBooleanArray();
     private int mVisibleSize;
 
     public void reset(int visibleSize){
@@ -44,7 +44,7 @@ class MDStatusManager {
 
     private static class StatusImpl extends Status{
 
-        private MDStatusManager manager;
+        private final MDStatusManager manager;
 
         private StatusImpl(int id, MDStatusManager manager) {
             super(id);

@@ -6,7 +6,7 @@ import android.view.Surface;
 
 public class VRUtil {
 
-    private static float[] mTmp = new float[16];
+    private static final float[] mTmp = new float[16];
 
     public static void sensorRotationVector2Matrix(SensorEvent event, int rotation, float[] output) {
         float[] values = event.values;

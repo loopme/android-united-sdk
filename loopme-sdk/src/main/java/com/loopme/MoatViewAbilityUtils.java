@@ -17,7 +17,7 @@ import java.util.Set;
 
 public class MoatViewAbilityUtils {
     private static final String LOG_TAG = MoatViewAbilityUtils.class.getSimpleName();
-    private static Handler mHandler = new Handler(Looper.getMainLooper());
+    private static final Handler mHandler = new Handler(Looper.getMainLooper());
     private static final double TOTAL_OVERLAPPED = 1.0D;
     private static final double INVISIBLE = 0;
     private static final double FIFTY_PERCENT = 0.5;
@@ -204,8 +204,7 @@ public class MoatViewAbilityUtils {
             if (!isViewVisible(lastView))
                 continue;
 
-            if (lastView instanceof ViewGroup && !(lastView instanceof ListView)) {
-                ViewGroup viewGroup = (ViewGroup) lastView;
+            if (lastView instanceof ViewGroup viewGroup && !(lastView instanceof ListView)) {
                 int childCount = viewGroup.getChildCount();
 
                 for (int i = childCount - 1; i >= 0; i--) {

@@ -16,7 +16,7 @@ public class MD360Program {
     private int mPositionHandle;
     private int mTextureCoordinateHandle;
     private int mProgramHandle;
-    private int mContentType;
+    private final int mContentType;
 
     public MD360Program(int type) {
         mContentType = type;

@@ -37,7 +37,7 @@ public class RecyclerViewFragment extends Fragment implements LoopMeBanner.Liste
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         CustomRecyclerViewAdapter adapter = new CustomRecyclerViewAdapter(getContext(), DataProvider.getCustomListItem());

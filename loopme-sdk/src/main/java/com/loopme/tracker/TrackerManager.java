@@ -16,7 +16,7 @@ import java.util.List;
 public class TrackerManager {
 
     private final List<Tracker> mTrackers = new ArrayList<>();
-    private List<String> mTrackersNamesList = new ArrayList<>();
+    private final List<String> mTrackersNamesList = new ArrayList<>();
     private LoopMeAd mLoopMeAd;
 
     public TrackerManager(LoopMeAd loopmeAd) {

@@ -460,7 +460,7 @@ public class XmlParseService {
         private boolean mHasWrapper;
         private Vast mVast;
         private String mVastTagUrl;
-        private String mVastString;
+        private final String mVastString;
         private Wrapper mWrapper;
         private VastInfo mVastInfo;
 

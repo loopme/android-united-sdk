@@ -15,155 +15,138 @@ public class BridgeCommandBuilder {
     private static final String PREFIX_360 = "javascript:window.L.track";
 
     public static String isNativeCallFinished(boolean b) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(LOOPME_PREFIX)
-                .append("('webview', {isNativeCallFinished: ")
-                .append("'")
-                .append(b)
-                .append("'});");
-        return builder.toString();
+        String builder = LOOPME_PREFIX +
+                "('webview', {isNativeCallFinished: " +
+                "'" +
+                b +
+                "'});";
+        return builder;
     }
 
     public static String shake(boolean b) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(LOOPME_PREFIX)
-                .append("('webview', {shake: ")
-                .append("'")
-                .append(b)
-                .append("'});");
-        return builder.toString();
+        String builder = LOOPME_PREFIX +
+                "('webview', {shake: " +
+                "'" +
+                b +
+                "'});";
+        return builder;
     }
 
     public static String videoMute(boolean mute) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(LOOPME_PREFIX)
-                .append("('video', {mute: ")
-                .append("'")
-                .append(mute)
-                .append("'});");
-        return builder.toString();
+        String builder = LOOPME_PREFIX +
+                "('video', {mute: " +
+                "'" +
+                mute +
+                "'});";
+        return builder;
     }
 
     public static String videoCurrentTime(int time) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(LOOPME_PREFIX)
-                .append("('video', {currentTime: ")
-                .append("'")
-                .append(time)
-                .append("'});");
-        return builder.toString();
+        String builder = LOOPME_PREFIX +
+                "('video', {currentTime: " +
+                "'" +
+                time +
+                "'});";
+        return builder;
     }
 
     public static String videoDuration(int time) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(LOOPME_PREFIX)
-                .append("('video', {duration: ")
-                .append("'")
-                .append(time)
-                .append("'});");
-        return builder.toString();
+        String builder = LOOPME_PREFIX +
+                "('video', {duration: " +
+                "'" +
+                time +
+                "'});";
+        return builder;
     }
 
     public static String videoState(Constants.VideoState state) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(LOOPME_PREFIX)
-                .append("('video', {state: ")
-                .append("'")
-                .append(state.name())
-                .append("'});");
-        return builder.toString();
+        String builder = LOOPME_PREFIX +
+                "('video', {state: " +
+                "'" +
+                state.name() +
+                "'});";
+        return builder;
     }
 
     public static String webviewState(String sdkPrefix,Constants.WebviewState state) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(sdkPrefix)
-                .append("('webview', {state: ")
-                .append("'")
-                .append(state.name())
-                .append("'});");
-        return builder.toString();
+        String builder = sdkPrefix +
+                "('webview', {state: " +
+                "'" +
+                state.name() +
+                "'});";
+        return builder;
     }
 
     public static String fullscreenMode(boolean b) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(LOOPME_PREFIX)
-                .append("('webview', {fullscreenMode: ")
-                .append(b)
-                .append("});");
-        return builder.toString();
+        String builder = LOOPME_PREFIX +
+                "('webview', {fullscreenMode: " +
+                b +
+                "});";
+        return builder;
     }
 
     public static String event360(String event) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(PREFIX_360)
-                .append("({eventType: 'INTERACTION', customEventName: 'video360&mode=")
-                .append(event)
-                .append("'});");
-        return builder.toString();
+        String builder = PREFIX_360 +
+                "({eventType: 'INTERACTION', customEventName: 'video360&mode=" +
+                event +
+                "'});";
+        return builder;
     }
 
     public static String mraidSetIsViewable(boolean isViewable) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(MRAID_PREFIX)
-                .append("setIsViewable(")
-                .append(isViewable)
-                .append(");");
-        return builder.toString();
+        String builder = MRAID_PREFIX +
+                "setIsViewable(" +
+                isViewable +
+                ");";
+        return builder;
     }
 
     public static String mraidNotifyReady() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(MRAID_PREFIX)
-                .append("notifyReadyEvent();");
-        return builder.toString();
+        String builder = MRAID_PREFIX +
+                "notifyReadyEvent();";
+        return builder;
     }
 
     public static String mraidNotifyError() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(MRAID_PREFIX)
-                .append("notifyErrorEvent();");
-        return builder.toString();
+        String builder = MRAID_PREFIX +
+                "notifyErrorEvent();";
+        return builder;
     }
 
     public static String mraidNotifyStateChange() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(MRAID_PREFIX)
-                .append("notifyStateChangeEvent();");
-        return builder.toString();
+        String builder = MRAID_PREFIX +
+                "notifyStateChangeEvent();";
+        return builder;
     }
 
     public static String mraidSetState(String state) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(MRAID_PREFIX)
-                .append("setState('")
-                .append(state)
-                .append("');");
-        return builder.toString();
+        String builder = MRAID_PREFIX +
+                "setState('" +
+                state +
+                "');";
+        return builder;
     }
 
     public static String mraidNotifySizeChangeEvent(int width, int height) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(MRAID_PREFIX)
-                .append("notifySizeChangeEvent(")
-                .append(width)
-                .append(", ")
-                .append(height)
-                .append(");");
-        return builder.toString();
+        String builder = MRAID_PREFIX +
+                "notifySizeChangeEvent(" +
+                width +
+                ", " +
+                height +
+                ");";
+        return builder;
     }
 
     public static String mraidResize() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(MRAID_PREFIX)
-                .append("resize();");
-        return builder.toString();
+        String builder = MRAID_PREFIX +
+                "resize();";
+        return builder;
     }
 
     public static String mraidNativeCallComplete() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(MRAID_PREFIX)
-                .append("nativeCallComplete();");
-        return builder.toString();
+        String builder = MRAID_PREFIX +
+                "nativeCallComplete();";
+        return builder;
     }
 }
 

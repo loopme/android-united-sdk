@@ -18,12 +18,12 @@ public class MD360Director {
     private static final float sDensity =  Resources.getSystem().getDisplayMetrics().density;
     private static final float sDamping = 0.2f;
 
-    private float[] mModelMatrix = new float[16];
-    private float[] mViewMatrix = new float[16];
-    private float[] mProjectionMatrix = new float[16];
+    private final float[] mModelMatrix = new float[16];
+    private final float[] mViewMatrix = new float[16];
+    private final float[] mProjectionMatrix = new float[16];
 
-    private float[] mMVMatrix = new float[16];
-    private float[] mMVPMatrix = new float[16];
+    private final float[] mMVMatrix = new float[16];
+    private final float[] mMVPMatrix = new float[16];
 
     private float mEyeZ = 0f;
     private float mEyeX = 0f;
@@ -32,9 +32,9 @@ public class MD360Director {
     private float mNear = 0f;
     private float mLookX = 0f;
 
-    private float[] mCurrentRotation = new float[16];
-    private float[] mAccumulatedRotation = new float[16];
-    private float[] mTemporaryMatrix = new float[16];
+    private final float[] mCurrentRotation = new float[16];
+    private final float[] mAccumulatedRotation = new float[16];
+    private final float[] mTemporaryMatrix = new float[16];
 
     private float mPreviousX;
     private float mPreviousY;
@@ -54,7 +54,7 @@ public class MD360Director {
     private boolean mAccelSupported;
 
     private View360Controller.Callback mCallback;
-    private List<String> mHandledEvents = new ArrayList<>();
+    private final List<String> mHandledEvents = new ArrayList<>();
 
     private MD360Director(Builder builder) {
         this.mEyeZ = builder.mEyeZ;
@@ -238,12 +238,12 @@ public class MD360Director {
     }
 
     public static class Builder {
-        private float mEyeZ = 0f;
-        private float mAngle = 0;
-        private float mRatio = 1.5f;
-        private float mNear = 0.4f;
-        private float mEyeX = 0f;
-        private float mLookX = 0f;
+        private final float mEyeZ = 0f;
+        private final float mAngle = 0;
+        private final float mRatio = 1.5f;
+        private final float mNear = 0.4f;
+        private final float mEyeX = 0f;
+        private final float mLookX = 0f;
 
         public MD360Director build(){
             return new MD360Director(this);

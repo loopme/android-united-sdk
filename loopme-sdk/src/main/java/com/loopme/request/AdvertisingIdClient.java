@@ -19,8 +19,8 @@ public final class AdvertisingIdClient {
 
     public static final class AdInfo {
 
-        private String mAdvertisingId;
-        private boolean mLimitAdTrackingEnabled;
+        private final String mAdvertisingId;
+        private final boolean mLimitAdTrackingEnabled;
 
         private AdInfo(String advertisingId, boolean limitAdTrackingEnabled) {
             mAdvertisingId = advertisingId;
@@ -59,7 +59,7 @@ public final class AdvertisingIdClient {
 
         } catch (GooglePlayServicesRepairableException e) {
             Logging.out(LOG_TAG,
-                    e.toString() +
+                    e +
                             " MESSAGE: " +
                             e.getMessage() +
                             " CONNECTION_STATUS_CODE: " +
@@ -67,7 +67,7 @@ public final class AdvertisingIdClient {
                     true);
         } catch (GooglePlayServicesNotAvailableException e) {
             Logging.out(LOG_TAG,
-                    e.toString() +
+                    e +
                             " MESSAGE: " +
                             e.getMessage() +
                             " ERROR_CODE: " +

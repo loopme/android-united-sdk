@@ -15,8 +15,8 @@ public enum IntegrationType {
     ADMOST(7, "admost"),
     AMR(8, "amr");
 
-    private int mId;
-    private String mType;
+    private final int mId;
+    private final String mType;
 
     IntegrationType(int id, String type) {
         this.mId = id;

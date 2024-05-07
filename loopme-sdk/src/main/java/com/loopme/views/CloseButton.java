@@ -18,8 +18,8 @@ public class CloseButton extends View {
     private static final int THICKNESS_DP = 4;
     private static final int OFFSET_DP = 14;
     private static final int CUSTOM_VIEW_SIZE_DP = 16;
-    private static final int CLICKABLE_VIEW_SIZE_DP = (int) (CUSTOM_VIEW_SIZE_DP * 3);
-    private Paint mPaint = new Paint();
+    private static final int CLICKABLE_VIEW_SIZE_DP = CUSTOM_VIEW_SIZE_DP * 3;
+    private final Paint mPaint = new Paint();
 
     public CloseButton(Context context) {
         super(context);

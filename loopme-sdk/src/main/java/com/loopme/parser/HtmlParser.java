@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 
 public class HtmlParser {
@@ -18,7 +19,7 @@ public class HtmlParser {
     private static final String HEIGHT = "HEIGHT";
     private static final String MACROS = "macros";
     private static final String EMPTY_STRING = "";
-    private String mHtml;
+    private final String mHtml;
     private String mJsonScript;
 
     public HtmlParser(String html) {
@@ -44,11 +45,7 @@ public class HtmlParser {
 
     @Deprecated
     public static String decode(String source) {
-        try {
-            return URLDecoder.decode(source, Constants.UTF_8);
-        } catch (UnsupportedEncodingException var2) {
-            return URLDecoder.decode(source);
-        }
+        return URLDecoder.decode(source, StandardCharsets.UTF_8);
     }
 
     public int getAdWidth() {

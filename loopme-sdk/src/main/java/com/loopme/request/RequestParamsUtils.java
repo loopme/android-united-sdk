@@ -94,8 +94,7 @@ public class RequestParamsUtils {
             adSizeArray[0] = widthInDp;
             adSizeArray[1] = heightInDp;
 
-        } else if (baseAd instanceof LoopMeBannerGeneral) {
-            final LoopMeBannerGeneral banner = (LoopMeBannerGeneral) baseAd;
+        } else if (baseAd instanceof LoopMeBannerGeneral banner) {
             final FrameLayout bannerView = banner.getBannerView();
             if (bannerView != null) {
                 bannerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -167,8 +166,8 @@ public class RequestParamsUtils {
     }
 
     public static class AdvAdInfo {
-        private String mAdvId;
-        private boolean mIsDoNotTrack;
+        private final String mAdvId;
+        private final boolean mIsDoNotTrack;
 
         private AdvAdInfo(AdvertisingIdClient.AdInfo adInfo) {
             mIsDoNotTrack = adInfo.isLimitAdTrackingEnabled();

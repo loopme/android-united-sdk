@@ -433,10 +433,7 @@ public class RequestUtils {
     }
 
     private void setInstl() {
-        boolean interstitial = false;
-        if (mLoopMeAd instanceof LoopMeInterstitialGeneral) {
-            interstitial = true;
-        }
+        boolean interstitial = mLoopMeAd instanceof LoopMeInterstitialGeneral;
         mInstl = interstitial ? 1 : 0;
     }
 

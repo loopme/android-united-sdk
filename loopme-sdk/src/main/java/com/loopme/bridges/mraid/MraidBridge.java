@@ -44,8 +44,8 @@ public class MraidBridge extends WebViewClientCompat {
     private static final String WEBVIEW_CLOSE = "/close";
     private static final String WEBVIEW_FAIL = "/fail";
 
-    private OnMraidBridgeListener mOnMraidBridgeListener;
-    private Listener adReadyListener;
+    private final OnMraidBridgeListener mOnMraidBridgeListener;
+    private final Listener adReadyListener;
 
     // TODO. Refactor.
     public MraidBridge(
