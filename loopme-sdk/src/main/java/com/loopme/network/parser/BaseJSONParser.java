@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BaseJSONParser {
-    private static final String LOG_TAG = GdprResponseParser.class.getSimpleName();
+    private static final String LOG_TAG = BaseJSONParser.class.getSimpleName();
 
     protected int getInt(JSONObject jsonObject, String param, boolean throwException) throws JSONException {
         try {

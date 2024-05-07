@@ -1,5 +1,7 @@
 package com.loopme.network.parser;
 
+import android.util.Log;
+
 import com.loopme.Constants;
 import com.loopme.models.response.Bid;
 import com.loopme.models.response.Ext;
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ResponseJsonModelParser extends BaseJSONParser {
+    private static final String LOG_TAG = ResponseJsonModelParser.class.getSimpleName();
     private static final String PARAM_ID = "id";
     private static final String PARAM_ADM = "adm";
     private static final String PARAM_BID = "bid";
@@ -161,6 +164,7 @@ public class ResponseJsonModelParser extends BaseJSONParser {
         try {
             return getInt(jsonObject, PARAM_EXT_AUTOLOADING, true);
         } catch (JSONException e) {
+            Log.d(LOG_TAG, e.toString());
         }
         return defaultValue;
     }

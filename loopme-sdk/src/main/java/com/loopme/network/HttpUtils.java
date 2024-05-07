@@ -19,7 +19,6 @@ import java.net.URL;
 
 public class HttpUtils {
     private static final String LOG_TAG = HttpUtils.class.getSimpleName();
-
     private static final int CONNECT_TIMEOUT = 15000;
     private static final int READ_TIMEOUT = 15000;
     private static final String APPLICATION_X_WWW_FORM = "application/x-www-form-urlencoded";
