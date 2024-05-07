@@ -2,10 +2,10 @@ package com.loopme;
 
 public class CreativeParams {
 
-    private int width;
-    private int height;
-    private String viewMode;
-    private int desiredBitrate;
+    private final int width;
+    private final int height;
+    private final String viewMode;
+    private final int desiredBitrate;
     private String creativeData;
     private String environmentVars;
 

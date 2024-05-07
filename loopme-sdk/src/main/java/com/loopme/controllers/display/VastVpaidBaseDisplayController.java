@@ -50,9 +50,9 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
 
     private boolean mIsVpaidEventTracked;
     private Timers mTimer;
-    private Context mContext;
+    private final Context mContext;
     private ViewableImpressionTracker viewableImpressionTracker;
-    private VastVpaidEventTracker mEventTracker;
+    private final VastVpaidEventTracker mEventTracker;
     private WebView webView;
 
     public VastVpaidBaseDisplayController(LoopMeAd loopMeAd) {
@@ -446,10 +446,10 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
     }
 
     protected static class Verification {
-        private String vendor;
-        private String javaScriptResourceUrl;
-        private List<String> verificationNotExecutedUrlList;
-        private String verificationParameters;
+        private final String vendor;
+        private final String javaScriptResourceUrl;
+        private final List<String> verificationNotExecutedUrlList;
+        private final String verificationParameters;
 
         public Verification(
                 String vendor,

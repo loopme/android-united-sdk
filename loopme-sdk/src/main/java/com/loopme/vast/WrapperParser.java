@@ -16,18 +16,18 @@ import java.util.List;
 import java.util.Map;
 
 public class WrapperParser {
-    private List<Wrapper> mWrapperList = new ArrayList<Wrapper>();
-    private List<String> mErrorUrlList = new ArrayList<String>();
-    private List<Tracking> mTrackingList = new ArrayList<Tracking>();
-    private ArrayList<String> mSimpleImpressionList = new ArrayList<String>();
-    private Map<String, ArrayList<String>> mViewableImpressionMap = new HashMap<String, ArrayList<String>>();
+    private final List<Wrapper> mWrapperList = new ArrayList<Wrapper>();
+    private final List<String> mErrorUrlList = new ArrayList<String>();
+    private final List<Tracking> mTrackingList = new ArrayList<Tracking>();
+    private final ArrayList<String> mSimpleImpressionList = new ArrayList<String>();
+    private final Map<String, ArrayList<String>> mViewableImpressionMap = new HashMap<String, ArrayList<String>>();
 
-    private List<Verification> verificationList = new ArrayList<>();
+    private final List<Verification> verificationList = new ArrayList<>();
 
-    private List<String> mVideoClicksList = new ArrayList<String>();
+    private final List<String> mVideoClicksList = new ArrayList<String>();
 
-    private List<String> mCompanionCreativeViewEventsList = new ArrayList<String>();
-    private List<String> mCompanionClickTrackingList = new ArrayList<String>();
+    private final List<String> mCompanionCreativeViewEventsList = new ArrayList<String>();
+    private final List<String> mCompanionClickTrackingList = new ArrayList<String>();
 
     public WrapperParser(List<Wrapper> wrapperList) {
         mWrapperList.addAll(wrapperList);

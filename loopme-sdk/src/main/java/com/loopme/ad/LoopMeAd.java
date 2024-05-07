@@ -40,21 +40,21 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     protected Handler mHandler = new Handler(Looper.getMainLooper());
     private IntegrationType mIntegrationType = IntegrationType.NORMAL;
-    private AdTargetingData mAdTargetingData = new AdTargetingData();
+    private final AdTargetingData mAdTargetingData = new AdTargetingData();
     protected BaseTrackableController mDisplayController;
     protected volatile FrameLayout mContainerView;
 
     private AdParams mAdParams;
-    private Activity mContext;
+    private final Activity mContext;
     private Type mPreferredAdType = Type.ALL;
     private Timers mTimers;
     private AdFetchTask mAdFetchTask;
 
     protected long mStartLoadingTime;
     protected Constants.AdState mAdState = Constants.AdState.NONE;
-    private String mAppKey;
+    private final String mAppKey;
     protected boolean mIsReady;
-    private int mAdId;
+    private final int mAdId;
     private volatile boolean mIsReverseOrientationRequest;
 
     public LoopMeAd(Activity context, String appKey) {
@@ -161,7 +161,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
             @Override
             public void run() {
                 if (mDisplayController != null) {
-                    Logging.out(LOG_TAG, "Release " + mDisplayController.toString());
+                    Logging.out(LOG_TAG, "Release " + mDisplayController);
                     mDisplayController.onDestroy();
                     mDisplayController = null;
                 }
@@ -521,7 +521,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     public enum Type {
         HTML,
         VIDEO,
-        ALL;
+        ALL
 
     }
 

@@ -154,8 +154,7 @@ public class DisplayControllerLoopMe
     }
 
     public void collapseMraidBanner() {
-        if (mLoopMeAd instanceof LoopMeBannerGeneral && isMraidAd()) {
-            LoopMeBannerGeneral banner = (LoopMeBannerGeneral) mLoopMeAd;
+        if (mLoopMeAd instanceof LoopMeBannerGeneral banner && isMraidAd()) {
             buildMraidContainer(banner.getBannerView());
             onCollapseBanner();
         }

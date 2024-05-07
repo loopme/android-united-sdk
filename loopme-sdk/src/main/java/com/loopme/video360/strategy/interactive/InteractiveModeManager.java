@@ -10,7 +10,7 @@ import java.util.List;
 
 public class InteractiveModeManager extends ModeManager<AbsInteractiveStrategy> implements IInteractiveMode {
 
-    private List<MD360Director> mDirectorList;
+    private final List<MD360Director> mDirectorList;
     private boolean mIsResumed;
 
     public InteractiveModeManager(List<MD360Director> directorList) {

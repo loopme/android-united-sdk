@@ -8,10 +8,10 @@ import android.view.View;
 
 public class LoopMeGestureListener implements View.OnTouchListener {
 
-    private Context mContext;
-    private Listener mListener;
-    private GestureDetector mGestureDetector;
-    private float MAX_ACCEPTABLE_VERTICAL_OFFSET_FOR_HORIZONTAL_SWIPE = 50;
+    private final Context mContext;
+    private final Listener mListener;
+    private final GestureDetector mGestureDetector;
+    private final float MAX_ACCEPTABLE_VERTICAL_OFFSET_FOR_HORIZONTAL_SWIPE = 50;
 
     public LoopMeGestureListener(Context context, Listener listener) {
         mContext = context;

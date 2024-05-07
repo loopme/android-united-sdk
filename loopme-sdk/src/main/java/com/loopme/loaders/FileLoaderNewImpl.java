@@ -35,15 +35,15 @@ public class FileLoaderNewImpl implements Loader {
     private static final int READ_TIMEOUT = 10000;
     private static final int CONNECT_TIMEOUT = 10000;
 
-    private String fileUrl;
+    private final String fileUrl;
     private String destFilePath;
 
     private volatile boolean isStopped;
 
     private Callback callback;
-    private Context context;
+    private final Context context;
 
-    private Handler handler;
+    private final Handler handler;
 
     private volatile HttpURLConnection connection;
 

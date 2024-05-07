@@ -23,10 +23,10 @@ public final class OmidEventTrackerWrapper {
     private boolean completeSent;
     private boolean skipSent;
 
-    private Set<String> sentProgressEvents = new HashSet<>();
+    private final Set<String> sentProgressEvents = new HashSet<>();
 
-    private AdEvents adEvents;
-    private MediaEvents mediaEvents;
+    private final AdEvents adEvents;
+    private final MediaEvents mediaEvents;
 
     public OmidEventTrackerWrapper(AdEvents adEvents, MediaEvents mediaEvents) {
         this.adEvents = adEvents;

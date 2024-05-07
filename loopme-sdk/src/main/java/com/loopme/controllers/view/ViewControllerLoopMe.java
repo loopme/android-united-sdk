@@ -28,7 +28,7 @@ public class ViewControllerLoopMe implements TextureView.SurfaceTextureListener,
     private int mResizeHeight;
 
     private Surface mSurface;
-    private Callback mCallback;
+    private final Callback mCallback;
     private TextureView mTextureView;
     private Constants.StretchOption mStretch = Constants.StretchOption.NONE;
 

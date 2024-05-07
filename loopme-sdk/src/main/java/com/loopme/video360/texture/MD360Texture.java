@@ -5,14 +5,13 @@ public abstract class MD360Texture {
     private static final String TAG = "MD360Texture";
     private int mWidth;
     private int mHeight;
-    private ThreadLocal<Integer> mLocalGLTexture = new ThreadLocal<>();
+    private final ThreadLocal<Integer> mLocalGLTexture = new ThreadLocal<>();
 
     public MD360Texture() {
     }
 
     public void resize(int width,int height){
-        boolean changed = false;
-        if (mWidth == width && mHeight == height) changed = true;
+        boolean changed = mWidth == width && mHeight == height;
         mWidth = width;
         mHeight = height;
 

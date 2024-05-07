@@ -15,7 +15,7 @@ import java.util.List;
 
 public class Wrapper {
     @Attribute
-    private boolean followAdditionalWrappers = true;
+    private final boolean followAdditionalWrappers = true;
 
     @Attribute
     private boolean allowMultipleAds;

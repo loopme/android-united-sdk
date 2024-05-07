@@ -14,7 +14,7 @@ class ViewableImpressionTracker {
     private static final double FIFTY_PERCENTS = 0.5;
 
     private boolean mIsImpressionTracked;
-    private AdParams mAdParams;
+    private final AdParams mAdParams;
     private View mAdView;
 
     ViewableImpressionTracker(AdParams adParams) {

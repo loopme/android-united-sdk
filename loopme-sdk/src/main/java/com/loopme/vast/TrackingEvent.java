@@ -1,5 +1,7 @@
 package com.loopme.vast;
 
+import java.util.Objects;
+
 public class TrackingEvent {
     public String url;
     public int timeMillis;
@@ -21,7 +23,7 @@ public class TrackingEvent {
         TrackingEvent that = (TrackingEvent) o;
 
         if (timeMillis != that.timeMillis) return false;
-        return url != null ? url.equals(that.url) : that.url == null;
+        return Objects.equals(url, that.url);
     }
 
     @Override

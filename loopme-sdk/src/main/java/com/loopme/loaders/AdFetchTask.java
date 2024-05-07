@@ -36,15 +36,15 @@ public class AdFetchTask implements Runnable, Observer {
 
     private AdType mAdType;
     private Future mFetchTask;
-    private LoopMeAd mLoopMeAd;
+    private final LoopMeAd mLoopMeAd;
     private String mOrientation;
     private VastWrapperFetcher mVastWrapperFetcher;
-    private ExecutorService mExecutorService;
+    private final ExecutorService mExecutorService;
     private volatile AdFetcherListener mAdFetcherListener;
-    private Handler mHandler = new Handler((Looper.getMainLooper()));
+    private final Handler mHandler = new Handler((Looper.getMainLooper()));
     private static final String UNEXPECTED = "Unexpected";
     private boolean mIsVastVpaidAd;
-    private Timers mTimers;
+    private final Timers mTimers;
     private volatile boolean mFirstRequest = true;
 
     public AdFetchTask(LoopMeAd loopMeAd, AdFetcherListener adFetcherListener) {

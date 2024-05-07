@@ -445,8 +445,7 @@ public class IasTracker implements Tracker {
         }
 
         private void injectJsToVpaid(Object[] args) {
-            if (Utils.isNotNull(args) && args[0] instanceof StringBuilder) {
-                StringBuilder html = (StringBuilder) args[0];
+            if (Utils.isNotNull(args) && args[0] instanceof StringBuilder html) {
                 String scripts = mUrlProvider.getCmTagScript();
                 html.insert(VPAID_IAS_SCRIPTS_PLACEHOLDER, scripts);
             }
@@ -493,8 +492,7 @@ public class IasTracker implements Tracker {
             if (isNativeTracker()) {
                 return;
             }
-            if (Utils.isNotNull(args) && args[0] instanceof LoopMeAd) {
-                LoopMeAd loopMeAd = (LoopMeAd) args[0];
+            if (Utils.isNotNull(args) && args[0] instanceof LoopMeAd loopMeAd) {
                 String html = putJsToCreative(loopMeAd.getAdParams().getHtml());
                 loopMeAd.getAdParams().setHtml(html);
             }
@@ -517,10 +515,9 @@ public class IasTracker implements Tracker {
 
         private void registerFriendlyView(Object[] args) {
             if (Utils.isNotNull(args)
-                    && args[0] instanceof View
+                    && args[0] instanceof View view
                     && mAbstractAvidAdSession != null) {
 
-                View view = (View) args[0];
                 mAbstractAvidAdSession.registerFriendlyObstruction(view);
             }
         }
@@ -528,11 +525,10 @@ public class IasTracker implements Tracker {
         private void registerView(Object[] args) {
             if (Utils.isNotNull(args)
                     && args.length >= 2
-                    && args[0] instanceof Activity
+                    && args[0] instanceof Activity activity
                     && args[1] instanceof View
                     && mAbstractAvidAdSession != null) {
 
-                Activity activity = (Activity) args[0];
                 mView = (View) args[1];
                 mAbstractAvidAdSession.registerAdView(mView, activity);
                 Logging.out(sLOG_TAG, "register view " + mView.getClass().getSimpleName());

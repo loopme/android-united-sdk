@@ -407,7 +407,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     private static class OmidFinisher implements Runnable {
-        private AdSession adSession;
+        private final AdSession adSession;
 
         private OmidFinisher(AdSession adSession) {
             this.adSession = adSession;

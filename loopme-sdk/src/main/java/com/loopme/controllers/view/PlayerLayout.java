@@ -38,7 +38,7 @@ public class PlayerLayout extends FrameLayout
     private int mViewPosition;
     private boolean mMuteState;
     private Surface mSurface;
-    private WebView mWebView;
+    private final WebView mWebView;
     private TextView mTextView;
     private ProgressBar mProgressBar;
 
@@ -48,7 +48,7 @@ public class PlayerLayout extends FrameLayout
 
     private View[] buttonViews;
 
-    private OnPlayerListener mListener;
+    private final OnPlayerListener mListener;
     private static final String TIME_FINISHED = "00:00";
     private static final int MINIMAL_TIME_STEP = 200;
 
@@ -160,7 +160,7 @@ public class PlayerLayout extends FrameLayout
         return gestureDetector.onTouchEvent(event);
     }
 
-    private GestureDetector gestureDetector = new GestureDetector(getContext(), this);
+    private final GestureDetector gestureDetector = new GestureDetector(getContext(), this);
 
     @Override
     public boolean onDown(MotionEvent e) {

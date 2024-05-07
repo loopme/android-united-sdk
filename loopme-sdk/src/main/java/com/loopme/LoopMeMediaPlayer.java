@@ -15,7 +15,7 @@ public class LoopMeMediaPlayer {
     private static final int START_POSITION_10 = 10;
     private static final float DEFAULT_RIGHT_VOLUME = 0f;
     private static final float DEFAULT_LEFT_VOLUME = 0f;
-    private MediaPlayer mMediaPlayer;
+    private final MediaPlayer mMediaPlayer;
     private LoopMeMediaPlayerListener mListener;
 
     public LoopMeMediaPlayer(String source, LoopMeMediaPlayerListener listener) {

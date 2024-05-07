@@ -176,8 +176,8 @@ public class Constants {
         BROKEN(BROKEN_INTEGER, "BROKEN"),
         BUFFERING(BUFFERING_INTEGER, "BUFFERING)");
 
-        private int mId;
-        private String mName;
+        private final int mId;
+        private final String mName;
 
         VideoState(int id, String name) {
             mId = id;
@@ -232,8 +232,8 @@ public class Constants {
         HIDDEN(HIDDEN_INTEGER, "HIDDEN"),
         CLOSED(CLOSED_INTEGER, "UNKNOWN");
 
-        private int mId;
-        private String mName;
+        private final int mId;
+        private final String mName;
 
         WebviewState(int id, String name) {
             mId = id;

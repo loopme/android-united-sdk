@@ -20,7 +20,7 @@ import com.loopme.utils.Utils;
 
 public class ViewControllerVpaid implements View.OnClickListener {
 
-    private java.lang.String LOG_TAG = ViewControllerVpaid.class.getSimpleName();
+    private final java.lang.String LOG_TAG = ViewControllerVpaid.class.getSimpleName();
     private static final int CLOSE_BUTTON_ID = View.generateViewId();
     private final DisplayControllerVpaid mDisplayControllerVpaid;
 
@@ -69,7 +69,7 @@ public class ViewControllerVpaid implements View.OnClickListener {
     private void initViews(Context context) {
         mEndCardLayout = LayoutInflater.from(context).inflate(R.layout.end_card, mContainerView, false);
         mEndCardLayout.setVisibility(View.GONE);
-        mEndCardView = (ImageView) mEndCardLayout.findViewById(R.id.end_card_imageview);
+        mEndCardView = mEndCardLayout.findViewById(R.id.end_card_imageview);
         configureCloseView(context);
     }
 

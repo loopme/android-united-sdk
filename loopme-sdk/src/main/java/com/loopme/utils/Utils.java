@@ -542,7 +542,7 @@ public class Utils {
             return "";
         }
         int lastIndexOfSlash = source.lastIndexOf("/");
-        return source.substring(lastIndexOfSlash, source.length());
+        return source.substring(lastIndexOfSlash);
     }
 
     public static void removeParent(ViewGroup view) {

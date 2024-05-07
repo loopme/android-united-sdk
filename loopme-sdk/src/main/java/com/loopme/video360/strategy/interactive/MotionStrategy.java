@@ -19,7 +19,7 @@ public class MotionStrategy extends AbsInteractiveStrategy implements SensorEven
 
     private static final String TAG = "MotionStrategy";
     private int mDeviceRotation;
-    private float[] mSensorMatrix = new float[16];
+    private final float[] mSensorMatrix = new float[16];
     private boolean mRegistered = false;
 
     public MotionStrategy(List<MD360Director> directorList) {

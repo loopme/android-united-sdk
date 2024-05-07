@@ -16,9 +16,9 @@ public class MD360Renderer implements GLSurfaceView.Renderer, MD360Texture.ISync
 
     private static final String TAG = "MD360Renderer";
 
-    private MDSphere3D mObject3D;
-    private MD360Program mProgram;
-    private MD360Texture mTexture;
+    private final MDSphere3D mObject3D;
+    private final MD360Program mProgram;
+    private final MD360Texture mTexture;
 
     // final
     private final Context mContext;

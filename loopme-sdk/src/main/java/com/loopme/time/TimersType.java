@@ -12,7 +12,7 @@ public enum TimersType {
     PREPARE_ASSETS_TIMER(5),
     GDPR_PAGE_LOADED_TIMER(6);
 
-    private int mId;
+    private final int mId;
 
     TimersType(int id) {
         mId = id;

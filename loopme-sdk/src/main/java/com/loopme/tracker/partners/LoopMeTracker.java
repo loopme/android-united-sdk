@@ -17,6 +17,7 @@ import com.loopme.utils.ExecutorHelper;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +29,7 @@ public class LoopMeTracker {
 
     private static String sPackageId;
     private static String sAppKey;
-    private static Set<String> sVastErrorUrlSet = new HashSet<>();
+    private static final Set<String> sVastErrorUrlSet = new HashSet<>();
 
     private LoopMeTracker() {
     }
@@ -156,11 +157,11 @@ public class LoopMeTracker {
                 } else {
                     result.append("&");
                 }
-                result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+                result.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8));
                 result.append("=");
-                result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+                result.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
             }
-        } catch (UnsupportedEncodingException | NullPointerException e) {
+        } catch (NullPointerException e) {
             Logging.out("HttpUtil", "UnsupportedEncoding: UTF-8");
         }
         return String.valueOf(result);

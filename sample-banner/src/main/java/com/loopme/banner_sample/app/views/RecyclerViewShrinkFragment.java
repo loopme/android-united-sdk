@@ -39,7 +39,7 @@ public class RecyclerViewShrinkFragment extends Fragment implements LoopMeBanner
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         CustomRecyclerViewAdapter adapter = new CustomRecyclerViewAdapter(getContext(), DataProvider.getCustomListItem());
@@ -52,7 +52,7 @@ public class RecyclerViewShrinkFragment extends Fragment implements LoopMeBanner
         mNativeVideoRecyclerAdapter.setViewBinder(binder);
 
         //Configure minimized mode (Optional)
-        RelativeLayout root = (RelativeLayout) view.findViewById(R.id.recycler_root_view);
+        RelativeLayout root = view.findViewById(R.id.recycler_root_view);
         MinimizedMode mode = new MinimizedMode(root, recyclerView);
         mNativeVideoRecyclerAdapter.setMinimizedMode(mode);
         recyclerView.setAdapter(mNativeVideoRecyclerAdapter);

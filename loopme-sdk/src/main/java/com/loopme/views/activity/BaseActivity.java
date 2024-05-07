@@ -44,8 +44,8 @@ public final class BaseActivity extends FragmentActivity
     private static final String LOG_TAG = BaseActivity.class.getSimpleName();
     private static final int START_DEFAULT_POSITION = 0;
 
-    private static int REQUEST_GENERAL_PERMISSIONS = 0;
-    private static int REQUEST_LOCATION_PERMISSIONS = 1;
+    private static final int REQUEST_GENERAL_PERMISSIONS = 0;
+    private static final int REQUEST_LOCATION_PERMISSIONS = 1;
 
     private BaseTrackableController mDisplayController;
 
@@ -61,7 +61,7 @@ public final class BaseActivity extends FragmentActivity
     private boolean mIsDestroyBroadcastReceived;
 
     @Override
-    public final void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Logging.out(LOG_TAG, "onCreate");
 

@@ -8,8 +8,8 @@ import com.loopme.Constants;
 
 public class AdReceiver extends BroadcastReceiver {
 
-    private Listener mListener;
-    private int mAdId;
+    private final Listener mListener;
+    private final int mAdId;
 
     public interface Listener {
         void onDestroyBroadcast();

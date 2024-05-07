@@ -7,7 +7,7 @@ import com.loopme.network.GetResponse;
 import com.loopme.webservice.LoopMeAdServiceImpl;
 
 public class AdFetchTaskByUrl extends AdFetchTask {
-    private String mUrl;
+    private final String mUrl;
 
     public AdFetchTaskByUrl(LoopMeAd loopMeAd, AdFetcherListener adFetcherListener, String url) {
         super(loopMeAd, adFetcherListener);

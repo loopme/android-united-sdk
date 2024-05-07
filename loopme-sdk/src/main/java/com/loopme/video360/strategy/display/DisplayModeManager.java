@@ -9,7 +9,7 @@ import java.util.List;
 
 public class DisplayModeManager extends ModeManager<AbsDisplayStrategy> implements IDisplayMode {
 
-    private List<GLSurfaceView> mGLSurfaceViews;
+    private final List<GLSurfaceView> mGLSurfaceViews;
 
     public DisplayModeManager(List<GLSurfaceView> glSurfaceViews) {
         super();

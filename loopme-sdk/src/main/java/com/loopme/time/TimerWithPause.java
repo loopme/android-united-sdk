@@ -17,10 +17,10 @@ public abstract class TimerWithPause {
     private final long mTotalCountdown;
     private final long mCountdownInterval;
     private long mPauseTimeRemaining;
-    private boolean mRunAtStart;
+    private final boolean mRunAtStart;
 
     @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler() {
+    private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             handleTimerMessage();

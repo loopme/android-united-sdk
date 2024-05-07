@@ -15,8 +15,8 @@ public abstract class AdWrapper extends AdConfig {
     private static final String LOG_TAG = AdWrapper.class.getSimpleName();
     private boolean mIsAutoLoadingPaused;
     private int mFailCounter;
-    private String mAppKey;
-    private Activity mActivity;
+    private final String mAppKey;
+    private final Activity mActivity;
     private CountDownTimer mSleepLoadTimer;
     private long mStartLoadingTime;
     private int mLoadingCounter;
@@ -328,7 +328,7 @@ public abstract class AdWrapper extends AdConfig {
 
     protected String getPassedTime() {
         double time = (double) (System.currentTimeMillis() - mStartLoadingTime) / 1000;
-        return String.valueOf(Utils.formatTime(time));
+        return Utils.formatTime(time);
     }
 
     private boolean isNeedSendMissedEvent() {

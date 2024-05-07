@@ -125,7 +125,7 @@ mBanner.loadAd();
 * Add `LoopMeMoPubBanner.pause()` in onPause() to pause video
 ```java
 @Override
-protected void onPause() {
+private void onPause() {
     LoopMeMoPubBanner.pause();
     super.onPause();
 }
@@ -133,7 +133,7 @@ protected void onPause() {
 * Add `LoopMeMoPubBanner.resume()` in onResume() to resume video
 ```java
 @Override
-protected void onResume() {
+private void onResume() {
     LoopMeMoPubBanner.resume();
     super.onResume();
 }

@@ -25,7 +25,7 @@ public class ViewableImpression {
 
     @Tag
     private ViewUndetermined viewUndetermined;
-    private Map<String, List<String>> mViewableImpressionMap = new HashMap<>();
+    private final Map<String, List<String>> mViewableImpressionMap = new HashMap<>();
 
 
     public String getId() {

@@ -29,9 +29,9 @@ public class VastWrapperFetcher {
     private static final long WRAPPER_REQUEST_TIMEOUT = 10000;
     private boolean mIsFollowAdditionalWrapper = true;
     private int mCurrentWrapper = 1;
-    private String mVastString;
+    private final String mVastString;
     private Listener mListener;
-    private List<Wrapper> mWrappersList = new ArrayList<>();
+    private final List<Wrapper> mWrappersList = new ArrayList<>();
     private CountDownTimer mWrapperTimer;
     protected Handler mHandler = new Handler(Looper.getMainLooper());
     private volatile boolean mIsStopped;

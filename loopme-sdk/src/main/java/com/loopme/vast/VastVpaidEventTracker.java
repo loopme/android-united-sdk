@@ -16,8 +16,8 @@ import java.util.Set;
 public class VastVpaidEventTracker {
     private static final String LOG_TAG = VastVpaidEventTracker.class.getSimpleName();
 
-    private Set<String> mUsedEventsSet = new HashSet<>();
-    private List<Tracking> mEventsList = new ArrayList<>();
+    private final Set<String> mUsedEventsSet = new HashSet<>();
+    private final List<Tracking> mEventsList = new ArrayList<>();
 
     public VastVpaidEventTracker(List<Tracking> events) {
         mUsedEventsSet.clear();

@@ -52,15 +52,15 @@ public class AdParams implements Serializable {
     private String mVideoRedirectUrl;
     private AdType mAdType = AdType.HTML;
 
-    private List<String> mCompanionCreativeViewEventsList = new ArrayList<>();
+    private final List<String> mCompanionCreativeViewEventsList = new ArrayList<>();
     private List<String> mVideoFileUrlsList = new ArrayList<>();
     private List<String> mEndCardUrlList = new ArrayList<>();
     private List<String> mImpressionsList = new ArrayList<>();
     private List<String> mVideoClicksList = new ArrayList<>();
     private List<String> mEndCardClicksList = new ArrayList<>();
 
-    private List<String> mErrorUrlList = new ArrayList<>();
-    private List<Tracking> mTrackingEventsList = new ArrayList<>();
+    private final List<String> mErrorUrlList = new ArrayList<>();
+    private final List<Tracking> mTrackingEventsList = new ArrayList<>();
     private List<Verification> verificationList = new ArrayList<>();
     private Map<String, List<String>> mViewableImpressionMap = new HashMap<>();
     private List<String> mTrackersList = new ArrayList<>();

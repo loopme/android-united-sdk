@@ -4,6 +4,8 @@ import android.util.Base64;
 
 import com.loopme.Constants;
 
+import java.nio.charset.StandardCharsets;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -43,7 +45,7 @@ public class AES {
         try {
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            setEncryptedString(Base64.encodeToString(cipher.doFinal(stringToEncrypt.getBytes(Constants.UTF_8)), Base64.DEFAULT));
+            setEncryptedString(Base64.encodeToString(cipher.doFinal(stringToEncrypt.getBytes(StandardCharsets.UTF_8)), Base64.DEFAULT));
         } catch (Exception e) {
             e.printStackTrace();
         }

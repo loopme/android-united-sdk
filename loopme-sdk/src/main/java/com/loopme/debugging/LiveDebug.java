@@ -28,7 +28,7 @@ public class LiveDebug {
     private static final int DEBUG_TIME = 3 * 60 * 1000;
 
     private static LogDbHelper sLogDbHelper;
-    private static ExecutorService sExecutor = Executors.newSingleThreadExecutor();
+    private static final ExecutorService sExecutor = Executors.newSingleThreadExecutor();
 
     private static CountDownTimer sDebugTimer;
     private static boolean sIsDebugOn;

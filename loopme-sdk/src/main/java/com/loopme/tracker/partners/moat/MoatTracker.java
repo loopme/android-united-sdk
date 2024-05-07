@@ -65,7 +65,7 @@ public class MoatTracker implements Tracker {
         private static final int FIRST_ARGUMENT = 0;
         private static final int SECOND_ARGUMENT = 1;
         private float mPreviousVolume;
-        private Map<String, String> mAdIds;
+        private final Map<String, String> mAdIds;
 
         protected MoatNativeTracker(LoopMeAd loopMeAd) {
             super(loopMeAd);
@@ -145,11 +145,8 @@ public class MoatTracker implements Tracker {
         private void startTracking(Object[] args) {
             if (ArrayUtils.isArgumentsValid(args)
                     && args.length >= 2
-                    && args[FIRST_ARGUMENT] instanceof MediaPlayer
-                    && args[SECOND_ARGUMENT] instanceof View) {
-
-                MediaPlayer mediaPlayer = (MediaPlayer) args[FIRST_ARGUMENT];
-                View playerView = (View) args[SECOND_ARGUMENT];
+                    && args[FIRST_ARGUMENT] instanceof MediaPlayer mediaPlayer
+                    && args[SECOND_ARGUMENT] instanceof View playerView) {
 
                 changeTargetView(playerView);
                 trackVideoAd(mediaPlayer, playerView);
@@ -280,7 +277,7 @@ public class MoatTracker implements Tracker {
 
     private abstract class MoatBaseTracker implements Tracker {
         private final WebView mWebView;
-        private MoatFactory mFactory;
+        private final MoatFactory mFactory;
 
         protected MoatBaseTracker(LoopMeAd loopMeAd) {
             mFactory = MoatFactory.create();

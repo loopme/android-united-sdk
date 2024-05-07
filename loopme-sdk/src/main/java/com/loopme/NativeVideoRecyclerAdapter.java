@@ -17,12 +17,12 @@ public class NativeVideoRecyclerAdapter extends RecyclerView.Adapter
 
     static final int TYPE_AD = 1000;
 
-    private RecyclerView.Adapter mOriginAdapter;
-    private NativeVideoController mNativeVideoController;
-    private Activity mActivity;
-    private LayoutInflater mInflater;
+    private final RecyclerView.Adapter mOriginAdapter;
+    private final NativeVideoController mNativeVideoController;
+    private final Activity mActivity;
+    private final LayoutInflater mInflater;
 
-    private RecyclerView mRecyclerView;
+    private final RecyclerView mRecyclerView;
 
     public NativeVideoRecyclerAdapter(RecyclerView.Adapter originAdapter,
                                       Activity activity,
@@ -308,7 +308,7 @@ public class NativeVideoRecyclerAdapter extends RecyclerView.Adapter
     }
 
     protected class NativeVideoViewHolder extends RecyclerView.ViewHolder {
-        private RelativeLayout adView;
+        private final RelativeLayout adView;
 
         private NativeVideoViewHolder(View view) {
             super(view);

@@ -2,8 +2,8 @@ package com.loopme;
 
 public class NativeVideoBinder {
 
-    private int mLayoutId;
-    private int mBannerViewId;
+    private final int mLayoutId;
+    private final int mBannerViewId;
 
     private NativeVideoBinder(Builder builder) {
         mLayoutId = builder.mLayoutId;
@@ -21,7 +21,7 @@ public class NativeVideoBinder {
 
     public static class Builder {
 
-        private int mLayoutId;
+        private final int mLayoutId;
         private int mBannerViewId;
 
         public Builder(int layoutId) {

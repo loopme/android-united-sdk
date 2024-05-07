@@ -34,8 +34,8 @@ public final class PermissionUtils {
             this.grantedPermissions = grantedPermissions;
         }
 
-        private List<String> deniedPermissions;
-        private List<String> grantedPermissions;
+        private final List<String> deniedPermissions;
+        private final List<String> grantedPermissions;
 
         public List<String> getDeniedPermissions() {
             return deniedPermissions;
