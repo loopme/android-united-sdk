@@ -1,12 +1,13 @@
 package com.loopme.banner_sample.app.model;
 
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.loopme.banner_sample.app.R;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.loopme.banner_sample.R;
 import com.loopme.banner_sample.app.views.MainFeaturesFragment;
 
 import java.util.ArrayList;

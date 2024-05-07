@@ -1,10 +1,11 @@
 package com.loopme.interstitial_sample;
 
 import android.app.ProgressDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.loopme.LoopMeInterstitial;
 import com.loopme.LoopMeSdk;
@@ -62,7 +63,7 @@ public class MainActivity
     private void onLoadClicked() {
         // Create new interstitial object
         if (mInterstitial == null) {
-            mInterstitial = LoopMeInterstitial.getInstance(LoopMeInterstitial.TEST_PORT_INTERSTITIAL, this);
+            mInterstitial = LoopMeInterstitial.getInstance("b5df00223e", this);
             mInterstitial.setAutoLoading(false);
         }
 

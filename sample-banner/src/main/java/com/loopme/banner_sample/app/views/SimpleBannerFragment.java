@@ -1,16 +1,17 @@
 package com.loopme.banner_sample.app.views;
 
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.loopme.LoopMeBanner;
 import com.loopme.LoopMeBannerView;
-import com.loopme.banner_sample.app.R;
+import com.loopme.banner_sample.R;
 import com.loopme.common.LoopMeError;
 
 public class SimpleBannerFragment extends Fragment implements LoopMeBanner.Listener {
@@ -52,7 +53,7 @@ public class SimpleBannerFragment extends Fragment implements LoopMeBanner.Liste
     }
 
     private void initBanner(LoopMeBannerView containerView) {
-        mBanner = LoopMeBanner.getInstance(LoopMeBanner.TEST_MPU_BANNER, getActivity());
+        mBanner = LoopMeBanner.getInstance("3ae8c26803", getActivity());
         mBanner.bindView(containerView);
         mBanner.setListener(this);
         mBanner.setAutoLoading(false);
