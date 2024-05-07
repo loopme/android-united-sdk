@@ -11,21 +11,16 @@ import com.loopme.gdpr.ConsentType;
  * Created by katerina on 4/27/18.
  */
 public final class IABPreferences {
-
     private static final String IAB_TCF_TC_STRING = "IABTCF_TCString";
     private static final String IAB_TCF_CMP_SDK_VERSION = "IABTCF_CmpSdkVersion";
     private static final String IAB_TCF_GDPR_APPLIES = "IABTCF_gdprApplies";
-
     private static final String IAB_US_PRIVACY_STRING = "IABUSPrivacy_String";
     private static final String IAB_US_PRIVACY_DOES_NOT_APPLY = "1---";
-
     private static String FLAG_GDPR;
-    private static ConsentType FLAG_CONSENT_TYPE = ConsentType.LOOPME;
+    private static ConsentType FLAG_CONSENT_TYPE = ConsentType.USER_RESTRICTED;
     private String usPrivacy;
     private boolean coppa;
-
     private final SharedPreferences prefs;
-
     private static IABPreferences instance;
 
     private IABPreferences(Context context) {
@@ -35,7 +30,6 @@ public final class IABPreferences {
     public static IABPreferences getInstance(Context context) {
         if (instance == null)
             instance = new IABPreferences(context);
-
         return instance;
     }
 
@@ -43,12 +37,10 @@ public final class IABPreferences {
         FLAG_GDPR = consent;
         FLAG_CONSENT_TYPE = consentType;
     }
-
     public void setGdprState(boolean consent, ConsentType consentType) {
         FLAG_GDPR = consent ? "1" : "0";
         FLAG_CONSENT_TYPE = consentType;
     }
-
     public String getGdprState() {
         return FLAG_GDPR;
     }
@@ -63,31 +55,26 @@ public final class IABPreferences {
         } catch (ClassCastException ex) {
             Logging.out(ex.toString());
         }
-
         return "";
     }
 
     public boolean isIabTcfCmpSdkPresent() {
         final int unset = -1;
-
         try {
             return prefs.getInt(IAB_TCF_CMP_SDK_VERSION, unset) > unset;
         } catch (ClassCastException ex) {
             Logging.out(ex.toString());
         }
-
         return false;
     }
 
     public int getIabTcfGdprApplies() {
         final int unset = -1;
-
         try {
             return prefs.getInt(IAB_TCF_GDPR_APPLIES, unset);
         } catch (ClassCastException ex) {
             Logging.out(ex.toString());
         }
-
         return unset;
     }
 
@@ -98,14 +85,12 @@ public final class IABPreferences {
         } catch (ClassCastException ex) {
             Logging.out(ex.toString());
         }
-
         return false;
     }
 
     public void setUSPrivacy(String usPrivacy) {
         this.usPrivacy = usPrivacy;
     }
-
     public String getUSPrivacyString() {
         if (usPrivacy != null) return usPrivacy;
         try {
@@ -113,14 +98,12 @@ public final class IABPreferences {
         } catch (ClassCastException ex) {
             Logging.out(ex.toString());
         }
-
         return IAB_US_PRIVACY_DOES_NOT_APPLY;
     }
 
     public boolean getCoppa() {
         return coppa;
     }
-
     public void setCoppa(boolean coppa) {
         this.coppa = coppa;
     }

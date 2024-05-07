@@ -12,9 +12,7 @@ import com.loopme.utils.ExecutorHelper;
  */
 
 public class DntFetcher implements Runnable {
-
     private static final String LOG_TAG = DntFetcher.class.getSimpleName();
-
     private final Context context;
     private final OnDntFetcherListener onDntFetcherListener;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -32,15 +30,9 @@ public class DntFetcher implements Runnable {
     public void run() {
         final AdvertisingIdClient.AdInfo adInfo =
                 AdvertisingIdClient.getAdvertisingIdInfo(context);
-
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (onDntFetcherListener != null)
-                    onDntFetcherListener.onDntFetched(
-                            adInfo.isLimitAdTrackingEnabled(),
-                            adInfo.getId());
-            }
+        mainHandler.post(() -> {
+            if (onDntFetcherListener != null)
+                onDntFetcherListener.onDntFetched(adInfo.isLimitAdTrackingEnabled(), adInfo.getId());
         });
     }
 
