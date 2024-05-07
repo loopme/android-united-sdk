@@ -12,6 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name="com.loopme.applovin.app.MainActivity"
             android:exported="true">
@@ -21,7 +22,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity android:name=".InterstitialActivity" />
+        <activity android:name=".BannerActivity" />
+        <activity android:name=".RewardedVideoActivity" />
         <!-- Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713 -->
         <meta-data android:name="applovin.sdk.key"
             android:value="mS4u2IXJUmLuQxVgAfXAOAlRr_EkaXTz88uiE5HHG5RJ3OlVC81NmdXhl5H3bINKhAe3oufK2FD9rXC6xpIJd9"/>

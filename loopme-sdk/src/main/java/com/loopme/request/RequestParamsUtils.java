@@ -5,10 +5,13 @@ import android.content.res.Resources;
 import android.graphics.Point;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.text.TextUtils;
 import android.view.Display;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 
 import com.loopme.Constants;
 import com.loopme.LoopMeBannerGeneral;
@@ -16,6 +19,9 @@ import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.utils.ConnectionUtils;
 import com.loopme.utils.Utils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by vynnykiakiv on 6/14/17.
@@ -25,6 +31,8 @@ public class RequestParamsUtils {
 
     private static final String UNKNOWN_SSID = "unknown ssid";
     private static final String SSID_VALUE = "0x";
+    // Map to store the sizes of each LoopMeAd by mAppKey
+    private static final Map<String, int[]> adSizes = new HashMap<>();
 
     public static String getWifiName(Context context) {
         try {
@@ -77,6 +85,8 @@ public class RequestParamsUtils {
         if (context == null || baseAd == null) {
             return adSizeArray;
         }
+        
+        final String appKey = baseAd.getAppKey();
 
         if (baseAd instanceof LoopMeInterstitialGeneral) {
             int widthInDp = RequestParamsUtils.convertPixelToDp(context, getDeviceWidthPx(context));
@@ -85,20 +95,37 @@ public class RequestParamsUtils {
             adSizeArray[1] = heightInDp;
 
         } else if (baseAd instanceof LoopMeBannerGeneral) {
-            LoopMeBannerGeneral banner = (LoopMeBannerGeneral) baseAd;
-            ViewGroup.LayoutParams params = RequestParamsUtils.getParamsSafety(banner);
-            int currentWidthInDp = 0;
-            int currentHeightInDp = 0;
-            if (params != null) {
-                currentWidthInDp = RequestParamsUtils.convertPixelToDp(context, params.width);
-                currentHeightInDp = RequestParamsUtils.convertPixelToDp(context, params.height);
+            final LoopMeBannerGeneral banner = (LoopMeBannerGeneral) baseAd;
+            final FrameLayout bannerView = banner.getBannerView();
+            if (bannerView != null) {
+                bannerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        int currentWidthInDp = RequestParamsUtils.convertPixelToDp(context, bannerView.getWidth());
+                        int currentHeightInDp = RequestParamsUtils.convertPixelToDp(context, bannerView.getHeight());
+                        if (currentWidthInDp > 0 && currentHeightInDp > 0) {
+                            adSizeArray[0] = currentWidthInDp;
+                            adSizeArray[1] = currentHeightInDp;
+
+                            // Round the size before updating the map
+                            Utils.roundBannersSize(adSizeArray, Constants.Banner.EXPANDABLE_BANNER_SIZE);
+                            Utils.roundBannersSize(adSizeArray, Constants.Banner.MPU_BANNER_SIZE);
+                            adSizes.put(appKey, adSizeArray);
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                bannerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                            } else {
+                                bannerView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                            }
+                        }
+                    }
+                });
             }
 
-            adSizeArray[0] = currentWidthInDp;
-            adSizeArray[1] = currentHeightInDp;
-
-            Utils.roundBannersSize(adSizeArray, Constants.Banner.EXPANDABLE_BANNER_SIZE);
-            Utils.roundBannersSize(adSizeArray, Constants.Banner.MPU_BANNER_SIZE);
+            // Get the size from the map
+            if (adSizes.containsKey(appKey)) {
+                return adSizes.get(appKey);
+            }
         }
         return adSizeArray;
     }
