@@ -6,8 +6,6 @@ android {
     namespace = "com.loopme"
     defaultConfig {
         consumerProguardFiles("proguard-rules.pro")
-        buildConfigField("String", "MOAT_TOKEN", project.findProperty("MOAT_TOKEN") as? String ?: "")
-        buildConfigField("String", "LOOPME_GDPR_URL", project.findProperty("LOOPME_GDPR_URL") as? String ?: "")
         buildConfigField("String", "OM_SDK_JS_URL", project.findProperty("OM_SDK_JS_URL") as? String ?: "")
         buildConfigField("String", "OM_SDK_PARTNER", project.findProperty("OM_SDK_PARTNER") as? String ?: "")
         buildConfigField("String", "VERSION_NAME", project.findProperty("VERSION_NAME") as? String ?: "")
@@ -16,7 +14,6 @@ android {
 
 dependencies {
     implementation(files("libs/omsdk-android-1.3.3-loopme.jar"))
-    implementation(files("libs/moat-mobile-appkit.jar"))
 
     api("androidx.appcompat:appcompat:1.6.1")
     api("androidx.recyclerview:recyclerview:1.3.2")

@@ -7,7 +7,6 @@ import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.constants.Event;
 import com.loopme.tracker.constants.Partner;
 import com.loopme.tracker.partners.DvTracker;
-import com.loopme.tracker.partners.moat.MoatTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +26,7 @@ public class TrackerManager {
 
     public void startSdk() {
         for (String name : mTrackersNamesList) {
-            if (isMoat(name)) {
-                MoatTracker.startSdk(mLoopMeAd);
-            } else if (isDv(name)) {
+            if (isDv(name)) {
                 DvTracker.startSdk(mLoopMeAd);
             }
         }
@@ -39,9 +36,7 @@ public class TrackerManager {
         for (String name : mTrackersNamesList) {
             Tracker tracker = null;
 
-            if (isMoat(name)) {
-                tracker = initTracker(Partner.MOAT, adType);
-            } else if (isDv(name)) {
+            if (isDv(name)) {
                 tracker = initTracker(Partner.DV, adType);
             }
             if (tracker != null) {
@@ -59,10 +54,6 @@ public class TrackerManager {
     private Tracker initTracker(Partner partner, AdType adType) {
         Tracker tracker = null;
         switch (partner) {
-            case MOAT: {
-                tracker = new MoatTracker(mLoopMeAd, adType);
-                break;
-            }
             case DV: {
                 tracker = new DvTracker();
                 break;
@@ -73,9 +64,5 @@ public class TrackerManager {
 
     private boolean isDv(String name) {
         return !TextUtils.isEmpty(name) && name.equalsIgnoreCase(Partner.DV.name());
-    }
-
-    private boolean isMoat(String name) {
-        return !TextUtils.isEmpty(name) && name.equalsIgnoreCase(Partner.MOAT.name());
     }
 }

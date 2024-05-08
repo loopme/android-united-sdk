@@ -27,8 +27,6 @@ public enum Event {
     INJECT_JS_WEB,
     INJECT_JS_VPAID,
 
-
-    //MOAT
     INIT,
     START,
     STOP,

@@ -24,8 +24,6 @@ import com.loopme.location.GoogleLocationService;
 import com.loopme.utils.StringUtils;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +34,6 @@ import java.util.UUID;
 public class RequestUtils {
 
     private static final String VIEWABILITY_VENDOR = "viewability";
-    private static final String MOAT = "moat";
     private static final String TYPE_KEY = "type";
     private static final String VENDOR_KEY = "vendor";
     private static final String VIDEO = "HTML - for usual MP4 video";
@@ -474,14 +471,7 @@ public class RequestUtils {
     }
 
     JSONArray getTrackersSupported() {
-        JSONArray arr = new JSONArray();
-        try {
-            arr.put(new JSONObject().put(TYPE_KEY, VIEWABILITY_VENDOR).put(VENDOR_KEY, MOAT));
-            return arr;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return arr;
+        return new JSONArray();
     }
 
     int getSkippable() {

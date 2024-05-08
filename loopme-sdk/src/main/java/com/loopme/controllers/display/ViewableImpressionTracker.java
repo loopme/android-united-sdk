@@ -3,7 +3,7 @@ package com.loopme.controllers.display;
 import android.view.View;
 
 import com.loopme.Logging;
-import com.loopme.MoatViewAbilityUtils;
+import com.loopme.ViewAbilityUtils;
 import com.loopme.ad.AdParams;
 import com.loopme.vast.VastVpaidEventTracker;
 import com.loopme.utils.ExecutorHelper;
@@ -40,8 +40,8 @@ class ViewableImpressionTracker {
     }
 
     private boolean isVideoVisible() {
-        MoatViewAbilityUtils.ViewAbilityInfo viewAbilityInfo =
-                MoatViewAbilityUtils.calculateViewAbilityInfo(mAdView);
+        ViewAbilityUtils.ViewAbilityInfo viewAbilityInfo =
+                ViewAbilityUtils.calculateViewAbilityInfo(mAdView);
 
         Logging.out(
                 LOG_TAG,

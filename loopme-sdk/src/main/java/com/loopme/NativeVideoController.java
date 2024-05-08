@@ -216,16 +216,16 @@ class NativeVideoController {
     }
 
     private void checkFiftyPercentVisibility(final View view, final int adIndex) {
-        MoatViewAbilityUtils.calculateViewAbilitySyncDelayed(view, new MoatViewAbilityUtils.OnResultListener() {
+        ViewAbilityUtils.calculateViewAbilitySyncDelayed(view, new ViewAbilityUtils.OnResultListener() {
 
             @Override
-            public void onResult(final MoatViewAbilityUtils.ViewAbilityInfo info) {
+            public void onResult(final ViewAbilityUtils.ViewAbilityInfo info) {
                 onVisibilityResult(info, adIndex);
             }
         });
     }
 
-    private void onVisibilityResult(MoatViewAbilityUtils.ViewAbilityInfo info, int adIndex) {
+    private void onVisibilityResult(ViewAbilityUtils.ViewAbilityInfo info, int adIndex) {
         LoopMeBanner banner = mAdsMap.get(adIndex);
         if (info.isVisibleMore50Percents()) {
             Logging.out(LOG_TAG, "visible more than 50%");

@@ -15,15 +15,15 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MoatViewAbilityUtils {
-    private static final String LOG_TAG = MoatViewAbilityUtils.class.getSimpleName();
+public class ViewAbilityUtils {
+    private static final String LOG_TAG = ViewAbilityUtils.class.getSimpleName();
     private static final Handler mHandler = new Handler(Looper.getMainLooper());
     private static final double TOTAL_OVERLAPPED = 1.0D;
     private static final double INVISIBLE = 0;
     private static final double FIFTY_PERCENT = 0.5;
     private static final long DELAY = 100;
 
-    private MoatViewAbilityUtils() {
+    private ViewAbilityUtils() {
     }
 
     public static void calculateViewAbilitySyncDelayed(final View checkedView, final OnResultListener listener) {
