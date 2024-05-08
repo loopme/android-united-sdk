@@ -1,6 +1,5 @@
 package com.loopme.controllers.display;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
@@ -22,7 +21,7 @@ import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.LoopMeBannerGeneral;
 import com.loopme.MinimizedMode;
-import com.loopme.MoatViewAbilityUtils;
+import com.loopme.ViewAbilityUtils;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
@@ -540,9 +539,9 @@ public class DisplayControllerLoopMe
 
     private void checkBannerVisibility() {
         if (isBanner() && mLoopMeAd != null) {
-            MoatViewAbilityUtils.calculateViewAbilitySyncDelayed(mLoopMeAd.getContainerView(), new MoatViewAbilityUtils.OnResultListener() {
+            ViewAbilityUtils.calculateViewAbilitySyncDelayed(mLoopMeAd.getContainerView(), new ViewAbilityUtils.OnResultListener() {
                 @Override
-                public void onResult(MoatViewAbilityUtils.ViewAbilityInfo info) {
+                public void onResult(ViewAbilityUtils.ViewAbilityInfo info) {
                     if (info.isVisibleMore50Percents()) {
                         setWebViewState(Constants.WebviewState.VISIBLE);
                         dispatchEvent();

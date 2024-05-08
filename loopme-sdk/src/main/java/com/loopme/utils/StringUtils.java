@@ -3,10 +3,8 @@ package com.loopme.utils;
 import android.os.Build;
 import android.text.TextUtils;
 
-import com.loopme.Constants;
 import com.loopme.request.AES;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -30,7 +28,11 @@ public class StringUtils {
     }
 
     public static String getUrlEncodedString(String stringToEncode) {
-        return URLEncoder.encode(stringToEncode, StandardCharsets.UTF_8);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return URLEncoder.encode(stringToEncode, StandardCharsets.UTF_8);
+        } else {
+            return URLEncoder.encode(stringToEncode);
+        }
     }
 
     public static String setErrorCode(String vastErrorUrl, String vastErrorCode) {

@@ -1,13 +1,14 @@
 package com.loopme.parser;
 
 
+import android.os.Build;
+
 import com.loopme.Constants;
 import com.loopme.Logging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
@@ -45,7 +46,11 @@ public class HtmlParser {
 
     @Deprecated
     public static String decode(String source) {
-        return URLDecoder.decode(source, StandardCharsets.UTF_8);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return URLDecoder.decode(source, StandardCharsets.UTF_8);
+        } else {
+            return URLDecoder.decode(source);
+        }
     }
 
     public int getAdWidth() {
