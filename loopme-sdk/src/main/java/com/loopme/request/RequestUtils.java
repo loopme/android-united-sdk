@@ -457,19 +457,6 @@ public class RequestUtils {
         return mDnt;
     }
 
-    ArrayList getSupportedTechs() {
-        ArrayList<String> techsList = new ArrayList<>();
-        techsList.add(VIDEO);
-        techsList.add(VAST2);
-        techsList.add(VAST3);
-        techsList.add(VAST4);
-        techsList.add(VPAID1);
-        techsList.add(VPAID2);
-        techsList.add(MRAID2);
-        techsList.add(V360);
-        return techsList;
-    }
-
     JSONArray getTrackersSupported() {
         return new JSONArray();
     }

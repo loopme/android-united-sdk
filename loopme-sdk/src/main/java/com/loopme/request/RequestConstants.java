@@ -12,7 +12,7 @@ public class RequestConstants {
     public static final String DEVICE_BLUETOOTH_NAME = "bluetooth_name";
     public static final int DEFAULT_MAX_DURATION = 999;
     public static final int BOXING_DEFAULT = 1;
-    public static final int MAX_TIME_TO_SUBMIT_BID = 250;
+    public static final int MAX_TIME_TO_SUBMIT_BID = 700;
     public static final int SECURE_IMPRESSION = 1;
     public static final int MAX_BITRATE_DEFAULT_VALUE = 1024;
     public static final int MIN_BITRATE_DEFAULT_VALUE = 5;

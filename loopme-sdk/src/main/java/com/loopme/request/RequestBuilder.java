@@ -43,8 +43,6 @@ public class RequestBuilder implements Serializable {
     private static final String MODEL = "model";
     private static final String EXT = "ext";
     private static final String TIMEZONE = "timezone";
-    private static final String PHONE_NAME = "phonename";
-    private static final String WIFI_NAME = "wifiname";
     private static final String ORIENTATION = "orientation";
     private static final String CHARGE_LEVEL = "chargelevel";
     private static final String PLUGIN = "plugin";
@@ -76,7 +74,6 @@ public class RequestBuilder implements Serializable {
     private static final String MAX_BITRATE = "maxbitrate";
     private static final String DISPLAY_MANAGER = "displaymanager";
     private static final String INSTL = "instl";
-    private static final String SUPPORTED_TECS = "supported_techs";
     private static final String METRIC = "metric";
     private static final String SKIP = "skip";
     private static final String PARAM_CONSENT_TYPE = "consent_type";
@@ -131,8 +128,6 @@ public class RequestBuilder implements Serializable {
 
             JSONObject extObj = new JSONObject();
             extObj.put(TIMEZONE, requestUtils.getTimeZone());
-            extObj.put(PHONE_NAME, requestUtils.getPhoneName());
-            extObj.put(WIFI_NAME, requestUtils.getWifiName());
             extObj.put(ORIENTATION, requestUtils.getOrientation());
             extObj.put(CHARGE_LEVEL, requestUtils.getChargeLevel(context));
             extObj.put(PLUGIN, requestUtils.getPlugin());
@@ -192,8 +187,6 @@ public class RequestBuilder implements Serializable {
 
             JSONObject extImpObj = new JSONObject();
             extImpObj.put(IT, requestUtils.getIt());
-            JSONArray supportedTechsArray = new JSONArray(requestUtils.getSupportedTechs());
-            extImpObj.put(SUPPORTED_TECS, supportedTechsArray);
 
             JSONArray trackersArray = requestUtils.getTrackersSupported();
             impObj.put(METRIC, trackersArray);
@@ -277,11 +270,13 @@ public class RequestBuilder implements Serializable {
 
         JSONObject ext = new JSONObject();
         if (requestUtils.isIabTcfCmpSdkPresent(loopMeAd.getContext())) {
-            ext.put(CONSENT, requestUtils.getIabTcfTcString(loopMeAd.getContext()));
+            userObj.put(CONSENT, requestUtils.getIabTcfTcString(loopMeAd.getContext()));
         } else {
             ext.put(PARAM_CONSENT_TYPE, requestUtils.getConsentType(loopMeAd.getContext()));
             ext.put(CONSENT, requestUtils.getUserConsent(loopMeAd.getContext()));
+            userObj.put(CONSENT, requestUtils.getUserConsent(loopMeAd.getContext()));
         }
+
         userObj.put(EXT, ext);
         return userObj;
     }
