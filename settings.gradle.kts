@@ -36,10 +36,8 @@ include(
     ":bridges:ironSource:app",
     // AppLovin Mediation Adapter and Sample App
     ":bridges:appLovin:adapter",
-    ":bridges:appLovin:app"
+    ":bridges:appLovin:app",
     // AdMob Mediation Adapter and Sample App
-    //include ":bridges:admob:admob-mediation-sample:app"
-
-    // MoPub Mediation Adapter and Sample App
-    //include ":bridges:mopub:mopub-mediation-sample:app"
+    ":bridges:admob:adapter",
+    ":bridges:admob:app"
 )

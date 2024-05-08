@@ -16,7 +16,7 @@ fun Project.androidLibrary(configuration: LibraryExtension.() -> Unit) =
     extensions.getByName<LibraryExtension>("android").configuration()
 
 subprojects {
-    if (name in setOf("bridges", "ironSource", "appLovin")) {
+    if (name in setOf("bridges", "ironSource", "appLovin", "admob")) {
         return@subprojects
     }
     afterEvaluate {
