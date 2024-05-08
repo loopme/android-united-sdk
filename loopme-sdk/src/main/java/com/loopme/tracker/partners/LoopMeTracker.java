@@ -1,5 +1,6 @@
 package com.loopme.tracker.partners;
 
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.loopme.BuildConfig;
@@ -11,11 +12,10 @@ import com.loopme.debugging.LiveDebug;
 import com.loopme.debugging.Params;
 import com.loopme.network.HttpUtils;
 import com.loopme.request.RequestUtils;
+import com.loopme.utils.ExecutorHelper;
 import com.loopme.utils.StringUtils;
 import com.loopme.utils.Utils;
-import com.loopme.utils.ExecutorHelper;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -157,9 +157,17 @@ public class LoopMeTracker {
                 } else {
                     result.append("&");
                 }
-                result.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    result.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8));
+                } else {
+                    result.append(URLEncoder.encode(entry.getKey()));
+                }
                 result.append("=");
-                result.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    result.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
+                } else {
+                    result.append(URLEncoder.encode(entry.getValue()));
+                }
             }
         } catch (NullPointerException e) {
             Logging.out("HttpUtil", "UnsupportedEncoding: UTF-8");

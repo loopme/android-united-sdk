@@ -1,5 +1,7 @@
 package com.loopme.request;
 
+import static android.content.Context.BATTERY_SERVICE;
+
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -13,8 +15,8 @@ import android.text.TextUtils;
 import android.webkit.WebSettings;
 
 import com.loopme.BuildConfig;
-import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.IABPreferences;
+import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.R;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.gdpr.ConsentType;
@@ -31,13 +33,10 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.UUID;
 
-import static android.content.Context.BATTERY_SERVICE;
-
 public class RequestUtils {
 
     private static final String VIEWABILITY_VENDOR = "viewability";
     private static final String MOAT = "moat";
-    private static final String IAS = "ias";
     private static final String TYPE_KEY = "type";
     private static final String VENDOR_KEY = "vendor";
     private static final String VIDEO = "HTML - for usual MP4 video";
@@ -478,7 +477,6 @@ public class RequestUtils {
         JSONArray arr = new JSONArray();
         try {
             arr.put(new JSONObject().put(TYPE_KEY, VIEWABILITY_VENDOR).put(VENDOR_KEY, MOAT));
-            arr.put(new JSONObject().put(TYPE_KEY, VIEWABILITY_VENDOR).put(VENDOR_KEY, IAS));
             return arr;
         } catch (JSONException e) {
             e.printStackTrace();
