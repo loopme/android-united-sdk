@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 
 import com.loopme.AdTargetingData;
+import com.loopme.JSONBuilder;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.debugging.LiveDebug;
 import com.loopme.om.OmidHelper;
@@ -94,240 +95,140 @@ public class RequestBuilder implements Serializable {
     private static final String GEO_TYPE = "type";
     private static final String GEO = "geo";
 
-    public static JSONObject buildRequestJson(Context context, LoopMeAd loopMeAd) {
+    public static JSONObject buildRequestJson(Context context, LoopMeAd loopMeAd) throws JSONException {
         RequestUtils requestUtils = new RequestUtils(context, loopMeAd);
-        JSONObject requestObj = new JSONObject();
-        try {
-            JSONObject appObj = new JSONObject();
-            appObj.put(BUNDLE, requestUtils.getAppBundle());
-            appObj.put(NAME, requestUtils.getAppName());
-            appObj.put(VERSION, requestUtils.getAppVersion());
-            appObj.put(APPKEY, loopMeAd.getAppKey());
-
-            requestObj.put(APP, appObj);
-            requestObj.put(ID, requestUtils.getUuId());
-
-            JSONObject deviceObj = new JSONObject();
-            deviceObj.put(DEVICE_TYPE, requestUtils.getDeviceType());
-            deviceObj.put(WIDTH, requestUtils.getDeviceWidthPx());
-            deviceObj.put(HEIGHT, requestUtils.getDeviceHeightPx());
-            deviceObj.put(JS, requestUtils.getJs());
-            deviceObj.put(IFA, RequestUtils.getIfa());
-            deviceObj.put(OSV, requestUtils.getOsv());
-            deviceObj.put(CONNECTION_TYPE, requestUtils.getConnectionType());
-            deviceObj.put(OS, requestUtils.getOs());
-
-            deviceObj.put(LANGUAGE, requestUtils.getLanguage());
-            deviceObj.put(MAKE, requestUtils.getMake());
-            deviceObj.put(HWV, requestUtils.getHwv());
-            deviceObj.put(UA, requestUtils.getUa());
-            deviceObj.put(DNT, requestUtils.getDnt());
-            deviceObj.put(MODEL, requestUtils.getModel());
-
-            tryAddGeo(deviceObj, requestUtils);
-
-            JSONObject extObj = new JSONObject();
-            extObj.put(TIMEZONE, requestUtils.getTimeZone());
-            extObj.put(ORIENTATION, requestUtils.getOrientation());
-            extObj.put(CHARGE_LEVEL, requestUtils.getChargeLevel(context));
-            extObj.put(PLUGIN, requestUtils.getPlugin());
-            addDebugInfo(extObj, requestUtils, context);
-            deviceObj.put(EXT, extObj);
-            requestObj.put(DEVICE, deviceObj);
-            requestObj.put(TMAX, requestUtils.getTmax());
-
-            JSONArray bcatArray = new JSONArray(requestUtils.getBcat());
-            requestObj.put(BCAT, bcatArray);
-
-            JSONObject sourceObj = new JSONObject();
-            requestObj.put(SOURCE, sourceObj);
-
-            JSONObject sourceExtObj = new JSONObject();
-            sourceObj.put(EXT, sourceExtObj);
-
-            sourceExtObj.put(OMID_PARTNER_NAME, OmidHelper.getPartnerName());
-            sourceExtObj.put(OMID_PARTNER_VERSION, OmidHelper.getPartnerVersion());
-
-            JSONObject eventsObject = new JSONObject();
-            requestObj.put(EVENTS, eventsObject);
-
-            eventsObject.put(APIS, new JSONArray(new int[]{RequestConstants.FRAMEWORK_OMID_1}));
-
-            JSONObject eventsExtObj = new JSONObject();
-            eventsObject.put(EXT, eventsExtObj);
-
-            eventsExtObj.put(OMID_PARTNER_NAME, OmidHelper.getPartnerName());
-            eventsExtObj.put(OMID_PARTNER_VERSION, OmidHelper.getPartnerVersion());
-
-            JSONArray impArray = new JSONArray();
-            JSONObject impObj = new JSONObject();
-
-            impObj.put(SECURE, requestUtils.getSecure());
-            impObj.put(DISPLAY_MANAGER_VERSION, requestUtils.getDisplayManagerVersion());
-            impObj.put(ID, requestUtils.getImpId());
-
-            JSONObject bannerObj = createBannerObject(requestUtils);
-            JSONObject videoObj = createVideoObject(requestUtils);
-
-            switch (loopMeAd.getPreferredAdType()) {
-                case ALL: {
-                    impObj.put(BANNER, bannerObj);
-                    impObj.put(VIDEO, videoObj);
-                    break;
-                }
-                case HTML: {
-                    impObj.put(BANNER, bannerObj);
-                    break;
-                }
-                case VIDEO: {
-                    impObj.put(VIDEO, videoObj);
-                    break;
-                }
-            }
-
-            JSONObject extImpObj = new JSONObject();
-            extImpObj.put(IT, requestUtils.getIt());
-
-            JSONArray trackersArray = requestUtils.getTrackersSupported();
-            impObj.put(METRIC, trackersArray);
-
-            impObj.put(EXT, extImpObj);
-            impObj.put(BID_FLOOR, requestUtils.getBidFloor());
-
-            impObj.put(DISPLAY_MANAGER, requestUtils.getDisplayManager());
-            impObj.put(INSTL, requestUtils.getInstl());
-
-            impArray.put(impObj);
-            requestObj.put(IMP, impArray);
-            requestObj.put(USER, createUserObj(requestUtils, loopMeAd));
-            requestObj.put(REGS, createRegsObj(requestUtils, context));
-        } catch (JSONException | ClassCastException ex) {
-            ex.printStackTrace();
-        }
-        return requestObj;
-    }
-
-    private static void tryAddGeo(JSONObject deviceObj, RequestUtils requestUtils)
-            throws JSONException {
-
-        if (deviceObj == null || requestUtils == null)
-            return;
-
         Location location = requestUtils.getLocation();
-        if (location == null)
-            return;
-
-        JSONObject geoObj = new JSONObject();
-        geoObj.put(LAT, (float) location.getLatitude());
-        geoObj.put(LON, (float) location.getLongitude());
-        geoObj.put(GEO_TYPE, 1 /*gps/location services*/);
-
-        deviceObj.put(GEO, geoObj);
-    }
-
-    private static void addDebugInfo(JSONObject extObj, RequestUtils requestUtils, Context context) throws JSONException {
-        if (LiveDebug.isDebugOn() && requestUtils != null && context != null) {
-            if (requestUtils.isAnyAudioOutput(context)) {
-                extObj.put(OUTPUT, requestUtils.getAudioOutputJson(context));
-            }
-            extObj.put(MUSIC, requestUtils.getMusic(context));
-        }
-    }
-
-    private static JSONObject createRegsObj(RequestUtils requestUtils, Context context) throws JSONException {
-        JSONObject regs = new JSONObject();
-
-        regs.put(COPPA, requestUtils.getCoppa(context));
-
-        JSONObject ext = new JSONObject();
-        regs.put(EXT, ext);
-
-        ext.put(US_PRIVACY, requestUtils.getUSPrivacyString(context));
-
-        if (requestUtils.isIabTcfGdprAppliesPresent(context))
-            ext.put(GDPR, requestUtils.getIabTcfGdprApplies(context));
-
-        return regs;
-    }
-
-    private static JSONObject createUserObj(RequestUtils requestUtils, LoopMeAd loopMeAd) throws JSONException {
-        JSONObject userObj = new JSONObject();
-
         AdTargetingData data = loopMeAd.getAdTargetingData();
-        String gender = data.getGender();
-        String keywords = data.getKeywords();
-        int yob = data.getYob();
+        LoopMeAd.Type adType = loopMeAd.getPreferredAdType();
+        boolean isBanner = LoopMeAd.Type.ALL == adType || LoopMeAd.Type.HTML == adType;
+        boolean isVideo = LoopMeAd.Type.ALL == adType || LoopMeAd.Type.VIDEO == adType;
 
-        if (gender != null) {
-            userObj.put(GENDER, gender);
-        }
-        if (yob != 0) {
-            userObj.put(YOB, yob);
-        }
-        if (keywords != null) {
-            userObj.put(KEYWORDS, keywords);
-        }
-
-        JSONObject ext = new JSONObject();
-        if (requestUtils.isIabTcfCmpSdkPresent(loopMeAd.getContext())) {
-            userObj.put(CONSENT, requestUtils.getIabTcfTcString(loopMeAd.getContext()));
-        } else {
-            ext.put(PARAM_CONSENT_TYPE, requestUtils.getConsentType(loopMeAd.getContext()));
-            ext.put(CONSENT, requestUtils.getUserConsent(loopMeAd.getContext()));
-            userObj.put(CONSENT, requestUtils.getUserConsent(loopMeAd.getContext()));
-        }
-
-        userObj.put(EXT, ext);
-        return userObj;
-    }
-
-    private static JSONObject createBannerObject(RequestUtils requestUtils) throws JSONException {
-        JSONObject bannerObj = new JSONObject();
-
-        JSONArray apiArray = new JSONArray(requestUtils.getApi());
-        bannerObj.put(API, apiArray);
-
-        bannerObj.put(WIDTH, requestUtils.getWidth());
-        bannerObj.put(HEIGHT, requestUtils.getHeight());
-        bannerObj.put(ID, 1);
-
-        JSONArray battrArray = new JSONArray(requestUtils.getBattery());
-        bannerObj.put(BATTR, battrArray);
-
-        JSONArray expDirArray = new JSONArray(requestUtils.getExpDir());
-        bannerObj.put(EXP_DIR, expDirArray);
-        return bannerObj;
-    }
-
-    private static JSONObject createVideoObject(RequestUtils requestUtils) throws JSONException {
-        JSONObject videoObj = new JSONObject();
-
-        JSONArray apiArray = new JSONArray(requestUtils.getApi());
-        videoObj.put(API, apiArray);
-
-        videoObj.put(SKIP, requestUtils.getSkippable());
-
-        JSONArray protocolsArray = new JSONArray(requestUtils.getProtocols());
-        videoObj.put(PROTOCOLS, protocolsArray);
-
-        videoObj.put(MAX_DURATION, requestUtils.getMaxDuration());
-
-        JSONArray battrArray = new JSONArray(requestUtils.getBattery());
-        videoObj.put(BATTR, battrArray);
-        videoObj.put(WIDTH, requestUtils.getWidth());
-        videoObj.put(HEIGHT, requestUtils.getHeight());
-        videoObj.put(LINEARITY, requestUtils.getLinearity());
-        videoObj.put(BOXING_ALLOWED, requestUtils.getBoxingAllowed());
-
-        JSONArray mimeArray = new JSONArray(requestUtils.getMimeTypes());
-        videoObj.put(MIME_TYPE, mimeArray);
-        videoObj.put(START_DELAY, requestUtils.getStartDelay());
-
-        JSONArray deliveryArray = new JSONArray(requestUtils.getDelivery());
-        videoObj.put(DELIVERY, deliveryArray);
-        videoObj.put(SEQUENCE, requestUtils.getSequence());
-        videoObj.put(MIN_DURATION, requestUtils.getMinDuration());
-        videoObj.put(MAX_BITRATE, requestUtils.getMaxBitrate());
-        return videoObj;
+        return new JSONBuilder()
+            .put(ID, requestUtils.getUuId())
+            .put(TMAX, requestUtils.getTmax())
+            .put(BCAT, new JSONArray(requestUtils.getBcat()))
+            .put(APP, new JSONBuilder()
+                .put(BUNDLE, requestUtils.getAppBundle())
+                .put(NAME, requestUtils.getAppName())
+                .put(VERSION, requestUtils.getAppVersion())
+                .put(APPKEY, loopMeAd.getAppKey())
+                .build()
+            )
+            .put(SOURCE, new JSONBuilder()
+                .put(EXT, new JSONBuilder()
+                    .put(OMID_PARTNER_NAME, OmidHelper.getPartnerName())
+                    .put(OMID_PARTNER_VERSION, OmidHelper.getPartnerVersion())
+                    .build())
+                .build()
+            )
+            .put(EVENTS, new JSONBuilder()
+                .put(APIS, new JSONArray(new int[]{RequestConstants.FRAMEWORK_OMID_1}))
+                .put(EXT, new JSONBuilder()
+                    .put(OMID_PARTNER_NAME, OmidHelper.getPartnerName())
+                    .put(OMID_PARTNER_VERSION, OmidHelper.getPartnerVersion())
+                    .build())
+                .build()
+            )
+            .put(REGS, new JSONBuilder()
+                .put(COPPA, requestUtils.getCoppa(context))
+                .put(EXT, new JSONBuilder()
+                    .put(US_PRIVACY, requestUtils.getUSPrivacyString(context))
+                    .put(GDPR, requestUtils.isIabTcfGdprAppliesPresent(context) ?
+                        requestUtils.getIabTcfGdprApplies(context) : null
+                    )
+                    .build())
+                .build()
+            )
+            .put(USER, new JSONBuilder()
+                .put(GENDER, data.getGender())
+                .put(KEYWORDS, data.getKeywords())
+                .put(YOB, data.getYob() != 0 ? data.getYob() : null)
+                .put(CONSENT, requestUtils.isIabTcfCmpSdkPresent(loopMeAd.getContext()) ?
+                    requestUtils.getIabTcfTcString(loopMeAd.getContext()) : null
+                )
+                .put(EXT, !requestUtils.isIabTcfCmpSdkPresent(loopMeAd.getContext()) ?
+                    new JSONBuilder()
+                        .put(PARAM_CONSENT_TYPE, requestUtils.getConsentType(loopMeAd.getContext()))
+                        .put(CONSENT, requestUtils.getUserConsent(loopMeAd.getContext()))
+                        .build() : null
+                )
+                .build()
+            )
+            .put(DEVICE, new JSONBuilder()
+                .put(DEVICE_TYPE, requestUtils.getDeviceType())
+                .put(WIDTH, requestUtils.getDeviceWidthPx())
+                .put(HEIGHT, requestUtils.getDeviceHeightPx())
+                .put(JS, requestUtils.getJs())
+                .put(IFA, RequestUtils.getIfa())
+                .put(OSV, requestUtils.getOsv())
+                .put(CONNECTION_TYPE, requestUtils.getConnectionType())
+                .put(OS, requestUtils.getOs())
+                .put(LANGUAGE, requestUtils.getLanguage())
+                .put(MAKE, requestUtils.getMake())
+                .put(HWV, requestUtils.getHwv())
+                .put(UA, requestUtils.getUa())
+                .put(DNT, requestUtils.getDnt())
+                .put(MODEL, requestUtils.getModel())
+                .put(GEO, (location != null) ? new JSONBuilder()
+                    .put(LAT, (float) location.getLatitude())
+                    .put(LON, (float) location.getLongitude())
+                    .put(GEO_TYPE, 1 /*gps/location services*/)
+                    .build() : null
+                )
+                .put(EXT, new JSONBuilder()
+                    .put(TIMEZONE, requestUtils.getTimeZone())
+                    .put(ORIENTATION, requestUtils.getOrientation())
+                    .put(CHARGE_LEVEL, requestUtils.getChargeLevel(context))
+                    .put(PLUGIN, requestUtils.getPlugin())
+                    .put(OUTPUT, LiveDebug.isDebugOn() && requestUtils.isAnyAudioOutput(context) ?
+                        requestUtils.getAudioOutputJson(context) : null
+                    )
+                    .put(MUSIC, LiveDebug.isDebugOn() ? requestUtils.getMusic(context) : null)
+                    .build()
+                )
+                .build()
+            )
+            .put(IMP, new JSONArray(new JSONObject[]{ new JSONBuilder()
+                .put(BANNER, isBanner ? new JSONBuilder()
+                    .put(WIDTH, requestUtils.getWidth())
+                    .put(HEIGHT, requestUtils.getHeight())
+                    .put(ID, 1)
+                    .put(API, new JSONArray(requestUtils.getApi()))
+                    .put(BATTR, new JSONArray(requestUtils.getBattery()))
+                    .put(EXP_DIR, new JSONArray(requestUtils.getExpDir()))
+                    .build() : null
+                )
+                .put(VIDEO, isVideo ? new JSONBuilder()
+                    .put(SKIP, requestUtils.getSkippable())
+                    .put(MAX_DURATION, requestUtils.getMaxDuration())
+                    .put(WIDTH, requestUtils.getWidth())
+                    .put(HEIGHT, requestUtils.getHeight())
+                    .put(LINEARITY, requestUtils.getLinearity())
+                    .put(BOXING_ALLOWED, requestUtils.getBoxingAllowed())
+                    .put(START_DELAY, requestUtils.getStartDelay())
+                    .put(SEQUENCE, requestUtils.getSequence())
+                    .put(MIN_DURATION, requestUtils.getMinDuration())
+                    .put(MAX_BITRATE, requestUtils.getMaxBitrate())
+                    .put(API, new JSONArray(requestUtils.getApi()))
+                    .put(PROTOCOLS, new JSONArray(requestUtils.getProtocols()))
+                    .put(BATTR, new JSONArray(requestUtils.getBattery()))
+                    .put(MIME_TYPE, new JSONArray(requestUtils.getMimeTypes()))
+                    .put(DELIVERY, new JSONArray(requestUtils.getDelivery()))
+                    .build() : null
+                )
+                .put(SECURE, requestUtils.getSecure())
+                .put(DISPLAY_MANAGER_VERSION, requestUtils.getDisplayManagerVersion())
+                .put(ID, requestUtils.getImpId())
+                .put(METRIC, requestUtils.getTrackersSupported())
+                .put(BID_FLOOR, requestUtils.getBidFloor())
+                .put(DISPLAY_MANAGER, requestUtils.getDisplayManager())
+                .put(INSTL, requestUtils.getInstl())
+                .put(EXT, new JSONBuilder()
+                    .put(IT, requestUtils.getIt())
+                    .build()
+                )
+                .build()
+            }))
+            .build();
     }
 }
