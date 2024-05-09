@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
@@ -94,9 +95,13 @@ public class ViewControllerVast {
 
     public void adjustLayoutParams(int width, int height, boolean isBanner) {
         adjustPlayerParams(width, height);
-        if (isBanner) {
-            Utils.adjustLayoutParams(mPlayerLayout.getPlayerView().getLayoutParams(), mAdLayout.getLayoutParams());
+        if (!isBanner) {
+            return;
         }
+        ViewGroup.LayoutParams paramFrom = mPlayerLayout.getPlayerView().getLayoutParams();
+        ViewGroup.LayoutParams paramTo = mAdLayout.getLayoutParams();
+        paramTo.width = paramFrom.width;
+        paramTo.height = paramFrom.height;
     }
 
     private void adjustPlayerParams(int width, int height) {

@@ -1,11 +1,13 @@
 package com.loopme.controllers.display;
 
 import android.annotation.SuppressLint;
-import androidx.annotation.Nullable;
+import android.content.res.AssetManager;
 import android.text.TextUtils;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+
+import androidx.annotation.Nullable;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
@@ -21,11 +23,15 @@ import com.loopme.models.Errors;
 import com.loopme.models.Message;
 import com.loopme.time.SimpleTimer;
 import com.loopme.tracker.constants.EventConstants;
+import com.loopme.utils.IOUtils;
 import com.loopme.utils.UiUtils;
 import com.loopme.utils.Utils;
 import com.loopme.views.LoopMeWebView;
 import com.loopme.views.webclient.AdViewChromeClient;
 import com.loopme.xml.Tracking;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class DisplayControllerVpaid extends VastVpaidBaseDisplayController implements
         BridgeEventHandler,
@@ -62,13 +68,30 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     //region DisplayController methods
 
+    private StringBuilder readAssets(AssetManager assetManager, String filename) {
+        InputStream inputStream = null;
+        try {
+            inputStream = assetManager.open(filename);
+            StringBuilder out = new StringBuilder();
+            byte[] bytes = new byte[4096];
+            int numberBytesRead;
+            while ((numberBytesRead = inputStream.read(bytes)) != -1) {
+                out.append(new String(bytes, 0, numberBytesRead));
+            }
+            return out;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            IOUtils.closeQuietly(inputStream);
+        }
+        return new StringBuilder();
+    }
+
     @Override
     public void prepare() {
         super.prepare();
 
-        StringBuilder htmlBuilder =
-                Utils.readAssets(getAssetsManager(), HTML_SOURCE_FILE);
-
+        StringBuilder htmlBuilder = readAssets(getAssetsManager(), HTML_SOURCE_FILE);
         onAdInjectJsVpaid(htmlBuilder);
         String html = htmlBuilder.toString().replace(VPAID_CREATIVE_URL_STRING, mAdParams.getVpaidJsUrl());
 
@@ -447,8 +470,14 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         }
     }
 
+    private boolean isUsualFormat(String source) {
+        int lastIndex = source.lastIndexOf("/");
+        String fileName = TextUtils.isEmpty(source) || lastIndex < 0 ? "" : source.substring(lastIndex);
+        return fileName.contains(Constants.MP4_FORMAT_EXT) || fileName.contains(Constants.WEBM_FORMAT_EXT);
+    }
+
     private void checkVideoFormat(String source) {
-        if (Utils.isUsualFormat(source)) {
+        if (isUsualFormat(source)) {
             cancelExtraCloseButton();
             mCreativeType = CreativeType.VIDEO_MP4_WEBM;
         } else {

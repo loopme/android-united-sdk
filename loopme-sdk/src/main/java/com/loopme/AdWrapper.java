@@ -9,7 +9,8 @@ import com.loopme.common.LoopMeError;
 import com.loopme.controllers.interfaces.DisplayController;
 import com.loopme.debugging.Params;
 import com.loopme.tracker.partners.LoopMeTracker;
-import com.loopme.utils.Utils;
+
+import java.text.DecimalFormat;
 
 public abstract class AdWrapper extends AdConfig {
     private static final String LOG_TAG = AdWrapper.class.getSimpleName();
@@ -328,7 +329,7 @@ public abstract class AdWrapper extends AdConfig {
 
     protected String getPassedTime() {
         double time = (double) (System.currentTimeMillis() - mStartLoadingTime) / 1000;
-        return Utils.formatTime(time);
+        return new DecimalFormat("0.00").format(time);
     }
 
     private boolean isNeedSendMissedEvent() {

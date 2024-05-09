@@ -236,12 +236,18 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
         }
     }
 
+    private void removeParent(ViewGroup view) {
+        if (view != null && view.getParent() != null) {
+            ((ViewGroup) view.getParent()).removeView(view);
+        }
+    }
+
     public void onRebuildView(FrameLayout containerView) {
         if (containerView != null && mMraidView != null) {
-            Utils.removeParent(mMraidView);
+            removeParent(mMraidView);
             RelativeLayout.LayoutParams mraidViewLayoutParams = new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.MATCH_PARENT);
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.MATCH_PARENT);
             containerView.addView(mMraidView, mraidViewLayoutParams);
         }
     }
@@ -250,7 +256,7 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
         FrameLayout.LayoutParams mraidViewLayoutParams = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT);
-        Utils.removeParent(mMraidView);
+        removeParent(mMraidView);
         containerView.addView(mMraidView, mraidViewLayoutParams);
     }
 }

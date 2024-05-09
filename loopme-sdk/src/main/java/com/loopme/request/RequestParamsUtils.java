@@ -12,7 +12,6 @@ import com.loopme.Constants;
 import com.loopme.LoopMeBannerGeneral;
 import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.ad.LoopMeAd;
-import com.loopme.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +26,26 @@ public class RequestParamsUtils {
 
     private static int convertPixelToDp(Resources resources, int pixels) {
         return resources == null ? 0 : (int) (pixels / resources.getDisplayMetrics().density);
+    }
+
+    private static boolean isWithinAcceptableLimits(int sizeToCheck, int currentSize) {
+        int minSizeToCheck = sizeToCheck - Constants.Banner.SIZE_DISCREPANCY;
+        int maxSizeToCheck = sizeToCheck + Constants.Banner.SIZE_DISCREPANCY;
+        return minSizeToCheck <= currentSize && currentSize <= maxSizeToCheck;
+    }
+
+    private static void roundBannersSize(int[] currentSizeArray, int[] bannerSizeToCheck) {
+        int currentWidth = currentSizeArray[0];
+        int currentHeight = currentSizeArray[1];
+        int bannerWidth = bannerSizeToCheck[0];
+        int bannerHeight = bannerSizeToCheck[1];
+        if (
+            isWithinAcceptableLimits(bannerWidth, currentWidth) &&
+            isWithinAcceptableLimits(bannerHeight, currentHeight)
+        ) {
+            currentSizeArray[0] = bannerWidth;
+            currentSizeArray[1] = bannerHeight;
+        }
     }
 
     public static int[] getAdSize(Context context, LoopMeAd baseAd) {
@@ -57,8 +76,8 @@ public class RequestParamsUtils {
                         adSizeArray[1] = heightInDp;
 
                         // Round the size before updating the map
-                        Utils.roundBannersSize(adSizeArray, Constants.Banner.EXPANDABLE_BANNER_SIZE);
-                        Utils.roundBannersSize(adSizeArray, Constants.Banner.MPU_BANNER_SIZE);
+                        roundBannersSize(adSizeArray, Constants.Banner.EXPANDABLE_BANNER_SIZE);
+                        roundBannersSize(adSizeArray, Constants.Banner.MPU_BANNER_SIZE);
                         adSizes.put(appKey, adSizeArray);
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
