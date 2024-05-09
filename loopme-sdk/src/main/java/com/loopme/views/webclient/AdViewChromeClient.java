@@ -11,7 +11,6 @@ import android.webkit.WebView;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.tracker.partners.LoopMeTracker;
-import com.loopme.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,6 +118,17 @@ public class AdViewChromeClient extends WebChromeClient {
     private String locationPermissionOrigin;
     private GeolocationPermissions.Callback geolocationPermissionsCallback;
 
+    private String getSourceUrl(String message) {
+        String result = "";
+        if (message != null) {
+            String[] tokens = message.split(":");
+            if (tokens.length >= 3) {
+                return tokens[tokens.length - 1];
+            }
+        }
+        return result;
+    }
+
     @Override
     public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
         if (consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.ERROR ||
@@ -129,7 +139,7 @@ public class AdViewChromeClient extends WebChromeClient {
             onErrorFromJs(consoleMessage.message() + ". Source: " + consoleMessage.sourceId());
         }
         if (isVideoSourceEvent(consoleMessage.message())) {
-            onVideoSource(Utils.getSourceUrl(consoleMessage.message()));
+            onVideoSource(getSourceUrl(consoleMessage.message()));
         }
         return super.onConsoleMessage(consoleMessage);
     }

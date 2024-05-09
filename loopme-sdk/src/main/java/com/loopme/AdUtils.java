@@ -2,13 +2,13 @@ package com.loopme;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 
 import androidx.browser.customtabs.CustomTabsIntent;
 
 import com.loopme.ad.LoopMeAd;
 import com.loopme.ad.LoopMeAdHolder;
-import com.loopme.utils.Utils;
 import com.loopme.views.activity.BaseActivity;
 
 public class AdUtils {
@@ -50,8 +50,12 @@ public class AdUtils {
             customTabsIntent.launchUrl(context, Uri.parse(uri));
 
             // TODO. Refactor - Why Refactor? What does it mean?
-            return Utils.isActivityResolved(customTabsIntent.intent, context);
-
+            return context
+                    .getPackageManager()
+                    .resolveActivity(
+                        customTabsIntent.intent,
+                        PackageManager.MATCH_DEFAULT_ONLY
+                    ) != null;
         } catch (Exception e) {
             Logging.out(LOG_TAG, e.toString());
         }

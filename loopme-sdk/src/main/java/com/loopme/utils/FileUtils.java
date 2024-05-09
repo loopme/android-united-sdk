@@ -1,16 +1,12 @@
 package com.loopme.utils;
 
 import android.content.Context;
-import android.os.Environment;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.security.MessageDigest;
 
 /**
@@ -34,11 +30,22 @@ public class FileUtils {
         }
     }
 
+    public static String bytesToHex(byte[] bytes) {
+        char[] HEX = "0123456789ABCDEF".toCharArray();
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = HEX[v >>> 4];
+            hexChars[j * 2 + 1] = HEX[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
+
     public static String calculateChecksum(String url) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(url.getBytes());
-            return Utils.bytesToHex(md.digest());
+            return bytesToHex(md.digest());
         } catch (Exception e) {
             Logging.out(LOG_TAG, e.toString());
             return null;

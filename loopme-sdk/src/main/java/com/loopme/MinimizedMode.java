@@ -1,8 +1,9 @@
 package com.loopme;
 
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.utils.Utils;
@@ -26,7 +27,9 @@ public class MinimizedMode {
         }
         mRoot = root;
         mRecyclerView = recyclerView;
-        Utils.setDimensions(mMinimizedViewDims);
+        if (mMinimizedViewDims != null) {
+            Utils.setDimensions(mMinimizedViewDims);
+        }
     }
 
     public void setViewSize(int width, int height) {

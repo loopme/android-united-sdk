@@ -11,10 +11,9 @@ import android.view.Surface;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.LoopMeMediaPlayer;
-import com.loopme.models.Errors;
 import com.loopme.common.LoopMeError;
+import com.loopme.models.Errors;
 import com.loopme.tracker.partners.LoopMeTracker;
-import com.loopme.utils.Utils;
 import com.loopme.views.AdView;
 
 import java.util.HashMap;
@@ -331,7 +330,7 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
         mBufferingTimer = new CountDownTimer(BUFFERING_MILLIS_IN_FUTURE, BUFFERING_COUNTDOWN_INTERVAL) {
             @Override
             public void onTick(long millisUntilFinished) {
-                Logging.out(LOG_TAG, "Buffering " + Utils.toSeconds(millisUntilFinished) + " second...");
+                Logging.out(LOG_TAG, "Buffering " + (millisUntilFinished / 1000) + " second...");
             }
 
             @Override
@@ -382,9 +381,13 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
         }
     }
 
+    private int roundNumberToHundredth(int number) {
+        return (number / 100) * 100;
+    }
+
     private void setQuarters(int mVideoDuration) {
-        mQuarter25 = Utils.roundNumberToHundredth(mVideoDuration / FOURTH);
-        mQuarter50 = Utils.roundNumberToHundredth(mVideoDuration / HALF);
+        mQuarter25 = roundNumberToHundredth(mVideoDuration / FOURTH);
+        mQuarter50 = roundNumberToHundredth(mVideoDuration / HALF);
         mQuarter75 = mQuarter25 + mQuarter50;
     }
 

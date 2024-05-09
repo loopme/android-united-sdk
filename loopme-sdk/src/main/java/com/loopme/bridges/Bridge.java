@@ -3,13 +3,13 @@ package com.loopme.bridges;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Vibrator;
 import android.text.TextUtils;
 import android.webkit.WebView;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.tracker.partners.LoopMeTracker;
-import com.loopme.utils.Utils;
 import com.loopme.views.AdView;
 import com.loopme.views.webclient.WebViewClientCompat;
 
@@ -190,7 +190,15 @@ public class Bridge extends WebViewClientCompat {
     }
 
     private void handleVibrate(Context context) {
-        Utils.vibrate(context);
+        try {
+            Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+            if (vibrator != null) {
+                int VIBRATE_MILLISECONDS = 500;
+                vibrator.vibrate(VIBRATE_MILLISECONDS);
+            }
+        } catch (Exception e) {
+            Logging.out(LOG_TAG, "Missing permission for vibrate");
+        }
     }
 
     private void handleVideoPause(Uri uri) {

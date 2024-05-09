@@ -2,9 +2,6 @@ package com.loopme.controllers.view;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
-import androidx.annotation.NonNull;
-import androidx.core.content.res.ResourcesCompat;
-
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -18,10 +15,15 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
+
 import com.loopme.Constants;
 import com.loopme.R;
 import com.loopme.utils.Utils;
 import com.loopme.utils.ViewUtils;
+
+import java.util.Locale;
 
 public class PlayerLayout extends FrameLayout
         implements GestureDetector.OnGestureListener, TextureView.SurfaceTextureListener {
@@ -224,9 +226,17 @@ public class PlayerLayout extends FrameLayout
         }
     }
 
+    private String createTimeStamp(int progress) {
+        int timeLeft = progress / Constants.MILLIS_IN_SECOND;
+        int minutes = timeLeft / Constants.SECONDS_IN_MINUTE;
+        int seconds = timeLeft % Constants.SECONDS_IN_MINUTE;
+        return String.format(Locale.US, "%02d:%02d", minutes, seconds);
+    }
+
     public void setProgress(int progress) {
         setProgressInProgressBar(getMaxDuration() - progress);
-        String timeStamp = progress < MINIMAL_TIME_STEP ? TIME_FINISHED : Utils.createTimeStamp(progress + Constants.MILLIS_IN_SECOND);
+        String timeStamp = progress < MINIMAL_TIME_STEP ?
+            TIME_FINISHED : createTimeStamp(progress + Constants.MILLIS_IN_SECOND);
         mTextView.setText(timeStamp);
     }
 

@@ -1,7 +1,7 @@
 package com.loopme;
 
 import com.loopme.ad.LoopMeAd;
-import com.loopme.utils.Utils;
+import com.loopme.utils.FileUtils;
 
 public abstract class AdConfig implements AdTargeting {
     protected LoopMeAd mFirstLoopMeAd;
@@ -103,7 +103,7 @@ public abstract class AdConfig implements AdTargeting {
      */
     public void clearCache() {
         if (mFirstLoopMeAd != null) {
-            Utils.clearCache(mFirstLoopMeAd.getContext());
+            FileUtils.clearCache(mFirstLoopMeAd.getContext());
         }
     }
 

@@ -1,15 +1,23 @@
 package com.loopme;
 
 import android.app.Activity;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
+
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.loopme.common.AdChecker;
 import com.loopme.common.LoopMeError;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 class NativeVideoController {
 
@@ -163,10 +171,48 @@ class NativeVideoController {
         return position - adsBefore;
     }
 
+    private int[] getPositionsOnScreen(RecyclerView recyclerView) {
+        int[] positions = {-1, -1};
+        if (recyclerView == null) {
+            return positions;
+        }
+
+        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+        if (layoutManager instanceof LinearLayoutManager) {
+            positions[0] = ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+            positions[1] = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
+        } else if (layoutManager instanceof GridLayoutManager) {
+            positions[0] = ((GridLayoutManager) layoutManager).findFirstVisibleItemPosition();
+            positions[1] = ((GridLayoutManager) layoutManager).findLastVisibleItemPosition();
+        } else if (layoutManager instanceof StaggeredGridLayoutManager) {
+            int[] firsts;
+            int[] lasts;
+            try {
+                firsts = ((StaggeredGridLayoutManager) layoutManager).findFirstVisibleItemPositions(null);
+                lasts = ((StaggeredGridLayoutManager) layoutManager).findLastVisibleItemPositions(null);
+            } catch (NullPointerException e) {
+                return positions;
+            }
+
+            List<Integer> firstList = new ArrayList<>(firsts.length);
+            for (int first : firsts) {
+                firstList.add(first);
+            }
+
+            List<Integer> lastList = new ArrayList<>(lasts.length);
+            for (int last : lasts) {
+                lastList.add(last);
+            }
+
+            positions[0] = Collections.min(firstList);
+            positions[1] = Collections.max(lastList);
+        }
+        return positions;
+    }
+
     public void onScroll(RecyclerView recyclerView) {
         if (recyclerView != null && mAdsMap.size() >= 0) {
-            int[] positions = Utils.getPositionsOnScreen(recyclerView);
-
+            int[] positions = getPositionsOnScreen(recyclerView);
             if (isPositionsArrayValid(positions)) {
                 checkAdMapVisibility(positions, recyclerView);
             }

@@ -1,6 +1,7 @@
 package com.loopme.views;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.webkit.WebSettings;
 
 import com.loopme.Constants;
@@ -9,7 +10,6 @@ import com.loopme.bridges.Bridge;
 import com.loopme.bridges.BridgeCommandBuilder;
 import com.loopme.bridges.BridgeInterface;
 import com.loopme.listener.Listener;
-import com.loopme.utils.Utils;
 
 
 public class AdView extends LoopMeWebView implements BridgeInterface, Bridge.Listener {
@@ -44,7 +44,10 @@ public class AdView extends LoopMeWebView implements BridgeInterface, Bridge.Lis
 
     private void modifyUserAgentForKrPano() {
         String userString = WebSettings.getDefaultUserAgent(getContext());
-        String modifiedUserString = Utils.makeChromeShortCut(userString);
+        String CHROME = "Chrome";
+        String CHROME_SHORTCUT = "Chrm";
+        String modifiedUserString = (TextUtils.isEmpty(userString) && userString.contains(CHROME)) ?
+            userString : userString.replace(CHROME, CHROME_SHORTCUT);
         getSettings().setUserAgentString(modifiedUserString);
     }
 

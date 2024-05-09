@@ -4,15 +4,14 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
-
-import androidx.annotation.Nullable;
-
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
+
+import androidx.annotation.Nullable;
 
 import com.iab.omid.library.loopme.adsession.AdEvents;
 import com.iab.omid.library.loopme.adsession.AdSession;
@@ -41,10 +40,12 @@ import com.loopme.models.Message;
 import com.loopme.om.OmidEventTrackerWrapper;
 import com.loopme.om.OmidHelper;
 import com.loopme.utils.UiUtils;
-import com.loopme.utils.Utils;
 import com.loopme.views.AdView;
 import com.loopme.views.LoopMeWebView;
 import com.loopme.views.MraidView;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DisplayControllerLoopMe
         extends BaseTrackableController
@@ -254,14 +255,28 @@ public class DisplayControllerLoopMe
         preloadHtml();
     }
 
+    private static String addMraidScript(String html) {
+        if (TextUtils.isEmpty(html)) {
+            return "";
+        }
+
+        Pattern SCRIPT_TAG_PATTERN = Pattern.compile("<\\s*script\\b[^>]*>");
+        Matcher m = SCRIPT_TAG_PATTERN.matcher(html);
+        if (!m.find()) {
+            Logging.out(LOG_TAG, "Couldn't find <script>");
+            return html;
+        }
+
+        // TODO. Performance?
+        return new StringBuilder(html).insert(m.start(), Constants.MRAID_SCRIPT).toString();
+    }
+
     private void preloadHtml() {
         onAdRegisterView(mLoopMeAd.getContext(), getWebView());
         injectTrackingJsForWeb();
 
         final String preInjectOmidHtml =
-                isMraidAd()
-                        ? Utils.addMraidScript(mAdParams.getHtml())
-                        : mAdParams.getHtml();
+                isMraidAd() ? addMraidScript(mAdParams.getHtml()) : mAdParams.getHtml();
 
         OmidHelper.injectScriptContentIntoHtmlAsync(
                 mLoopMeAd.getContext().getApplicationContext(),

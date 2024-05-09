@@ -2,8 +2,6 @@ package com.loopme.parser.xml;
 
 import android.text.TextUtils;
 
-import com.loopme.utils.Utils;
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
@@ -76,12 +74,30 @@ public class XmlParser {
         }
     }
 
+    public static boolean isBooleanString(String value) {
+        if (TextUtils.isEmpty(value)) {
+            return false;
+        }
+        return value.equalsIgnoreCase(Boolean.TRUE.toString()) ||
+            value.equalsIgnoreCase(Boolean.FALSE.toString());
+    }
+
+    public static int getInteger(String value) {
+        if (TextUtils.isEmpty(value)) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
     private static <T> void setBooleanValue(Field field, String value, T tagInstance) throws IllegalAccessException {
-        if (Utils.isBooleanString(value)) {
+        if (isBooleanString(value)) {
             field.setBoolean(tagInstance, Boolean.parseBoolean(value));
         } else {
-            int intValue = Utils.getInteger(value);
-            field.setBoolean(tagInstance, intValue == 1);
+            field.setBoolean(tagInstance, getInteger(value) == 1);
         }
     }
 

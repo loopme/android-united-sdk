@@ -27,7 +27,6 @@ import com.loopme.request.RequestParamsUtils;
 import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
 import com.loopme.tracker.partners.LoopMeTracker;
-import com.loopme.utils.Utils;
 import com.loopme.utils.ValidationHelper;
 
 import java.util.Observable;
@@ -529,11 +528,33 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         return isCustomBanner() && mPreferredAdType == Type.HTML;
     }
 
+    private boolean isMpuBannerSize(int width, int height) {
+        AdSpotDimensions mpuBanner = new AdSpotDimensions(
+                Constants.Banner.MPU_BANNER_WIDTH,
+                Constants.Banner.MPU_BANNER_HEIGHT
+        );
+        AdSpotDimensions customSize = new AdSpotDimensions(width, height);
+        return mpuBanner.equals(customSize);
+    }
+
+    private boolean isExpandBannerSize(int width, int height) {
+        AdSpotDimensions expandBanner = new AdSpotDimensions(
+                Constants.Banner.EXPAND_BANNER_WIDTH,
+                Constants.Banner.EXPAND_BANNER_HEIGHT
+        );
+        AdSpotDimensions customSize = new AdSpotDimensions(width, height);
+        return expandBanner.equals(customSize);
+    }
+
+    private boolean isCustomBannerSize(int width, int height) {
+        return !(isExpandBannerSize(width, height) || isMpuBannerSize(width, height));
+    }
+
     public boolean isCustomBanner() {
         int[] adSize = RequestParamsUtils.getAdSize(mContext, this);
         int width = adSize[0];
         int height = adSize[1];
-        return isBanner() && Utils.isCustomBannerSize(width, height);
+        return isBanner() && isCustomBannerSize(width, height);
     }
 
     public boolean isExpandBannerVideo() {
@@ -544,7 +565,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         int[] adSize = RequestParamsUtils.getAdSize(mContext, this);
         int width = adSize[0];
         int height = adSize[1];
-        return isBanner() && Utils.isExpandBanner(width, height);
+        return isBanner() && isExpandBannerSize(width, height);
     }
 
     public AdTargetingData getAdTargetingData() {
