@@ -3,12 +3,7 @@ package com.loopme.request;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Point;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.text.TextUtils;
-import android.view.Display;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -17,7 +12,6 @@ import com.loopme.Constants;
 import com.loopme.LoopMeBannerGeneral;
 import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.ad.LoopMeAd;
-import com.loopme.utils.ConnectionUtils;
 import com.loopme.utils.Utils;
 
 import java.util.HashMap;
@@ -28,56 +22,11 @@ import java.util.Map;
  */
 
 public class RequestParamsUtils {
-
-    private static final String UNKNOWN_SSID = "unknown ssid";
-    private static final String SSID_VALUE = "0x";
     // Map to store the sizes of each LoopMeAd by mAppKey
     private static final Map<String, int[]> adSizes = new HashMap<>();
 
-    public static String getWifiName(Context context) {
-        try {
-            WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            if (wifiManager == null) {
-                return "";
-            }
-            if (!wifiManager.isWifiEnabled()) {
-                return "";
-            }
-            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-            String ssid = wifiInfo.getSSID();
-            // remove extra quotes if needed
-            if (ssid.startsWith("\"") && ssid.endsWith("\"")) {
-                ssid = ssid.substring(1, ssid.length() - 1);
-            }
-            if (TextUtils.isEmpty(ssid) || ssid.contains(UNKNOWN_SSID) || ssid.equals(SSID_VALUE)) {
-                return "";
-            }
-            return ssid;
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
-    public static int getConnectionType(Context context) {
-        return ConnectionUtils.getConnectionType(context);
-    }
-
-    public static int convertPixelToDp(Context context, int pixels) {
-        Resources resources = context.getResources();
-        if (resources != null) {
-            return (int) (pixels / resources.getDisplayMetrics().density);
-        } else {
-            return 0;
-        }
-    }
-
-    public static ViewGroup.LayoutParams getParamsSafety(LoopMeBannerGeneral banner) {
-        try {
-            return banner.getBannerView().getLayoutParams();
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-        return null;
+    private static int convertPixelToDp(Resources resources, int pixels) {
+        return resources == null ? 0 : (int) (pixels / resources.getDisplayMetrics().density);
     }
 
     public static int[] getAdSize(Context context, LoopMeAd baseAd) {
@@ -87,35 +36,35 @@ public class RequestParamsUtils {
         }
         
         final String appKey = baseAd.getAppKey();
-
+        Resources resources = context.getResources();
         if (baseAd instanceof LoopMeInterstitialGeneral) {
-            int widthInDp = RequestParamsUtils.convertPixelToDp(context, getDeviceWidthPx(context));
-            int heightInDp = RequestParamsUtils.convertPixelToDp(context, getDeviceHeightPx(context));
+            int widthInDp = convertPixelToDp(resources, getDeviceSize(context).x);
+            int heightInDp = convertPixelToDp(resources, getDeviceSize(context).y);
             adSizeArray[0] = widthInDp;
             adSizeArray[1] = heightInDp;
-
         } else if (baseAd instanceof LoopMeBannerGeneral banner) {
             final FrameLayout bannerView = banner.getBannerView();
             if (bannerView != null) {
                 bannerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
-                        int currentWidthInDp = RequestParamsUtils.convertPixelToDp(context, bannerView.getWidth());
-                        int currentHeightInDp = RequestParamsUtils.convertPixelToDp(context, bannerView.getHeight());
-                        if (currentWidthInDp > 0 && currentHeightInDp > 0) {
-                            adSizeArray[0] = currentWidthInDp;
-                            adSizeArray[1] = currentHeightInDp;
+                        int widthInDp = convertPixelToDp(resources, bannerView.getWidth());
+                        int heightInDp = convertPixelToDp(resources, bannerView.getHeight());
+                        if (widthInDp <= 0 || heightInDp <= 0) {
+                            return;
+                        }
+                        adSizeArray[0] = widthInDp;
+                        adSizeArray[1] = heightInDp;
 
-                            // Round the size before updating the map
-                            Utils.roundBannersSize(adSizeArray, Constants.Banner.EXPANDABLE_BANNER_SIZE);
-                            Utils.roundBannersSize(adSizeArray, Constants.Banner.MPU_BANNER_SIZE);
-                            adSizes.put(appKey, adSizeArray);
+                        // Round the size before updating the map
+                        Utils.roundBannersSize(adSizeArray, Constants.Banner.EXPANDABLE_BANNER_SIZE);
+                        Utils.roundBannersSize(adSizeArray, Constants.Banner.MPU_BANNER_SIZE);
+                        adSizes.put(appKey, adSizeArray);
 
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                bannerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                            } else {
-                                bannerView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                            }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            bannerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        } else {
+                            bannerView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                         }
                     }
                 });
@@ -129,36 +78,18 @@ public class RequestParamsUtils {
         return adSizeArray;
     }
 
-    public static int getDeviceWidthPx(Context context) {
+    public static Point getDeviceSize(Context context) {
         WindowManager windowManager;
-        if (context != null) {
-            windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-            if (windowManager == null) {
-                return 0;
-            }
-            Display display = windowManager.getDefaultDisplay();
-            Point size = new Point();
-            display.getSize(size);
-            return size.x;
-        } else {
-            return 0;
+        Point size = new Point(0, 0);
+        if (context == null) {
+            return size;
         }
-    }
-
-    public static int getDeviceHeightPx(Context context) {
-        WindowManager windowManager;
-        if (context != null) {
-            windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-            if (windowManager == null) {
-                return 0;
-            }
-            Display display = windowManager.getDefaultDisplay();
-            Point size = new Point();
-            display.getSize(size);
-            return size.y;
-        } else {
-            return 0;
+        windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        if (windowManager == null) {
+            return size;
         }
+        windowManager.getDefaultDisplay().getSize(size);
+        return size;
     }
 
     public static AdvAdInfo getAdvertisingIdInfo(Context context) {
@@ -177,11 +108,9 @@ public class RequestParamsUtils {
         public String getAdvId() {
             return mAdvId;
         }
-
         public boolean isUserSetDoNotTrack() {
             return mIsDoNotTrack;
         }
-
         public String getDoNotTrackAsString() {
             return mIsDoNotTrack ? "1" : "0";
         }
