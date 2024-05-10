@@ -77,6 +77,11 @@ public class RequestBuilder implements Serializable {
     private static final String INSTL = "instl";
     private static final String METRIC = "metric";
     private static final String SKIP = "skip";
+    private static final String SKIP_MIN = "skipmin";
+    private static final String SKIP_AFTER = "skipafter";
+    private static final String PLACEMENT_TYPE = "placementType";
+    private static final String VIDEO_TYPE = "videotype";
+    private static final String RWDD = "rwdd";
     private static final String PARAM_CONSENT_TYPE = "consent_type";
     private static final String EXP_DIR = "expdir";
     private static final String USER = "user";
