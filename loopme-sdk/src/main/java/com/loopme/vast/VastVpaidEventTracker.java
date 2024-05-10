@@ -51,13 +51,10 @@ public class VastVpaidEventTracker {
 
     public static synchronized void trackVastEvent(final String eventUrl, final String addMessage) {
 
-        ExecutorHelper.getExecutor().submit(new Runnable() {
-            @Override
-            public void run() {
-                String completeUrl = StringUtils.setMessage(eventUrl, addMessage);
-                HttpUtils.doRequest(completeUrl, HttpUtils.Method.GET, null);
-                Logging.out(LOG_TAG, completeUrl);
-            }
+        ExecutorHelper.getExecutor().submit(() -> {
+            String completeUrl = StringUtils.setMessage(eventUrl, addMessage);
+            HttpUtils.doRequest(completeUrl, HttpUtils.Method.GET, null);
+            Logging.out(LOG_TAG, completeUrl);
         });
     }
 }

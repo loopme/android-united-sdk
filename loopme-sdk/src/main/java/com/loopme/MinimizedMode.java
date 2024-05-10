@@ -39,14 +39,6 @@ public class MinimizedMode {
         mMinimizedViewDims.setHeight(heightInPx);
     }
 
-    public void setMarginRight(int margin) {
-        mMarginRight = Utils.convertDpToPixel(margin);
-    }
-
-    public void setMarginBottom(int margin) {
-        mMarginBottom = Utils.convertDpToPixel(margin);
-    }
-
     public int getWidth() {
         return mMinimizedViewDims.getWidth();
     }

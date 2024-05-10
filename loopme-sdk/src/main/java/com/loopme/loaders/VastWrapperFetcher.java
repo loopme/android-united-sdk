@@ -3,19 +3,20 @@ package com.loopme.loaders;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.NonNull;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.ad.AdParams;
 import com.loopme.common.LoopMeError;
 import com.loopme.models.Errors;
+import com.loopme.network.GetResponse;
 import com.loopme.parser.XmlParseService;
 import com.loopme.vast.VastVpaidEventTracker;
 import com.loopme.vast.WrapperParser;
 import com.loopme.webservice.LoopMeAdServiceImpl;
-import com.loopme.network.GetResponse;
 import com.loopme.xml.vast4.VastInfo;
 import com.loopme.xml.vast4.Wrapper;
 
@@ -153,33 +154,27 @@ public class VastWrapperFetcher {
     }
 
     private void startTimer() {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mWrapperTimer = new CountDownTimer(WRAPPER_REQUEST_TIMEOUT, Constants.ONE_SECOND_IN_MILLIS) {
-                    @Override
-                    public void onTick(long millisUntilFinished) {
-                    }
+        mHandler.post(() -> {
+            mWrapperTimer = new CountDownTimer(WRAPPER_REQUEST_TIMEOUT, Constants.ONE_SECOND_IN_MILLIS) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                }
 
-                    @Override
-                    public void onFinish() {
-                        Logging.out(LOG_TAG, Errors.TIMEOUT_OF_VAST_URI.getMessage());
-                        onFailed(Errors.TIMEOUT_OF_VAST_URI);
-                    }
-                };
-                mWrapperTimer.start();
-            }
+                @Override
+                public void onFinish() {
+                    Logging.out(LOG_TAG, Errors.TIMEOUT_OF_VAST_URI.getMessage());
+                    onFailed(Errors.TIMEOUT_OF_VAST_URI);
+                }
+            };
+            mWrapperTimer.start();
         });
     }
 
     private void stopTimer() {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (mWrapperTimer != null) {
-                    mWrapperTimer.cancel();
-                    mWrapperTimer = null;
-                }
+        mHandler.post(() -> {
+            if (mWrapperTimer != null) {
+                mWrapperTimer.cancel();
+                mWrapperTimer = null;
             }
         });
     }

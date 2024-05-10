@@ -58,13 +58,7 @@ public class MraidVideoActivity extends Activity {
 
     private void initCloseButton() {
         mCloseButton = new CloseButton(this);
-//        mCloseButton.addInLayout(mRelativeLayout);
-        mCloseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MraidVideoActivity.this.finish();
-            }
-        });
+        mCloseButton.setOnClickListener(v -> MraidVideoActivity.this.finish());
     }
 
     @Override

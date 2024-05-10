@@ -25,15 +25,12 @@ class ViewableImpressionTracker {
         if (mIsImpressionTracked || doneMillis < IMPRESSION_TIME_NATIVE_VIDEO)
             return;
 
-        ExecutorHelper.getExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                for (String url :
-                        isVideoVisible()
-                                ? mAdParams.getVisibleImpressions()
-                                : mAdParams.getNotVisibleImpressions())
-                    VastVpaidEventTracker.trackVastEvent(url, "");
-            }
+        ExecutorHelper.getExecutor().execute(() -> {
+            for (String url :
+                    isVideoVisible()
+                            ? mAdParams.getVisibleImpressions()
+                            : mAdParams.getNotVisibleImpressions())
+                VastVpaidEventTracker.trackVastEvent(url, "");
         });
 
         mIsImpressionTracked = true;

@@ -1,6 +1,5 @@
 package com.loopme;
 
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -36,19 +35,6 @@ public class SensorManagerExtension {
 
     private void onAdShake() {
 
-    }
-
-    public SensorManagerExtension initSensor(Context context, OnLoopMeSensorListener listener) {
-        mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        mCurrentAcceleration = android.hardware.SensorManager.GRAVITY_EARTH;
-        mLastAcceleration = android.hardware.SensorManager.GRAVITY_EARTH;
-        return this;
-    }
-
-    public void pauseSensor(){
-        if (mSensorManager != null) {
-            mSensorManager.unregisterListener(mSensorListener);
-        }
     }
 
     public void registerListener(){

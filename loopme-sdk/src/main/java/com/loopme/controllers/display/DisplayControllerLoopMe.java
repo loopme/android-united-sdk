@@ -554,15 +554,12 @@ public class DisplayControllerLoopMe
 
     private void checkBannerVisibility() {
         if (isBanner() && mLoopMeAd != null) {
-            ViewAbilityUtils.calculateViewAbilitySyncDelayed(mLoopMeAd.getContainerView(), new ViewAbilityUtils.OnResultListener() {
-                @Override
-                public void onResult(ViewAbilityUtils.ViewAbilityInfo info) {
-                    if (info.isVisibleMore50Percents()) {
-                        setWebViewState(Constants.WebviewState.VISIBLE);
-                        dispatchEvent();
-                    } else {
-                        setWebViewState(Constants.WebviewState.HIDDEN);
-                    }
+            ViewAbilityUtils.calculateViewAbilitySyncDelayed(mLoopMeAd.getContainerView(), info -> {
+                if (info.isVisibleMore50Percents()) {
+                    setWebViewState(Constants.WebviewState.VISIBLE);
+                    dispatchEvent();
+                } else {
+                    setWebViewState(Constants.WebviewState.HIDDEN);
                 }
             });
         }

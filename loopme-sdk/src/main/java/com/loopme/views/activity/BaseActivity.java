@@ -1,19 +1,23 @@
 package com.loopme.views.activity;
 
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
@@ -31,9 +35,6 @@ import com.loopme.views.LoopMeWebView;
 import com.loopme.views.webclient.AdViewChromeClient;
 
 import java.util.List;
-
-import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 
 public final class BaseActivity extends FragmentActivity
@@ -242,14 +243,11 @@ public final class BaseActivity extends FragmentActivity
 
         mMraidCloseButton = new CloseButton(this);
         mMraidCloseButton.addInLayout(mLoopMeContainerView);
-        mMraidCloseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mLoopMeAd.isInterstitial())
-                    dc.closeMraidAd();
-                else
-                    dc.collapseMraidBanner();
-            }
+        mMraidCloseButton.setOnClickListener(v -> {
+            if (mLoopMeAd.isInterstitial())
+                dc.closeMraidAd();
+            else
+                dc.collapseMraidBanner();
         });
 
         onCloseButtonVisibilityChanged(mLoopMeAd.getAdParams().isOwnCloseButton());

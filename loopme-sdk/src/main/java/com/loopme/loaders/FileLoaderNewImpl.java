@@ -173,22 +173,14 @@ public class FileLoaderNewImpl implements Loader {
     }
 
     private void preloadFile() {
-        runInBackgroundThread(new Runnable() {
-            @Override
-            public void run() {
-                load();
-            }
-        });
+        runInBackgroundThread(() -> load());
     }
 
     private void disconnect() {
-        runInBackgroundThread(new Runnable() {
-            @Override
-            public void run() {
-                if (connection != null) {
-                    connection.disconnect();
-                    Logging.out(LOG_TAG, "disconnect()");
-                }
+        runInBackgroundThread(() -> {
+            if (connection != null) {
+                connection.disconnect();
+                Logging.out(LOG_TAG, "disconnect()");
             }
         });
     }
@@ -203,22 +195,16 @@ public class FileLoaderNewImpl implements Loader {
     }
 
     private void onFileFullLoaded() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (callback != null && !isStopped)
-                    callback.onFileFullLoaded(destFilePath);
-            }
+        runOnUiThread(() -> {
+            if (callback != null && !isStopped)
+                callback.onFileFullLoaded(destFilePath);
         });
     }
 
     private void onError(final LoopMeError error) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (callback != null)
-                    callback.onError(error);
-            }
+        runOnUiThread(() -> {
+            if (callback != null)
+                callback.onError(error);
         });
     }
 

@@ -43,12 +43,7 @@ public class LiveDebug {
             sIsDebugOn = debug;
             if (debug) {
                 Handler handler = new Handler(Looper.getMainLooper());
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        startTimer(context, appKey);
-                    }
-                });
+                handler.post(() -> startTimer(context, appKey));
             }
         }
     }
@@ -82,14 +77,11 @@ public class LiveDebug {
 
     private static void sendToServer(final Context context, final String appKey) {
         ExecutorService executor = Executors.newCachedThreadPool();
-        executor.submit(new Runnable() {
-            @Override
-            public void run() {
-                if (sLogDbHelper != null) {
-                    Logging.out(LOG_TAG, "send to server");
-                    Map<String, String> params = initPostDataParams(context, appKey);
-                    HttpUtils.simpleRequest(Constants.ERROR_URL, LoopMeTracker.obtainRequestString(params));
-                }
+        executor.submit(() -> {
+            if (sLogDbHelper != null) {
+                Logging.out(LOG_TAG, "send to server");
+                Map<String, String> params = initPostDataParams(context, appKey);
+                HttpUtils.simpleRequest(Constants.ERROR_URL, LoopMeTracker.obtainRequestString(params));
             }
         });
     }
@@ -128,12 +120,7 @@ public class LiveDebug {
     private static void saveLog(String logTag, String text) {
         final String logString = formatLogMessage(logTag, text);
         if (sLogDbHelper != null) {
-            sExecutor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    sLogDbHelper.putLog(logString);
-                }
-            });
+            sExecutor.submit(() -> sLogDbHelper.putLog(logString));
         }
     }
 

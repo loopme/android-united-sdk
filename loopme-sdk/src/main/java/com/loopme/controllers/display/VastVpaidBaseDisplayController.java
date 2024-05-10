@@ -2,10 +2,11 @@ package com.loopme.controllers.display;
 
 import android.content.Context;
 import android.content.res.AssetManager;
-import androidx.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.webkit.WebView;
+
+import androidx.annotation.NonNull;
 
 import com.loopme.Logging;
 import com.loopme.ad.AdParams;
@@ -329,45 +330,25 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
 
     protected void onAdLoadSuccess() {
         if (mLoopMeAd != null) {
-            mLoopMeAd.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mLoopMeAd.onAdLoadSuccess();
-                }
-            });
+            mLoopMeAd.runOnUiThread(() -> mLoopMeAd.onAdLoadSuccess());
         }
     }
 
     protected void dismissAd() {
         if (mLoopMeAd != null) {
-            mLoopMeAd.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mLoopMeAd.dismiss();
-                }
-            });
+            mLoopMeAd.runOnUiThread(() -> mLoopMeAd.dismiss());
         }
     }
 
     protected void onAdClicked() {
         if (mLoopMeAd != null) {
-            mLoopMeAd.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mLoopMeAd.onAdClicked();
-                }
-            });
+            mLoopMeAd.runOnUiThread(() -> mLoopMeAd.onAdClicked());
         }
     }
 
     protected void onAdVideoDidReachEnd() {
         if (mLoopMeAd != null) {
-            mLoopMeAd.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mLoopMeAd.onAdVideoDidReachEnd();
-                }
-            });
+            mLoopMeAd.runOnUiThread(() -> mLoopMeAd.onAdVideoDidReachEnd());
         }
     }
 
