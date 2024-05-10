@@ -3,19 +3,17 @@ package com.loopme.controllers.display;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Looper;
-
-import androidx.annotation.Nullable;
-
 import android.text.TextUtils;
 import android.view.Surface;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
+import androidx.annotation.Nullable;
+
 import com.iab.omid.library.loopme.adsession.AdEvents;
 import com.iab.omid.library.loopme.adsession.AdSession;
 import com.iab.omid.library.loopme.adsession.VerificationScriptResource;
 import com.iab.omid.library.loopme.adsession.media.MediaEvents;
-
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.LoopMeMediaPlayer;
@@ -201,12 +199,9 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     @Override
     public void onPlay(int position) {
         mIsAdSkipped = false;
-        postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                destroyMediaPlayer();
-                startMediaPlayer();
-            }
+        postDelayed(() -> {
+            destroyMediaPlayer();
+            startMediaPlayer();
         }, DELAY_UNTIL_EXECUTE);
 
         onAdResumedEvent();

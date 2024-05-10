@@ -9,7 +9,6 @@ import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
-import com.loopme.utils.ApiLevel;
 import com.loopme.views.webclient.AdViewChromeClient;
 
 public class VastWebView extends WebView {
@@ -28,11 +27,8 @@ public class VastWebView extends WebView {
         // TODO.
         setWebContentsDebuggingEnabled(true);
         setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
-        setWebChromeClient(new AdViewChromeClient(new AdViewChromeClient.OnErrorFromJsCallback() {
-            @Override
-            public void onErrorFromJs(String message) {
+        setWebChromeClient(new AdViewChromeClient(message -> {
 
-            }
         }));
 
         setWebViewClient(new Vast4WebViewClient());

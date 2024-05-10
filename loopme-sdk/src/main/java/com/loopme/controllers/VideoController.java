@@ -420,16 +420,12 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
     }
 
     private void initCurrentTimePoster() {
-        mCurrentTimePoster = new Runnable() {
-
-            @Override
-            public void run() {
-                int currentPosition = getCurrentPosition();
-                postVideoCurrentTimeToWebView(currentPosition);
-                onDurationChangedEvent(currentPosition, mVideoDuration);
-                updateCurrentVolume();
-                runProgressAgain();
-            }
+        mCurrentTimePoster = () -> {
+            int currentPosition = getCurrentPosition();
+            postVideoCurrentTimeToWebView(currentPosition);
+            onDurationChangedEvent(currentPosition, mVideoDuration);
+            updateCurrentVolume();
+            runProgressAgain();
         };
     }
 

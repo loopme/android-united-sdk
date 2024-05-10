@@ -1,14 +1,14 @@
 package com.loopme;
 
 import android.app.Activity;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.widget.FrameLayout;
+
+import androidx.annotation.Nullable;
 
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.tracker.partners.LoopMeTracker;
-import com.loopme.utils.ApiLevel;
 
 /**
  * The `LoopMeBanner` class provides facilities to display a custom size ads
@@ -112,16 +112,6 @@ public final class LoopMeBanner extends AdWrapper {
         mMainAdListener = listener;
         setListener(initInternalListener(), mFirstLoopMeAd);
         setListener(initInternalListener(), mSecondLoopMeAd);
-    }
-
-    /**
-     * Checks whether any view already binded to ad or not.
-     *
-     * @return true - if binded,
-     * false - otherwise.
-     */
-    public boolean isViewBinded() {
-        return mBannerView != null;
     }
 
     public void showNativeVideo() {

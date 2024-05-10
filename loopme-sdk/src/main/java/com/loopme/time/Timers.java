@@ -48,25 +48,13 @@ public class Timers extends Observable {
     }
 
     private void initExpirationTimer() {
-        mExpirationListener = new AdTimer.Listener() {
-
-            @Override
-            public void onTimeout() {
-                notifyTimeout(TimersType.EXPIRATION_TIMER);
-            }
-        };
+        mExpirationListener = () -> notifyTimeout(TimersType.EXPIRATION_TIMER);
         mExpirationTimer = new AdTimer(mValidExpirationTime, mExpirationListener);
         Logging.out(LOG_TAG, "Expiration timeout: " + mValidExpirationTime / (1000 * 60) + " minutes");
     }
 
     private void initFetcherTimer() {
-        mFetcherTimerListener = new AdTimer.Listener() {
-
-            @Override
-            public void onTimeout() {
-                notifyTimeout(TimersType.FETCHER_TIMER);
-            }
-        };
+        mFetcherTimerListener = () -> notifyTimeout(TimersType.FETCHER_TIMER);
         mFetcherTimer = new AdTimer(Constants.FETCH_TIMEOUT, mFetcherTimerListener);
         float fetchTimeout = (float) Constants.FETCH_TIMEOUT / Constants.ONE_MINUTE_IN_MILLIS;
         Logging.out(LOG_TAG, "Fetch timeout: " + fetchTimeout + " minutes");
@@ -118,12 +106,7 @@ public class Timers extends Observable {
     }
 
     private void initGdprPageReadyTimer() {
-        mGdprPageReadyTimerListener = new AdTimer.Listener() {
-            @Override
-            public void onTimeout() {
-                notifyTimeout(TimersType.GDPR_PAGE_LOADED_TIMER);
-            }
-        };
+        mGdprPageReadyTimerListener = () -> notifyTimeout(TimersType.GDPR_PAGE_LOADED_TIMER);
         mGdprPageReadyTimer = new AdTimer(Constants.GDPR_PAGE_READY_TIMEOUT, mGdprPageReadyTimerListener);
         Logging.out(LOG_TAG, "Gdpr page loaded timeout: " + Constants.GDPR_PAGE_READY_TIMEOUT / 1000 + " seconds");
 
@@ -138,13 +121,7 @@ public class Timers extends Observable {
     }
 
     private void initPrepareVpaidJsTimer() {
-        mPrepareVpaidJsTimerListener = new AdTimer.Listener() {
-
-            @Override
-            public void onTimeout() {
-                notifyTimeout(TimersType.PREPARE_VPAID_JS_TIMER);
-            }
-        };
+        mPrepareVpaidJsTimerListener = () -> notifyTimeout(TimersType.PREPARE_VPAID_JS_TIMER);
         mPrepareVpaidJsTimer = new AdTimer(Constants.PREPARE_VPAID_JS_TIMEOUT, mPrepareVpaidJsTimerListener);
         Logging.out(LOG_TAG, "Prepare vpaid js timeout: " + Constants.PREPARE_VPAID_JS_TIMEOUT / 1000 + " seconds");
     }
@@ -158,13 +135,7 @@ public class Timers extends Observable {
     }
 
     private void initPrepareAssetsTimer() {
-        mPrepareAssetsTimerListener = new AdTimer.Listener() {
-
-            @Override
-            public void onTimeout() {
-                notifyTimeout(TimersType.PREPARE_ASSETS_TIMER);
-            }
-        };
+        mPrepareAssetsTimerListener = () -> notifyTimeout(TimersType.PREPARE_ASSETS_TIMER);
         mPrepareAssetsTimer = new AdTimer(Constants.PREPARE_VAST_ASSET_TIMEOUT, mPrepareAssetsTimerListener);
         Logging.out(LOG_TAG, "Prepare assets timeout: " + Constants.PREPARE_VAST_ASSET_TIMEOUT / 1000 + " seconds");
     }

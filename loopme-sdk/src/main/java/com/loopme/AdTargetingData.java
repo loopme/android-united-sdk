@@ -15,7 +15,7 @@ public class AdTargetingData implements Serializable {
     private int mYearOfBirth;
     private String mGender;
 
-    private final List<CustomRequestParameter> mCustomParams = new ArrayList<CustomRequestParameter>();
+    private final List<CustomRequestParameter> mCustomParams = new ArrayList<>();
 
     public void clear() {
         mKeywords = null;
@@ -44,13 +44,9 @@ public class AdTargetingData implements Serializable {
         return mYearOfBirth;
     }
 
-    public List<CustomRequestParameter> getCustomParameters() {
-        return mCustomParams;
-    }
-
     public void setCustomParameters(String paramName, String paramValue) {
         if (!TextUtils.isEmpty(paramValue) && !TextUtils.isEmpty(paramName)) {
-            mCustomParams.add(new CustomRequestParameter(paramName, paramValue));
+            mCustomParams.add(new CustomRequestParameter());
         }
     }
 

@@ -230,23 +230,17 @@ public class AdFetchTask implements Runnable, Observer {
     }
 
     private void startRequestTimer() {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (mTimers != null) {
-                    mTimers.startTimer(TimersType.REQUEST_TIMER);
-                }
+        mHandler.post(() -> {
+            if (mTimers != null) {
+                mTimers.startTimer(TimersType.REQUEST_TIMER);
             }
         });
     }
 
     protected void stopRequestTimer() {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (mTimers != null) {
-                    mTimers.stopTimer(TimersType.REQUEST_TIMER);
-                }
+        mHandler.post(() -> {
+            if (mTimers != null) {
+                mTimers.stopTimer(TimersType.REQUEST_TIMER);
             }
         });
     }
@@ -256,25 +250,19 @@ public class AdFetchTask implements Runnable, Observer {
     }
 
     public void onSuccessResult(final AdParams adParams) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (mAdFetcherListener != null && adParams != null) {
-                    mAdFetcherListener.onAdFetchCompleted(adParams);
-                } else {
-                    onErrorResult(Errors.FAILED_TO_PROCESS_AD);
-                }
+        mHandler.post(() -> {
+            if (mAdFetcherListener != null && adParams != null) {
+                mAdFetcherListener.onAdFetchCompleted(adParams);
+            } else {
+                onErrorResult(Errors.FAILED_TO_PROCESS_AD);
             }
         });
     }
 
     public void onErrorResult(final LoopMeError error) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (mAdFetcherListener != null) {
-                    mAdFetcherListener.onAdFetchFailed(error);
-                }
+        mHandler.post(() -> {
+            if (mAdFetcherListener != null) {
+                mAdFetcherListener.onAdFetchFailed(error);
             }
         });
     }

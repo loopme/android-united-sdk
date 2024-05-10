@@ -1,11 +1,12 @@
 package com.loopme.utils;
 
 import android.app.Activity;
-import com.loopme.Constants;
+
 import com.loopme.IntegrationType;
 import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
+
 import java.util.Arrays;
 
 /**
@@ -17,12 +18,6 @@ public class ValidationHelper {
     private static final String LOG_TAG = ValidationHelper.class.getSimpleName();
 
     public ValidationHelper() {
-    }
-
-    public static boolean isValidFormat(String format) {
-        return format != null
-                && (format.equalsIgnoreCase(Constants.BANNER_TAG)
-                || format.equalsIgnoreCase(Constants.INTERSTITIAL_TAG));
     }
 
     public static boolean isCouldLoadAd(LoopMeAd loopMeAd) {

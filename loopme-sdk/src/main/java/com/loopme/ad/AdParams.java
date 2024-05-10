@@ -501,7 +501,4 @@ public class AdParams implements Serializable {
         this.mExpiredDate = mExpiredDate;
     }
 
-    public AdIds getAdIds() {
-        return mAdIds;
-    }
 }

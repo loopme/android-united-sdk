@@ -383,7 +383,7 @@ public class XmlParseService {
     }
 
     private static Comparator<MediaFile> createMediaSizeComparator(final int screenSquare) {
-        return new Comparator<MediaFile>() {
+        return new Comparator<>() {
 
             @Override
             public int compare(MediaFile mediaFile1, MediaFile mediaFile2) {
@@ -414,8 +414,8 @@ public class XmlParseService {
                 // The lowest of the higher-than-screen resolutions go first
                 // when there's no lower-than-screen resolution.
                 return square1 > screenSquare
-                    ? Integer.compare(square1, square2)
-                    : Integer.compare(square2, square1);
+                        ? Integer.compare(square1, square2)
+                        : Integer.compare(square2, square1);
             }
 
             private int calculateSquare(MediaFile mediaFile) {

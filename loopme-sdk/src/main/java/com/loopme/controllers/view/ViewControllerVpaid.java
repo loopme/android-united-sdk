@@ -173,34 +173,25 @@ public class ViewControllerVpaid implements View.OnClickListener {
     }
 
     public void pause() {
-        mDisplayControllerVpaid.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mCloseButtonTimer != null) {
-                    mCloseButtonTimer.pause();
-                }
+        mDisplayControllerVpaid.runOnUiThread(() -> {
+            if (mCloseButtonTimer != null) {
+                mCloseButtonTimer.pause();
             }
         });
     }
 
     public void resume() {
-        mDisplayControllerVpaid.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mCloseButtonTimer != null) {
-                    mCloseButtonTimer.resume();
-                }
+        mDisplayControllerVpaid.runOnUiThread(() -> {
+            if (mCloseButtonTimer != null) {
+                mCloseButtonTimer.resume();
             }
         });
     }
 
     public void destroy() {
-        mDisplayControllerVpaid.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mCloseButtonTimer != null) {
-                    mCloseButtonTimer.cancel();
-                }
+        mDisplayControllerVpaid.runOnUiThread(() -> {
+            if (mCloseButtonTimer != null) {
+                mCloseButtonTimer.cancel();
             }
         });
     }

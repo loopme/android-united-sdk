@@ -11,10 +11,6 @@ public class AdIds {
     private String mLineItemId = "";
     private String mCreativeId = "";
     private String mAppId = "";
-    private String mCompany = "";
-    private String mAppName = "";
-    private String mAppBundle = "";
-    private String mDeveloper = "";
 
     private static final String LEVEL1 = "level1";
     private static final String LEVEL2 = "level2";
@@ -83,35 +79,19 @@ public class AdIds {
         return dataMap;
     }
 
-    public String getCompany() {
-        return mCompany;
-    }
-
-    public String getDeveloper() {
-        return mDeveloper;
-    }
-
-    public String getBundleDomain() {
-        return mAppBundle;
-    }
-
-    public String getAppName() {
-        return mAppName;
-    }
-
     public void setCompany(String company) {
-        this.mCompany = TextUtils.isEmpty(company) ? "" : company;
+        String mCompany = TextUtils.isEmpty(company) ? "" : company;
     }
 
     public void setAppName(String appName) {
-        this.mAppName = TextUtils.isEmpty(appName) ? "" : appName;
+        String mAppName = TextUtils.isEmpty(appName) ? "" : appName;
     }
 
     public void setAppBundle(String appBundle) {
-        this.mAppBundle = TextUtils.isEmpty(appBundle) ? "" : appBundle;
+        String mAppBundle = TextUtils.isEmpty(appBundle) ? "" : appBundle;
     }
 
     public void setDeveloper(String developer) {
-        this.mDeveloper = TextUtils.isEmpty(developer) ? "" : developer;
+        String mDeveloper = TextUtils.isEmpty(developer) ? "" : developer;
     }
 }

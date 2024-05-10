@@ -148,12 +148,9 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     public void onDestroy() {
         super.onDestroy();
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                callBridgeMethod(BridgeMethods.VPAID_STOP_AD);
-                destroyWebView();
-            }
+        runOnUiThread(() -> {
+            callBridgeMethod(BridgeMethods.VPAID_STOP_AD);
+            destroyWebView();
         });
 
         if (mViewControllerVpaid != null)
@@ -168,12 +165,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     public void skipVideo() {
         onAdSkipped();
         mIsStarted = false;
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                dismissAd();
-            }
-        });
+        runOnUiThread(() -> dismissAd());
     }
     //endregion
 
@@ -244,12 +236,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         }
         onAdClicked();
         final String finalUrl = url;
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                DisplayControllerVpaid.super.onRedirect(finalUrl, mLoopMeAd);
-            }
-        });
+        runOnUiThread(() -> DisplayControllerVpaid.super.onRedirect(finalUrl, mLoopMeAd));
     }
 
     @Override
@@ -366,12 +353,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     @Override
     public void adStarted() {
-        mImpressionTimer = new SimpleTimer(IMPRESSION_TIMER, new SimpleTimer.Listener() {
-            @Override
-            public void onFinish() {
-                onAdImpression();
-            }
-        });
+        mImpressionTimer = new SimpleTimer(IMPRESSION_TIMER, this::onAdImpression);
         mImpressionTimer.start();
 
         startCloseButtonTimerOnUiThread();

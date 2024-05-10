@@ -66,12 +66,9 @@ public class View360Controller implements IViewController {
         if (mVRLibrary == null) {
             Logging.out(LOG_TAG, "initVRLibrary");
             mVRLibrary = MDVRLibrary.with(context)
-                    .video(new MDVRLibrary.IOnSurfaceReadyCallback() {
-                        @Override
-                        public void onSurfaceReady(Surface surface) {
-                            if (mCallback != null) {
-                                mCallback.onSurfaceReady(surface);
-                            }
+                    .video(surface -> {
+                        if (mCallback != null) {
+                            mCallback.onSurfaceReady(surface);
                         }
                     })
                     .build(mGLSurfaceView);

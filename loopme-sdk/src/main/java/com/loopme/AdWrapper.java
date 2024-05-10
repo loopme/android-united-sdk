@@ -6,7 +6,6 @@ import android.os.CountDownTimer;
 
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
-import com.loopme.controllers.interfaces.DisplayController;
 import com.loopme.debugging.Params;
 import com.loopme.tracker.partners.LoopMeTracker;
 
@@ -124,16 +123,6 @@ public abstract class AdWrapper extends AdConfig {
         destroy(mFirstLoopMeAd);
         destroy(mSecondLoopMeAd);
         stopSleepLoadTimer();
-    }
-
-    public DisplayController getAdController() {
-        if (isReady(mFirstLoopMeAd)) {
-            return mFirstLoopMeAd.getDisplayController();
-        } else if (isReady(mSecondLoopMeAd)) {
-            return mSecondLoopMeAd.getDisplayController();
-        } else {
-            return null;
-        }
     }
 
     public void removeListener() {

@@ -1,12 +1,7 @@
 package com.loopme.utils;
 
-import android.os.Build;
 import android.text.TextUtils;
 
-import com.loopme.request.AES;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -18,22 +13,6 @@ public class StringUtils {
     private static final String TIMESTAMP_CODE_PATTERN = "[TIMESTAMP]";
     private static final String REASON = "[REASON]";
     private static final String ISO_8601_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.mmm'Z'";
-
-    public static String getEncryptedString(String name) {
-        name = name == null ? "" : name;
-
-        AES.setDefaultKey();
-        AES.encrypt(name);
-        return deleteLastCharacter(AES.getEncryptedString());
-    }
-
-    public static String getUrlEncodedString(String stringToEncode) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            return URLEncoder.encode(stringToEncode, StandardCharsets.UTF_8);
-        } else {
-            return URLEncoder.encode(stringToEncode);
-        }
-    }
 
     public static String setErrorCode(String vastErrorUrl, String vastErrorCode) {
         return replace(vastErrorUrl, ERROR_CODE, vastErrorCode);
@@ -79,20 +58,10 @@ public class StringUtils {
 
     public static String replace(String baseString, String pattern, String contentToReplace) {
         if (!TextUtils.isEmpty(baseString)) {
-            if (baseString.contains(pattern)) {
-                return baseString.replace(pattern, contentToReplace);
-            } else {
-                return baseString;
-            }
+            return baseString.contains(pattern) ?
+                baseString.replace(pattern, contentToReplace) : baseString;
         } else {
             return "";
         }
-    }
-
-    private static String deleteLastCharacter(String encryptedString) {
-        if (!TextUtils.isEmpty(encryptedString)) {
-            return encryptedString.substring(0, encryptedString.length() - 1);
-        }
-        return "";
     }
 }
