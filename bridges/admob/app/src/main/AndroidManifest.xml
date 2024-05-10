@@ -13,6 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
         <activity android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
@@ -21,10 +22,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".InterstitialActivity" />
+        <activity android:name=".BannerActivity" />
+        <activity android:name=".RewardedVideoActivity" />
 
         <!-- Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713 -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="YOUR_ADMOB_APP_ID" />
+            android:value="ca-app-pub-3940256099942544~3347511713" />
     </application>
 </manifest>

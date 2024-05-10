@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">admob-app</string>
+    <string name="interstitial">Interstitial</string>
+    <string name="banner">Banner</string>
+    <string name="rewarded">Rewarded</string>
+    <string name="load">Load</string>
+    <string name="show">Show</string>
+    <string name="hide">Hide</string>
 </resources>
