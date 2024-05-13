@@ -20,7 +20,7 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
 
     private static final String LOG_TAG = LoopmeCustomRewardedVideo.class.getSimpleName();
 
-    private LoopMeInterstitial mInterstitial;
+    private LoopMeInterstitial mRewarded;
 
     private RewardedVideoAdListener rewardedVideoAdListener;
 
@@ -33,9 +33,9 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
         try {
             this.rewardedVideoAdListener = rewardedVideoAdListener;
             String appkey = adData.getConfiguration().get("instancekey").toString();
-            mInterstitial = LoopMeInterstitial.getInstance(appkey, activity);
-            mInterstitial.setAutoLoading(false);
-            mInterstitial.setListener(new LoopMeInterstitial.Listener() {
+            mRewarded = LoopMeInterstitial.getInstance(appkey, activity);
+            mRewarded.setAutoLoading(false);
+            mRewarded.setListener(new LoopMeInterstitial.Listener() {
                 @Override
                 public void onLoopMeInterstitialClicked(LoopMeInterstitial arg0) {
                     rewardedVideoAdListener.onAdClicked();
@@ -76,7 +76,7 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
                     rewardedVideoAdListener.onAdRewarded();
                 }
             });
-            mInterstitial.load(IntegrationType.NORMAL);
+            mRewarded.load(IntegrationType.NORMAL);
         } catch (Exception e) {
             rewardedVideoAdListener.onAdLoadFailed(AdapterErrorType.ADAPTER_ERROR_TYPE_INTERNAL, -1, e.getMessage());
         }
@@ -85,7 +85,7 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
     @Override
     public void showAd(AdData adData, RewardedVideoAdListener rewardedVideoAdListener) {
         if (isAdAvailable(adData)) {
-            mInterstitial.show();
+            mRewarded.show();
         } else {
             rewardedVideoAdListener.onAdShowFailed(-2, "adShowFailed");
         }
@@ -93,7 +93,7 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
 
     @Override
     public boolean isAdAvailable(AdData adData) {
-        return mInterstitial.isReady();
+        return mRewarded.isReady();
     }
 
 }

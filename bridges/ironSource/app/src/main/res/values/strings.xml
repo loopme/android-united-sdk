@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">ironsource-mediation-sample</string>
     <string name="interstitial">Interstitial</string>
-    <string name="banner">banner</string>
-    <string name="rewarded">rewarded</string>
+    <string name="banner">Banner</string>
+    <string name="rewarded">Manual Rewarded</string>
     <string name="load">Load</string>
     <string name="show">Show</string>
     <string name="hide">hide</string>
