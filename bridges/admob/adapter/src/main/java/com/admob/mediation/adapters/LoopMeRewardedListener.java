@@ -102,11 +102,9 @@ public class LoopMeRewardedListener implements LoopMeInterstitial.Listener, Medi
 
     /** Loads the interstitial ad from the third-party ad network. */
     public void loadAd() {
-        String serverParameter = mediationRewardedAdConfiguration
+        String appkey = mediationRewardedAdConfiguration
             .getServerParameters()
             .getString(MediationConfiguration.CUSTOM_EVENT_SERVER_PARAMETER_FIELD);
-        // TODO: Take appkey from AdMob waterfall setup
-        String appkey = "";
         Activity activity = (Activity) mediationRewardedAdConfiguration.getContext();
         rewardedAd = LoopMeInterstitial.getInstance(appkey, activity);
         rewardedAd.setListener(this);
@@ -116,7 +114,6 @@ public class LoopMeRewardedListener implements LoopMeInterstitial.Listener, Medi
 
     @Override
     public void showAd(@NonNull Context context) {
-        Log.d(LOG_TAG, "showAd");
         if (rewardedAd != null) {
             rewardedAd.show();
         }

@@ -13,6 +13,7 @@ import com.google.android.gms.ads.mediation.MediationAdLoadCallback;
 import com.google.android.gms.ads.mediation.MediationBannerAd;
 import com.google.android.gms.ads.mediation.MediationBannerAdCallback;
 import com.google.android.gms.ads.mediation.MediationBannerAdConfiguration;
+import com.google.android.gms.ads.mediation.MediationConfiguration;
 import com.loopme.LoopMeBanner;
 import com.loopme.common.LoopMeError;
 
@@ -88,10 +89,9 @@ public class LoopMeBannerListener implements LoopMeBanner.Listener, MediationBan
     }
 
     public void loadAd() {
-
         String appKey = mediationBannerAdConfiguration
-                .getServerParameters()
-                .getString("app_key");
+            .getServerParameters()
+            .getString(MediationConfiguration.CUSTOM_EVENT_SERVER_PARAMETER_FIELD);
         Activity activity = (Activity) mediationBannerAdConfiguration.getContext();
         bannerAd = LoopMeBanner.getInstance(appKey, activity);
         FrameLayout container = new FrameLayout(activity);

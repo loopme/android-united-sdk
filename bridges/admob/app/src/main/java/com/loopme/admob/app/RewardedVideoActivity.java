@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.ads.AdapterResponseInfo;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.admanager.AdManagerAdRequest;
 import com.google.android.gms.ads.rewarded.RewardedAd;
@@ -15,6 +16,8 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 
 public class RewardedVideoActivity extends Activity {
     private static final String LOG_TAG = RewardedVideoActivity.class.getSimpleName();
+//    private static final String adUnitId = "/6499/example/rewarded";
+    private static final String adUnitId = "ca-app-pub-3222206793588139/6342952349";
     private RewardedAd rewardedAd;
     AdManagerAdRequest adRequest;
     private Button mLoadButton;
@@ -53,26 +56,24 @@ public class RewardedVideoActivity extends Activity {
     private void loadAd() {
         mShowButton.setText("Loading Rewarded...");
         mShowButton.setEnabled(false);
-        RewardedAd.load(
-            this,
-            "/6499/example/rewarded",
-            adRequest,
-            new RewardedAdLoadCallback() {
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    String errorMessage = loadAdError.getMessage();
-                    mShowButton.setText(String.format("Failed To Receive Ad:\n[%s]", errorMessage));
-                    mShowButton.setEnabled(false);
-                    rewardedAd = null;
-                }
+        RewardedAd.load(this, adUnitId, adRequest, new RewardedAdLoadCallback() {
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                String errorMessage = loadAdError.getMessage();
+                mShowButton.setText(String.format("Failed To Receive Ad:\n[%s]", errorMessage));
+                mShowButton.setEnabled(false);
+                rewardedAd = null;
+            }
 
-                @Override
-                public void onAdLoaded(@NonNull RewardedAd ad) {
-                    rewardedAd = ad;
-                    String adUnitId = rewardedAd.getAdUnitId();
-                    mShowButton.setText(String.format("Show Interstitial [%s]", adUnitId));
-                    mShowButton.setEnabled(true);
-                }
-            });
+            @Override
+            public void onAdLoaded(@NonNull RewardedAd ad) {
+                rewardedAd = ad;
+                AdapterResponseInfo adapterResponseInfo = ad.getResponseInfo().getLoadedAdapterResponseInfo();
+                String appkey = (String) adapterResponseInfo.getCredentials().get("parameter");
+                String adapterClassName = adapterResponseInfo.getAdapterClassName();
+                mShowButton.setText(String.format("Show Rewarded \nAppKey: %s\nAdapter: %s", appkey, adapterClassName));
+                mShowButton.setEnabled(true);
+            }
+        });
     }
 }
