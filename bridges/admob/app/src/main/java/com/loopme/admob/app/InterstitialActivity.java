@@ -8,6 +8,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.ads.AdapterResponseInfo;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.admanager.AdManagerAdRequest;
 import com.google.android.gms.ads.admanager.AdManagerInterstitialAd;
@@ -16,6 +17,8 @@ import com.google.android.gms.ads.admanager.AdManagerInterstitialAdLoadCallback;
 
 public class InterstitialActivity extends AppCompatActivity {
     private static final String LOG_TAG = InterstitialActivity.class.getSimpleName();
+//    private static final String adUnitId = "/6499/example/interstitial";
+    private static final String adUnitId = "ca-app-pub-3222206793588139/8737181390";
     private AdManagerInterstitialAd mAdManagerInterstitialAd;
     AdManagerAdRequest adRequest;
     private Button mLoadButton;
@@ -54,15 +57,17 @@ public class InterstitialActivity extends AppCompatActivity {
     private void loadAd() {
         mShowButton.setText("Loading Interstitial...");
         mShowButton.setEnabled(false);
-        AdManagerInterstitialAd.load(this,"/6499/example/interstitial", adRequest,
+        AdManagerInterstitialAd.load(this,adUnitId, adRequest,
             new AdManagerInterstitialAdLoadCallback() {
                 @Override
-                public void onAdLoaded(@NonNull AdManagerInterstitialAd interstitialAd) {
+                public void onAdLoaded(@NonNull AdManagerInterstitialAd ad) {
                     // The mAdManagerInterstitialAd reference will be null until
                     // an ad is loaded.
-                    mAdManagerInterstitialAd = interstitialAd;
-                    String adUnitId = mAdManagerInterstitialAd.getAdUnitId();
-                    mShowButton.setText(String.format("Show Interstitial [%s]", adUnitId));
+                    mAdManagerInterstitialAd = ad;
+                    AdapterResponseInfo adapterResponseInfo = ad.getResponseInfo().getLoadedAdapterResponseInfo();
+                    String appkey = (String) adapterResponseInfo.getCredentials().get("parameter");
+                    String adapterClassName = adapterResponseInfo.getAdapterClassName();
+                    mShowButton.setText(String.format("Show Rewarded \nAppKey: %s\nAdapter: %s", appkey, adapterClassName));
                     mShowButton.setEnabled(true);
                 }
 

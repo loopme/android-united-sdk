@@ -86,11 +86,9 @@ public class LoopMeInterstitialListener implements LoopMeInterstitial.Listener, 
 
     /** Loads the interstitial ad from the third-party ad network. */
     public void loadAd() {
-        String serverParameter = mediationInterstitialAdConfiguration
+        String appkey = mediationInterstitialAdConfiguration
             .getServerParameters()
             .getString(MediationConfiguration.CUSTOM_EVENT_SERVER_PARAMETER_FIELD);
-        // TODO: Take appkey from AdMob waterfall setup
-        String appkey = "";
         Activity activity = (Activity) mediationInterstitialAdConfiguration.getContext();
         interstitialAd = LoopMeInterstitial.getInstance(appkey, activity);
         interstitialAd.setListener(this);
