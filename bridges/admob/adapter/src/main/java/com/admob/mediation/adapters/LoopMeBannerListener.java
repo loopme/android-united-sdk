@@ -1,6 +1,7 @@
 package com.admob.mediation.adapters;
 
 import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -92,9 +93,20 @@ public class LoopMeBannerListener implements LoopMeBanner.Listener, MediationBan
         String appKey = mediationBannerAdConfiguration
             .getServerParameters()
             .getString(MediationConfiguration.CUSTOM_EVENT_SERVER_PARAMETER_FIELD);
-        Activity activity = (Activity) mediationBannerAdConfiguration.getContext();
+        Context context = mediationBannerAdConfiguration.getContext();
+        Activity activity = (Activity) context;
         bannerAd = LoopMeBanner.getInstance(appKey, activity);
+        bannerAd.setSize(
+            mediationBannerAdConfiguration.getAdSize().getWidth(),
+            mediationBannerAdConfiguration.getAdSize().getHeight()
+        );
         FrameLayout container = new FrameLayout(activity);
+        container.setLayoutParams(
+            new FrameLayout.LayoutParams(
+                mediationBannerAdConfiguration.getAdSize().getWidthInPixels(context),
+                mediationBannerAdConfiguration.getAdSize().getHeightInPixels(context)
+            )
+        );
         bannerAd.bindView(container);
         bannerAd.setAutoLoading(false);
         bannerAd.setListener(this);

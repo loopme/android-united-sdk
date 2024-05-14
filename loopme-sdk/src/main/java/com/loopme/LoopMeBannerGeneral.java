@@ -27,6 +27,8 @@ public class LoopMeBannerGeneral extends LoopMeAd {
     private volatile FrameLayout mBannerView;
 
     private boolean mIsVideoFinished;
+    private int mWidth = 0;
+    private int mHeight = 0;
 
     public void setMinimizedMode(MinimizedMode mode) {
         if (isLoopMeController()) {
@@ -71,6 +73,19 @@ public class LoopMeBannerGeneral extends LoopMeAd {
                 LoopMeBannerGeneral.super.destroy();
             }
         });
+    }
+
+    public void setSize(int width, int height) {
+        mWidth = width;
+        mHeight = height;
+    }
+
+    public int getWidth() {
+        return mWidth;
+    }
+
+    public int getHeight() {
+        return mHeight;
     }
 
     /**
