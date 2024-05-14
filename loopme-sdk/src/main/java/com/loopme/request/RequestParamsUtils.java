@@ -3,8 +3,6 @@ package com.loopme.request;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Point;
-import android.os.Build;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
@@ -64,29 +62,11 @@ public class RequestParamsUtils {
         } else if (baseAd instanceof LoopMeBannerGeneral banner) {
             final FrameLayout bannerView = banner.getBannerView();
             if (bannerView != null) {
-                bannerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-                        int widthInDp = convertPixelToDp(resources, bannerView.getWidth());
-                        int heightInDp = convertPixelToDp(resources, bannerView.getHeight());
-                        if (widthInDp <= 0 || heightInDp <= 0) {
-                            return;
-                        }
-                        adSizeArray[0] = widthInDp;
-                        adSizeArray[1] = heightInDp;
-
-                        // Round the size before updating the map
-                        roundBannersSize(adSizeArray, Constants.Banner.EXPANDABLE_BANNER_SIZE);
-                        roundBannersSize(adSizeArray, Constants.Banner.MPU_BANNER_SIZE);
-                        adSizes.put(appKey, adSizeArray);
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                            bannerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                        } else {
-                            bannerView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                        }
-                    }
-                });
+                adSizeArray[0] = banner.getWidth();
+                adSizeArray[1] = banner.getHeight();
+                roundBannersSize(adSizeArray, Constants.Banner.EXPANDABLE_BANNER_SIZE);
+                roundBannersSize(adSizeArray, Constants.Banner.MPU_BANNER_SIZE);
+                adSizes.put(appKey, adSizeArray);
             }
 
             // Get the size from the map

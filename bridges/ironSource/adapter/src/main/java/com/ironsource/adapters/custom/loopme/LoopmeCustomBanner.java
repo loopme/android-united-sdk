@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
@@ -34,6 +33,10 @@ public class LoopmeCustomBanner extends BaseBanner<LoopmeCustomAdapter> {
         try {
             String appkey = adData.getConfiguration().get("instancekey").toString();
             mBanner = LoopMeBanner.getInstance(appkey, activity);
+            mBanner.setSize(
+                isBannerSize.getWidth(),
+                isBannerSize.getHeight()
+            );
             FrameLayout container = new FrameLayout(activity);
             mBanner.bindView(container);
             mBanner.setAutoLoading(false);

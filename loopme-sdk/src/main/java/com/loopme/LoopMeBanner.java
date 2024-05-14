@@ -48,6 +48,15 @@ public final class LoopMeBanner extends AdWrapper {
         }
     }
 
+    public void setSize(int width, int height) {
+        if (mFirstLoopMeAd != null) {
+            ((LoopMeBannerGeneral)mFirstLoopMeAd).setSize(width, height);
+        }
+        if (mSecondLoopMeAd != null) {
+            ((LoopMeBannerGeneral)mSecondLoopMeAd).setSize(width, height);
+        }
+    }
+
     /**
      * Getting already initialized ad object or create new one with specified appKey
      *

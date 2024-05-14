@@ -117,7 +117,18 @@ public class LoopmeMediationAdapter
 
         try {
             mBanner = LoopMeBanner.getInstance(placementId, activity);
+            mBanner.setSize(
+                maxAdFormat.getSize().getWidth(),
+                maxAdFormat.getSize().getHeight()
+            );
             FrameLayout container = new FrameLayout(activity);
+
+            container.setLayoutParams(
+                new FrameLayout.LayoutParams(
+                    maxAdFormat.getAdaptiveSize(activity).getWidth(),
+                    maxAdFormat.getAdaptiveSize(activity).getHeight()
+                )
+            );
             mBanner.bindView(container);
             mBanner.setAutoLoading(false);
             mBanner.setListener(new LoopMeBanner.Listener() {
