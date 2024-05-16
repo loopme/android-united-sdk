@@ -102,8 +102,10 @@ public class XmlParser {
     }
 
     private static <T> void parseElements(XmlPullParser parser, T tagInstance) throws Exception {
-        while (parser.getEventType() == XmlPullParser.START_TAG
-                || parser.getEventType() == XmlPullParser.TEXT) {
+        while (
+            parser.getEventType() == XmlPullParser.START_TAG ||
+            parser.getEventType() == XmlPullParser.TEXT
+        ) {
             if (parser.getEventType() == XmlPullParser.TEXT) {
                 parseText(parser, tagInstance);
             } else {
@@ -132,24 +134,24 @@ public class XmlParser {
         Field tagField = getFieldForTag(parent, tagName);
         if (tagField == null) {
             skipTag(parser, tagName, tagDepth);
-        } else {
-            if (List.class.isAssignableFrom(tagField.getType())) {
-                ParameterizedType listGenericType = (ParameterizedType) tagField.getGenericType();
-                Class<?> listGenericClass = (Class<?>) listGenericType.getActualTypeArguments()[0];
-                Object tag = parseTag(parser, listGenericClass);
-                tagField.setAccessible(true);
-                List list = (List) tagField.get(parent);
-                if (list == null) {
-                    list = new ArrayList();
-                    tagField.set(parent, list);
-                }
-                list.add(tag);
-            } else {
-                Object tag = parseTag(parser, tagField.getType());
-                tagField.setAccessible(true);
-                tagField.set(parent, tag);
-            }
+            return;
         }
+        if (!List.class.isAssignableFrom(tagField.getType())) {
+            Object tag = parseTag(parser, tagField.getType());
+            tagField.setAccessible(true);
+            tagField.set(parent, tag);
+            return;
+        }
+        ParameterizedType listGenericType = (ParameterizedType) tagField.getGenericType();
+        Class<?> listGenericClass = (Class<?>) listGenericType.getActualTypeArguments()[0];
+        Object tag = parseTag(parser, listGenericClass);
+        tagField.setAccessible(true);
+        List list = (List) tagField.get(parent);
+        if (list == null) {
+            list = new ArrayList();
+            tagField.set(parent, list);
+        }
+        list.add(tag);
     }
 
     private static <T> Field getFieldForTag(T parent, String tagName) {
@@ -170,8 +172,7 @@ public class XmlParser {
 
     private static <T> Field getFieldForText(T parent) {
         for (Field field : parent.getClass().getDeclaredFields()) {
-            Text textAnnotation = getAnnotation(field, Text.class);
-            if (textAnnotation != null) {
+            if (getAnnotation(field, Text.class) != null) {
                 return field;
             }
         }
@@ -179,12 +180,9 @@ public class XmlParser {
     }
 
     private static void skipTag(XmlPullParser parser, String name, int depth) throws Exception {
-        while (true) {
+        do {
             parser.next();
-            if (parser.getEventType() == XmlPullParser.END_TAG && parser.getName().equalsIgnoreCase(name) && parser.getDepth() == depth) {
-                break;
-            }
-        }
+        } while (parser.getEventType() != XmlPullParser.END_TAG || !parser.getName().equalsIgnoreCase(name) || parser.getDepth() != depth);
         parser.next();
     }
 

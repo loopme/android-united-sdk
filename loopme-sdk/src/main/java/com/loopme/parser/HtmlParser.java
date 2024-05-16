@@ -36,8 +36,7 @@ public class HtmlParser {
         try {
             JSONObject jsonObject = new JSONObject(mJsonScript);
             String param = jsonObject.getJSONObject(MACROS).getString(name);
-            String decodedParam = decode(param);
-            return decodedParam;
+            return decode(param);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -46,36 +45,29 @@ public class HtmlParser {
 
     @Deprecated
     public static String decode(String source) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            return URLDecoder.decode(source, StandardCharsets.UTF_8);
-        } else {
-            return URLDecoder.decode(source);
-        }
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ?
+            URLDecoder.decode(source, StandardCharsets.UTF_8) : URLDecoder.decode(source);
     }
 
     public int getAdWidth() {
-        int widthInt = Constants.DEFAULT_BANNER_WIDTH;
-        String width = getObject(WIDTH);
         try {
-            widthInt = Integer.parseInt(width);
+            return Integer.parseInt(getObject(WIDTH));
         } catch (NumberFormatException e) {
             e.printStackTrace();
         } catch (Exception e) {
             Logging.out(LOG_TAG, "Not appropriate ad type, ad width by default");
         }
-        return widthInt;
+        return Constants.DEFAULT_BANNER_WIDTH;
     }
 
     public int getAdHeight() {
-        int heightInt = Constants.DEFAULT_BANNER_HEIGHT;
-        String height = getObject(HEIGHT);
         try {
-            heightInt = Integer.parseInt(height);
+            return Integer.parseInt(getObject(HEIGHT));
         } catch (NumberFormatException e) {
             e.printStackTrace();
         } catch (Exception e) {
             Logging.out(LOG_TAG, "Not appropriate ad type, ad height by default");
         }
-        return heightInt;
+        return Constants.DEFAULT_BANNER_HEIGHT;
     }
 }

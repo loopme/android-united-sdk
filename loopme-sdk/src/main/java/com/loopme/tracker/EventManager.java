@@ -22,12 +22,12 @@ public class EventManager implements AdEvents {
     private TrackerManager mTrackerManager;
 
     public EventManager(LoopMeAd loopMeAd) {
-        if (loopMeAd != null) {
-            mTrackerManager = new TrackerManager(loopMeAd);
-            mTrackerManager.startSdk();
-        } else {
+        if (loopMeAd == null) {
             Logging.out(LOG_TAG, "LoopMeAd is null!");
+            return;
         }
+        mTrackerManager = new TrackerManager(loopMeAd);
+        mTrackerManager.startSdk();
     }
 
     @Override
@@ -39,10 +39,11 @@ public class EventManager implements AdEvents {
 
     @Override
     public void onAdDestroyedEvent() {
-        if (mTrackerManager != null) {
-            mTrackerManager.track(Event.STOP);
-            mTrackerManager.track(Event.END_SESSION);
+        if (mTrackerManager == null) {
+            return;
         }
+        mTrackerManager.track(Event.STOP);
+        mTrackerManager.track(Event.END_SESSION);
     }
 
     @Override
@@ -54,10 +55,11 @@ public class EventManager implements AdEvents {
 
     @Override
     public void onAdStartedEvent() {
-        if (mTrackerManager != null) {
-            mTrackerManager.track(Event.START);
-            mTrackerManager.track(Event.VIDEO_STARTED);
+        if (mTrackerManager == null) {
+            return;
         }
+        mTrackerManager.track(Event.START);
+        mTrackerManager.track(Event.VIDEO_STARTED);
     }
 
     @Override
@@ -105,11 +107,12 @@ public class EventManager implements AdEvents {
 
     @Override
     public void onAdCompleteEvent() {
-        if (mTrackerManager != null) {
-            mTrackerManager.track(Event.COMPLETE);
-            mTrackerManager.track(Event.VIDEO_COMPLETE);
-            mTrackerManager.track(Event.VIDEO_STOPPED);
+        if (mTrackerManager == null) {
+            return;
         }
+        mTrackerManager.track(Event.COMPLETE);
+        mTrackerManager.track(Event.VIDEO_COMPLETE);
+        mTrackerManager.track(Event.VIDEO_STOPPED);
     }
 
     @Override
@@ -235,11 +238,12 @@ public class EventManager implements AdEvents {
     }
 
     private void onAdDurationChangedEvent(int position, int videoDuration) {
-        if (mTrackerManager != null) {
-            String adDuration = String.valueOf(position);
-            String adRemainingTime = String.valueOf(videoDuration - position);
-            mTrackerManager.track(Event.DURATION_CHANGED, adDuration, adRemainingTime);
+        if (mTrackerManager == null) {
+            return;
         }
+        String adDuration = String.valueOf(position);
+        String adRemainingTime = String.valueOf(videoDuration - position);
+        mTrackerManager.track(Event.DURATION_CHANGED, adDuration, adRemainingTime);
     }
 
     private void handleProgressDurationEvents(int position, int videoDuration) {

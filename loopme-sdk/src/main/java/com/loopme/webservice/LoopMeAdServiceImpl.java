@@ -11,8 +11,7 @@ import org.json.JSONObject;
 public class LoopMeAdServiceImpl implements LoopMeAdService {
     private static LoopMeAdService sService;
 
-    private LoopMeAdServiceImpl() {
-    }
+    private LoopMeAdServiceImpl() { }
 
     public static LoopMeAdService getInstance() {
         if (sService == null) {

@@ -68,8 +68,7 @@ public class AdParams implements Serializable {
 
     AdSpotDimensions mAdSpotDimensions;
 
-    public AdParams() {
-    }
+    public AdParams() { }
 
     public AdParams(AdParamsBuilder builder) {
         mFormat = builder.mBuilderFormat;
@@ -77,8 +76,7 @@ public class AdParams implements Serializable {
         mOrientation = builder.mBuilderOrientation;
         mAdType = builder.mAdType;
         mExpiredDate = builder.mBuilderExpiredDate == 0 ?
-                Constants.DEFAULT_EXPIRED_TIME :
-                builder.mBuilderExpiredDate;
+            Constants.DEFAULT_EXPIRED_TIME : builder.mBuilderExpiredDate;
         mPackageIds = builder.mPackageIds;
         mTrackersList = builder.mTrackersList;
         mToken = builder.mToken;
@@ -191,7 +189,6 @@ public class AdParams implements Serializable {
         private boolean mAutoLoading;
         private AdSpotDimensions mAdSpotDimensions;
 
-
         public AdParamsBuilder(String format) {
             mBuilderFormat = format;
         }
@@ -203,11 +200,6 @@ public class AdParams implements Serializable {
 
         public AdParamsBuilder trackersList(List<String> trackersList) {
             mTrackersList = trackersList;
-            return this;
-        }
-
-        public AdParamsBuilder partPreload(boolean preload) {
-            mPartPreload = preload;
             return this;
         }
 
@@ -226,11 +218,6 @@ public class AdParams implements Serializable {
             return this;
         }
 
-        public AdParamsBuilder adType(AdType adType) {
-            mAdType = adType;
-            return this;
-        }
-
         public AdParamsBuilder token(String token) {
             mToken = token;
             return this;
@@ -244,6 +231,16 @@ public class AdParams implements Serializable {
             return this;
         }
 
+        private boolean isValidOrientationValue(String orientation) {
+            if (orientation == null) {
+                return false;
+            }
+            return (
+                orientation.equalsIgnoreCase(Constants.ORIENTATION_PORT) ||
+                orientation.equalsIgnoreCase(Constants.ORIENTATION_LAND)
+            );
+        }
+
         public AdParamsBuilder orientation(String orientation) {
             if (isValidOrientationValue(orientation)) {
                 mBuilderOrientation = orientation;
@@ -254,10 +251,14 @@ public class AdParams implements Serializable {
             return this;
         }
 
-        public AdParamsBuilder expiredTime(int time) {
-            int timeSec = time * 1000;
-            mBuilderExpiredDate = Math.max(Constants.DEFAULT_EXPIRED_TIME, timeSec);
-            return this;
+        private boolean isValidFormatValue() {
+            if (mBuilderFormat == null) {
+                return false;
+            }
+            return (
+                mBuilderFormat.equalsIgnoreCase(Constants.BANNER_TAG) ||
+                mBuilderFormat.equalsIgnoreCase(Constants.INTERSTITIAL_TAG)
+            );
         }
 
         public AdParams build() {
@@ -267,17 +268,6 @@ public class AdParams implements Serializable {
                 Logging.out(LOG_TAG, "Wrong ad format value");
                 return null;
             }
-        }
-
-        private boolean isValidFormatValue() {
-            return mBuilderFormat != null
-                    && (mBuilderFormat.equalsIgnoreCase(Constants.BANNER_TAG)
-                    || mBuilderFormat.equalsIgnoreCase(Constants.INTERSTITIAL_TAG));
-        }
-
-        private boolean isValidOrientationValue(String orientation) {
-            return orientation != null && (orientation.equalsIgnoreCase(Constants.ORIENTATION_PORT)
-                    || orientation.equalsIgnoreCase(Constants.ORIENTATION_LAND));
         }
 
         public AdParamsBuilder debug(boolean debug) {
@@ -378,10 +368,6 @@ public class AdParams implements Serializable {
         return mTrackersList;
     }
 
-    public void setTrackers(List<String> trackersList) {
-        this.mTrackersList = trackersList;
-    }
-
     public List<String> getVideoClicks() {
         return mVideoClicksList;
     }
@@ -458,10 +444,6 @@ public class AdParams implements Serializable {
         return mViewableImpressionMap != null && !mViewableImpressionMap.isEmpty();
     }
 
-    public Map<String, List<String>> getViewableImpressionMap() {
-        return mViewableImpressionMap;
-    }
-
     public void addErrorUrl(String errorUrl) {
         mErrorUrlList.add(errorUrl);
     }
@@ -487,11 +469,12 @@ public class AdParams implements Serializable {
     }
 
     private List<String> getViewableImpressionByType(String type) {
-        if (mViewableImpressionMap != null) {
-            for (String key : mViewableImpressionMap.keySet()) {
-                if (key.equalsIgnoreCase(type)) {
-                    return mViewableImpressionMap.get(key);
-                }
+        if (mViewableImpressionMap == null) {
+            return Collections.emptyList();
+        }
+        for (String key : mViewableImpressionMap.keySet()) {
+            if (key.equalsIgnoreCase(type)) {
+                return mViewableImpressionMap.get(key);
             }
         }
         return Collections.emptyList();

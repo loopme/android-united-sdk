@@ -28,9 +28,7 @@ public class TrackingEvent {
 
     @Override
     public int hashCode() {
-        int result = url.hashCode();
-        result = 31 * result + timeMillis;
-        return result;
+        return 31 * url.hashCode() + timeMillis;
     }
 
 }

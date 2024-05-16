@@ -97,27 +97,22 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
     }
 
     private void postVpaidDidReachEnd(String eventType) {
-        if (!mIsVpaidEventTracked) {
-            if (this instanceof DisplayControllerVpaid && TextUtils.equals(eventType, EventConstants.COMPLETE)) {
-                onAdVideoDidReachEnd();
-                mIsVpaidEventTracked = true;
-            }
+        if (mIsVpaidEventTracked) {
+            return;
+        }
+        if (this instanceof DisplayControllerVpaid && TextUtils.equals(eventType, EventConstants.COMPLETE)) {
+            onAdVideoDidReachEnd();
+            mIsVpaidEventTracked = true;
         }
     }
 
     @Override
     public void onStartLoad() {
         super.onStartLoad();
-
         // Start initializing OMID part.
         onTryCreateOmidTracker(getSupportedOmidVerificationData(mAdParams));
-
         startTimer(TimersType.PREPARE_ASSETS_TIMER);
-        mVastVpaidAssetsResolver.resolve(
-                mAdParams,
-                mContext,
-                createAssetsLoadListener());
-
+        mVastVpaidAssetsResolver.resolve(mAdParams, mContext, createAssetsLoadListener());
         initTrackers();
     }
 
@@ -148,13 +143,11 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
                 stopTimer(TimersType.PREPARE_ASSETS_TIMER);
                 prepareAd();
             }
-
             @Override
             public void onError(LoopMeError info) {
                 onInternalLoadFail(info);
                 stopTimer(TimersType.PREPARE_ASSETS_TIMER);
             }
-
             @Override
             public void onPostWarning(LoopMeError error) {
                 postWarning(error);
@@ -176,79 +169,61 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
         for (com.loopme.xml.vast4.Verification v : verificationList) {
             if (v == null)
                 continue;
-
             String vendor = v.getVendor();
             if (TextUtils.isEmpty(vendor))
                 continue;
-
             List<String> verificationNotExecutedEventUrlList =
-                    getVerificationNotExecutedEventUrlList(v.getTrackingEvents());
-
+                getVerificationNotExecutedEventUrlList(v.getTrackingEvents());
             String omidJSUrl = pickOMIDJavaScriptResourceUrl(v.getJavaScriptResourceList());
             // TODO. Refactor. This piece of code isn't about retrieving data.
             // Verification vendor api/resource type isn't supported: OMID JS resource only.
             if (TextUtils.isEmpty(omidJSUrl)) {
                 postVerificationNotExecutedEvent(
-                        verificationNotExecutedEventUrlList,
-                        VAST_MACROS_REASON_NOT_SUPPORTED);
+                    verificationNotExecutedEventUrlList, VAST_MACROS_REASON_NOT_SUPPORTED
+                );
                 continue;
             }
-
             VerificationParameters vp = v.getVerificationParameters();
-
             omidVerificationMap.put(
-                    vendor,
-                    new Verification(
-                            vendor,
-                            omidJSUrl,
-                            verificationNotExecutedEventUrlList,
-                            vp == null ? null : vp.getText()));
+                vendor,
+                new Verification(
+                    vendor, omidJSUrl, verificationNotExecutedEventUrlList, vp == null ? null : vp.getText()
+                )
+            );
         }
-
         return omidVerificationMap;
     }
 
     // TODO. Refactor.
     protected static void postVerificationNotExecutedEvent(
-            List<String> verificationNotExecutedUrlList,
-            int reason) {
-
+        List<String> verificationNotExecutedUrlList, int reason
+    ) {
         if (verificationNotExecutedUrlList == null)
             return;
-
         for (String url : verificationNotExecutedUrlList)
-            VastVpaidEventTracker.trackVastEvent(
-                    url,
-                    String.valueOf(reason));
+            VastVpaidEventTracker.trackVastEvent(url, String.valueOf(reason));
     }
 
     // TODO. Refactor.
     @NonNull
     private static List<String> getVerificationNotExecutedEventUrlList(TrackingEvents trackingEvents) {
         List<String> verificationNotExecutedUrlList = new ArrayList<>();
-
         if (trackingEvents == null)
             return verificationNotExecutedUrlList;
-
         List<Tracking> trackingList = trackingEvents.getTrackingList();
         if (trackingList == null)
             return verificationNotExecutedUrlList;
-
         for (Tracking t : trackingList) {
             if (t == null)
                 continue;
-
             String event = t.getEvent();
             if (event == null || !event.equalsIgnoreCase(VAST_EVENT_VERIFICATION_NOT_EXECUTED))
                 continue;
-
             String url = t.getText();
             if (TextUtils.isEmpty(url))
                 continue;
-
             verificationNotExecutedUrlList.add(url);
         }
-
         return verificationNotExecutedUrlList;
     }
 
@@ -256,30 +231,23 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
     private static String pickOMIDJavaScriptResourceUrl(List<JavaScriptResource> jsResourceList) {
         if (jsResourceList == null)
             return null;
-
         String browserOptionalJsUrl = null;
-
         for (JavaScriptResource jsr : jsResourceList) {
             if (jsr == null)
                 continue;
-
             String api = jsr.getApiFramework();
             if (api == null || !api.equalsIgnoreCase(VAST_VERIFICATION_API_FRAMEWORK_OMID))
                 continue;
-
             String jsUrl = jsr.getText();
             if (TextUtils.isEmpty(jsUrl))
                 continue;
-
             if (jsr.getBrowserOptional())
                 browserOptionalJsUrl = jsUrl;
             else
                 return jsUrl;
         }
-
         return browserOptionalJsUrl;
     }
-
 
     private void postWarning(LoopMeError error) {
         if (mLoopMeAd != null) {
@@ -288,12 +256,9 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
     }
 
     private void prepareAd() {
-        onUiThread(new Runnable() {
-            @Override
-            public void run() {
-                startTimer(TimersType.PREPARE_VPAID_JS_TIMER);
-                prepare();
-            }
+        onUiThread(() -> {
+            startTimer(TimersType.PREPARE_VPAID_JS_TIMER);
+            prepare();
         });
     }
 
@@ -302,7 +267,6 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
     protected void destroyWebView() {
         if (webView != null)
             webView.destroy();
-
         webView = null;
     }
 
@@ -310,7 +274,6 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
     public void prepare() {
         webView = createWebView();
         onAdRegisterView(mLoopMeAd.getContext(), webView);
-
         if (viewableImpressionTracker == null && hasViewableImpression())
             viewableImpressionTracker = new ViewableImpressionTracker(mLoopMeAd.getAdParams());
     }
@@ -398,10 +361,11 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
     }
 
     private void destroyTimers() {
-        if (mTimer != null) {
-            mTimer.destroy();
-            mTimer = null;
+        if (mTimer == null) {
+            return;
         }
+        mTimer.destroy();
+        mTimer = null;
     }
 
     @Override
@@ -433,10 +397,11 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
         private final String verificationParameters;
 
         public Verification(
-                String vendor,
-                String jsResourceUrl,
-                List<String> verificationNotExecutedUrlList,
-                String verificationParameters) {
+            String vendor,
+            String jsResourceUrl,
+            List<String> verificationNotExecutedUrlList,
+            String verificationParameters
+        ) {
             this.vendor = vendor;
             this.javaScriptResourceUrl = jsResourceUrl;
             this.verificationNotExecutedUrlList = verificationNotExecutedUrlList;

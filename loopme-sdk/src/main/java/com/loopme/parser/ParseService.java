@@ -77,33 +77,29 @@ public class ParseService {
         AdSpotDimensions adSpotDimensions = retrieveAdDimensionsForNoneVastOrDefault(bidObject);
 
         return new AdParams.AdParamsBuilder(retrieveAdFormat(loopMeAd))
-                .html(html)
-                .orientation(orientation)
-                .token(token)
-                .debug(debug)
-                .trackersList(measurePartners)
-                .packageIds(packageIds)
-                .video360(v360)
-                .mraid(false)
-                .adIds(adIds)
-                .autoLoading(autoLoadingValue)
-                .adSpotDimensions(adSpotDimensions)
-                .build();
+            .html(html)
+            .orientation(orientation)
+            .token(token)
+            .debug(debug)
+            .trackersList(measurePartners)
+            .packageIds(packageIds)
+            .video360(v360)
+            .mraid(false)
+            .adIds(adIds)
+            .autoLoading(autoLoadingValue)
+            .adSpotDimensions(adSpotDimensions)
+            .build();
     }
 
     private static AdSpotDimensions retrieveAdDimensionsForNoneVastOrDefault(Bid bidObject) {
-        AdSpotDimensions adSpotDimensions = new AdSpotDimensions(Constants.DEFAULT_BANNER_WIDTH, Constants.DEFAULT_BANNER_HEIGHT);
-
         String creativeType = parseCreativeTypeFromBid(bidObject);
-        if (isHtmlAd(creativeType) || isMraidAd(creativeType)) {
-            String html = retrieveAdm(bidObject);
-            HtmlParser parser = new HtmlParser(html);
-            int adWidth = parser.getAdWidth();
-            int adHeight = parser.getAdHeight();
-            adSpotDimensions = new AdSpotDimensions(adWidth, adHeight);
+        if (!isHtmlAd(creativeType) && !isMraidAd(creativeType)) {
+            return new AdSpotDimensions(
+                Constants.DEFAULT_BANNER_WIDTH, Constants.DEFAULT_BANNER_HEIGHT
+            );
         }
-
-        return adSpotDimensions;
+        HtmlParser parser = new HtmlParser(retrieveAdm(bidObject));
+        return new AdSpotDimensions(parser.getAdWidth(), parser.getAdHeight());
     }
 
     private static List<String> retrievePackageIds(Ext ext) {
@@ -157,11 +153,9 @@ public class ParseService {
     private static String retrieveAdFormat(LoopMeAd loopMeAd) {
         if (loopMeAd.getAdFormat() == Constants.AdFormat.INTERSTITIAL) {
             return Constants.INTERSTITIAL_TAG;
-        } else if (loopMeAd.getAdFormat() == Constants.AdFormat.BANNER) {
-            return Constants.BANNER_TAG;
-        } else {
-            return Constants.INTERSTITIAL_TAG;
         }
+        return loopMeAd.getAdFormat() == Constants.AdFormat.BANNER ?
+            Constants.BANNER_TAG : Constants.INTERSTITIAL_TAG;
     }
 
     private static String retrieveAdIdToken(Bid bidObject) {
@@ -203,11 +197,7 @@ public class ParseService {
     private static String retrieveOrientation(Bid bidObject) {
         try {
             String orientation = bidObject.getExt().getOrientation();
-            if (orientation.equalsIgnoreCase(DEFAULT)) {
-                return PORTRAIT;
-            } else {
-                return orientation;
-            }
+            return orientation.equalsIgnoreCase(DEFAULT) ? PORTRAIT : orientation;
         } catch (IllegalStateException | NullPointerException ex) {
             ex.printStackTrace();
         }
@@ -264,18 +254,15 @@ public class ParseService {
     }
 
     public static boolean isVastAd(ResponseJsonModel responseJsonModel) {
-        String type = parseCreativeTypeFromModel(responseJsonModel);
-        return isVastAd(type);
+        return isVastAd(parseCreativeTypeFromModel(responseJsonModel));
     }
 
     private static boolean isHtmlAd(String creativeType) {
         return !TextUtils.isEmpty(creativeType) && creativeType.equalsIgnoreCase(AdType.HTML.name());
     }
 
-
     public static AdType parseCreativeType(ResponseJsonModel body) {
-        String type = parseCreativeTypeFromModel(body);
-        return AdType.fromString(type);
+        return AdType.fromString(parseCreativeTypeFromModel(body));
     }
 
     public static boolean isMraidAd(String creativeType) {

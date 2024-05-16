@@ -76,13 +76,13 @@ public class AdFetchTask implements Runnable, Observer {
     }
 
     private void handleNoAds() {
-        if (mFirstRequest && isInterstitial()) {
-            mFirstRequest = false;
-            mLoopMeAd.setReversOrientationRequest();
-            runFetchTask();
-        } else {
+        if (!mFirstRequest || !isInterstitial()) {
             onErrorResult(Errors.NO_ADS_FOUND);
+            return;
         }
+        mFirstRequest = false;
+        mLoopMeAd.setReversOrientationRequest();
+        runFetchTask();
     }
 
     private boolean isInterstitial() {
@@ -93,13 +93,11 @@ public class AdFetchTask implements Runnable, Observer {
     public void run() {
         try {
             JSONObject data = RequestBuilder.buildRequestJson(mLoopMeAd.getContext(), mLoopMeAd);
-
             if (Thread.interrupted()) {
                 Logging.out(LOG_TAG, "Thread interrupted.");
                 stopRequestTimer();
                 return;
             }
-
             GetResponse<ResponseJsonModel> response = LoopMeAdServiceImpl.getInstance().fetchAd(Constants.BASE_URL, data);
             Logging.out(LOG_TAG, "response received");
             stopRequestTimer();
@@ -112,11 +110,11 @@ public class AdFetchTask implements Runnable, Observer {
     }
 
     protected void handleBadResponse(String message) {
-        if (!TextUtils.isEmpty(message) && message.contains(UNEXPECTED)) {
-            onErrorResult(Errors.SYNTAX_ERROR_IN_RESPONSE);
-        } else {
+        if (TextUtils.isEmpty(message) || !message.contains(UNEXPECTED)) {
             onErrorResult(new LoopMeError(message, Constants.ErrorType.SERVER));
+            return;
         }
+        onErrorResult(Errors.SYNTAX_ERROR_IN_RESPONSE);
     }
 
     protected void parseResponse(GetResponse<ResponseJsonModel> response) {
@@ -128,12 +126,12 @@ public class AdFetchTask implements Runnable, Observer {
     }
 
     private void handleResponse(ResponseJsonModel body) {
-        if (isVastWrapperCase(body)) {
-            saveParams(body);
-            launchVastFetcher(body);
-        } else {
+        if (!isVastWrapperCase(body)) {
             handleNonWrapper(body);
+            return;
         }
+        saveParams(body);
+        launchVastFetcher(body);
     }
 
     private boolean isVast(ResponseJsonModel body) {
@@ -152,34 +150,30 @@ public class AdFetchTask implements Runnable, Observer {
     }
 
     private void handleSuccess(AdParams adParams) {
-        if (adParams != null) {
-            adParams.setAdType(mAdType);
-            adParams.setOrientation(mOrientation);
-            onSuccessResult(adParams);
-        } else {
+        if (adParams == null) {
             onErrorResult(Errors.PARSING_ERROR);
+            return;
         }
+        adParams.setAdType(mAdType);
+        adParams.setOrientation(mOrientation);
+        onSuccessResult(adParams);
     }
 
     private void launchVastFetcher(ResponseJsonModel body) {
-        String vastString = XmlParseService.getVastString(body);
-        VastWrapperFetcher.Listener listener = initVastFetcherListener();
-        mVastWrapperFetcher = new VastWrapperFetcher(vastString, listener);
-        mVastWrapperFetcher.start();
-    }
-
-    private VastWrapperFetcher.Listener initVastFetcherListener() {
-        return new VastWrapperFetcher.Listener() {
+        VastWrapperFetcher.Listener listener = new VastWrapperFetcher.Listener() {
             @Override
             public void onCompleted(AdParams adParams) {
                 handleSuccess(adParams);
             }
-
             @Override
             public void onFailed(LoopMeError error) {
                 onErrorResult(error);
             }
         };
+        mVastWrapperFetcher = new VastWrapperFetcher(
+            XmlParseService.getVastString(body), listener
+        );
+        mVastWrapperFetcher.start();
     }
 
     private void saveParams(ResponseJsonModel body) {
@@ -196,28 +190,28 @@ public class AdFetchTask implements Runnable, Observer {
     }
 
     private boolean isVastWrapperCase(ResponseJsonModel body) {
-        if (isVast(body)) {
-            mIsVastVpaidAd = ParseService.isVastVpaidAd(body);
-            String vastString = XmlParseService.getVastString(body);
-            VastInfo vastInfo = XmlParseService.getVastInfo(vastString);
-            return mIsVastVpaidAd && vastInfo != null && vastInfo.hasWrapper();
-        } else {
+        if (!isVast(body)) {
             return false;
         }
+        mIsVastVpaidAd = ParseService.isVastVpaidAd(body);
+        String vastString = XmlParseService.getVastString(body);
+        VastInfo vastInfo = XmlParseService.getVastInfo(vastString);
+        return mIsVastVpaidAd && vastInfo != null && vastInfo.hasWrapper();
     }
 
     private void handleError(GetResponse<ResponseJsonModel> response) {
         if (response == null) {
             onErrorResult(Errors.NO_CONTENT);
-        } else if (response.getCode() == RESPONSE_NO_ADS) {
-            handleNoAds();
-        } else {
-            if (response.getCode() != 0) {
-                onErrorResult(new LoopMeError(Constants.BAD_SERVERS_CODE + response.getCode()));
-            } else {
-                onErrorResult(new LoopMeError(response.getMessage()));
-            }
+            return;
         }
+        if (response.getCode() == RESPONSE_NO_ADS) {
+            handleNoAds();
+            return;
+        }
+        LoopMeError error = response.getCode() != 0 ?
+            new LoopMeError(Constants.BAD_SERVERS_CODE + response.getCode()) :
+            new LoopMeError(response.getMessage());
+        onErrorResult(error);
     }
 
     @Override

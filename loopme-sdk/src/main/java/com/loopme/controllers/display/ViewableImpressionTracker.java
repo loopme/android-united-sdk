@@ -5,8 +5,10 @@ import android.view.View;
 import com.loopme.Logging;
 import com.loopme.ViewAbilityUtils;
 import com.loopme.ad.AdParams;
-import com.loopme.vast.VastVpaidEventTracker;
 import com.loopme.utils.ExecutorHelper;
+import com.loopme.vast.VastVpaidEventTracker;
+
+import java.util.List;
 
 class ViewableImpressionTracker {
     private static final String LOG_TAG = ViewableImpressionTracker.class.getSimpleName();
@@ -24,26 +26,19 @@ class ViewableImpressionTracker {
     void postViewableEvents(final int doneMillis) {
         if (mIsImpressionTracked || doneMillis < IMPRESSION_TIME_NATIVE_VIDEO)
             return;
-
         ExecutorHelper.getExecutor().execute(() -> {
-            for (String url :
-                    isVideoVisible()
-                            ? mAdParams.getVisibleImpressions()
-                            : mAdParams.getNotVisibleImpressions())
+            List<String> impressions = isVideoVisible()
+                ? mAdParams.getVisibleImpressions() : mAdParams.getNotVisibleImpressions();
+            for (String url : impressions)
                 VastVpaidEventTracker.trackVastEvent(url, "");
         });
-
         mIsImpressionTracked = true;
     }
 
     private boolean isVideoVisible() {
         ViewAbilityUtils.ViewAbilityInfo viewAbilityInfo =
-                ViewAbilityUtils.calculateViewAbilityInfo(mAdView);
-
-        Logging.out(
-                LOG_TAG,
-                "visibility: " + viewAbilityInfo.getVisibility());
-
+            ViewAbilityUtils.calculateViewAbilityInfo(mAdView);
+        Logging.out(LOG_TAG, "visibility: " + viewAbilityInfo.getVisibility());
         return viewAbilityInfo.getVisibility() > FIFTY_PERCENTS;
     }
 

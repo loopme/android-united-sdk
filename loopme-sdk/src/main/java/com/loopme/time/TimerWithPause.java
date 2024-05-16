@@ -22,9 +22,7 @@ public abstract class TimerWithPause {
     @SuppressLint("HandlerLeak")
     private final Handler mHandler = new Handler() {
         @Override
-        public void handleMessage(Message msg) {
-            handleTimerMessage();
-        }
+        public void handleMessage(Message msg) { handleTimerMessage(); }
     };
 
     protected TimerWithPause(long millisOnTimer, long countDownInterval, boolean runAtStart) {
@@ -55,19 +53,21 @@ public abstract class TimerWithPause {
     }
 
     public void pause() {
-        if (isRunning()) {
-            mPauseTimeRemaining = timeLeft();
-            cancel();
+        if (!isRunning()) {
+            return;
         }
+        mPauseTimeRemaining = timeLeft();
+        cancel();
     }
 
     public void resume() {
-        if (isPaused()) {
-            mMillisInFuture = mPauseTimeRemaining;
-            mStopTimeInFuture = SystemClock.elapsedRealtime() + mMillisInFuture;
-            mHandler.sendMessage(mHandler.obtainMessage(MSG));
-            mPauseTimeRemaining = 0;
+        if (!isPaused()) {
+            return;
         }
+        mMillisInFuture = mPauseTimeRemaining;
+        mStopTimeInFuture = SystemClock.elapsedRealtime() + mMillisInFuture;
+        mHandler.sendMessage(mHandler.obtainMessage(MSG));
+        mPauseTimeRemaining = 0;
     }
 
     public boolean isPaused() {
@@ -81,11 +81,10 @@ public abstract class TimerWithPause {
     public long timeLeft() {
         long millisUntilFinished;
         if (isPaused()) {
-            millisUntilFinished = mPauseTimeRemaining;
-        } else {
-            millisUntilFinished = mStopTimeInFuture - SystemClock.elapsedRealtime();
-            if (millisUntilFinished < 0) millisUntilFinished = 0;
+            return mPauseTimeRemaining;
         }
+        millisUntilFinished = mStopTimeInFuture - SystemClock.elapsedRealtime();
+        if (millisUntilFinished < 0) return 0;
         return millisUntilFinished;
     }
 
@@ -98,22 +97,21 @@ public abstract class TimerWithPause {
         if (millisLeft <= 0) {
             cancel();
             onFinish();
-        } else if (millisLeft < mCountdownInterval) {
+            return;
+        }
+        if (millisLeft < mCountdownInterval) {
             // no tick, just delay until done
             mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG), millisLeft);
-        } else {
-            long lastTickStart = SystemClock.elapsedRealtime();
-            onTick(millisLeft);
-
-            // take into account user's onTick taking time to execute
-            long delay = mCountdownInterval - (SystemClock.elapsedRealtime() - lastTickStart);
-
-            // special case: user's onTick took more than mCountdownInterval to
-            // complete, skip to next interval
-            while (delay < 0) delay += mCountdownInterval;
-
-            mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG), delay);
+            return;
         }
+        long lastTickStart = SystemClock.elapsedRealtime();
+        onTick(millisLeft);
+        // take into account user's onTick taking time to execute
+        long delay = mCountdownInterval - (SystemClock.elapsedRealtime() - lastTickStart);
+        // special case: user's onTick took more than mCountdownInterval to
+        // complete, skip to next interval
+        while (delay < 0) delay += mCountdownInterval;
+        mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG), delay);
     }
 
 }

@@ -29,7 +29,7 @@ public class DntFetcher implements Runnable {
     @Override
     public void run() {
         final AdvertisingIdClient.AdInfo adInfo =
-                AdvertisingIdClient.getAdvertisingIdInfo(context);
+            AdvertisingIdClient.getAdvertisingIdInfo(context);
         mainHandler.post(() -> {
             if (onDntFetcherListener != null)
                 onDntFetcherListener.onDntFetched(adInfo.isLimitAdTrackingEnabled(), adInfo.getId());

@@ -21,8 +21,7 @@ public class AdViewChromeClient extends WebChromeClient {
     private static final String UNCAUGHT_ERROR = "Uncaught";
     private static final String VIDEO_SOURCE = "VIDEO_SOURCE";
 
-    public AdViewChromeClient() {
-    }
+    public AdViewChromeClient() { }
 
     public AdViewChromeClient(OnErrorFromJsCallback callback) {
         this.mCallback = callback;
@@ -54,7 +53,6 @@ public class AdViewChromeClient extends WebChromeClient {
         }
 
         permissionRequest = request;
-
         permissionResolveListener.onRequestGeneralPermissions(androidPermissions);
     }
 

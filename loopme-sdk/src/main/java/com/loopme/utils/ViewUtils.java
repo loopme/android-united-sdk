@@ -6,8 +6,7 @@ import android.view.View;
 
 public final class ViewUtils {
 
-    private ViewUtils() {
-    }
+    private ViewUtils() { }
 
     public static View findVisibleView(View[] views, MotionEvent e) {
         if (views == null || e == null)

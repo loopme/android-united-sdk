@@ -1,12 +1,14 @@
 package com.loopme.bridges.vpaid;
 
-import androidx.annotation.Keep;
 import android.webkit.JavascriptInterface;
 
-import com.loopme.Logging;
-import com.loopme.ad.*;
-import com.loopme.tracker.constants.EventConstants;
+import androidx.annotation.Keep;
+
 import com.loopme.CreativeParams;
+import com.loopme.Logging;
+import com.loopme.ad.AdParams;
+import com.loopme.ad.AdSpotDimensions;
+import com.loopme.tracker.constants.EventConstants;
 
 import java.util.Locale;
 
@@ -15,10 +17,10 @@ import java.util.Locale;
 public class VpaidBridgeImpl implements VpaidBridge {
 
     private static final String LOG_TAG = VpaidBridgeImpl.class.getSimpleName();
-    private static final String ENVIRONMENT_VARS = "{ " +
-            "slot: document.getElementById('loopme-slot'), " +
-            "videoSlot: document.getElementById('loopme-videoslot'), " +
-            "videoSlotCanAutoPlay: true }";
+    private static final String ENVIRONMENT_VARS =
+        "{ slot: document.getElementById('loopme-slot'), " +
+        "videoSlot: document.getElementById('loopme-videoslot'), " +
+        "videoSlotCanAutoPlay: true }";
     private final BridgeEventHandler mBridge;
     private final CreativeParams mCreativeParams;
     private volatile int mPreviousValue;
@@ -95,19 +97,19 @@ public class VpaidBridgeImpl implements VpaidBridge {
     private void initAd() {
         Logging.out(LOG_TAG, "JS: call initAd()");
         String requestTemplate = "initAd(" +
-                "%1$d," + // width
-                "%2$d," + // height
-                "%3$s," + // viewMode
-                "%4$s," + // desiredBitrate
-                "%5$s," + // creativeData
-                "%6$s)"; // environmentVars
+            "%1$d," + // width
+            "%2$d," + // height
+            "%3$s," + // viewMode
+            "%4$s," + // desiredBitrate
+            "%5$s," + // creativeData
+            "%6$s)"; // environmentVars
         String requestFinal = String.format(Locale.US, requestTemplate,
-                mCreativeParams.getWidth(),
-                mCreativeParams.getHeight(),
-                mCreativeParams.getViewMode(),
-                mCreativeParams.getDesiredBitrate(),
-                mCreativeParams.getCreativeData(),
-                mCreativeParams.getEnvironmentVars()
+            mCreativeParams.getWidth(),
+            mCreativeParams.getHeight(),
+            mCreativeParams.getViewMode(),
+            mCreativeParams.getDesiredBitrate(),
+            mCreativeParams.getCreativeData(),
+            mCreativeParams.getEnvironmentVars()
         );
         callWrapper(requestFinal);
     }
@@ -261,10 +263,10 @@ public class VpaidBridgeImpl implements VpaidBridge {
         mPreviousValue = value;
         if (value == 0) {
             mBridge.postEvent(EventConstants.COMPLETE);
-        } else {
-            mBridge.postEvent(EventConstants.PROGRESS, value);
-            mBridge.setVideoTime(value);
+            return;
         }
+        mBridge.postEvent(EventConstants.PROGRESS, value);
+        mBridge.setVideoTime(value);
     }
 
     @JavascriptInterface
@@ -280,23 +282,13 @@ public class VpaidBridgeImpl implements VpaidBridge {
     @JavascriptInterface
     public void vpaidAdSkipped() {
         Logging.out(LOG_TAG, "JS: vpaidAdSkipped");
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mBridge.onAdSkipped();
-            }
-        });
+        runOnUiThread(mBridge::onAdSkipped);
     }
 
     @JavascriptInterface
     public void vpaidAdStopped() {
         Logging.out(LOG_TAG, "JS: vpaidAdStopped");
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mBridge.onAdStopped();
-            }
-        });
+        runOnUiThread(mBridge::onAdStopped);
     }
 
     @JavascriptInterface

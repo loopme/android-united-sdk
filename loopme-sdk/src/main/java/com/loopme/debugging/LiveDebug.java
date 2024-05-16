@@ -39,12 +39,13 @@ public class LiveDebug {
 
     public static void setLiveDebug(final Context context, final boolean debug, final String appKey) {
         Logging.out(LOG_TAG, "setLiveDebug " + debug);
-        if (sIsDebugOn != debug) {
-            sIsDebugOn = debug;
-            if (debug) {
-                Handler handler = new Handler(Looper.getMainLooper());
-                handler.post(() -> startTimer(context, appKey));
-            }
+        if (sIsDebugOn == debug) {
+            return;
+        }
+        sIsDebugOn = debug;
+        if (debug) {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> startTimer(context, appKey));
         }
     }
 
@@ -57,32 +58,32 @@ public class LiveDebug {
     }
 
     private static void startTimer(final Context context, final String appKey) {
-        if (sDebugTimer == null) {
-            sDebugTimer = new CountDownTimer(DEBUG_TIME, 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                }
-
-                @Override
-                public void onFinish() {
-                    sendToServer(context, appKey);
-                    sIsDebugOn = false;
-                    sDebugTimer = null;
-                }
-            };
-            Logging.out(LOG_TAG, "start debug timer");
-            sDebugTimer.start();
+        if (sDebugTimer != null) {
+            return;
         }
+        sDebugTimer = new CountDownTimer(DEBUG_TIME, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) { }
+            @Override
+            public void onFinish() {
+                sendToServer(context, appKey);
+                sIsDebugOn = false;
+                sDebugTimer = null;
+            }
+        };
+        Logging.out(LOG_TAG, "start debug timer");
+        sDebugTimer.start();
     }
 
     private static void sendToServer(final Context context, final String appKey) {
         ExecutorService executor = Executors.newCachedThreadPool();
         executor.submit(() -> {
-            if (sLogDbHelper != null) {
-                Logging.out(LOG_TAG, "send to server");
-                Map<String, String> params = initPostDataParams(context, appKey);
-                HttpUtils.simpleRequest(Constants.ERROR_URL, LoopMeTracker.obtainRequestString(params));
+            if (sLogDbHelper == null) {
+                return;
             }
+            Logging.out(LOG_TAG, "send to server");
+            Map<String, String> params = initPostDataParams(context, appKey);
+            HttpUtils.simpleRequest(Constants.ERROR_URL, LoopMeTracker.obtainRequestString(params));
         });
     }
 
@@ -104,17 +105,17 @@ public class LiveDebug {
     }
 
     private static String initLogsString() {
-        if (sLogDbHelper != null) {
-            List<String> logList = sLogDbHelper.getLogs();
-            sLogDbHelper.clear();
-            StringBuilder sb = new StringBuilder();
-            for (String s : logList) {
-                sb.append(s);
-                sb.append("\n");
-            }
-            return sb.toString();
+        if (sLogDbHelper == null) {
+            return null;
         }
-        return null;
+        List<String> logList = sLogDbHelper.getLogs();
+        sLogDbHelper.clear();
+        StringBuilder sb = new StringBuilder();
+        for (String s : logList) {
+            sb.append(s);
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 
     private static void saveLog(String logTag, String text) {

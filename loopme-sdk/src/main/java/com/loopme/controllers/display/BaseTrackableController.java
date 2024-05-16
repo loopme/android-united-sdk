@@ -3,12 +3,11 @@ package com.loopme.controllers.display;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
-
-import androidx.annotation.Nullable;
-
 import android.text.TextUtils;
 import android.view.View;
 import android.webkit.WebView;
+
+import androidx.annotation.Nullable;
 
 import com.loopme.AdUtils;
 import com.loopme.Constants;
@@ -18,13 +17,12 @@ import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.interfaces.DisplayController;
 import com.loopme.models.Message;
-import com.loopme.tracker.constants.AdType;
-import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.tracker.AdEvents;
 import com.loopme.tracker.EventManager;
+import com.loopme.tracker.constants.AdType;
+import com.loopme.tracker.partners.LoopMeTracker;
 
 public abstract class BaseTrackableController implements DisplayController, AdEvents {
-
     private static final long DELAY_UNTIL_EXECUTE = 100;
     protected String mLogTag;
     private EventManager mEventManager;
@@ -50,16 +48,15 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     }
 
     protected void initTrackers() {
-        if (isNativeAd()) {
-            onInitTracker(AdType.NATIVE);
-        } else {
-            onInitTracker(AdType.WEB);
-        }
+        onInitTracker(isNativeAd() ? AdType.NATIVE : AdType.WEB);
     }
 
     // TODO.
     private boolean isNativeAd() {
-        return mLoopMeAd != null && !mLoopMeAd.isMraidAd() && !mLoopMeAd.isVpaidAd() && (mLoopMeAd.isVideo360() || mLoopMeAd.isVastAd());
+        return mLoopMeAd != null &&
+            !mLoopMeAd.isMraidAd() &&
+            !mLoopMeAd.isVpaidAd() &&
+            (mLoopMeAd.isVideo360() || mLoopMeAd.isVastAd());
     }
 
     private boolean isEventManagerNeeded() {
@@ -71,23 +68,17 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     }
 
     protected void onInternalLoadFail(final LoopMeError error) {
-        onUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mLoopMeAd != null) {
-                    mLoopMeAd.onInternalLoadFail(error);
-                }
+        onUiThread(() -> {
+            if (mLoopMeAd != null) {
+                mLoopMeAd.onInternalLoadFail(error);
             }
         });
     }
 
     protected void onPostWarning(final LoopMeError error) {
-        onUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mLoopMeAd != null) {
-                    mLoopMeAd.onSendPostWarning(error);
-                }
+        onUiThread(() -> {
+            if (mLoopMeAd != null) {
+                mLoopMeAd.onSendPostWarning(error);
             }
         });
     }
@@ -138,7 +129,6 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     public void onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
         onAdClickedEvent();
         onMessage(Message.LOG, "Handle url");
-
         if (AdUtils.tryStartCustomTabs(loopMeAd.getContext(), url))
             loopMeAd.onAdLeaveApp();
     }
@@ -293,12 +283,9 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
 
     @Override
     public void onStartWebMeasuringDelayed() {
-        mLoopMeAd.getContainerView().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (mEventManager != null) {
-                    mEventManager.onStartWebMeasuringDelayed();
-                }
+        mLoopMeAd.getContainerView().postDelayed(() -> {
+            if (mEventManager != null) {
+                mEventManager.onStartWebMeasuringDelayed();
             }
         }, DELAY_UNTIL_EXECUTE);
     }
@@ -339,12 +326,13 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     }
 
     public void postImpression() {
-        if (!mIsImpressionTracked) {
-            onAdRecordReady();
-            onAdLoadedEvent();
-            onAdImpressionEvent();
-            mIsImpressionTracked = true;
+        if (mIsImpressionTracked) {
+            return;
         }
+        onAdRecordReady();
+        onAdLoadedEvent();
+        onAdImpressionEvent();
+        mIsImpressionTracked = true;
     }
 
     @Override
@@ -355,11 +343,11 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     protected int getOrientationFromAdParams() {
         if (TextUtils.equals(mOrientation, Constants.ORIENTATION_PORT)) {
             return ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
-        } else if (TextUtils.equals(mOrientation, Constants.ORIENTATION_LAND)) {
-            return ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
-        } else {
-            return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
         }
+        if (TextUtils.equals(mOrientation, Constants.ORIENTATION_LAND)) {
+            return ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+        }
+        return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
     }
 
     protected boolean isTrackerAvailable() {

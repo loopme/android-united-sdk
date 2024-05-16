@@ -35,12 +35,14 @@ public class ValidationHelper {
             Logging.out(LOG_TAG, error);
             loopMeAd.onAdLoadFail(new LoopMeError(error));
             return false;
-        } else if (!InternetUtils.isOnline(loopMeAd.getContext())) {
+        }
+        if (!InternetUtils.isOnline(loopMeAd.getContext())) {
             error = "No connection";
             Logging.out(LOG_TAG, error);
             loopMeAd.onAdLoadFail(new LoopMeError(error));
             return false;
-        } else if (loopMeAd.isCustomBannerHtml() || loopMeAd.isExpandBannerVideo()) {
+        }
+        if (loopMeAd.isCustomBannerHtml() || loopMeAd.isExpandBannerVideo()) {
             error = "Container size is not valid for chosen ad type";
             Logging.out(LOG_TAG, error);
             loopMeAd.onAdLoadFail(new LoopMeError(error));

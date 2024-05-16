@@ -48,10 +48,7 @@ public class MraidBridge extends WebViewClientCompat {
     private final Listener adReadyListener;
 
     // TODO. Refactor.
-    public MraidBridge(
-            OnMraidBridgeListener onMraidBridgeListener,
-            Listener adReadyListener) {
-
+    public MraidBridge(OnMraidBridgeListener onMraidBridgeListener, Listener adReadyListener) {
         mOnMraidBridgeListener = onMraidBridgeListener;
         this.adReadyListener = adReadyListener;
     }
@@ -65,19 +62,15 @@ public class MraidBridge extends WebViewClientCompat {
             notifyError(webView, "Broken redirect in bridge: " + url);
             return true;
         }
-
         String scheme = uri.getScheme();
-
         if (MRAID_SCHEME.equalsIgnoreCase(scheme)) {
             handleMraidCommand(uri);
             return true;
         }
-
         if (LOOPME_SCHEME.equalsIgnoreCase(scheme)) {
             handleLoopMeCommand(uri);
             return true;
         }
-
         onOpen(url);
         return true;
     }
@@ -85,7 +78,6 @@ public class MraidBridge extends WebViewClientCompat {
     @Override
     public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
-
         onLoadSuccess();
     }
 
@@ -105,7 +97,6 @@ public class MraidBridge extends WebViewClientCompat {
         String command = uri.getPath();
         if (TextUtils.isEmpty(command))
             return;
-
         if (mOnMraidBridgeListener != null)
             mOnMraidBridgeListener.onLoopMeCallComplete(uri.toString());
 
@@ -113,11 +104,9 @@ public class MraidBridge extends WebViewClientCompat {
             case WEBVIEW_FAIL:
                 onLoadFail(Errors.SPECIFIC_WEBVIEW_ERROR);
                 break;
-
             case WEBVIEW_SUCCESS:
                 onLoadSuccess();
                 break;
-
             case WEBVIEW_CLOSE:
                 onClose();
                 break;
@@ -125,49 +114,39 @@ public class MraidBridge extends WebViewClientCompat {
     }
 
     private void handleMraidCommand(Uri uri) {
-
         String command = uri.getHost();
         if (TextUtils.isEmpty(command))
             return;
-
         switch (command) {
             case USE_CUSTOM_CLOSE:
                 handleUseCustomClose(uri);
                 break;
-
             case EXPAND:
                 handleExpand(uri);
                 break;
-
             case RESIZE:
                 handleResize(uri);
                 break;
-
             case CLOSE:
                 handleClose();
                 break;
-
             case OPEN:
                 onOpen(detectQueryParameter(uri, QUERY_PARAMETER_URL));
                 break;
-
             case PLAY_VIDEO:
                 handlePlayVideo(uri);
                 break;
-
             case SET_ORIENTATION_PROPERTIES:
                 handleOrientationProperties(uri);
                 break;
         }
-
         onNativeCallCompleted(uri.toString());
     }
 
     private void handleOrientationProperties(Uri uri) {
         boolean allowOrientationChange = detectBooleanQueryParameter(
-                uri,
-                QUERY_PARAMETER_ALLOW_ORIENTATION_CHANGE);
-
+            uri, QUERY_PARAMETER_ALLOW_ORIENTATION_CHANGE
+        );
         MraidOrientation forceOrientation = detectOrientation(uri, QUERY_PARAMETER_FORCE_ORIENTATION);
         mOnMraidBridgeListener.setOrientationProperties(allowOrientationChange, forceOrientation);
     }
@@ -272,34 +251,23 @@ public class MraidBridge extends WebViewClientCompat {
         String orientation = detectStringQueryParameter(uri, parameter);
         if (Constants.ORIENTATION_PORT.equals(orientation))
             return MraidOrientation.PORTRAIT;
-        else if (Constants.ORIENTATION_LAND.equals(orientation))
+        if (Constants.ORIENTATION_LAND.equals(orientation))
             return MraidOrientation.LANDSCAPE;
-        else
-            return MraidOrientation.NONE;
+        return MraidOrientation.NONE;
     }
 
     public interface OnMraidBridgeListener {
 
         void close();
-
         void open(String url);
-
         void resize(int width, int height);
-
         void playVideo(String videoUrl);
-
         void expand(boolean useCustomClose);
-
         void onLoadSuccess();
-
         void onLoadFail(LoopMeError error);
-
         void onChangeCloseButtonVisibility(boolean hasOwnCloseButton);
-
         void onMraidCallComplete(String command);
-
         void onLoopMeCallComplete(String command);
-
         void setOrientationProperties(boolean allowOrientationChange, MraidOrientation forceOrientation);
     }
 }

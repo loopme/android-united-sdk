@@ -18,16 +18,16 @@ public class FileUtils {
     private static final String LOG_TAG = FileUtils.class.getSimpleName();
     private static final int ZERO = 0;
 
-    private FileUtils() {
-    }
+    private FileUtils() { }
 
     public static void deleteExpiredFiles(Context context) {
         Logging.out(LOG_TAG, "Delete expired files from cache");
         File externalFilesDirectory = getExternalFilesDir(context);
-        if (externalFilesDirectory != null) {
-            File[] files = externalFilesDirectory.listFiles();
-            deleteAllFiles(files, true);
+        if (externalFilesDirectory == null) {
+            return;
         }
+        File[] files = externalFilesDirectory.listFiles();
+        deleteAllFiles(files, true);
     }
 
     public static String bytesToHex(byte[] bytes) {
@@ -64,41 +64,35 @@ public class FileUtils {
         }
     }
 
-    private static int deleteAllFiles(File[] files, boolean deleteOnlyExpired) {
-        if (files != null) {
-            int deletedFilesCounter = 0;
-            for (File file : files) {
-                if (delete(file, deleteOnlyExpired)) {
-                    deletedFilesCounter++;
-                }
-            }
-            Logging.out(LOG_TAG, "Deleted " + deletedFilesCounter + " file(s)");
-            return deletedFilesCounter;
-        } else {
-            return ZERO;
+    private static void deleteAllFiles(File[] files, boolean deleteOnlyExpired) {
+        if (files == null) {
+            return;
         }
+        int deletedFilesCounter = 0;
+        for (File file : files) {
+            if (delete(file, deleteOnlyExpired)) {
+                deletedFilesCounter++;
+            }
+        }
+        Logging.out(LOG_TAG, "Deleted " + deletedFilesCounter + " file(s)");
     }
 
     private static boolean delete(File file, boolean deleteOnlyExpired) {
-        if (isValidFile(file)) {
-            if (deleteOnlyExpired) {
-                if (isFileExpired(file)) {
-                    return deleteFile(file);
-                }
-            } else {
-                return deleteFile(file);
-            }
+        if (!isValidFile(file)) {
+            return false;
+        }
+        if (!deleteOnlyExpired || isFileExpired(file)) {
+            return deleteFile(file);
         }
         return false;
     }
 
     private static boolean deleteFile(File file) {
-        if (file != null) {
-            Logging.out(LOG_TAG, "Deleted cached file: " + file.getAbsolutePath());
-            return file.delete();
-        } else {
+        if (file == null) {
             return false;
         }
+        Logging.out(LOG_TAG, "Deleted cached file: " + file.getAbsolutePath());
+        return file.delete();
     }
 
     private static boolean isFileExpired(File file) {
@@ -131,11 +125,10 @@ public class FileUtils {
     }
 
     public static String getFileName(String fileUrl) {
-        if (!TextUtils.isEmpty(fileUrl)) {
-            String[] components = fileUrl.split("/");
-            return components[components.length - 1];
-        } else {
+        if (TextUtils.isEmpty(fileUrl)) {
             return "";
         }
+        String[] components = fileUrl.split("/");
+        return components[components.length - 1];
     }
 }

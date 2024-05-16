@@ -15,7 +15,6 @@ public class Vast4WebViewClient extends WebViewClientCompat {
     public void onPageFinished(WebView view, String url) {
         if (mPageLoadedListener != null)
             mPageLoadedListener.onPageLoaded();
-
         super.onPageFinished(view, url);
     }
 

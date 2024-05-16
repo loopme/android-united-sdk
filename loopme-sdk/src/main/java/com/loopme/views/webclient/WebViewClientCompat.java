@@ -11,18 +11,12 @@ public class WebViewClientCompat extends WebViewClient {
     @Deprecated
     @Override
     public final boolean shouldOverrideUrlLoading(WebView view, String url) {
-        return !ApiLevel.isApi24AndHigher() &&
-                shouldOverrideUrlLoadingCompat(
-                        view,
-                        url);
+        return !ApiLevel.isApi24AndHigher() && shouldOverrideUrlLoadingCompat(view, url);
     }
 
     @Override
     public final boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-        return ApiLevel.isApi24AndHigher() &&
-                shouldOverrideUrlLoadingCompat(
-                        view,
-                        request.getUrl().toString());
+        return ApiLevel.isApi24AndHigher() && shouldOverrideUrlLoadingCompat(view, request.getUrl().toString());
     }
 
     protected boolean shouldOverrideUrlLoadingCompat(WebView webView, String url) {

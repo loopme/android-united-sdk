@@ -21,14 +21,12 @@ public class GoogleLocationService {
 
     private static final String LOG_TAG = GoogleLocationService.class.getSimpleName();
 
-    private GoogleLocationService() {
-    }
+    private GoogleLocationService() { }
 
     private static boolean isLocationServiceAvailable(Context context) {
         boolean hasLocationPermission = ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED;
+            context, Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED;
 
         if (!hasLocationPermission)
             return false;
@@ -40,18 +38,13 @@ public class GoogleLocationService {
     @SuppressLint("MissingPermission")
     public static Location getLocation(Context context) {
         Context appCtx = context.getApplicationContext();
-
         if (!isLocationServiceAvailable(appCtx))
             return null;
-
         try {
             Task<android.location.Location> task =
-                    LocationServices.getFusedLocationProviderClient(appCtx).getLastLocation();
-
+                LocationServices.getFusedLocationProviderClient(appCtx).getLastLocation();
             Tasks.await(task, 1, TimeUnit.SECONDS);
-
             return task.getResult();
-
         } catch (Exception ex) {
             Logging.out(LOG_TAG, ex.toString());
             return null;

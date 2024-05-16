@@ -38,7 +38,6 @@ public class ViewControllerVpaid implements View.OnClickListener {
     public void buildVideoAdView(FrameLayout containerView, WebView webView, Context context) {
         mContainerView = containerView;
         mWebView = webView;
-
         clearViews();
         initViews(context);
         setListeners();
@@ -78,20 +77,18 @@ public class ViewControllerVpaid implements View.OnClickListener {
         mCloseImageView.setId(CLOSE_BUTTON_ID);
         mCloseImageView.setScaleType(ImageView.ScaleType.CENTER);
         mCloseImageView.setImageResource(R.drawable.l_close);
-
         int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI, context);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                btnSizePx,
-                btnSizePx,
-                Gravity.END);
-
+            btnSizePx, btnSizePx, Gravity.END
+        );
         mCloseImageView.setLayoutParams(params);
         enableCloseButton(false);
     }
 
     private FrameLayout.LayoutParams createParams() {
         return new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
+        );
     }
 
     private void clearViews() {
@@ -117,7 +114,8 @@ public class ViewControllerVpaid implements View.OnClickListener {
         int id = view.getId();
         if (id == R.id.close_imageview || id == CLOSE_BUTTON_ID) {
             closeSelf();
-        } else if (id == R.id.replay_imageview) {
+        }
+        if (id == R.id.replay_imageview) {
             onReplayButtonClicked();
         }
     }
@@ -147,7 +145,6 @@ public class ViewControllerVpaid implements View.OnClickListener {
             public void onTick(long millisUntilFinished) {
                 Logging.out(LOG_TAG, "Till extra close button " + millisUntilFinished / 1000);
             }
-
             @Override
             public void onFinish() {
                 enableCloseButton(true);
@@ -163,13 +160,10 @@ public class ViewControllerVpaid implements View.OnClickListener {
     }
 
     public void enableCloseButton(boolean enable) {
-        if (mCloseImageView != null) {
-            if (enable) {
-                mCloseImageView.setVisibility(View.VISIBLE);
-            } else {
-                mCloseImageView.setVisibility(View.GONE);
-            }
+        if (mCloseImageView == null) {
+            return;
         }
+        mCloseImageView.setVisibility(enable ? View.VISIBLE : View.GONE);
     }
 
     public void pause() {

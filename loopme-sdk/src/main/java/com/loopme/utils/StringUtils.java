@@ -57,11 +57,10 @@ public class StringUtils {
     }
 
     public static String replace(String baseString, String pattern, String contentToReplace) {
-        if (!TextUtils.isEmpty(baseString)) {
-            return baseString.contains(pattern) ?
-                baseString.replace(pattern, contentToReplace) : baseString;
-        } else {
+        if (TextUtils.isEmpty(baseString)) {
             return "";
         }
+        return baseString.contains(pattern) ?
+            baseString.replace(pattern, contentToReplace) : baseString;
     }
 }

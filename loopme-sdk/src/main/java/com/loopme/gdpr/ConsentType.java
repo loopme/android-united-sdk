@@ -13,7 +13,6 @@ public enum ConsentType {
     ConsentType(int type) {
         mType = type;
     }
-
     public int getType() {
         return mType;
     }

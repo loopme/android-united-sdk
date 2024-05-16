@@ -82,12 +82,8 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     protected void onAdReady() {
         if (needWaitOmidAdSessionStart || !controllerPrepared)
             return;
-
         if (omidEventTrackerWrapper != null)
-            omidEventTrackerWrapper.sendLoaded(
-                    mAdParams.getSkipTime(),
-                    mAdParams.getDuration());
-
+            omidEventTrackerWrapper.sendLoaded(mAdParams.getSkipTime(), mAdParams.getDuration());
         super.onAdReady();
     }
 
@@ -95,23 +91,20 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     protected void onTryCreateOmidTracker(Map<String, Verification> omidVerificationMap) {
         if (omidVerificationMap == null || omidVerificationMap.isEmpty())
             return;
-
         needWaitOmidAdSessionStart = true;
-
         OmidHelper.createNativeVideoAdSessionAsync(
-                mLoopMeAd.getContext().getApplicationContext(),
-                createOmidVerificationScriptResourceList(omidVerificationMap),
-                new OmidHelper.AdSessionListener() {
-                    @Override
-                    public void onReady(AdSession adSession) {
-                        onOmidNativeVideoAdSessionCreated(adSession, null);
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        onOmidNativeVideoAdSessionCreated(null, error);
-                    }
+            mLoopMeAd.getContext().getApplicationContext(),
+            createOmidVerificationScriptResourceList(omidVerificationMap),
+            new OmidHelper.AdSessionListener() {
+                @Override
+                public void onReady(AdSession adSession) {
+                    onOmidNativeVideoAdSessionCreated(adSession, null);
                 }
+                @Override
+                public void onError(String error) {
+                    onOmidNativeVideoAdSessionCreated(null, error);
+                }
+            }
         );
     }
 
@@ -121,8 +114,9 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         } else {
             try {
                 omidEventTrackerWrapper = new OmidEventTrackerWrapper(
-                        AdEvents.createAdEvents(adSession),
-                        MediaEvents.createMediaEvents(adSession));
+                    AdEvents.createAdEvents(adSession),
+                    MediaEvents.createMediaEvents(adSession)
+                );
                 // Starting adSession.
                 omidAdSession = adSession;
                 omidAdSession.start();
@@ -130,64 +124,54 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
                 Logging.out(LOG_TAG, e.toString());
             }
         }
-
         needWaitOmidAdSessionStart = false;
         onAdReady();
     }
 
     // TODO. Refactor.
     private static List<VerificationScriptResource> createOmidVerificationScriptResourceList(
-            Map<String, Verification> omidVerificationMap) {
-
+        Map<String, Verification> omidVerificationMap
+    ) {
         List<VerificationScriptResource> vsrList = new ArrayList<>();
         if (omidVerificationMap == null)
             return vsrList;
-
         for (Verification v : omidVerificationMap.values()) {
             if (v == null)
                 continue;
-
             try {
                 String vendor = v.getVendor();
                 URL url = new URL(v.getJavaScriptResourceUrl());
                 String vp = v.getVerificationParameters();
-
-                VerificationScriptResource vsr = TextUtils.isEmpty(vp)
-                        ? VerificationScriptResource.createVerificationScriptResourceWithoutParameters(
-                        vendor, url)
-                        : VerificationScriptResource.createVerificationScriptResourceWithParameters(
-                        vendor, url, vp);
-
+                VerificationScriptResource vsr = TextUtils.isEmpty(vp) ?
+                    VerificationScriptResource.createVerificationScriptResourceWithoutParameters(
+                        vendor, url
+                    ) :
+                    VerificationScriptResource.createVerificationScriptResourceWithParameters(
+                        vendor, url, vp
+                    );
                 vsrList.add(vsr);
-
             } catch (Exception e) {
                 Logging.out(LOG_TAG, e.toString());
                 // TODO. Refactor. This piece of code isn't about creating data.
                 postVerificationNotExecutedEvent(
-                        v.getVerificationNotExecutedUrlList(),
-                        VAST_MACROS_REASON_LOAD_ERROR);
+                    v.getVerificationNotExecutedUrlList(), VAST_MACROS_REASON_LOAD_ERROR
+                );
             }
         }
-
         return vsrList;
     }
 
     @Override
     protected WebView createWebView() {
-        return isTrackerAvailable()
-                ? new VastWebView(mLoopMeAd.getContext())
-                : null;
+        return isTrackerAvailable() ? new VastWebView(mLoopMeAd.getContext()) : null;
     }
 
     @Override
     public void onBuildVideoAdView(FrameLayout containerView) {
         mViewControllerVast.buildVideoAdView(
-                containerView,
-                mLoopMeAd.getContext(),
-                getWebView());
-
+            containerView, mLoopMeAd.getContext(), getWebView()
+        );
         setVerificationView(containerView);
-
         try {
             if (omidAdSession != null)
                 omidAdSession.registerAdView(containerView);
@@ -203,7 +187,6 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
             destroyMediaPlayer();
             startMediaPlayer();
         }, DELAY_UNTIL_EXECUTE);
-
         onAdResumedEvent();
     }
 
@@ -215,19 +198,16 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     private void resumeMediaPlayer(final Surface surface) {
         if (mLoopMePlayer == null)
             return;
-
         mLoopMePlayer.setSurface(surface);
-
         if (!playerPrepared)
             return;
-
         if (omidEventTrackerWrapper != null) {
             omidEventTrackerWrapper.sendOneTimeImpression();
             omidEventTrackerWrapper.sendOneTimeStartEvent(
-                    mAdParams.getDuration(),
-                    mViewControllerVast.isMute());
+                mAdParams.getDuration(),
+                mViewControllerVast.isMute()
+            );
         }
-
         mLoopMePlayer.start();
         resumeVideoTimer();
     }
@@ -239,22 +219,16 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     private Surface getSurface() {
-        if (mViewControllerVast != null) {
-            return mViewControllerVast.getSurface();
-        }
-        return null;
+        return mViewControllerVast == null ? null : mViewControllerVast.getSurface();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         pauseMediaPlayer();
-
         if (mIsAdSkipped)
             return;
-
         postVideoEvent(EventConstants.PAUSE);
-
         if (omidEventTrackerWrapper != null)
             omidEventTrackerWrapper.sendPause();
     }
@@ -263,12 +237,9 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     public void onResume() {
         super.onResume();
         resumeSdk24AndAbove();
-
         if (mIsAdSkipped)
             return;
-
         postVideoEvent(EventConstants.RESUME);
-
         if (omidEventTrackerWrapper != null)
             omidEventTrackerWrapper.sendResume();
     }
@@ -294,7 +265,6 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     private void trackDurationsEvents(int doneMillis) {
         if (mLoopMePlayer != null)
             onAdDurationEvents(doneMillis, mLoopMePlayer.getVideoDuration());
-
         postViewableEvents(doneMillis);
         List<TrackingEvent> eventsToRemove = new ArrayList<>();
         for (TrackingEvent event : mTrackingEventsList) {
@@ -304,20 +274,20 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
             }
         }
         mTrackingEventsList.removeAll(eventsToRemove);
-
         // TODO. Refactor.
         // Omid progress events tracking.
         if (omidEventTrackerWrapper != null)
             omidEventTrackerWrapper.sendOneTimeProgressEvent(
-                    doneMillis / 1000f,
-                    mAdParams.getDuration());
+                doneMillis / 1000f, mAdParams.getDuration()
+            );
     }
 
     private void showSkipButton(int doneMillis) {
-        if (mSkipTimeMillis >= 0 && doneMillis > mSkipTimeMillis) {
-            mViewControllerVast.showSkipButton();
-            mSkipTimeMillis = -1;
+        if (mSkipTimeMillis < 0 || doneMillis <= mSkipTimeMillis) {
+            return;
         }
+        mViewControllerVast.showSkipButton();
+        mSkipTimeMillis = -1;
     }
 
     private void initSkipTime(int duration) {
@@ -332,7 +302,6 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     public void skipVideo() {
         skipVideo(true);
         onAdSkippedEvent();
-
         if (omidEventTrackerWrapper != null)
             omidEventTrackerWrapper.sendOneTimeSkipEvent();
     }
@@ -340,7 +309,6 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     @Override
     public void onVolumeMute(boolean mute) {
         muteVideo(mute, true);
-
         if (omidEventTrackerWrapper != null)
             omidEventTrackerWrapper.sendVolume(mute);
     }
@@ -356,7 +324,6 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         }
         onAdClicked();
         super.onRedirect(url, mLoopMeAd);
-
         if (omidEventTrackerWrapper != null)
             omidEventTrackerWrapper.sendClicked();
     }
@@ -393,21 +360,12 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     private void destroyOmid() {
         new Handler(Looper.getMainLooper())
-                .postDelayed(
-                        new OmidFinisher(omidAdSession),
-                        OmidHelper.FINISH_AD_SESSION_DELAY_MILLIS);
-
+            .postDelayed(new OmidFinisher(omidAdSession), OmidHelper.FINISH_AD_SESSION_DELAY_MILLIS);
         omidAdSession = null;
         omidEventTrackerWrapper = null;
     }
 
-    private static class OmidFinisher implements Runnable {
-        private final AdSession adSession;
-
-        private OmidFinisher(AdSession adSession) {
-            this.adSession = adSession;
-        }
-
+    private record OmidFinisher(AdSession adSession) implements Runnable {
         @Override
         public void run() {
             if (adSession != null)
@@ -417,11 +375,12 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     private void destroyMediaPlayer() {
         playerPrepared = false;
-        if (mLoopMePlayer != null) {
-            mLoopMePlayer.destroyListeners();
-            mLoopMePlayer.releasePlayer();
-            mLoopMePlayer = null;
+        if (mLoopMePlayer == null) {
+            return;
         }
+        mLoopMePlayer.destroyListeners();
+        mLoopMePlayer.releasePlayer();
+        mLoopMePlayer = null;
     }
 
     private void skipVideo(boolean skipEvent) {
@@ -447,22 +406,17 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     private void postVolumeStateEvent(boolean mute, boolean postEvent) {
-        if (mute) {
-            if (postEvent) {
-                postVideoEvent(EventConstants.MUTE);
-            }
-        } else {
-            if (postEvent) {
-                postVideoEvent(EventConstants.UNMUTE);
-            }
+        if (postEvent) {
+            postVideoEvent(mute ? EventConstants.MUTE : EventConstants.UNMUTE);
         }
     }
 
     private void pauseMediaPlayer() {
-        if (mLoopMePlayer != null) {
-            mLoopMePlayer.pauseMediaPlayer();
-            pauseVideoTimer();
+        if (mLoopMePlayer == null) {
+            return;
         }
+        mLoopMePlayer.pauseMediaPlayer();
+        pauseVideoTimer();
     }
 
     private void pauseVideoTimer() {
@@ -488,11 +442,12 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     private void destroyVideoTimer() {
-        if (mVideoTimer != null) {
-            mVideoTimer.pause();
-            mVideoTimer.cancel();
-            mVideoTimer = null;
+        if (mVideoTimer == null) {
+            return;
         }
+        mVideoTimer.pause();
+        mVideoTimer.cancel();
+        mVideoTimer = null;
     }
 
     // TODO. Refactor.
@@ -506,14 +461,11 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     @Override
     public void onPrepared(MediaPlayer mp) {
         playerPrepared = true;
-
         mVideoDuration = mp.getDuration();
         mViewControllerVast.adjustLayoutParams(mp.getVideoWidth(), mp.getVideoHeight(), mLoopMeAd.isBanner());
         createVideoTimer(mVideoDuration);
         prepareControls(mVideoDuration);
-
         resumeMediaPlayer(getSurface());
-
         postEvents(mp);
         muteVideo(mViewControllerVast.isMute(), false);
     }
@@ -540,14 +492,10 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     @Override
-    public void onAdShake() {
-
-    }
+    public void onAdShake() { }
 
     @Override
-    public void setFullScreen(boolean isFullScreen) {
-
-    }
+    public void setFullScreen(boolean isFullScreen) { }
 
     private TimerWithPause initVideoTimer(final int duration) {
         return new TimerWithPause(duration, COUNTDOWN_INTERVAL, true) {
@@ -555,10 +503,8 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
             public void onTick(long millisUntilFinished) {
                 onDurationChanged(millisUntilFinished);
             }
-
             @Override
-            public void onFinish() {
-            }
+            public void onFinish() { }
         };
     }
 

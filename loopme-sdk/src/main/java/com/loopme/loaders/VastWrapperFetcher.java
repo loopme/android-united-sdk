@@ -64,11 +64,11 @@ public class VastWrapperFetcher {
         }
         if (hasWrapper(vastInfo)) {
             handleWrapper(vastInfo);
-        } else {
-            AdParams adParams = XmlParseService.parse(vastString);
-            parseWrappers(adParams);
-            onCompleted(adParams);
+            return;
         }
+        AdParams adParams = XmlParseService.parse(vastString);
+        parseWrappers(adParams);
+        onCompleted(adParams);
     }
 
     private void handleWrapper(VastInfo vastInfo) {
@@ -86,25 +86,25 @@ public class VastWrapperFetcher {
             Logging.out(LOG_TAG, Errors.WRAPPER_LIMIT_REACHED.getMessage());
             return;
         }
-
         if (mIsFollowAdditionalWrapper) {
             mCurrentWrapper++;
             mIsFollowAdditionalWrapper = wrapper.isFollowAdditionalWrappers();
             Logging.out(LOG_TAG, "doWrapperRequest()");
             proceed(wrapper.getVastTagUrl());
-        } else {
-            Logging.out(LOG_TAG, "mIsFollowAdditionalWrapper = false");
-            Logging.out(LOG_TAG, Errors.NO_VAST_RESPONSE_AFTER_WRAPPER.getMessage());
-            onFailed(Errors.NO_VAST_RESPONSE_AFTER_WRAPPER);
+            return;
         }
+        Logging.out(LOG_TAG, "mIsFollowAdditionalWrapper = false");
+        Logging.out(LOG_TAG, Errors.NO_VAST_RESPONSE_AFTER_WRAPPER.getMessage());
+        onFailed(Errors.NO_VAST_RESPONSE_AFTER_WRAPPER);
     }
 
     private void proceed(String vastTagUrl) {
-        if (isVastTagUriAvailable(vastTagUrl) && !mIsStopped) {
-            Logging.out(LOG_TAG, "vast url: " + vastTagUrl);
-            startTimer();
-            doRequest(vastTagUrl);
+        if (!isVastTagUriAvailable(vastTagUrl) || mIsStopped) {
+            return;
         }
+        Logging.out(LOG_TAG, "vast url: " + vastTagUrl);
+        startTimer();
+        doRequest(vastTagUrl);
     }
 
     private void doRequest(String vastTagUrl) {
@@ -130,11 +130,10 @@ public class VastWrapperFetcher {
     private boolean isVastTagUriAvailable(String vastTagUrl) {
         if (!TextUtils.isEmpty(vastTagUrl)) {
             return true;
-        } else {
-            Logging.out(LOG_TAG, Errors.TIMEOUT_OF_VAST_URI.getMessage());
-            onFailed(Errors.TIMEOUT_OF_VAST_URI);
-            return false;
         }
+        Logging.out(LOG_TAG, Errors.TIMEOUT_OF_VAST_URI.getMessage());
+        onFailed(Errors.TIMEOUT_OF_VAST_URI);
+        return false;
     }
 
     private boolean isWrapperLimitReached() {
@@ -157,9 +156,7 @@ public class VastWrapperFetcher {
         mHandler.post(() -> {
             mWrapperTimer = new CountDownTimer(WRAPPER_REQUEST_TIMEOUT, Constants.ONE_SECOND_IN_MILLIS) {
                 @Override
-                public void onTick(long millisUntilFinished) {
-                }
-
+                public void onTick(long millisUntilFinished) { }
                 @Override
                 public void onFinish() {
                     Logging.out(LOG_TAG, Errors.TIMEOUT_OF_VAST_URI.getMessage());
@@ -172,10 +169,11 @@ public class VastWrapperFetcher {
 
     private void stopTimer() {
         mHandler.post(() -> {
-            if (mWrapperTimer != null) {
-                mWrapperTimer.cancel();
-                mWrapperTimer = null;
+            if (mWrapperTimer == null) {
+                return;
             }
+            mWrapperTimer.cancel();
+            mWrapperTimer = null;
         });
     }
 
@@ -203,7 +201,6 @@ public class VastWrapperFetcher {
 
     public interface Listener {
         void onCompleted(AdParams adParams);
-
         void onFailed(LoopMeError error);
     }
 }

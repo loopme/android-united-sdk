@@ -10,6 +10,8 @@ public class LoopMeError {
     private String mErrorMessage;
     private String mErrorType = Constants.ErrorType.CUSTOM;
 
+    public LoopMeError() { }
+
     public LoopMeError(int errorCode, String errorMessage) {
         this.mErrorCode = errorCode;
         this.mErrorMessage = errorMessage;
@@ -21,15 +23,13 @@ public class LoopMeError {
         this.mErrorType = errorType;
     }
 
-    public LoopMeError() {
-    }
-
     public LoopMeError(LoopMeError error) {
-        if (error != null) {
-            mErrorCode = error.getErrorCode();
-            mErrorMessage = error.getMessage();
-            mErrorType = error.getErrorType();
+        if (error == null) {
+            return;
         }
+        mErrorCode = error.getErrorCode();
+        mErrorMessage = error.getMessage();
+        mErrorType = error.getErrorType();
     }
 
     public LoopMeError(String message) {
@@ -43,10 +43,6 @@ public class LoopMeError {
 
     public int getErrorCode() {
         return this.mErrorCode;
-    }
-
-    public void setErrorCode(int errorCode) {
-        this.mErrorCode = errorCode;
     }
 
     public String getMessage() {

@@ -56,18 +56,16 @@ public class UiUtils {
     private static AdSpotDimensions getNormalViewSize(LoopMeAd loopMeAd) {
         if (loopMeAd != null) {
             return loopMeAd.getAdSpotDimensions();
-        } else {
-            Logging.out(LOG_TAG, "WARNING: LoopMeAd is null");
         }
+        Logging.out(LOG_TAG, "WARNING: LoopMeAd is null");
         return DEFAULT_DIMENSIONS;
     }
 
     private static AdSpotDimensions getMinimizedViewSize(MinimizedMode minimizedMode) {
         if (minimizedMode != null) {
             return new AdSpotDimensions(minimizedMode.getWidth(), minimizedMode.getHeight());
-        } else {
-            Logging.out(LOG_TAG, "WARNING: MinimizedMode is null");
         }
+        Logging.out(LOG_TAG, "WARNING: MinimizedMode is null");
         return DEFAULT_DIMENSIONS;
     }
 
@@ -87,13 +85,14 @@ public class UiUtils {
     }
 
     public static void broadcastIntent(Context context, String intentAction, int adId) {
-        if (context != null && !TextUtils.isEmpty(intentAction)) {
-            Intent intent = new Intent();
-            intent.setAction(intentAction);
-            if (adId != Constants.DEFAULT_AD_ID) {
-                intent.putExtra(Constants.AD_ID_TAG, adId);
-            }
-            context.sendBroadcast(intent);
+        if (context == null || TextUtils.isEmpty(intentAction)) {
+            return;
         }
+        Intent intent = new Intent();
+        intent.setAction(intentAction);
+        if (adId != Constants.DEFAULT_AD_ID) {
+            intent.putExtra(Constants.AD_ID_TAG, adId);
+        }
+        context.sendBroadcast(intent);
     }
 }

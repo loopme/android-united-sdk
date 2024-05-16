@@ -61,19 +61,21 @@ public class DisplayModeResolver {
     }
 
     private void switchToFullScreenMode() {
-        if (!isFullScreenMode()) {
-            setDisplayMode(Constants.DisplayMode.FULLSCREEN);
-            removeMinimizedView();
-            AdUtils.startAdActivity(mLoopMeAd);
+        if (isFullScreenMode()) {
+            return;
         }
+        setDisplayMode(Constants.DisplayMode.FULLSCREEN);
+        removeMinimizedView();
+        AdUtils.startAdActivity(mLoopMeAd);
     }
 
     public void switchToNormalMode() {
-        if (!isNormalMode()) {
-            setDisplayMode(Constants.DisplayMode.NORMAL);
-            removeMinimizedView();
-            rebuildView();
+        if (isNormalMode()) {
+            return;
         }
+        setDisplayMode(Constants.DisplayMode.NORMAL);
+        removeMinimizedView();
+        rebuildView();
     }
 
     public void switchToMinimizedMode() {
@@ -81,13 +83,13 @@ public class DisplayModeResolver {
             if (isVideoPausedOrPlaying()) {
                 setWebViewState(Constants.WebviewState.VISIBLE);
             }
-        } else {
-            setDisplayMode(Constants.DisplayMode.MINIMIZED);
-            configureMinimizedView();
-            mMinimizedView.setOnTouchListener(initGestureListener());
-            rebuildView(mMinimizedView, Constants.DisplayMode.MINIMIZED);
-            setWebViewState(Constants.WebviewState.VISIBLE);
+            return;
         }
+        setDisplayMode(Constants.DisplayMode.MINIMIZED);
+        configureMinimizedView();
+        mMinimizedView.setOnTouchListener(initGestureListener());
+        rebuildView(mMinimizedView, Constants.DisplayMode.MINIMIZED);
+        setWebViewState(Constants.WebviewState.VISIBLE);
     }
 
     private void configureMinimizedView() {
@@ -97,11 +99,12 @@ public class DisplayModeResolver {
     }
 
     private void rebuildView() {
-        if (mLoopMeAd != null) {
-            FrameLayout initialView = mLoopMeAd.getContainerView();
-            rebuildView(initialView, Constants.DisplayMode.NORMAL);
-            initialView.setVisibility(View.VISIBLE);
+        if (mLoopMeAd == null) {
+            return;
         }
+        FrameLayout initialView = mLoopMeAd.getContainerView();
+        rebuildView(initialView, Constants.DisplayMode.NORMAL);
+        initialView.setVisibility(View.VISIBLE);
     }
 
     private void rebuildView(FrameLayout view, Constants.DisplayMode displayMode) {
@@ -117,11 +120,12 @@ public class DisplayModeResolver {
     }
 
     private void destroyMinimizedView() {
-        if (mMinimizedView != null) {
-            removeMinimizedView();
-            mMinimizedView.removeAllViews();
-            mMinimizedView = null;
+        if (mMinimizedView == null) {
+            return;
         }
+        removeMinimizedView();
+        mMinimizedView.removeAllViews();
+        mMinimizedView = null;
     }
 
     private boolean isVideoPausedOrPlaying() {
@@ -150,7 +154,6 @@ public class DisplayModeResolver {
             public void onSwipe(boolean toRight) {
                 dismissMinimizedView(toRight);
             }
-
             @Override
             public void onClick() {
                 onMinimizedViewClicked();
@@ -243,12 +246,11 @@ public class DisplayModeResolver {
     }
 
     private boolean isFirstCommand() {
-        if (mIsFirstFullScreenCommand) {
-            mIsFirstFullScreenCommand = false;
-            setFullscreenMode(false);
-            return true;
-        } else {
+        if (!mIsFirstFullScreenCommand) {
             return false;
         }
+        mIsFirstFullScreenCommand = false;
+        setFullscreenMode(false);
+        return true;
     }
 }

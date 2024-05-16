@@ -68,11 +68,12 @@ public class LoopMeWebView extends WebView {
 
     public void loadHtml(String html) {
         loadDataWithBaseURL(
-                Constants.BASE_URL,
-                html,
-                Constants.MIME_TYPE_TEXT_HTML,
-                Constants.UTF_8,
-                null);
+            Constants.BASE_URL,
+            html,
+            Constants.MIME_TYPE_TEXT_HTML,
+            Constants.UTF_8,
+            null
+        );
     }
 
     public void setDefaultWebChromeClient() {
@@ -102,12 +103,8 @@ public class LoopMeWebView extends WebView {
         setWebViewClient(null);
         setWebChromeClient(null);
 
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                LoopMeWebView.super.destroy();
-            }
-        }, com.loopme.om.OmidHelper.FINISH_AD_SESSION_DELAY_MILLIS);
+        new Handler(Looper.getMainLooper())
+            .postDelayed(LoopMeWebView.super::destroy, com.loopme.om.OmidHelper.FINISH_AD_SESSION_DELAY_MILLIS);
     }
 
     private void tryRemoveFromParent() {
@@ -117,12 +114,13 @@ public class LoopMeWebView extends WebView {
     }
 
     public void setWebViewState(Constants.WebviewState webviewState) {
-        if (mViewState != webviewState) {
-            mViewState = webviewState;
-            String command = BridgeCommandBuilder.webviewState(BridgeCommandBuilder.LOOPME_PREFIX, mViewState);
-            Logging.out(LOG_TAG, "setWebViewState() : " + webviewState.name());
-            loadCommand(command);
+        if (mViewState == webviewState) {
+            return;
         }
+        mViewState = webviewState;
+        String command = BridgeCommandBuilder.webviewState(BridgeCommandBuilder.LOOPME_PREFIX, mViewState);
+        Logging.out(LOG_TAG, "setWebViewState() : " + webviewState.name());
+        loadCommand(command);
     }
 
     protected void loadCommand(String command) {

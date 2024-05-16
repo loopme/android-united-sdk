@@ -220,12 +220,7 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
 
     @Override
     public void onAdLoadFail(final LoopMeError error) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                onLoopMeInterstitialLoadFail(error);
-            }
-        });
+        runOnUiThread(() -> onLoopMeInterstitialLoadFail(error));
     }
 
     @Override

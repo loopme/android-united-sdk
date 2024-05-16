@@ -11,15 +11,13 @@ public class ResponseJsonModel implements Serializable, Parcelable {
     private final static long serialVersionUID = 738802787497556038L;
     private String id;
     private List<Seatbid> seatbid = null;
-    public final static Parcelable.Creator<ResponseJsonModel> CREATOR = new Creator<ResponseJsonModel>() {
-
+    public final static Parcelable.Creator<ResponseJsonModel> CREATOR = new Creator<>() {
         public ResponseJsonModel createFromParcel(Parcel in) {
             ResponseJsonModel instance = new ResponseJsonModel();
             instance.id = ((String) in.readValue((String.class.getClassLoader())));
             in.readList(instance.seatbid, (Seatbid.class.getClassLoader()));
             return instance;
         }
-
         public ResponseJsonModel[] newArray(int size) {
             return (new ResponseJsonModel[size]);
         }

@@ -43,16 +43,11 @@ public class Bridge extends WebViewClientCompat {
     private final com.loopme.listener.Listener adReadyListener;
 
     // TODO. Refactor.
-    public Bridge(
-            Listener listener,
-            com.loopme.listener.Listener adReadyListener) {
-
+    public Bridge(Listener listener, com.loopme.listener.Listener adReadyListener) {
         if (listener == null)
             Logging.out(LOG_TAG, "VideoBridgeListener should not be null");
         else
             mListener = listener;
-
-
         this.adReadyListener = adReadyListener;
     }
 
@@ -77,7 +72,6 @@ public class Bridge extends WebViewClientCompat {
     @Override
     public boolean shouldOverrideUrlLoadingCompat(WebView webView, String url) {
         Logging.out(LOG_TAG, "shouldOverrideUrlLoadingCompat " + url);
-
         Uri uri;
         try {
             uri = Uri.parse(url);
@@ -86,27 +80,21 @@ public class Bridge extends WebViewClientCompat {
             LoopMeTracker.post("Broken redirect in bridge: " + url, Constants.ErrorType.JS);
             return true;
         }
-
         if (!LOOPME.equalsIgnoreCase(uri.getScheme())) {
             handleNonLoopMe(url);
             return true;
         }
-
         // TODO. Something old. Remove?
         ((AdView) webView).sendNativeCallFinished();
-
         String host = uri.getHost();
-
         if (WEBVIEW.equalsIgnoreCase(host)) {
             handleWebViewCommands(uri, webView.getContext());
             return true;
         }
-
         if (VIDEO.equalsIgnoreCase(host)) {
             handleVideoCommands(uri);
             return true;
         }
-
         return true;
     }
 
@@ -114,24 +102,19 @@ public class Bridge extends WebViewClientCompat {
         String command = uri.getPath();
         if (TextUtils.isEmpty(command))
             return;
-
         switch (command) {
             case WEBVIEW_CLOSE:
                 onJsClose();
                 break;
-
             case WEBVIEW_VIBRATE:
                 handleVibrate(context);
                 break;
-
             case WEBVIEW_FAIL:
                 onJsLoadFail("Ad received specific URL loopme://webview/fail");
                 break;
-
             case WEBVIEW_FULLSCREEN:
                 handleFullscreenMode(uri);
                 break;
-
             case WEBVIEW_SUCCESS:
                 onJsLoadSuccess();
                 break;
@@ -142,28 +125,22 @@ public class Bridge extends WebViewClientCompat {
         String command = uri.getPath();
         if (TextUtils.isEmpty(command))
             return;
-
         switch (command) {
             case VIDEO_LOAD:
                 handleVideoLoad(uri);
                 break;
-
             case VIDEO_MUTE:
                 handleVideoMute(uri);
                 break;
-
             case VIDEO_PLAY:
                 handleVideoPlay(uri);
                 break;
-
             case VIDEO_PAUSE:
                 handleVideoPause(uri);
                 break;
-
             case VIDEO_ENABLE_STRETCH:
                 onJsVideoStretch(true);
                 break;
-
             case VIDEO_DISABLE_STRETCH:
                 onJsVideoStretch(false);
                 break;
@@ -185,16 +162,15 @@ public class Bridge extends WebViewClientCompat {
 
     private boolean isValidBooleanParameter(String param) {
         return !TextUtils.isEmpty(param) &&
-                (param.equalsIgnoreCase(Boolean.TRUE.toString()) ||
-                        param.equalsIgnoreCase(Boolean.FALSE.toString()));
+            (param.equalsIgnoreCase(Boolean.TRUE.toString()) ||
+            param.equalsIgnoreCase(Boolean.FALSE.toString()));
     }
 
     private void handleVibrate(Context context) {
         try {
             Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
             if (vibrator != null) {
-                int VIBRATE_MILLISECONDS = 500;
-                vibrator.vibrate(VIBRATE_MILLISECONDS);
+                vibrator.vibrate(500);
             }
         } catch (Exception e) {
             Logging.out(LOG_TAG, "Missing permission for vibrate");
@@ -203,21 +179,12 @@ public class Bridge extends WebViewClientCompat {
 
     private void handleVideoPause(Uri uri) {
         String pauseString = detectQueryParameter(uri, QUERY_PARAM_CURRENT_TIME);
-        int pauseTime = 0;
-        if (pauseString != null) {
-            pauseTime = Integer.parseInt(pauseString);
-        }
-        onJsVideoPause(pauseTime);
+        onJsVideoPause(pauseString == null ? 0 : Integer.parseInt(pauseString));
     }
 
     private void handleVideoPlay(Uri uri) {
         String playString = detectQueryParameter(uri, QUERY_PARAM_CURRENT_TIME);
-        int playTime = 0;
-        if (playString != null) {
-            playTime = Integer.parseInt(playString);
-        }
-        onJsVideoPlay(playTime);
-
+        onJsVideoPlay(playString == null ? 0 : Integer.parseInt(playString));
     }
 
     private void handleVideoMute(Uri uri) {
@@ -302,25 +269,15 @@ public class Bridge extends WebViewClientCompat {
     }
 
     public interface Listener {
-
         void onJsClose();
-
         void onJsLoadSuccess();
-
         void onJsLoadFail(String mess);
-
         void onJsFullscreenMode(boolean isFullScreen);
-
         void onJsVideoLoad(String videoUrl);
-
         void onJsVideoMute(boolean mute);
-
         void onJsVideoPlay(int time);
-
         void onJsVideoPause(int time);
-
         void onJsVideoStretch(boolean b);
-
         void onNonLoopMe(String url);
     }
 }

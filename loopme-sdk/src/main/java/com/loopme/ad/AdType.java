@@ -7,18 +7,20 @@ import android.text.TextUtils;
  */
 
 public enum AdType {
-
     HTML, VAST, MRAID, VPAID;
 
     public static AdType fromString(String adType) {
-        if (!TextUtils.isEmpty(adType)) {
-            if (adType.equalsIgnoreCase(MRAID.name())) {
-                return MRAID;
-            } else if (adType.equalsIgnoreCase(VPAID.name())) {
-                return VPAID;
-            } else if (adType.equalsIgnoreCase(VAST.name())) {
-                return VAST;
-            }
+        if (TextUtils.isEmpty(adType)) {
+            return HTML;
+        }
+        if (adType.equalsIgnoreCase(MRAID.name())) {
+            return MRAID;
+        }
+        if (adType.equalsIgnoreCase(VPAID.name())) {
+            return VPAID;
+        }
+        if (adType.equalsIgnoreCase(VAST.name())) {
+            return VAST;
         }
         return HTML;
     }

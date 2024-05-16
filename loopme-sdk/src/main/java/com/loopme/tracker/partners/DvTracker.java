@@ -11,9 +11,7 @@ public class DvTracker implements Tracker {
 
     private static final String LOG_TAG = DvTracker.class.getSimpleName();
 
-    public DvTracker() {
-
-    }
+    public DvTracker() { }
 
     public static void startSdk(LoopMeAd loopMeAd) {
         if (loopMeAd == null) {
@@ -24,6 +22,5 @@ public class DvTracker implements Tracker {
     }
 
     @Override
-    public void track(Event event, Object... args) {
-    }
+    public void track(Event event, Object... args) { }
 }

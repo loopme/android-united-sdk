@@ -28,20 +28,21 @@ public class ViewControllerVast {
     }
 
     public void buildVideoAdView(FrameLayout containerView, Context context, WebView webView) {
-        if (containerView != null && context != null) {
-            mContainerView = containerView;
-            mContainerView.removeAllViews();
-            mContainerView.setBackgroundColor(Color.TRANSPARENT);
-            mPlayerLayout = new PlayerLayout(context, webView, initOnPlayerListener());
-            mEndCardLayout = new EndCardLayout(context, initOnEndCardListener());
-
-            mAdLayout = new FrameLayout(containerView.getContext());
-            mAdLayout.setLayoutParams(Utils.createMatchParentLayoutParams());
-
-            mAdLayout.addView(mPlayerLayout);
-            mAdLayout.addView(mEndCardLayout);
-            mContainerView.addView(mAdLayout);
+        if (containerView == null || context == null) {
+            return;
         }
+        mContainerView = containerView;
+        mContainerView.removeAllViews();
+        mContainerView.setBackgroundColor(Color.TRANSPARENT);
+        mPlayerLayout = new PlayerLayout(context, webView, initOnPlayerListener());
+        mEndCardLayout = new EndCardLayout(context, initOnEndCardListener());
+
+        mAdLayout = new FrameLayout(containerView.getContext());
+        mAdLayout.setLayoutParams(Utils.createMatchParentLayoutParams());
+
+        mAdLayout.addView(mPlayerLayout);
+        mAdLayout.addView(mEndCardLayout);
+        mContainerView.addView(mAdLayout);
     }
 
     private EndCardLayout.OnEndCardListener initOnEndCardListener() {
@@ -50,12 +51,10 @@ public class ViewControllerVast {
             public void onEndCardClick() {
                 openUrl();
             }
-
             @Override
             public void onCloseClick() {
                 closeSelf();
             }
-
             @Override
             public void onReplayClick() {
                 replayVideo();
@@ -69,17 +68,14 @@ public class ViewControllerVast {
             public void onSurfaceTextureReady(Surface surface) {
                 onSurfaceReady(surface);
             }
-
             @Override
             public void onPlayerClick() {
                 openUrl();
             }
-
             @Override
             public void onMuteClick(boolean mute) {
                 onVolumeMute(mute);
             }
-
             @Override
             public void onSkipClick() {
                 skipVideo();
@@ -111,10 +107,7 @@ public class ViewControllerVast {
     }
 
     public Surface getSurface() {
-        if (mPlayerLayout != null) {
-            return mPlayerLayout.getSurface();
-        }
-        return null;
+        return mPlayerLayout == null ? null : mPlayerLayout.getSurface();
     }
 
     public void showEndCard(String imageUri) {
@@ -186,11 +179,7 @@ public class ViewControllerVast {
     }
 
     public TextureView getPlayerView() {
-        if (mPlayerLayout != null) {
-            return mPlayerLayout.getPlayerView();
-        } else {
-            return null;
-        }
+        return mPlayerLayout != null ? mPlayerLayout.getPlayerView() : null;
     }
 
     public void destroy() {

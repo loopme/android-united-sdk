@@ -23,7 +23,6 @@ public class MraidAdCloseButtonReceiver extends BroadcastReceiver {
         void onCloseButtonVisibilityChanged(boolean customCloseButton);
     }
 
-
     @Override
     public void onReceive(Context context, Intent intent) {
         if (mListener != null && intent.getExtras() != null) {

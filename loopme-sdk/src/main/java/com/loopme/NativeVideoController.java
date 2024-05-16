@@ -262,13 +262,7 @@ class NativeVideoController {
     }
 
     private void checkFiftyPercentVisibility(final View view, final int adIndex) {
-        ViewAbilityUtils.calculateViewAbilitySyncDelayed(view, new ViewAbilityUtils.OnResultListener() {
-
-            @Override
-            public void onResult(final ViewAbilityUtils.ViewAbilityInfo info) {
-                onVisibilityResult(info, adIndex);
-            }
-        });
+        ViewAbilityUtils.calculateViewAbilitySyncDelayed(view, info -> onVisibilityResult(info, adIndex));
     }
 
     private void onVisibilityResult(ViewAbilityUtils.ViewAbilityInfo info, int adIndex) {
