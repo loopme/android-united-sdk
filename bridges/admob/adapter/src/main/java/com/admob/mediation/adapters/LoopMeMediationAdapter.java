@@ -41,14 +41,30 @@ public class LoopMeMediationAdapter extends Adapter {
     @NonNull
     @Override
     public VersionInfo getSDKVersionInfo() {
-        // return LoopMeSdk.getVersion();
+        String versionString = LoopMeSdk.getVersion();
+        String[] splits = versionString.split("\\.");
+
+        if (splits.length >= 3) {
+            int major = Integer.parseInt(splits[0]);
+            int minor = Integer.parseInt(splits[1]);
+            int micro = Integer.parseInt(splits[2]);
+            return new VersionInfo(major, minor, micro);
+        }
         return new VersionInfo(0, 0, 0);
     }
 
     @NonNull
     @Override
     public VersionInfo getVersionInfo() {
-        // return BuildConfig.VERSION_NAME;
+        String versionString = BuildConfig.VERSION_NAME;
+        String[] splits = versionString.split("\\.");
+
+        if (splits.length >= 3) {
+            int major = Integer.parseInt(splits[0]);
+            int minor = Integer.parseInt(splits[1]);
+            int micro = Integer.parseInt(splits[2]);
+            return new VersionInfo(major, minor, micro);
+        }
         return new VersionInfo(0, 0, 0);
     }
 
