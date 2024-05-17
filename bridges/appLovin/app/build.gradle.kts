@@ -31,7 +31,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":bridges:appLovin:adapter"))
+//    implementation(project(":bridges:appLovin:adapter"))
+    implementation("com.github.loopme.android-united-sdk:appLovin-adapter:AL_0.0.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.12.0")
     testImplementation("junit:junit:4.13.2")
