@@ -27,12 +27,7 @@ public class ViewAbilityUtils {
     }
 
     public static void calculateViewAbilitySyncDelayed(final View checkedView, final OnResultListener listener) {
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                calculateViewAbilitySync(checkedView, listener);
-            }
-        }, DELAY);
+        mHandler.postDelayed(() -> calculateViewAbilitySync(checkedView, listener), DELAY);
     }
 
     private static void calculateViewAbilitySync(final View view, final OnResultListener listener) {
@@ -174,12 +169,7 @@ public class ViewAbilityUtils {
 
     private static ArrayList<Rect> createChildrenRectSortedArrayList(Set<Rect> rectSet) {
         ArrayList<Rect> childRectList = new ArrayList<>(rectSet);
-        Collections.sort(childRectList, new Comparator<Rect>() {
-            @Override
-            public int compare(Rect rect1, Rect rect2) {
-                return Integer.compare(rect1.top, rect2.top);
-            }
-        });
+        childRectList.sort(Comparator.comparingInt(rect -> rect.top));
         return childRectList;
     }
 
@@ -254,10 +244,6 @@ public class ViewAbilityUtils {
         public void setVisibility(double mVisibility) {
             this.mVisibility = mVisibility;
             Logging.out(LOG_TAG, "visibility : " + ((int) (mVisibility * 100)) + "%");
-        }
-
-        public double getOverlapping() {
-            return mOverlapping;
         }
 
         public void setOverlapping(double mOverlapping) {

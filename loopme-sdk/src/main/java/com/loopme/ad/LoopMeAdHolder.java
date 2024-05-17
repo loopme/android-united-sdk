@@ -1,8 +1,6 @@
 package com.loopme.ad;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.text.TextUtils;
 
 import com.loopme.Constants;
 import com.loopme.LoopMeBannerGeneral;
@@ -16,8 +14,7 @@ public class LoopMeAdHolder {
     private static final Map<Integer, LoopMeInterstitialGeneral> mNewImplInterstitialMap = new HashMap<>();
     private static final Map<Integer, LoopMeBannerGeneral> mNewImplBannerMap = new HashMap<>();
 
-    private LoopMeAdHolder() {
-    }
+    private LoopMeAdHolder() { }
 
     public static void putAd(LoopMeAd loopMeAd) {
         int id = loopMeAd.getAdId();
@@ -28,37 +25,20 @@ public class LoopMeAdHolder {
         }
     }
 
-    public static LoopMeInterstitialGeneral createInterstitial(String appKey, Activity activity) {
-        if (activity == null || TextUtils.isEmpty(appKey)) {
-            return null;
-        } else {
-            LoopMeInterstitialGeneral interstitial = new LoopMeInterstitialGeneral(activity, appKey);
-            mNewImplInterstitialMap.put(interstitial.getAdId(), interstitial);
-            return interstitial;
-        }
-    }
-
     private static LoopMeInterstitialGeneral findInterstitial(int adId) {
-        if (mNewImplInterstitialMap.containsKey(adId)) {
-            return mNewImplInterstitialMap.get(adId);
-        } else {
-            return null;
-        }
+        return mNewImplInterstitialMap.getOrDefault(adId, null);
     }
 
     private static LoopMeBannerGeneral findBanner(int adId) {
-        if (mNewImplBannerMap.containsKey(adId)) {
-            return mNewImplBannerMap.get(adId);
-        } else {
-            return null;
-        }
+        return mNewImplBannerMap.getOrDefault(adId, null);
     }
 
     public static void removeAd(LoopMeAd loopMeAd) {
-        if (loopMeAd != null) {
-            mNewImplInterstitialMap.remove(loopMeAd.getAdId());
-            mNewImplBannerMap.remove(loopMeAd.getAdId());
+        if (loopMeAd == null) {
+            return;
         }
+        mNewImplInterstitialMap.remove(loopMeAd.getAdId());
+        mNewImplBannerMap.remove(loopMeAd.getAdId());
     }
 
     public static LoopMeAd getAd(Intent intent) {

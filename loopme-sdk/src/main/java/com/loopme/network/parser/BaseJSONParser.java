@@ -39,7 +39,6 @@ public class BaseJSONParser {
 
     protected List<String> parseStringsList(JSONObject jsonObject, String param) {
         List<String> measurePartners = new ArrayList<>();
-
         try {
             JSONArray jsonArray = jsonObject.getJSONArray(param);
             for (int i = 0; i < jsonArray.length(); i++) {

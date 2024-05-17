@@ -3,7 +3,6 @@ package com.loopme.controllers.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
-import android.os.Build;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.TextureView;
@@ -39,46 +38,45 @@ public class ViewControllerLoopMe implements TextureView.SurfaceTextureListener,
 
     @Override
     public void buildVideoAdView(Context context, ViewGroup bannerView, AdView adView) {
-        if (context != null && bannerView != null && adView != null) {
-            mTextureView = new TextureView(context);
-            configureTextureView();
-            configureAdView(adView);
-            clearView(adView);
-
-            bannerView.setBackgroundColor(Color.BLACK);
-            bannerView.addView(mTextureView, CHILD_INDEX_0);
-            bannerView.addView(adView, CHILD_INDEX_1);
+        if (context == null || bannerView == null || adView == null) {
+            return;
         }
+        mTextureView = new TextureView(context);
+        configureTextureView();
+        configureAdView(adView);
+        clearView(adView);
+        bannerView.setBackgroundColor(Color.BLACK);
+        bannerView.addView(mTextureView, CHILD_INDEX_0);
+        bannerView.addView(adView, CHILD_INDEX_1);
     }
 
     private void configureTextureView() {
-        if (mTextureView != null) {
-            mTextureView.setSurfaceTextureListener(this);
-            if (Build.VERSION.SDK_INT < 23) {
-                mTextureView.setBackgroundColor(Color.TRANSPARENT);
-            }
+        if (mTextureView == null) {
+            return;
         }
+        mTextureView.setSurfaceTextureListener(this);
     }
 
     private void configureAdView(AdView adView) {
-        if (adView != null) {
-            adView.setBackgroundColor(Color.TRANSPARENT);
-            adView.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
+        if (adView == null) {
+            return;
         }
+        adView.setBackgroundColor(Color.TRANSPARENT);
+        adView.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
     }
 
     @Override
     public void rebuildView(ViewGroup bannerView, AdView adView, Constants.DisplayMode displayMode) {
         Logging.out(LOG_TAG, "rebuildView");
-        if (bannerView != null && adView != null && mTextureView != null) {
-            bannerView.setBackgroundColor(Color.BLACK);
-            clearView(mTextureView);
-            clearView(adView);
-
-            bannerView.addView(mTextureView, CHILD_INDEX_0);
-            if (displayMode == Constants.DisplayMode.NORMAL) {
-                bannerView.addView(adView, CHILD_INDEX_1);
-            }
+        if (bannerView == null || adView == null || mTextureView == null) {
+            return;
+        }
+        bannerView.setBackgroundColor(Color.BLACK);
+        clearView(mTextureView);
+        clearView(adView);
+        bannerView.addView(mTextureView, CHILD_INDEX_0);
+        if (displayMode == Constants.DisplayMode.NORMAL) {
+            bannerView.addView(adView, CHILD_INDEX_1);
         }
     }
 
@@ -90,25 +88,29 @@ public class ViewControllerLoopMe implements TextureView.SurfaceTextureListener,
 
     private void resizeVideo() {
         Logging.out(LOG_TAG, "resizeVideo()");
-        if (areNewParamsValid()) {
-            FrameLayout.LayoutParams params = createNewParams();
-            mTextureView.setLayoutParams(params);
+        if (!areNewParamsValid()) {
+            return;
         }
+        FrameLayout.LayoutParams params = createNewParams();
+        mTextureView.setLayoutParams(params);
     }
 
     private FrameLayout.LayoutParams createNewParams() {
-        if (mTextureView != null) {
-            FrameLayout.LayoutParams oldParams = (FrameLayout.LayoutParams) mTextureView.getLayoutParams();
-            return Utils.calculateNewLayoutParams(oldParams, mVideoWidth, mVideoHeight,
-                    mResizeWidth, mResizeHeight, mStretch);
-        } else {
+        if (mTextureView == null) {
             return new FrameLayout.LayoutParams(Utils.getScreenWidth(), Utils.getScreenHeight());
         }
+        FrameLayout.LayoutParams oldParams = (FrameLayout.LayoutParams) mTextureView.getLayoutParams();
+        return Utils.calculateNewLayoutParams(
+            oldParams, mVideoWidth, mVideoHeight, mResizeWidth, mResizeHeight, mStretch
+        );
     }
 
     private boolean areNewParamsValid() {
-        return mResizeWidth != 0 || mResizeHeight != 0 || mVideoWidth != 0
-                || mVideoHeight != 0 || mTextureView != null;
+        return mResizeWidth != 0 ||
+            mResizeHeight != 0 ||
+            mVideoWidth != 0 ||
+            mVideoHeight != 0 ||
+            mTextureView != null;
     }
 
     @Override
@@ -150,30 +152,17 @@ public class ViewControllerLoopMe implements TextureView.SurfaceTextureListener,
 
 
     @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-    }
-
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) { }
     @Override
-    public void onPause() {
-    }
-
+    public void onPause() { }
     @Override
-    public void onResume() {
-    }
-
+    public void onResume() { }
     @Override
-    public void onDestroy() {
-    }
-
+    public void onDestroy() { }
     @Override
-    public void initVRLibrary(Context context) {
-    }
-
+    public void initVRLibrary(Context context) { }
     @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-    }
-
-
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) { }
     public Surface getSurface() {
         return mSurface;
     }
@@ -194,7 +183,6 @@ public class ViewControllerLoopMe implements TextureView.SurfaceTextureListener,
 
     public interface Callback {
         void onSurfaceTextureAvailable(SurfaceTexture surface);
-
         void onSurfaceTextureDestroyed();
     }
 }

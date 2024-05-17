@@ -31,18 +31,8 @@ public class MraidVideoActivity extends Activity {
             mAdView = new VideoView(this);
 
             ((VideoView) mAdView).setVideoPath(getIntent().getStringExtra(EXTRAS_VIDEO_URL));
-            ((VideoView) mAdView).setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    mp.start();
-                }
-            });
-            ((VideoView) mAdView).setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    mCloseButton.setVisibility(View.VISIBLE);
-                }
-            });
+            ((VideoView) mAdView).setOnPreparedListener(MediaPlayer::start);
+            ((VideoView) mAdView).setOnCompletionListener(mp -> mCloseButton.setVisibility(View.VISIBLE));
         }
         setLayoutParams();
         setContentView(mRelativeLayout);
@@ -51,8 +41,8 @@ public class MraidVideoActivity extends Activity {
 
     private void setLayoutParams() {
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.MATCH_PARENT);
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.MATCH_PARENT);
         mRelativeLayout.addView(mAdView, lp);
     }
 

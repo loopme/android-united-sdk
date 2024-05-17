@@ -17,9 +17,8 @@ public class Bid implements Serializable, Parcelable {
     private String iurl;
     private String cid;
     private String crid;
-    public final static Parcelable.Creator<Bid> CREATOR = new Creator<Bid>() {
-
-    public Bid createFromParcel(Parcel in) {
+    public final static Parcelable.Creator<Bid> CREATOR = new Creator<>() {
+        public Bid createFromParcel(Parcel in) {
             Bid instance = new Bid();
             instance.ext = ((Ext) in.readValue((Ext.class.getClassLoader())));
             instance.id = ((String) in.readValue((String.class.getClassLoader())));
@@ -36,15 +35,13 @@ public class Bid implements Serializable, Parcelable {
         public Bid[] newArray(int size) {
             return (new Bid[size]);
         }
-
     };
     private final static long serialVersionUID = 899597700635596792L;
 
     /**
      * No args constructor for use in serialization
      */
-    public Bid() {
-    }
+    public Bid() { }
 
     public Bid(Ext ext, String id, String impid, String adid, String adm, List<String> adomain, String iurl, String cid, String crid) {
         super();

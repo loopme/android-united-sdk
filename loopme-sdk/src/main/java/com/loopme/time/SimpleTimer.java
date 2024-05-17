@@ -16,8 +16,7 @@ public class SimpleTimer extends CountDownTimer {
     }
 
     @Override
-    public void onTick(long millisUntilFinished) {
-    }
+    public void onTick(long millisUntilFinished) { }
 
     @Override
     public void onFinish() {

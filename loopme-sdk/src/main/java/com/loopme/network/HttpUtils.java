@@ -27,8 +27,7 @@ public class HttpUtils {
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
     private static final String HEADER_OPEN_RTB_VER = "x-openrtb-version";
 
-    private HttpUtils() {
-    }
+    private HttpUtils() { }
 
     @NonNull
     public static HttpRawResponse doRequest(String url, Method httpMethod, byte[] body) {
@@ -76,7 +75,6 @@ public class HttpUtils {
         HttpURLConnection connection = null;
         try {
             connection = createConnection(url);
-
             if (body != null) {
                 connection.setRequestMethod(Method.POST.name());
                 connection.addRequestProperty(HEADER_CONTENT_TYPE, APPLICATION_X_WWW_FORM);
@@ -110,7 +108,5 @@ public class HttpUtils {
         return connection;
     }
 
-    public enum Method {
-        GET, POST,
-    }
+    public enum Method { GET, POST }
 }

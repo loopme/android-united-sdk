@@ -67,12 +67,13 @@ public class AdView extends LoopMeWebView implements BridgeInterface, Bridge.Lis
 
     @Override
     public void setVideoState(Constants.VideoState state) {
-        if (mCurrentVideoState != state) {
-            mCurrentVideoState = state;
-            String command = BridgeCommandBuilder.videoState(state);
-            Logging.out(LOG_TAG, "setVideoState(): " + state.name());
-            loadUrl(command);
+        if (mCurrentVideoState == state) {
+            return;
         }
+        mCurrentVideoState = state;
+        String command = BridgeCommandBuilder.videoState(state);
+        Logging.out(LOG_TAG, "setVideoState(): " + state.name());
+        loadUrl(command);
     }
 
     @Override

@@ -36,13 +36,7 @@ public class Timers extends Observable {
     }
 
     private void initRequestTimer() {
-        mRequestTimerListener = new AdTimer.Listener() {
-
-            @Override
-            public void onTimeout() {
-                notifyTimeout(TimersType.REQUEST_TIMER);
-            }
-        };
+        mRequestTimerListener = () -> notifyTimeout(TimersType.REQUEST_TIMER);
         mRequestTimer = new AdTimer(Constants.REQUEST_TIMEOUT, mRequestTimerListener);
         Logging.out(LOG_TAG, "Request timeout: " + Constants.REQUEST_TIMEOUT / 1000 + " seconds");
     }
@@ -66,58 +60,59 @@ public class Timers extends Observable {
     }
 
     public void startTimer(TimersType timersType) {
-        if (timersType != null) {
-            switch (timersType) {
-                case FETCHER_TIMER: {
-                    startFetcherTime();
-                    break;
-                }
-                case EXPIRATION_TIMER: {
-                    startExpirationTimer();
-                    break;
-                }
-                case REQUEST_TIMER: {
-                    startRequestTimer();
-                    break;
-                }
-                case PREPARE_ASSETS_TIMER: {
-                    startPrepareAssetsTimer();
-                    break;
-                }
-                case PREPARE_VPAID_JS_TIMER: {
-                    startPrepareVpaidJsTimer();
-                    break;
-                }
-                case GDPR_PAGE_LOADED_TIMER: {
-                    startGdprPageLoadedTimer();
-                    break;
-                }
+        if (timersType == null) {
+            return;
+        }
+        switch (timersType) {
+            case FETCHER_TIMER: {
+                startFetcherTime();
+                break;
+            }
+            case EXPIRATION_TIMER: {
+                startExpirationTimer();
+                break;
+            }
+            case REQUEST_TIMER: {
+                startRequestTimer();
+                break;
+            }
+            case PREPARE_ASSETS_TIMER: {
+                startPrepareAssetsTimer();
+                break;
+            }
+            case PREPARE_VPAID_JS_TIMER: {
+                startPrepareVpaidJsTimer();
+                break;
+            }
+            case GDPR_PAGE_LOADED_TIMER: {
+                startGdprPageLoadedTimer();
+                break;
             }
         }
     }
 
     private void startGdprPageLoadedTimer() {
-        if (mGdprPageReadyTimer == null) {
-            initGdprPageReadyTimer();
-            mGdprPageReadyTimer.start();
-            Logging.out(LOG_TAG, "Gdpr page ready timer starts");
-
+        if (mGdprPageReadyTimer != null) {
+            return;
         }
+        initGdprPageReadyTimer();
+        mGdprPageReadyTimer.start();
+        Logging.out(LOG_TAG, "Gdpr page ready timer starts");
     }
 
     private void initGdprPageReadyTimer() {
         mGdprPageReadyTimerListener = () -> notifyTimeout(TimersType.GDPR_PAGE_LOADED_TIMER);
         mGdprPageReadyTimer = new AdTimer(Constants.GDPR_PAGE_READY_TIMEOUT, mGdprPageReadyTimerListener);
         Logging.out(LOG_TAG, "Gdpr page loaded timeout: " + Constants.GDPR_PAGE_READY_TIMEOUT / 1000 + " seconds");
-
     }
 
     private void startPrepareVpaidJsTimer() {
-        if (mPrepareVpaidJsTimer == null) {
-            initPrepareVpaidJsTimer();
-            mPrepareVpaidJsTimer.start();
-            Logging.out(LOG_TAG, "Prepare vpaid js timer starts");
+        if (mPrepareVpaidJsTimer != null) {
+            return;
         }
+        initPrepareVpaidJsTimer();
+        mPrepareVpaidJsTimer.start();
+        Logging.out(LOG_TAG, "Prepare vpaid js timer starts");
     }
 
     private void initPrepareVpaidJsTimer() {
@@ -127,11 +122,12 @@ public class Timers extends Observable {
     }
 
     private void startPrepareAssetsTimer() {
-        if (mPrepareAssetsTimer == null) {
-            initPrepareAssetsTimer();
-            mPrepareAssetsTimer.start();
-            Logging.out(LOG_TAG, "Prepare assets timer starts");
+        if (mPrepareAssetsTimer != null) {
+            return;
         }
+        initPrepareAssetsTimer();
+        mPrepareAssetsTimer.start();
+        Logging.out(LOG_TAG, "Prepare assets timer starts");
     }
 
     private void initPrepareAssetsTimer() {
@@ -141,27 +137,30 @@ public class Timers extends Observable {
     }
 
     private void startRequestTimer() {
-        if (mRequestTimer == null) {
-            initRequestTimer();
-            mRequestTimer.start();
-            Logging.out(LOG_TAG, "Request timer starts");
+        if (mRequestTimer != null) {
+            return;
         }
+        initRequestTimer();
+        mRequestTimer.start();
+        Logging.out(LOG_TAG, "Request timer starts");
     }
 
     private void startExpirationTimer() {
-        if (mExpirationTimer == null) {
-            initExpirationTimer();
-            mExpirationTimer.start();
-            Logging.out(LOG_TAG, "Expiration timer starts");
+        if (mExpirationTimer != null) {
+            return;
         }
+        initExpirationTimer();
+        mExpirationTimer.start();
+        Logging.out(LOG_TAG, "Expiration timer starts");
     }
 
     private void startFetcherTime() {
-        if (mFetcherTimer == null) {
-            initFetcherTimer();
-            mFetcherTimer.start();
-            Logging.out(LOG_TAG, "Fetcher timer starts");
+        if (mFetcherTimer != null) {
+            return;
         }
+        initFetcherTimer();
+        mFetcherTimer.start();
+        Logging.out(LOG_TAG, "Fetcher timer starts");
     }
 
     private void stopExpirationTimer() {
@@ -211,32 +210,33 @@ public class Timers extends Observable {
     }
 
     public void stopTimer(TimersType timersType) {
-        if (timersType != null) {
-            switch (timersType) {
-                case FETCHER_TIMER: {
-                    stopFetcherTimer();
-                    break;
-                }
-                case EXPIRATION_TIMER: {
-                    stopExpirationTimer();
-                    break;
-                }
-                case REQUEST_TIMER: {
-                    stopRequestTimer();
-                    break;
-                }
-                case PREPARE_ASSETS_TIMER: {
-                    stopPrepareAssetsTimer();
-                    break;
-                }
-                case PREPARE_VPAID_JS_TIMER: {
-                    stopPrepareVpaidJsTimer();
-                    break;
-                }
-                case GDPR_PAGE_LOADED_TIMER: {
-                    stopGdprPageReadyTimer();
-                    break;
-                }
+        if (timersType == null) {
+            return;
+        }
+        switch (timersType) {
+            case FETCHER_TIMER: {
+                stopFetcherTimer();
+                break;
+            }
+            case EXPIRATION_TIMER: {
+                stopExpirationTimer();
+                break;
+            }
+            case REQUEST_TIMER: {
+                stopRequestTimer();
+                break;
+            }
+            case PREPARE_ASSETS_TIMER: {
+                stopPrepareAssetsTimer();
+                break;
+            }
+            case PREPARE_VPAID_JS_TIMER: {
+                stopPrepareVpaidJsTimer();
+                break;
+            }
+            case GDPR_PAGE_LOADED_TIMER: {
+                stopGdprPageReadyTimer();
+                break;
             }
         }
     }
@@ -263,6 +263,5 @@ public class Timers extends Observable {
             Logging.out(LOG_TAG, "Stop prepare assets timer");
         }
         mPrepareAssetsTimerListener = null;
-
     }
 }

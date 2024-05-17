@@ -65,7 +65,9 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
     public void playVideo(int time) {
         if (isReadyToStartPlay() || isVideoStateComplete() || isVideoStateIdle()) {
             playVideoInternal(time);
-        } else if (isVideoStatePaused()) {
+            return;
+        }
+        if (isVideoStatePaused()) {
             resumeVideoInternal(time);
         }
     }
@@ -79,26 +81,27 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
     }
 
     private void resumeVideoInternal(int time) {
-        if (isVideoStatePaused()) {
-            int seekTime = time == START ? START : mCurrentPosition;
-            playVideoInternal(seekTime);
+        if (!isVideoStatePaused()) {
+            return;
         }
+        playVideoInternal(time == START ? START : mCurrentPosition);
     }
 
     public void pauseVideo(boolean isSkip) {
-        if (isPlaying()) {
-            pauseVideoInternal();
-            setVideoState(isSkip);
+        if (!isPlaying()) {
+            return;
         }
+        pauseVideoInternal();
+        setVideoState(isSkip);
     }
 
     private void setVideoState(boolean isSkip) {
-        if (isInterstitial()) {
-            if (isSkip) {
-                setVideoState(Constants.VideoState.IDLE);
-            } else {
-                setVideoState(Constants.VideoState.PAUSED);
-            }
+        if (!isInterstitial()) {
+            setVideoState(Constants.VideoState.PAUSED);
+            return;
+        }
+        if (isSkip) {
+            setVideoState(Constants.VideoState.IDLE);
         } else {
             setVideoState(Constants.VideoState.PAUSED);
         }
@@ -186,14 +189,15 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
     }
 
     private void playVideoInternal(int time) {
-        if (!isPlaying()) {
-            muteVideo(mMuteState);
-            seekMediaPlayerTo(time);
-            startMediaPlayer();
-            startCurrentTimePoster();
-            setVideoState(Constants.VideoState.PLAYING);
-            Logging.out(LOG_TAG, "Play video " + time);
+        if (isPlaying()) {
+            return;
         }
+        muteVideo(mMuteState);
+        seekMediaPlayerTo(time);
+        startMediaPlayer();
+        startCurrentTimePoster();
+        setVideoState(Constants.VideoState.PLAYING);
+        Logging.out(LOG_TAG, "Play video " + time);
     }
 
     private void startCurrentTimePoster() {
@@ -285,11 +289,11 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
         setVideoPositionWhenError(mediaPlayer);
         if (!TextUtils.isEmpty(mFileRest)) {
             restartMediaPlayer();
-        } else {
-            mWaitForVideo = true;
-            setVideoState(Constants.VideoState.BUFFERING);
-            startBuffering();
+            return;
         }
+        mWaitForVideo = true;
+        setVideoState(Constants.VideoState.BUFFERING);
+        startBuffering();
     }
 
     private void restartMediaPlayer() {
@@ -315,9 +319,7 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
     }
 
     private void removeCallbacks() {
-        if (mHandler != null) {
-            mHandler.removeCallbacks(mCurrentTimePoster);
-        }
+        mHandler.removeCallbacks(mCurrentTimePoster);
     }
 
     private void postVideoCurrentTimeToWebView(int currentPosition) {
@@ -332,7 +334,6 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
             public void onTick(long millisUntilFinished) {
                 Logging.out(LOG_TAG, "Buffering " + (millisUntilFinished / 1000) + " second...");
             }
-
             @Override
             public void onFinish() {
                 LoopMeTracker.post("Buffering 2 seconds");
@@ -342,17 +343,17 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
     }
 
     public void fullVideoLoaded(String filePath, boolean preload, boolean adShown) {
-        if (preload) {
-            if (adShown) {
-                setFileRest(mFileRest);
-                waitForVideo();
-            } else {
-                releasePlayer();
-                initPlayerFromFile(filePath);
-            }
-        } else {
+        if (!preload) {
             initPlayerFromFile(filePath);
+            return;
         }
+        if (adShown) {
+            setFileRest(mFileRest);
+            waitForVideo();
+            return;
+        }
+        releasePlayer();
+        initPlayerFromFile(filePath);
     }
 
     private void stopBuffering() {
@@ -442,8 +443,7 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
         Logging.out(LOG_TAG, "onError: " + extra);
         removeCallbacks();
         destroyListeners();
-        boolean mediaErrorHandled = handleError(mediaPlayer, extra);
-        if (mediaErrorHandled) {
+        if (handleError(mediaPlayer, extra)) {
             return true;
         }
         releasePlayer();
@@ -452,12 +452,13 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        if (!isVideoStateComplete()) {
-            removeCallbacks();
-            postVideoCurrentTimeToWebView(mp.getCurrentPosition());
-            setVideoState(Constants.VideoState.COMPLETE);
-            onVideoReachEnd();
+        if (isVideoStateComplete()) {
+            return;
         }
+        removeCallbacks();
+        postVideoCurrentTimeToWebView(mp.getCurrentPosition());
+        setVideoState(Constants.VideoState.COMPLETE);
+        onVideoReachEnd();
     }
 
     @Override
@@ -508,15 +509,10 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
 
     public interface Callback {
         void onVideoReachEnd();
-
         void onFail(LoopMeError error);
-
         void onVideoSizeChanged(int width, int height);
-
         void onPlaybackFinishedWithError();
-
         void onVolumeChangedEvent(float volume, int currentPosition);
-
         void onDurationChangedEvent(int currentPosition, int adDuration);
     }
 

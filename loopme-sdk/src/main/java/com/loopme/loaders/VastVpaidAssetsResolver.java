@@ -52,12 +52,11 @@ public class VastVpaidAssetsResolver {
             onErrorOccurred(Errors.VAST_COULD_NOT_FIND_SUPPORTED_FORMAT);
             return;
         }
-
         mVideoLoader = new FileLoaderNewImpl(
-                mAdParams.getVideoFileUrlsList().get(videoFileIndex),
-                mContext,
-                initVastFileLoaderCallback());
-
+            mAdParams.getVideoFileUrlsList().get(videoFileIndex),
+            mContext,
+            initVastFileLoaderCallback()
+        );
         mVideoLoader.start();
     }
 
@@ -79,9 +78,7 @@ public class VastVpaidAssetsResolver {
     private void startCompanionTimer() {
         mCompanionTimer = new CountDownTimer(COMPANION_TIMEOUT, Constants.ONE_SECOND_IN_MILLIS) {
             @Override
-            public void onTick(long millisUntilFinished) {
-            }
-
+            public void onTick(long millisUntilFinished) { }
             @Override
             public void onFinish() {
                 onCompanionTimeout();
@@ -108,7 +105,6 @@ public class VastVpaidAssetsResolver {
                 cancelCompanionTimer();
                 handleVpaidError(Errors.COMPANION_ERROR);
             }
-
             @Override
             public void onFileFullLoaded(String filePath) {
                 cancelCompanionTimer();
@@ -118,10 +114,11 @@ public class VastVpaidAssetsResolver {
     }
 
     private void cancelCompanionTimer() {
-        if (mCompanionTimer != null) {
-            mCompanionTimer.cancel();
-            mCompanionTimer = null;
+        if (mCompanionTimer == null) {
+            return;
         }
+        mCompanionTimer.cancel();
+        mCompanionTimer = null;
     }
 
     private FileLoaderNewImpl.Callback initVastFileLoaderCallback() {
@@ -130,7 +127,6 @@ public class VastVpaidAssetsResolver {
             public void onError(LoopMeError error) {
                 handleVastError(error);
             }
-
             @Override
             public void onFileFullLoaded(String filePath) {
                 Logging.out(LOG_TAG, "onFileFullLoaded");
@@ -181,9 +177,7 @@ public class VastVpaidAssetsResolver {
 
     public interface OnAssetsLoaded {
         void onAssetsLoaded(String videoFilePath, String endCardFilePath);
-
         void onError(LoopMeError error);
-
         void onPostWarning(LoopMeError error);
     }
 }

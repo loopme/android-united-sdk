@@ -47,11 +47,8 @@ public class ResponseJsonModelParser extends BaseJSONParser {
     private static ResponseJsonModel sLastProcessingResult;
 
     public ResponseJsonModel parse(JSONObject jsonObject) throws JSONException {
-        if (equalsToLastPrecessing(jsonObject)) {
-            return sLastProcessingResult;
-        } else {
-            return parseResponseJsonModel(jsonObject);
-        }
+        return equalsToLastPrecessing(jsonObject) ?
+            sLastProcessingResult : parseResponseJsonModel(jsonObject);
     }
 
     private boolean equalsToLastPrecessing(JSONObject jsonObject) {
@@ -62,7 +59,6 @@ public class ResponseJsonModelParser extends BaseJSONParser {
         saveAsLastProcessingObject(jsonObject);
         String id = getString(jsonObject, PARAM_ID, false);
         List<Seatbid> seatBidsList = parseSeatBidList(jsonObject);
-
         ResponseJsonModel responseJsonModel = new ResponseJsonModel();
         responseJsonModel.setId(id);
         responseJsonModel.setSeatbid(seatBidsList);
@@ -73,7 +69,6 @@ public class ResponseJsonModelParser extends BaseJSONParser {
 
     private List<Seatbid> parseSeatBidList(JSONObject jsonObject) throws JSONException {
         JSONArray seatBidArray = jsonObject.getJSONArray(PARAM_SEAT_BID);
-
         List<Seatbid> seatBidList = new ArrayList<>();
         for (int i = 0; i < seatBidArray.length(); i++) {
             JSONObject seatBidAsJson = seatBidArray.getJSONObject(i);

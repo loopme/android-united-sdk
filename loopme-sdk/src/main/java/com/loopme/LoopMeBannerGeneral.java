@@ -66,12 +66,9 @@ public class LoopMeBannerGeneral extends LoopMeAd {
 
     @Override
     public void destroy() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                dismiss();
-                LoopMeBannerGeneral.super.destroy();
-            }
+        runOnUiThread(() -> {
+            dismiss();
+            LoopMeBannerGeneral.super.destroy();
         });
     }
 

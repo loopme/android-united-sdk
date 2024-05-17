@@ -2,11 +2,12 @@ package com.loopme;
 
 import android.app.Activity;
 import android.content.Context;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.loopme.common.AdChecker;
 
@@ -55,12 +56,9 @@ public class NativeVideoRecyclerAdapter extends RecyclerView.Adapter
     }
 
     private View.OnLayoutChangeListener initLayoutChangeListener() {
-        return new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                Logging.out(LOG_TAG, "onLayoutChange!!!!!");
-                mNativeVideoController.onScroll(mRecyclerView);
-            }
+        return (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+            Logging.out(LOG_TAG, "onLayoutChange!!!!!");
+            mNativeVideoController.onScroll(mRecyclerView);
         };
     }
 

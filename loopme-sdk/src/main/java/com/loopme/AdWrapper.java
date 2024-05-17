@@ -47,16 +47,16 @@ public abstract class AdWrapper extends AdConfig {
      * As a result you'll receive onLoopMeInterstitialShow() callback
      */
     public void show() {
-        if (!isShowing()) {
-            if (isReady(mFirstLoopMeAd)) {
-                show(mFirstLoopMeAd);
-            } else if (isReady(mSecondLoopMeAd)) {
-                show(mSecondLoopMeAd);
-            } else {
-                postShowMissedEvent();
-            }
-        } else {
+        if (isShowing()) {
             Logging.out(LOG_TAG, "Ad is already presented on the screen");
+            return;
+        }
+        if (isReady(mFirstLoopMeAd)) {
+            show(mFirstLoopMeAd);
+        } else if (isReady(mSecondLoopMeAd)) {
+            show(mSecondLoopMeAd);
+        } else {
+            postShowMissedEvent();
         }
     }
 
@@ -159,24 +159,26 @@ public abstract class AdWrapper extends AdConfig {
     }
 
     private void sleep() {
-        if (mSleepLoadTimer == null) {
-            mSleepLoadTimer = initSleepLoadTimer();
-            float sleepTimeout = (float) Constants.SLEEP_TIME / Constants.ONE_MINUTE_IN_MILLIS;
-            Logging.out(LOG_TAG, "Sleep timeout: " + sleepTimeout + " minutes");
-            mSleepLoadTimer.start();
-            mIsAutoLoadingPaused = true;
+        if (mSleepLoadTimer != null) {
+            return;
         }
+        mSleepLoadTimer = initSleepLoadTimer();
+        float sleepTimeout = (float) Constants.SLEEP_TIME / Constants.ONE_MINUTE_IN_MILLIS;
+        Logging.out(LOG_TAG, "Sleep timeout: " + sleepTimeout + " minutes");
+        mSleepLoadTimer.start();
+        mIsAutoLoadingPaused = true;
     }
 
     protected void increaseFailCounter(LoopMeAd loopMeAd) {
-        if (isAutoLoadingEnabled()) {
-            mFailCounter++;
-            if (mFailCounter > Constants.MAX_FAIL_COUNT) {
-                sleep();
-            } else {
-                Logging.out(LOG_TAG, "Attempt #" + mFailCounter);
-                reload(loopMeAd);
-            }
+        if (!isAutoLoadingEnabled()) {
+            return;
+        }
+        mFailCounter++;
+        if (mFailCounter > Constants.MAX_FAIL_COUNT) {
+            sleep();
+        } else {
+            Logging.out(LOG_TAG, "Attempt #" + mFailCounter);
+            reload(loopMeAd);
         }
     }
 

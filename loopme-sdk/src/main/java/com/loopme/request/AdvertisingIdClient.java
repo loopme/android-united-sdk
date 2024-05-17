@@ -1,8 +1,9 @@
 package com.loopme.request;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -41,11 +42,8 @@ public final class AdvertisingIdClient {
         try {
             Context appContext = context.getApplicationContext();
             com.google.android.gms.ads.identifier.AdvertisingIdClient.Info result =
-                    com.google.android.gms.ads.identifier.AdvertisingIdClient
-                            .getAdvertisingIdInfo(
-                                    appContext == null
-                                            ? context
-                                            : appContext);
+                com.google.android.gms.ads.identifier.AdvertisingIdClient
+                    .getAdvertisingIdInfo(appContext == null ? context : appContext);
 
             boolean dnt = result.isLimitAdTrackingEnabled();
             String id = dnt ? DNT_AD_ID : result.getId();
@@ -54,25 +52,19 @@ public final class AdvertisingIdClient {
                 id = "";
                 Logging.out(LOG_TAG, "getId() returned empty id.", true);
             }
-
             return new AdInfo(id, dnt);
-
         } catch (GooglePlayServicesRepairableException e) {
-            Logging.out(LOG_TAG,
-                    e +
-                            " MESSAGE: " +
-                            e.getMessage() +
-                            " CONNECTION_STATUS_CODE: " +
-                            e.getConnectionStatusCode(),
-                    true);
+            Logging.out(
+                LOG_TAG,
+                e + " MESSAGE: " + e.getMessage() + " CONNECTION_STATUS_CODE: " + e.getConnectionStatusCode(),
+                true
+            );
         } catch (GooglePlayServicesNotAvailableException e) {
-            Logging.out(LOG_TAG,
-                    e +
-                            " MESSAGE: " +
-                            e.getMessage() +
-                            " ERROR_CODE: " +
-                            e.errorCode,
-                    true);
+            Logging.out(
+                LOG_TAG,
+                e + " MESSAGE: " + e.getMessage() + " ERROR_CODE: " + e.errorCode,
+                true
+            );
         } catch (Exception e) {
             Logging.out(LOG_TAG, e.toString(), true);
         }

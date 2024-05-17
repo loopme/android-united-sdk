@@ -21,9 +21,8 @@ public class LogDbHelper extends SQLiteOpenHelper {
     static final String ID = "id";
     static final String LOG = "log";
 
-    private static final String TABLE_CREATE = "create table " + TABLE_NAME +
-            " (" + ID + " integer primary key autoincrement," +
-            LOG + " text not null);";
+    private static final String TABLE_CREATE =
+        "create table " + TABLE_NAME + " (" + ID + " integer primary key autoincrement," + LOG + " text not null);";
 
     public LogDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -42,14 +41,13 @@ public class LogDbHelper extends SQLiteOpenHelper {
 
     public void putLog(String logMessage) {
         SQLiteDatabase db = this.getWritableDatabase();
-
-        if (getCount(db) < MAX_ROW_COUNT) {
-            ContentValues values = new ContentValues();
-            values.put(LOG, logMessage);
-            db.insert(TABLE_NAME, null, values);
-        } else {
+        if (getCount(db) >= MAX_ROW_COUNT) {
             clear();
+            return;
         }
+        ContentValues values = new ContentValues();
+        values.put(LOG, logMessage);
+        db.insert(TABLE_NAME, null, values);
     }
 
     public int getCount(SQLiteDatabase db) {
@@ -61,9 +59,8 @@ public class LogDbHelper extends SQLiteOpenHelper {
     }
 
     public List<String> getLogs() {
-        List logList = new ArrayList();
+        List<String> logList = new ArrayList<>();
         String query = "SELECT  * FROM " + TABLE_NAME;
-
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {

@@ -2,8 +2,6 @@ package com.loopme.request;
 
 import android.util.Base64;
 
-import com.loopme.Constants;
-
 import java.nio.charset.StandardCharsets;
 
 import javax.crypto.Cipher;
@@ -17,10 +15,10 @@ public class AES {
 
     //TODO: Check if hardcoding encryption secrets is intended
     private static final byte[] SECRET_KEY_SDK = new byte[]{
-            (byte) 0xfa, (byte) 0x62, (byte) 0x44, (byte) 0xa2,
-            (byte) 0x97, (byte) 0xa4, (byte) 0xba, (byte) 0x03,
-            (byte) 0x2e, (byte) 0x89, (byte) 0xde, (byte) 0x9b,
-            (byte) 0x77, (byte) 0xf3, (byte) 0xa2, (byte) 0xf9};
+        (byte) 0xfa, (byte) 0x62, (byte) 0x44, (byte) 0xa2,
+        (byte) 0x97, (byte) 0xa4, (byte) 0xba, (byte) 0x03,
+        (byte) 0x2e, (byte) 0x89, (byte) 0xde, (byte) 0x9b,
+        (byte) 0x77, (byte) 0xf3, (byte) 0xa2, (byte) 0xf9};
 
     private static SecretKeySpec secretKey;
     private static String encryptedString;

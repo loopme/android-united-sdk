@@ -30,7 +30,6 @@ import com.loopme.xml.vast4.ViewableImpression;
 import com.loopme.xml.vast4.Wrapper;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +39,6 @@ public class XmlParseService {
     private static final String LOG_TAG = XmlParseService.class.getSimpleName();
     private static final int FIRST_ELEMENT = 0;
     private static AdParams sAdParams = new AdParams();
-
 
     public static AdParams parse(AdParams adParams, ResponseJsonModel responseModel) {
         Bid bidObject = retrieveBidObject(responseModel);
@@ -65,10 +63,10 @@ public class XmlParseService {
 
     public static String parseOrientation(ResponseJsonModel responseModel) {
         Bid bidObject = retrieveBidObject(responseModel);
-        if (bidObject != null && bidObject.getExt() != null) {
-            return bidObject.getExt().getOrientation();
+        if (bidObject == null || bidObject.getExt() == null) {
+            return "";
         }
-        return "";
+        return bidObject.getExt().getOrientation();
     }
 
     private static Bid retrieveBidObject(ResponseJsonModel responseModel) {
@@ -82,18 +80,12 @@ public class XmlParseService {
 
     private static String retrieveXml(ResponseJsonModel responseModel) {
         Bid bid = retrieveBidObject(responseModel);
-        if (bid != null) {
-            return bid.getAdm();
-        }
-        return "";
+        return bid == null ? "" : bid.getAdm();
     }
 
     private static AdParams parseResponse(String response) {
         Vast vast = parseVast(response);
-        if (vast != null) {
-            return createAdParams(vast);
-        }
-        return null;
+        return vast == null ? null : createAdParams(vast);
     }
 
     private static AdParams createAdParams(Vast vast) {
@@ -122,32 +114,36 @@ public class XmlParseService {
 
         List<Companion> companionList = getCompanionList(getCreativeList(inLine));
 
-        if (companionList != null && companionList.size() > 0) {
-            setParamEndCardUrlList(inLine, companionList);
-            Companion companion = companionList.get(0);
-            if (companion != null) {
-                setParamEndCardRedirectUrl(companion);
-                setParamEndCardClicks(companion);
-                setParamCompanionCreativeViewEvents(companion);
-            }
+        if (companionList == null || companionList.isEmpty()) {
+            return sAdParams;
         }
+        setParamEndCardUrlList(inLine, companionList);
+        Companion companion = companionList.get(0);
+        if (companion == null) {
+            return sAdParams;
+        }
+        setParamEndCardRedirectUrl(companion);
+        setParamEndCardClicks(companion);
+        setParamCompanionCreativeViewEvents(companion);
         return sAdParams;
     }
 
     private static void setErrorUrl(Error error) {
-        if (error != null) {
-            String errorUrl = error.getText();
-            if (!TextUtils.isEmpty(errorUrl)) {
-                sAdParams.addErrorUrl(errorUrl);
-            }
+        if (error == null) {
+            return;
+        }
+        String errorUrl = error.getText();
+        if (!TextUtils.isEmpty(errorUrl)) {
+            sAdParams.addErrorUrl(errorUrl);
         }
     }
 
     private static void setViewableImpression(ViewableImpression viewableImpression) {
-        if (viewableImpression != null) {
-            Map<String, List<String>> viewableImpressionMap = viewableImpression.getViewableImpressionMap();
-            sAdParams.setViewableImpressionMap(viewableImpressionMap);
+        if (viewableImpression == null) {
+            return;
         }
+        Map<String, List<String>> viewableImpressionMap = viewableImpression.getViewableImpressionMap();
+        sAdParams.setViewableImpressionMap(viewableImpressionMap);
     }
 
     private static void setAdVerificationJavaScriptUrl(AdVerifications adVerifications) {
@@ -162,54 +158,57 @@ public class XmlParseService {
     }
 
     private static void setParamCompanionCreativeViewEvents(Companion companion) {
-        if (companion.getTrackingEvents() != null) {
-            List<String> events = new ArrayList<>();
-            for (Tracking tracking : companion.getTrackingEvents().getTrackingList()) {
-                events.add(tracking.getText());
-            }
-            sAdParams.setCompanionCreativeViewEvents(events);
+        if (companion.getTrackingEvents() == null) {
+            return;
         }
+        List<String> events = new ArrayList<>();
+        for (Tracking tracking : companion.getTrackingEvents().getTrackingList()) {
+            events.add(tracking.getText());
+        }
+        sAdParams.setCompanionCreativeViewEvents(events);
     }
 
     private static void setParamEndCardClicks(Companion companion) {
-        if (companion.getCompanionClickTracking() != null) {
-            List<String> clickEvents = new ArrayList<>();
-            for (CompanionClickTracking tracking : companion.getCompanionClickTracking()) {
-                clickEvents.add(tracking.getText());
-            }
-            sAdParams.setEndCardClicks(clickEvents);
+        if (companion.getCompanionClickTracking() == null) {
+            return;
         }
+        List<String> clickEvents = new ArrayList<>();
+        for (CompanionClickTracking tracking : companion.getCompanionClickTracking()) {
+            clickEvents.add(tracking.getText());
+        }
+        sAdParams.setEndCardClicks(clickEvents);
     }
 
     private static void setParamEndCardRedirectUrl(Companion companion) {
         CompanionClickThrough clickThrough = companion.getCompanionClickThrough();
-        if (clickThrough != null && clickThrough.getText() != null) {
-            String redirectUrl = clickThrough.getText().trim();
-            sAdParams.setEndCardRedirectUrl(redirectUrl);
+        if (clickThrough == null || clickThrough.getText() == null) {
+            return;
         }
-
+        String redirectUrl = clickThrough.getText().trim();
+        sAdParams.setEndCardRedirectUrl(redirectUrl);
     }
 
     private static void setParamEndCardUrlList(InLine inLine, List<Companion> companionList) {
-        if (inLine != null && companionList != null) {
-            List<String> endCardUrlList = new ArrayList<>();
-            for (Companion companion : companionList) {
-                endCardUrlList.add(companion.getStaticResource().getText().trim());
-            }
-            sAdParams.setEndCardUrlList(endCardUrlList);
+        if (inLine == null || companionList == null) {
+            return;
         }
+        List<String> endCardUrlList = new ArrayList<>();
+        for (Companion companion : companionList) {
+            endCardUrlList.add(companion.getStaticResource().getText().trim());
+        }
+        sAdParams.setEndCardUrlList(endCardUrlList);
     }
 
     private static void setVastVpaid(Linear linear) {
-        if (linear.getMediaFiles() != null) {
-            List<MediaFile> mediaFileList = linear.getMediaFiles().getMediaFileList();
-            String vpaidJsUrl = getVpaidJsUrl(mediaFileList);
-
-            if (!TextUtils.isEmpty(vpaidJsUrl)) {
-                setVpaidJsUrl(vpaidJsUrl);
-            } else {
-                setParamVastVideoFileUrlList(mediaFileList);
-            }
+        if (linear.getMediaFiles() == null) {
+            return;
+        }
+        List<MediaFile> mediaFileList = linear.getMediaFiles().getMediaFileList();
+        String vpaidJsUrl = getVpaidJsUrl(mediaFileList);
+        if (!TextUtils.isEmpty(vpaidJsUrl)) {
+            setVpaidJsUrl(vpaidJsUrl);
+        } else {
+            setParamVastVideoFileUrlList(mediaFileList);
         }
     }
 
@@ -223,38 +222,37 @@ public class XmlParseService {
             return;
 
         List<String> videoFileUrlsList = new ArrayList<>();
-
         for (MediaFile mediaFile : filterAndSortSupportedMediaFiles(mediaFileList))
             videoFileUrlsList.add(mediaFile.getText().trim());
-
         sAdParams.setVideoFileUrlsList(videoFileUrlsList);
     }
 
     private static void setParamVideoClicks(Linear linear) {
-        if (linear.getVideoClicks() != null) {
-            List<ClickTracking> trackingList = linear.getVideoClicks().getClickTrackingList();
-            List<String> clickEvents = new ArrayList<>();
-            if (trackingList != null) {
-                for (ClickTracking tracking : trackingList) {
-                    clickEvents.add(tracking.getText());
-                }
-            }
-            sAdParams.setVideoClicks(clickEvents);
+        if (linear.getVideoClicks() == null) {
+            return;
         }
+        List<ClickTracking> trackingList = linear.getVideoClicks().getClickTrackingList();
+        List<String> clickEvents = new ArrayList<>();
+        if (trackingList != null) {
+            for (ClickTracking tracking : trackingList) {
+                clickEvents.add(tracking.getText());
+            }
+        }
+        sAdParams.setVideoClicks(clickEvents);
     }
 
     private static void setParamVideoRedirectUrl(Linear linear) {
-        if (linear.getVideoClicks() != null) {
-            ClickThrough clickThrough = linear.getVideoClicks().getClickThrough();
-            if (clickThrough != null) {
-                sAdParams.setVideoRedirectUrl(clickThrough.getText());
-            }
+        if (linear.getVideoClicks() == null) {
+            return;
+        }
+        ClickThrough clickThrough = linear.getVideoClicks().getClickThrough();
+        if (clickThrough != null) {
+            sAdParams.setVideoRedirectUrl(clickThrough.getText());
         }
     }
 
     private static void setAdParameters(Linear linear) {
-        String adParameters = parseAdParameters(linear);
-        sAdParams.setAdParams(adParameters);
+        sAdParams.setAdParams(parseAdParameters(linear));
     }
 
     private static void setParamDuration(Linear linear) {
@@ -273,24 +271,20 @@ public class XmlParseService {
     }
 
     private static Linear getParamLinear(InLine inLine) {
-        if (inLine != null && inLine.getCreatives() != null) {
-            List<Creative> creativeList = getCreativeList(inLine);
-
-            for (Creative creative : creativeList) {
-                if (creative.getLinear() != null) {
-                    return creative.getLinear();
-                }
+        if (inLine == null || inLine.getCreatives() == null) {
+            return null;
+        }
+        List<Creative> creativeList = getCreativeList(inLine);
+        for (Creative creative : creativeList) {
+            if (creative.getLinear() != null) {
+                return creative.getLinear();
             }
         }
         return null;
     }
 
     private static List<Creative> getCreativeList(InLine inLine) {
-        if (inLine != null) {
-            return inLine.getCreatives().getCreativeList();
-        } else {
-            return new ArrayList<>();
-        }
+        return inLine == null ? new ArrayList<>() : inLine.getCreatives().getCreativeList();
     }
 
     private static void setParamImpressions(InLine inLine) {
@@ -314,11 +308,12 @@ public class XmlParseService {
     }
 
     private static String getVpaidJsUrl(List<MediaFile> mediaFileList) {
-        if (mediaFileList != null) {
-            for (MediaFile mediaFile : mediaFileList) {
-                if (isMediaFileValid(mediaFile)) {
-                    return mediaFile.getText().trim();
-                }
+        if (mediaFileList == null) {
+            return "";
+        }
+        for (MediaFile mediaFile : mediaFileList) {
+            if (isMediaFileValid(mediaFile)) {
+                return mediaFile.getText().trim();
             }
         }
         return "";
@@ -355,9 +350,9 @@ public class XmlParseService {
     }
 
     private static boolean isCompanionAdsNull(Creative creative) {
-        return creative == null
-                || creative.getCompanionAds() == null
-                || creative.getCompanionAds().getCompanionList() == null;
+        return creative == null ||
+            creative.getCompanionAds() == null ||
+            creative.getCompanionAds().getCompanionList() == null;
     }
 
     private static List<MediaFile> filterAndSortSupportedMediaFiles(List<MediaFile> mediaFileList) {
@@ -369,22 +364,20 @@ public class XmlParseService {
             if (isSupportedFormat(mediaFile))
                 supportedMediaFilesList.add(mediaFile);
 
-        Collections.sort(
-                supportedMediaFilesList,
-                createMediaSizeComparator(Utils.getScreenWidth() * Utils.getScreenHeight()));
-
+        supportedMediaFilesList.sort(
+            createMediaSizeComparator(Utils.getScreenWidth() * Utils.getScreenHeight())
+        );
         return supportedMediaFilesList;
     }
 
     private static boolean isSupportedFormat(MediaFile mediaFile) {
         String text = mediaFile == null ? "" : mediaFile.getText();
-        return text.contains(Constants.MP4_FORMAT_EXT)
-                || text.contains(Constants.WEBM_FORMAT_EXT);
+        return text.contains(Constants.MP4_FORMAT_EXT) ||
+            text.contains(Constants.WEBM_FORMAT_EXT);
     }
 
     private static Comparator<MediaFile> createMediaSizeComparator(final int screenSquare) {
         return new Comparator<>() {
-
             @Override
             public int compare(MediaFile mediaFile1, MediaFile mediaFile2) {
                 // TODO. Use resolution comparisons instead of squares?
@@ -414,8 +407,8 @@ public class XmlParseService {
                 // The lowest of the higher-than-screen resolutions go first
                 // when there's no lower-than-screen resolution.
                 return square1 > screenSquare
-                        ? Integer.compare(square1, square2)
-                        : Integer.compare(square2, square1);
+                    ? Integer.compare(square1, square2)
+                    : Integer.compare(square2, square1);
             }
 
             private int calculateSquare(MediaFile mediaFile) {
@@ -434,26 +427,21 @@ public class XmlParseService {
     }
 
     public static VastInfo getVastInfo(String vastString) {
-        VastInfoParser vastInfoParser = new VastInfoParser(vastString);
-        return vastInfoParser.getVastInfo();
+        return new VastInfoParser(vastString).getVastInfo();
     }
 
     public static String getVastString(ResponseJsonModel mResponseModel) {
         Bid bidObject = retrieveBidObject(mResponseModel);
-        if (bidObject != null) {
-            return bidObject.getAdm();
-        }
-        return "";
+        return bidObject == null ? "" : bidObject.getAdm();
     }
 
     public static boolean isValidXml(ResponseJsonModel body) {
         String xml = retrieveXml(body);
-        if (!TextUtils.isEmpty(xml)) {
-            Vast vast = parseVast(xml);
-            return vast != null && vast.getAd() != null;
-        } else {
+        if (TextUtils.isEmpty(xml)) {
             return false;
         }
+        Vast vast = parseVast(xml);
+        return vast != null && vast.getAd() != null;
     }
 
     private static class VastInfoParser {
@@ -502,12 +490,13 @@ public class XmlParseService {
         }
 
         private void createVastInfo() {
-            if (mVast != null) {
-                mVastInfo = new VastInfo();
-                mVastInfo.setVastTagUrl(mVastTagUrl);
-                mVastInfo.setHasWrapper(mHasWrapper);
-                mVastInfo.setWrapper(mWrapper);
+            if (mVast == null) {
+                return;
             }
+            mVastInfo = new VastInfo();
+            mVastInfo.setVastTagUrl(mVastTagUrl);
+            mVastInfo.setHasWrapper(mHasWrapper);
+            mVastInfo.setWrapper(mWrapper);
         }
 
         private VastInfo getVastInfo() {

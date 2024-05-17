@@ -319,9 +319,10 @@ public final class BaseActivity extends FragmentActivity
 
         if (requestCode == REQUEST_LOCATION_PERMISSIONS)
             chromeClient.setLocationPermissionGranted(
-                    PermissionUtils
-                            .groupPermissions(this, LOCATION_PERMISSIONS)
-                            .getGrantedPermissions().size() > 0);
+                !PermissionUtils
+                    .groupPermissions(this, LOCATION_PERMISSIONS)
+                    .getGrantedPermissions().isEmpty()
+            );
     }
 
     @Override
@@ -343,9 +344,8 @@ public final class BaseActivity extends FragmentActivity
         generalPermissionsFromWebViewRequest = androidPermissions;
 
         ActivityCompat.requestPermissions(
-                this,
-                deniedPermissions.toArray(new String[0]),
-                REQUEST_GENERAL_PERMISSIONS);
+            this, deniedPermissions.toArray(new String[0]), REQUEST_GENERAL_PERMISSIONS
+        );
     }
 
     private String[] generalPermissionsFromWebViewRequest;
@@ -365,24 +365,20 @@ public final class BaseActivity extends FragmentActivity
         if (deniedPermissions.isEmpty()) {
             AdViewChromeClient chromeClient = tryGetAdViewChromeClient(mDisplayController.getWebView());
             if (chromeClient != null) {
-                chromeClient.setLocationPermissionGranted(
-                        groupedPermissions.getGrantedPermissions().size() > 0);
+                chromeClient.setLocationPermissionGranted(!groupedPermissions.getGrantedPermissions().isEmpty());
             }
             return;
         }
 
         ActivityCompat.requestPermissions(
-                this,
-                deniedPermissions.toArray(new String[0]),
-                REQUEST_LOCATION_PERMISSIONS);
+            this, deniedPermissions.toArray(new String[0]), REQUEST_LOCATION_PERMISSIONS
+        );
     }
 
     @Override
-    public void onCancelLocationPermissionRequest() {
-
-    }
+    public void onCancelLocationPermissionRequest() { }
 
     private static final String[] LOCATION_PERMISSIONS = new String[]{
-            ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION
+        ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION
     };
 }

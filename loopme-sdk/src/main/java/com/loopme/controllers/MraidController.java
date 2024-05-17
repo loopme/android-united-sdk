@@ -50,12 +50,14 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
         if (isExpanded()) {
             Logging.out(LOG_TAG, "collapse banner");
             ((DisplayControllerLoopMe) mLoopMeAd.getDisplayController()).collapseMraidBanner();
-        } else if (isResized()) {
-            resizeToInitialState();
-        } else {
-            Logging.out(LOG_TAG, "close");
-            mLoopMeAd.dismiss();
+            return;
         }
+        if (isResized()) {
+            resizeToInitialState();
+            return;
+        }
+        Logging.out(LOG_TAG, "close");
+        mLoopMeAd.dismiss();
     }
 
     private boolean isResized() {
@@ -85,9 +87,7 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     @Override
     public void open(String url) {
         Logging.out(LOG_TAG, "open " + url);
-
         mLoopMeAd.onAdClicked();
-
         if (AdUtils.tryStartCustomTabs(mMraidView.getContext(), url))
             mLoopMeAd.onAdLeaveApp();
     }
@@ -95,44 +95,48 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     @Override
     public void resize(int width, int height) {
         Logging.out(LOG_TAG, "resize");
-        if (mLoopMeAd.isBanner()) {
-            storeCurrentBannerSize();
-            setAdContainerSize(width, height);
-            mMraidView.setState(Constants.MraidState.RESIZED);
-            mMraidView.notifySizeChangeEvent(width, height);
-            mMraidView.setIsViewable(true);
+        if (!mLoopMeAd.isBanner()) {
+            return;
         }
+        storeCurrentBannerSize();
+        setAdContainerSize(width, height);
+        mMraidView.setState(Constants.MraidState.RESIZED);
+        mMraidView.notifySizeChangeEvent(width, height);
+        mMraidView.setIsViewable(true);
     }
 
     private void storeCurrentBannerSize() {
-        if (mLoopMeAd.isBanner()) {
-            ViewGroup.LayoutParams params = ((LoopMeBannerGeneral) mLoopMeAd).getBannerView().getLayoutParams();
-            if (params != null) {
-                mWidth = params.width;
-                mHeight = params.height;
-            }
+        if (!mLoopMeAd.isBanner()) {
+            return;
         }
+        ViewGroup.LayoutParams params = ((LoopMeBannerGeneral) mLoopMeAd).getBannerView().getLayoutParams();
+        if (params == null) {
+            return;
+        }
+        mWidth = params.width;
+        mHeight = params.height;
     }
 
     private void resizeToInitialState() {
         Logging.out(LOG_TAG, "banner goes back to default ");
-
-        if (mLoopMeAd.isBanner()) {
-            setAdContainerSize(mWidth, mHeight);
-            mMraidView.setState(Constants.MraidState.DEFAULT);
-            mMraidView.notifySizeChangeEvent(mWidth, mHeight);
-            mMraidView.setIsViewable(true);
+        if (!mLoopMeAd.isBanner()) {
+            return;
         }
+        setAdContainerSize(mWidth, mHeight);
+        mMraidView.setState(Constants.MraidState.DEFAULT);
+        mMraidView.notifySizeChangeEvent(mWidth, mHeight);
+        mMraidView.setIsViewable(true);
     }
 
     private void setAdContainerSize(int width, int height) {
-        if (mLoopMeAd.isBanner()) {
-            LoopMeBannerGeneral banner = (LoopMeBannerGeneral) mLoopMeAd;
-            ViewGroup.LayoutParams params = banner.getBannerView().getLayoutParams();
-            params.width = width;
-            params.height = height;
-            banner.getBannerView().setLayoutParams(params);
+        if (!mLoopMeAd.isBanner()) {
+            return;
         }
+        LoopMeBannerGeneral banner = (LoopMeBannerGeneral) mLoopMeAd;
+        ViewGroup.LayoutParams params = banner.getBannerView().getLayoutParams();
+        params.width = width;
+        params.height = height;
+        banner.getBannerView().setLayoutParams(params);
     }
 
     @Override
@@ -214,12 +218,13 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     }
 
     public void setAdContainerSize(AdSpotDimensions dimensions) {
-        if (dimensions != null) {
-            mWidth = Utils.convertDpToPixel(dimensions.getWidth());
-            mHeight = Utils.convertDpToPixel(dimensions.getHeight());
-            Logging.out(LOG_TAG, "MRAID width " + mWidth);
-            Logging.out(LOG_TAG, "MRAID height " + mHeight);
+        if (dimensions == null) {
+            return;
         }
+        mWidth = Utils.convertDpToPixel(dimensions.getWidth());
+        mHeight = Utils.convertDpToPixel(dimensions.getHeight());
+        Logging.out(LOG_TAG, "MRAID width " + mWidth);
+        Logging.out(LOG_TAG, "MRAID height " + mHeight);
     }
 
     public int getForceOrientation() {
@@ -243,19 +248,21 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     }
 
     public void onRebuildView(FrameLayout containerView) {
-        if (containerView != null && mMraidView != null) {
-            removeParent(mMraidView);
-            RelativeLayout.LayoutParams mraidViewLayoutParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.MATCH_PARENT);
-            containerView.addView(mMraidView, mraidViewLayoutParams);
+        if (containerView == null || mMraidView == null) {
+            return;
         }
+        removeParent(mMraidView);
+        RelativeLayout.LayoutParams mraidViewLayoutParams = new RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.MATCH_PARENT);
+        containerView.addView(mMraidView, mraidViewLayoutParams);
     }
 
     public void buildMraidContainer(FrameLayout containerView) {
         FrameLayout.LayoutParams mraidViewLayoutParams = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT);
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        );
         removeParent(mMraidView);
         containerView.addView(mMraidView, mraidViewLayoutParams);
     }

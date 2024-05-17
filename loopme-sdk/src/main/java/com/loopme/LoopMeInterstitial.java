@@ -17,7 +17,6 @@ import com.loopme.common.LoopMeError;
  * when an ad has been presented or dismissed from the screen, and when an ad has expired or received a tap.
  */
 public final class LoopMeInterstitial extends AdWrapper {
-    public static final String TEST_PORT_INTERSTITIAL = "test_interstitial_p";
 
     private static final String LOG_TAG = LoopMeInterstitial.class.getSimpleName();
     private Listener mMainAdListener;

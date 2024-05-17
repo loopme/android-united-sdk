@@ -17,9 +17,8 @@ public class MraidView extends LoopMeWebView {
     private String mCurrentMraidState;
 
     public MraidView(
-            Context context,
-            final MraidController mraidController,
-            Listener adReadyListener) {
+        Context context, final MraidController mraidController, Listener adReadyListener
+    ) {
         super(context);
         getSettings().setAllowUniversalAccessFromFileURLs(true);
         mraidController.setMraidView(this);
@@ -36,11 +35,12 @@ public class MraidView extends LoopMeWebView {
     @Override
     public void loadHtml(String html) {
         loadDataWithBaseURL(
-                Constants.MRAID_ANDROID_ASSET,
-                html,
-                Constants.MIME_TYPE_TEXT_HTML,
-                Constants.UTF_8,
-                null);
+            Constants.MRAID_ANDROID_ASSET,
+            html,
+            Constants.MIME_TYPE_TEXT_HTML,
+            Constants.UTF_8,
+            null
+        );
     }
 
     public void setIsViewable(boolean isViewable) {

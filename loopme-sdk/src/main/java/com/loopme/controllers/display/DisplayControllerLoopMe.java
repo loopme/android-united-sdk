@@ -1,11 +1,9 @@
 package com.loopme.controllers.display;
 
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.text.TextUtils;
-import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.webkit.WebView;
@@ -88,11 +86,11 @@ public class DisplayControllerLoopMe
     public void initControllers() {
         if (isMraidAd()) {
             initMraidControllers();
-        } else {
-            initLoopMeControllers();
-            initVideoController();
-            initViewController();
+            return;
         }
+        initLoopMeControllers();
+        initVideoController();
+        initViewController();
     }
 
     private void initLoopMeControllers() {
@@ -108,14 +106,12 @@ public class DisplayControllerLoopMe
         onMessage(Message.LOG, "initMraidController");
         mMraidController = new MraidController(mLoopMeAd);
         mMraidView = new MraidView(
-                mLoopMeAd.getContext(),
-                mMraidController,
-                createAdReadyListener());
+            mLoopMeAd.getContext(), mMraidController, createAdReadyListener()
+        );
     }
 
     public void initVideoController() {
-        VideoController.Callback callback = initVideoControllerCallback();
-        mVideoController = new VideoController(mAdView, callback, mLoopMeAd.getAdFormat());
+        mVideoController = new VideoController(mAdView, initVideoControllerCallback(), mLoopMeAd.getAdFormat());
     }
 
     public void initViewController() {
@@ -137,7 +133,6 @@ public class DisplayControllerLoopMe
     public void tryAddOmidFriendlyObstructionCloseButton(View view) {
         if (omidAdSession == null || view == null)
             return;
-
         try {
             omidAdSession.addFriendlyObstruction(view, FriendlyObstructionPurpose.CLOSE_AD, null);
         } catch (RuntimeException ex) {
@@ -149,7 +144,6 @@ public class DisplayControllerLoopMe
     public void tryRemoveOmidFriendlyObstruction(View view) {
         if (omidAdSession == null || view == null)
             return;
-
         omidAdSession.removeFriendlyObstruction(view);
     }
 
@@ -174,20 +168,18 @@ public class DisplayControllerLoopMe
     }
 
     private void loadVideoFile(final String videoUrl) {
-        boolean preload = mAdParams.getPartPreload();
-        Context context = mLoopMeAd.getContext();
-        mFileLoader = new FileLoaderNewImpl(videoUrl, context, initFileLoaderCallback(preload));
+        mFileLoader = new FileLoaderNewImpl(
+            videoUrl, mLoopMeAd.getContext(), initFileLoaderCallback(mAdParams.getPartPreload())
+        );
         mFileLoader.start();
     }
 
     private FileLoaderNewImpl.Callback initFileLoaderCallback(final boolean preload) {
         return new FileLoaderNewImpl.Callback() {
-
             @Override
             public void onError(LoopMeError error) {
                 onAdLoadFail(error);
             }
-
             @Override
             public void onFileFullLoaded(String filePath) {
                 onMessage(Message.LOG, "fullVideoLoaded: " + filePath);
@@ -223,10 +215,11 @@ public class DisplayControllerLoopMe
     }
 
     private void onAdLoadFail(LoopMeError error) {
-        if (mLoopMeAd != null && error != null) {
-            error.setErrorType(Constants.ErrorType.CUSTOM);
-            mLoopMeAd.onInternalLoadFail(error);
+        if (mLoopMeAd == null || error == null) {
+            return;
         }
+        error.setErrorType(Constants.ErrorType.CUSTOM);
+        mLoopMeAd.onInternalLoadFail(error);
     }
 
     private void playbackFinishedWithError() {
@@ -259,14 +252,12 @@ public class DisplayControllerLoopMe
         if (TextUtils.isEmpty(html)) {
             return "";
         }
-
         Pattern SCRIPT_TAG_PATTERN = Pattern.compile("<\\s*script\\b[^>]*>");
         Matcher m = SCRIPT_TAG_PATTERN.matcher(html);
         if (!m.find()) {
             Logging.out(LOG_TAG, "Couldn't find <script>");
             return html;
         }
-
         // TODO. Performance?
         return new StringBuilder(html).insert(m.start(), Constants.MRAID_SCRIPT).toString();
     }
@@ -274,34 +265,31 @@ public class DisplayControllerLoopMe
     private void preloadHtml() {
         onAdRegisterView(mLoopMeAd.getContext(), getWebView());
         injectTrackingJsForWeb();
-
         final String preInjectOmidHtml =
-                isMraidAd() ? addMraidScript(mAdParams.getHtml()) : mAdParams.getHtml();
+            isMraidAd() ? addMraidScript(mAdParams.getHtml()) : mAdParams.getHtml();
 
         OmidHelper.injectScriptContentIntoHtmlAsync(
-                mLoopMeAd.getContext().getApplicationContext(),
-                preInjectOmidHtml,
-                new OmidHelper.ScriptInjectListener() {
-                    @Override
-                    public void onReady(String injectedOmidHtml) {
-                        onOmidScriptInjectResult(injectedOmidHtml, null);
-                    }
-
-                    @Override
-                    public void onError(String injectOmidError) {
-                        onOmidScriptInjectResult(preInjectOmidHtml, injectOmidError);
-                    }
-                });
+            mLoopMeAd.getContext().getApplicationContext(),
+            preInjectOmidHtml,
+            new OmidHelper.ScriptInjectListener() {
+                @Override
+                public void onReady(String injectedOmidHtml) {
+                    onOmidScriptInjectResult(injectedOmidHtml, null);
+                }
+                @Override
+                public void onError(String injectOmidError) {
+                    onOmidScriptInjectResult(preInjectOmidHtml, injectOmidError);
+                }
+            }
+        );
     }
 
     private void onOmidScriptInjectResult(String html, String injectOmidError) {
         Logging.out(LOG_TAG, injectOmidError);
-
         // Omid has been injected successfully.
         // Wait for html loading and then create omid ad session.
         if (TextUtils.isEmpty(injectOmidError))
             needWaitOmidJsLoad = true;
-
         // Start loading html.
         WebView wv = getWebView();
         if (wv instanceof LoopMeWebView)
@@ -310,38 +298,26 @@ public class DisplayControllerLoopMe
 
     // TODO. Ugly. Use LoopMeAd.onLoadSuccess at least.
     private Listener createAdReadyListener() {
-        return new Listener() {
-            @Override
-            public void onCall() {
-                tryCreateOmidAdSession();
-            }
-        };
+        return this::tryCreateOmidAdSession;
     }
 
     // TODO. Refactor.
     private void tryCreateOmidAdSession() {
         if (!needWaitOmidJsLoad)
             return;
-
         needWaitOmidJsLoad = false;
-
         if (omidAdSession != null)
             return;
-
         WebView wv = getWebView();
-
         omidAdSession = OmidHelper.createWebDisplayAdSession(wv);
         // Something went wrong with omid. See logs.
         if (omidAdSession == null)
             return;
-
         omidEventTrackerWrapper = new OmidEventTrackerWrapper(
-                AdEvents.createAdEvents(omidAdSession),
-                null);
-
+            AdEvents.createAdEvents(omidAdSession), null)
+        ;
         omidAdSession.registerAdView(wv);
         omidAdSession.start();
-
         omidEventTrackerWrapper.sendLoaded();
     }
 
@@ -398,17 +374,19 @@ public class DisplayControllerLoopMe
     private void pauseControllers() {
         pauseViewController();
         pauseMraid();
-        if (isInterstitial()) {
-            pauseVideoController(false);
-            setWebViewState(Constants.WebviewState.HIDDEN);
+        if (!isInterstitial()) {
+            return;
         }
+        pauseVideoController(false);
+        setWebViewState(Constants.WebviewState.HIDDEN);
     }
 
     private void resumeMraid() {
-        if (mMraidView != null) {
-            mMraidView.notifySizeChangeEvent(MRAID_WIDTH, MRAID_HEIGHT);
-            mMraidView.setIsViewable(true);
+        if (mMraidView == null) {
+            return;
         }
+        mMraidView.notifySizeChangeEvent(MRAID_WIDTH, MRAID_HEIGHT);
+        mMraidView.setIsViewable(true);
     }
 
     private void resumeVideoController() {
@@ -461,40 +439,26 @@ public class DisplayControllerLoopMe
     @Override
     public void onDestroy() {
         super.onDestroy();
-
         if (omidAdSession != null)
             omidAdSession.finish();
-
         omidAdSession = null;
         omidEventTrackerWrapper = null;
         needWaitOmidJsLoad = false;
-
         destroyMraidController();
         destroyVideoController();
-
         stopVideoLoader();
-
         clearWebView(mAdView);
         clearWebView(mMraidView);
-
         mAdView = null;
         mMraidView = null;
-
         mBridgeListener = null;
         mOnTouchListener = null;
-
         mDisplayModeResolver.destroy();
     }
 
     private void destroyMraidController() {
         if (mMraidController != null) {
             mMraidController.destroyExpandedView();
-        }
-    }
-
-    public void destroyMinimizedView() {
-        if (mDisplayModeResolver != null) {
-            mDisplayModeResolver.destroy();
         }
     }
 
@@ -527,11 +491,12 @@ public class DisplayControllerLoopMe
 
     @Override
     public void onBuildMraidView(FrameLayout containerView) {
-        if (mMraidView != null && containerView != null) {
-            buildMraidContainer(containerView);
-            mMraidView.setIsViewable(true);
-            mMraidView.notifyStateChange();
+        if (mMraidView == null || containerView == null) {
+            return;
         }
+        buildMraidContainer(containerView);
+        mMraidView.setIsViewable(true);
+        mMraidView.notifyStateChange();
     }
 
     @Override
@@ -553,16 +518,17 @@ public class DisplayControllerLoopMe
     }
 
     private void checkBannerVisibility() {
-        if (isBanner() && mLoopMeAd != null) {
-            ViewAbilityUtils.calculateViewAbilitySyncDelayed(mLoopMeAd.getContainerView(), info -> {
-                if (info.isVisibleMore50Percents()) {
-                    setWebViewState(Constants.WebviewState.VISIBLE);
-                    dispatchEvent();
-                } else {
-                    setWebViewState(Constants.WebviewState.HIDDEN);
-                }
-            });
+        if (!isBanner() || mLoopMeAd == null) {
+            return;
         }
+        ViewAbilityUtils.calculateViewAbilitySyncDelayed(mLoopMeAd.getContainerView(), info -> {
+            if (info.isVisibleMore50Percents()) {
+                setWebViewState(Constants.WebviewState.VISIBLE);
+                dispatchEvent();
+            } else {
+                setWebViewState(Constants.WebviewState.HIDDEN);
+            }
+        });
     }
 
     private void dispatchEvent() {
@@ -587,18 +553,17 @@ public class DisplayControllerLoopMe
     public int getOrientation() {
         if (isMraidAd()) {
             return getMraidOrientation();
-        } else if (isInterstitial()) {
-            return getOrientationFromAdParams();
-        } else {
-            return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
         }
+        if (isInterstitial()) {
+            return getOrientationFromAdParams();
+        }
+        return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
     }
 
     private void handleVideoStretch(boolean videoStretch) {
         onMessage(Message.LOG, "JS command: stretch video ");
         Constants.StretchOption stretch = videoStretch ?
-                Constants.StretchOption.STRETCH :
-                Constants.StretchOption.NO_STRETCH;
+            Constants.StretchOption.STRETCH : Constants.StretchOption.NO_STRETCH;
         mViewController.setStretchParam(stretch);
     }
 
@@ -615,75 +580,60 @@ public class DisplayControllerLoopMe
     public void setWebViewState(Constants.WebviewState state) {
         if (mAdView != null)
             mAdView.setWebViewState(state);
-
         if (mMraidView != null)
             mMraidView.setWebViewState(state);
-
         if (omidEventTrackerWrapper != null && state == Constants.WebviewState.VISIBLE)
             omidEventTrackerWrapper.sendOneTimeImpression();
     }
 
     private View.OnTouchListener initOnTouchListener() {
-        return new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mViewController.handleTouchEvent(event);
-                return false;
-            }
+        return (v, event) -> {
+            mViewController.handleTouchEvent(event);
+            return false;
         };
     }
 
     private Bridge.Listener initBridgeListener() {
         return new Bridge.Listener() {
-
             @Override
             public void onJsVideoPlay(int time) {
                 onPlay(time);
             }
-
             @Override
             public void onJsVideoPause(final int time) {
                 pauseViewController();
                 pauseVideoController(true);
                 onAdSkippedEvent();
             }
-
             @Override
             public void onJsVideoMute(boolean mute) {
                 onVolumeMute(mute);
             }
-
             @Override
             public void onJsVideoLoad(final String videoUrl) {
                 handleVideoLoad(videoUrl);
             }
-
             @Override
             public void onJsLoadSuccess() {
                 handleLoadSuccess();
             }
-
             @Override
             public void onJsClose() {
                 onAdUserCloseEvent();
                 destroyLoopMeAd();
             }
-
             @Override
             public void onJsLoadFail(String mess) {
                 onAdLoadFail(Errors.FAILED_TO_PROCESS_AD);
             }
-
             @Override
             public void onJsFullscreenMode(boolean isFullScreen) {
                 switchToFullScreenMode(isFullScreen);
             }
-
             @Override
             public void onNonLoopMe(String url) {
                 onRedirect(url, mLoopMeAd);
             }
-
             @Override
             public void onJsVideoStretch(boolean b) {
                 handleVideoStretch(b);
@@ -712,7 +662,6 @@ public class DisplayControllerLoopMe
                     mVideoController.setSurface(surface);
                 }
             }
-
             @Override
             public void onEvent(String event) {
                 if (mAdView != null) {
@@ -730,7 +679,6 @@ public class DisplayControllerLoopMe
                 surfaceTextureAvailable(surfaceTexture);
                 setViewSize();
             }
-
             @Override
             public void onSurfaceTextureDestroyed() {
                 onMessage(Message.LOG, "onSurfaceTextureDestroyed");
@@ -747,10 +695,11 @@ public class DisplayControllerLoopMe
     }
 
     private void surfaceTextureAvailable(SurfaceTexture surfaceTexture) {
-        if (mVideoController != null) {
-            mVideoController.setSurfaceTextureAvailable(true);
-            mVideoController.setSurfaceTexture(surfaceTexture);
+        if (mVideoController == null) {
+            return;
         }
+        mVideoController.setSurfaceTextureAvailable(true);
+        mVideoController.setSurfaceTexture(surfaceTexture);
     }
 
     private void surfaceTextureDestroyed() {
@@ -771,22 +720,18 @@ public class DisplayControllerLoopMe
             public void onFail(LoopMeError error) {
                 onAdLoadFail(error);
             }
-
             @Override
             public void onVideoSizeChanged(int width, int height) {
                 setVideoSize(width, height);
             }
-
             @Override
             public void onPlaybackFinishedWithError() {
                 playbackFinishedWithError();
             }
-
             @Override
             public void onVolumeChangedEvent(float volume, int currentPosition) {
                 onAdVolumeChangedEvent(volume, currentPosition);
             }
-
             @Override
             public void onDurationChangedEvent(int currentPosition, int adDuration) {
                 onAdDurationEvents(currentPosition, adDuration);
@@ -847,11 +792,7 @@ public class DisplayControllerLoopMe
 
     @Override
     public WebView getWebView() {
-        if (isMraidAd()) {
-            return mMraidView;
-        } else {
-            return mAdView;
-        }
+        return isMraidAd() ? mMraidView : mAdView;
     }
 
     public void setFullscreenMode(boolean isFullScreen) {
@@ -903,11 +844,8 @@ public class DisplayControllerLoopMe
     }
 
     public int getMraidOrientation() {
-        if (mMraidController != null) {
-            return mMraidController.getForceOrientation();
-        } else {
-            return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
-        }
+        return mMraidController != null ?
+            mMraidController.getForceOrientation() : ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
     }
 
     public void dismiss() {

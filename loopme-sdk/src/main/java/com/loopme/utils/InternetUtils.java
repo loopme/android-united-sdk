@@ -10,25 +10,18 @@ import android.net.NetworkInfo;
 
 public class InternetUtils {
     public static boolean isOnline(Context context) {
-        boolean isOnline;
         try {
-            final ConnectivityManager conMgr = (ConnectivityManager) context
-                    .getSystemService(Context.CONNECTIVITY_SERVICE);
-
+            final ConnectivityManager conMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             if (conMgr == null) {
                 return false;
             }
-
             final NetworkInfo activeNetwork = conMgr.getActiveNetworkInfo();
-
             //TODO: See above
-            return activeNetwork != null && activeNetwork.isConnected()
-                    && activeNetwork.isAvailable();
+            return activeNetwork != null && activeNetwork.isConnected() && activeNetwork.isAvailable();
         } catch (Exception e) {
             e.printStackTrace();
-            isOnline = false;
         }
-        return isOnline;
+        return false;
     }
 
 }

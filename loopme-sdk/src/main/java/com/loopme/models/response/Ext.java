@@ -30,8 +30,8 @@ public class Ext implements Serializable, Parcelable {
     private String developer = "";
     private String company = "";
 
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-    public final static Parcelable.Creator<Ext> CREATOR = new Creator<Ext>() {
+    private Map<String, Object> additionalProperties = new HashMap<>();
+    public final static Parcelable.Creator<Ext> CREATOR = new Creator<>() {
         @SuppressWarnings({
                 "unchecked"
         })
@@ -60,8 +60,7 @@ public class Ext implements Serializable, Parcelable {
 
     };
 
-    public Ext() {
-    }
+    public Ext() { }
 
     public Ext(String advertiser, int v360, String orientation, int debug, String lineitem,
                String appname, String crtype, String campaign, List<String> measurePartners,
@@ -224,7 +223,6 @@ public class Ext implements Serializable, Parcelable {
         this.packageIds = packageIds;
         return this;
     }
-
 
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;

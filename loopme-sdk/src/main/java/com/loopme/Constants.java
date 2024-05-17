@@ -87,18 +87,16 @@ public class Constants {
 
 
     public enum AdFormat {
-        BANNER,
-        INTERSTITIAL,
-        EXPANDABLE_BANNER;
+        BANNER, INTERSTITIAL, EXPANDABLE_BANNER;
 
         public static AdFormat fromInt(int format) {
             if (format == BANNER.ordinal()) {
                 return BANNER;
-            } else if (format == INTERSTITIAL.ordinal()) {
-                return INTERSTITIAL;
-            } else {
-                return EXPANDABLE_BANNER;
             }
+            if (format == INTERSTITIAL.ordinal()) {
+                return INTERSTITIAL;
+            }
+            return EXPANDABLE_BANNER;
         }
     }
 
@@ -136,26 +134,9 @@ public class Constants {
         }
     }
 
-    public class DeviceType {
-        public static final String PHONE = "PHONE";
-        public static final String TABLET = "TABLET";
-        public static final String UNKNOWN = "UNKNOWN";
+    public enum DisplayMode { NORMAL, MINIMIZED, FULLSCREEN }
 
-        private DeviceType() {
-        }
-    }
-
-    public enum DisplayMode {
-        NORMAL,
-        MINIMIZED,
-        FULLSCREEN
-    }
-
-    public enum StretchOption {
-        NONE,
-        STRETCH,
-        NO_STRETCH
-    }
+    public enum StretchOption { NONE, STRETCH, NO_STRETCH }
 
     private static final int IDLE_INTEGER = 0;
     private static final int READY_INTEGER = 1;
@@ -191,32 +172,16 @@ public class Constants {
         }
 
         public static String nameOf(int state) {
-            switch (state) {
-                case IDLE_INTEGER: {
-                    return IDLE.getName();
-                }
-                case READY_INTEGER: {
-                    return READY.getName();
-                }
-                case PLAYING_INTEGER: {
-                    return PLAYING.getName();
-                }
-                case PAUSED_INTEGER: {
-                    return PAUSED.getName();
-                }
-                case COMPLETE_INTEGER: {
-                    return COMPLETE.getName();
-                }
-                case BROKEN_INTEGER: {
-                    return BROKEN.getName();
-                }
-                case BUFFERING_INTEGER: {
-                    return BUFFERING.getName();
-                }
-                default: {
-                    return UNKNOWN_NAME;
-                }
-            }
+            return switch (state) {
+                case IDLE_INTEGER -> IDLE.getName();
+                case READY_INTEGER -> READY.getName();
+                case PLAYING_INTEGER -> PLAYING.getName();
+                case PAUSED_INTEGER -> PAUSED.getName();
+                case COMPLETE_INTEGER -> COMPLETE.getName();
+                case BROKEN_INTEGER -> BROKEN.getName();
+                case BUFFERING_INTEGER -> BUFFERING.getName();
+                default -> UNKNOWN_NAME;
+            };
         }
     }
 
@@ -247,20 +212,12 @@ public class Constants {
         }
 
         public static String nameOf(int state) {
-            switch (state) {
-                case VISIBLE_INTEGER: {
-                    return VISIBLE.getName();
-                }
-                case HIDDEN_INTEGER: {
-                    return HIDDEN.getName();
-                }
-                case CLOSED_INTEGER: {
-                    return CLOSED.getName();
-                }
-                default: {
-                    return UNKNOWN_NAME;
-                }
-            }
+            return switch (state) {
+                case VISIBLE_INTEGER -> VISIBLE.getName();
+                case HIDDEN_INTEGER -> HIDDEN.getName();
+                case CLOSED_INTEGER -> CLOSED.getName();
+                default -> UNKNOWN_NAME;
+            };
         }
     }
 
@@ -274,43 +231,12 @@ public class Constants {
         public static final String DO_NOT_TRACK = "do not track";
     }
 
-    class Params {
-        public static final String DEVICE_OS = "device_os";
-        public static final String SDK_TYPE = "sdk_type";
-        public static final String SDK_VERSION = "sdk_version";
-        public static final String DEVICE_ID = "device_id";
-        public static final String PACKAGE_ID = "package";
-        public static final String APP_KEY = "app_key";
-        public static final String MSG = "msg";
-        public static final String DEBUG_LOGS = "debug_logs";
-        public static final String ERROR_TYPE = "error_type";
-        public static final String ERROR_MSG = "error_msg";
-    }
-
     public class MraidState {
         public static final String DEFAULT = "default";
         public static final String LOADING = "loading";
         public static final String EXPANDED = "expanded";
         public static final String HIDDEN = "hidden";
         public static final String RESIZED = "resized";
-    }
-
-    public class VREvents {
-        public static final String SWIPE = "SWIPE";
-        public static final String GYRO = "GYRO";
-        public static final String ACCEL = "ACCEL";
-        public static final String FRONT = "FRONT";
-        public static final String LEFT = "LEFT";
-        public static final String RIGHT = "RIGHT";
-        public static final String BACK = "BACK";
-    }
-
-    public class ViewQuarter {
-        public static final int UNKNOWN = 0;
-        public static final int FRONT = 1;
-        public static final int LEFT = 2;
-        public static final int RIGHT = 3;
-        public static final int BACK = 4;
     }
 
     public static class Banner {

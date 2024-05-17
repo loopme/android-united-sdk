@@ -40,8 +40,6 @@ public class AdSpotDimensions {
 
     @Override
     public int hashCode() {
-        int result = width;
-        result = 31 * result + height;
-        return result;
+        return 31 * width + height;
     }
 }

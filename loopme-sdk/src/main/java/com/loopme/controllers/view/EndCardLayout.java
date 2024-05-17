@@ -1,13 +1,14 @@
 package com.loopme.controllers.view;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+
+import androidx.annotation.NonNull;
 
 import com.loopme.Constants;
 import com.loopme.R;
@@ -45,7 +46,6 @@ public class EndCardLayout extends FrameLayout implements GestureDetector.OnGest
         configureEndCardImageView();
         configureCloseView();
         configureReplayView();
-
         buttonViews = new View[]{mReplayImageView, mCloseImageView};
     }
 
@@ -62,20 +62,17 @@ public class EndCardLayout extends FrameLayout implements GestureDetector.OnGest
     }
 
     @Override
-    public void onShowPress(MotionEvent e) {
-    }
+    public void onShowPress(MotionEvent e) { }
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
         View v = ViewUtils.findVisibleView(buttonViews, e);
-
         if (v == null)
             onEndCardClick();
         else if (v.getId() == REPLAY_BUTTON_ID)
             onReplayClick();
         else if (v.getId() == CLOSE_BUTTON_ID)
             onCloseClick();
-
         return true;
     }
 
@@ -85,9 +82,7 @@ public class EndCardLayout extends FrameLayout implements GestureDetector.OnGest
     }
 
     @Override
-    public void onLongPress(MotionEvent e) {
-
-    }
+    public void onLongPress(MotionEvent e) { }
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
@@ -106,29 +101,22 @@ public class EndCardLayout extends FrameLayout implements GestureDetector.OnGest
         mReplayImageView.setId(REPLAY_BUTTON_ID);
         mReplayImageView.setScaleType(ImageView.ScaleType.CENTER);
         mReplayImageView.setImageResource(R.drawable.l_replay);
-
         int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI, getContext());
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                btnSizePx,
-                btnSizePx,
-                Gravity.START);
-
+            btnSizePx, btnSizePx, Gravity.START
+        );
         mReplayImageView.setLayoutParams(params);
     }
 
     private void configureCloseView() {
         mCloseImageView = new ImageView(getContext());
         mCloseImageView.setId(CLOSE_BUTTON_ID);
-
         mCloseImageView.setScaleType(ImageView.ScaleType.CENTER);
         mCloseImageView.setImageResource(R.drawable.l_close);
-
         int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI, getContext());
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                btnSizePx,
-                btnSizePx,
-                Gravity.END);
-
+            btnSizePx, btnSizePx, Gravity.END
+        );
         mCloseImageView.setLayoutParams(params);
     }
 
@@ -163,9 +151,7 @@ public class EndCardLayout extends FrameLayout implements GestureDetector.OnGest
 
     public interface OnEndCardListener {
         void onEndCardClick();
-
         void onCloseClick();
-
         void onReplayClick();
     }
 }

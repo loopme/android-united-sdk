@@ -23,19 +23,11 @@ public class SensorManagerExtension {
             float z = sensorEvent.values[2];
             mLastAcceleration = mCurrentAcceleration;
             mCurrentAcceleration = (float) Math.sqrt(x * x + y * y + z * z);
-            float delta = mCurrentAcceleration - mLastAcceleration;
-            if (delta > 5) {
-                onAdShake();
-            }
         }
 
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
         }
     };
-
-    private void onAdShake() {
-
-    }
 
     public void registerListener(){
         if (mSensorManager != null) {

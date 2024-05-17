@@ -91,28 +91,22 @@ public class FileLoaderNewImpl implements Loader {
 
         try {
             connection = openConnection(fileUrl);
-
             File file = new File(destFilePath + "_download");
-
             inputStream = new BufferedInputStream(connection.getInputStream());
             outputStream = new FileOutputStream(file, false);
-
             // If download was stopped.
             if (!writeStreamToFile(inputStream, outputStream))
                 return;
-
             if (file.renameTo(new File(destFilePath))) {
                 onFileFullLoaded();
                 long time = System.currentTimeMillis() - startLoadingTime;
                 Logging.out(LOG_TAG, "Asset successfully loaded (" + time + "ms)");
                 return;
             }
-
             Logging.out(LOG_TAG, "Couldn't rename downloaded file");
             LoopMeError error = new LoopMeError(Errors.VAST_BAD_ASSET);
             error.addToMessage(fileUrl);
             onError(error);
-
         } catch (SocketTimeoutException e) {
             onError(Errors.REQUEST_TIMEOUT);
         } catch (MalformedURLException e) {
@@ -132,27 +126,24 @@ public class FileLoaderNewImpl implements Loader {
     private boolean writeStreamToFile(InputStream stream, FileOutputStream outputStream) throws IOException {
         if (isStopped)
             return false;
-
         int length;
         byte[] buffer = new byte[BUFFER_SIZE];
-
         while ((length = stream.read(buffer)) != -1) {
             if (isStopped)
                 return false;
-
             outputStream.write(buffer, 0, length);
         }
-
         return true;
     }
 
     private void handleFileDoesNotExist() {
-        if (InternetUtils.isOnline(context)) {
-            if (ConnectionUtils.isWifiConnection(context))
-                preloadFile();
-            else
-                loadViaMobileNetwork();
+        if (!InternetUtils.isOnline(context)) {
+            return;
         }
+        if (ConnectionUtils.isWifiConnection(context))
+            preloadFile();
+        else
+            loadViaMobileNetwork();
     }
 
     private void loadViaMobileNetwork() {
@@ -164,11 +155,9 @@ public class FileLoaderNewImpl implements Loader {
 
     private HttpURLConnection openConnection(String fileUrl) throws IOException, NullPointerException {
         HttpURLConnection connection = (HttpURLConnection) new URL(fileUrl).openConnection();
-
         connection.setRequestMethod(HTTP_METHOD_GET);
         connection.setReadTimeout(READ_TIMEOUT);
         connection.setConnectTimeout(CONNECT_TIMEOUT);
-
         return connection;
     }
 
@@ -178,10 +167,11 @@ public class FileLoaderNewImpl implements Loader {
 
     private void disconnect() {
         runInBackgroundThread(() -> {
-            if (connection != null) {
-                connection.disconnect();
-                Logging.out(LOG_TAG, "disconnect()");
+            if (connection == null) {
+                return;
             }
+            connection.disconnect();
+            Logging.out(LOG_TAG, "disconnect()");
         });
     }
 
@@ -214,7 +204,6 @@ public class FileLoaderNewImpl implements Loader {
 
     public interface Callback {
         void onError(LoopMeError error);
-
         void onFileFullLoaded(String filePath);
     }
 }

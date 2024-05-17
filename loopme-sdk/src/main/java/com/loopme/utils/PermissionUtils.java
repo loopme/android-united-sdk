@@ -1,8 +1,11 @@
 package com.loopme.utils;
 
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+
 import androidx.core.app.ActivityCompat;
 
 import com.loopme.Logging;
@@ -12,8 +15,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 public final class PermissionUtils {
 
@@ -27,9 +28,7 @@ public final class PermissionUtils {
             this.grantedPermissions = new ArrayList<>();
         }
 
-        private GroupedPermissions(
-                List<String> deniedPermissions,
-                List<String> grantedPermissions) {
+        private GroupedPermissions(List<String> deniedPermissions, List<String> grantedPermissions) {
             this.deniedPermissions = deniedPermissions;
             this.grantedPermissions = grantedPermissions;
         }
@@ -47,10 +46,7 @@ public final class PermissionUtils {
     }
 
     // TODO. Rename.
-    public static GroupedPermissions groupPermissions(
-            Activity activity,
-            String[] permissionsToGroup) {
-
+    public static GroupedPermissions groupPermissions(Activity activity, String[] permissionsToGroup) {
         if (permissionsToGroup == null)
             return new GroupedPermissions();
 
@@ -63,7 +59,6 @@ public final class PermissionUtils {
             else if (isPermissionInManifest(activity, permission))
                 deniedPermissions.add(permission);
         }
-
         return new GroupedPermissions(deniedPermissions, grantedPermissions);
     }
 
@@ -75,20 +70,17 @@ public final class PermissionUtils {
 
     // TODO. Refactor.
     private static Set<String> getManifestPermissions(Context context) {
-        if (manifestPermissions == null) {
-            try {
-                manifestPermissions = new HashSet<>(
-                        Arrays.asList(
-                                context.getPackageManager()
-                                        .getPackageInfo(
-                                                context.getPackageName(),
-                                                PackageManager.GET_PERMISSIONS
-                                        ).requestedPermissions
-                        )
-                );
-            } catch (Exception e) {
-                Logging.out(e.toString());
-            }
+        if (manifestPermissions != null) {
+            return manifestPermissions;
+        }
+        try {
+            manifestPermissions = new HashSet<>(Arrays.asList(context
+                .getPackageManager()
+                .getPackageInfo(context.getPackageName(), PackageManager.GET_PERMISSIONS)
+                .requestedPermissions
+            ));
+        } catch (Exception e) {
+            Logging.out(e.toString());
         }
 
         return manifestPermissions;

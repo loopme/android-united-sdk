@@ -13,7 +13,6 @@ public class AdReceiver extends BroadcastReceiver {
 
     public interface Listener {
         void onDestroyBroadcast();
-
         void onClickBroadcast();
     }
 
@@ -27,24 +26,22 @@ public class AdReceiver extends BroadcastReceiver {
         if (mListener == null) {
             return;
         }
-        if (getAdId(intent) == mAdId) {
-            String action = intent.getAction();
-            if (action != null) {
-                if (action.equalsIgnoreCase(Constants.DESTROY_INTENT)) {
-                    mListener.onDestroyBroadcast();
-
-                } else if (action.equalsIgnoreCase(Constants.CLICK_INTENT)) {
-                    mListener.onClickBroadcast();
-                }
-            }
+        if (getAdId(intent) != mAdId) {
+            return;
+        }
+        String action = intent.getAction();
+        if (action == null) {
+            return;
+        }
+        if (action.equalsIgnoreCase(Constants.DESTROY_INTENT)) {
+            mListener.onDestroyBroadcast();
+        } else if (action.equalsIgnoreCase(Constants.CLICK_INTENT)) {
+            mListener.onClickBroadcast();
         }
     }
 
     private int getAdId(Intent intent) {
-        if (intent != null && intent.getExtras() != null) {
-            return intent.getExtras().getInt(Constants.AD_ID_TAG);
-        } else {
-            return Constants.DEFAULT_AD_ID;
-        }
+        return (intent == null || intent.getExtras() == null) ?
+            Constants.DEFAULT_AD_ID : intent.getExtras().getInt(Constants.AD_ID_TAG);
     }
 }

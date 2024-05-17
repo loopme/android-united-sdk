@@ -10,6 +10,7 @@ import com.loopme.tracker.partners.DvTracker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TrackerManager {
 
@@ -18,10 +19,11 @@ public class TrackerManager {
     private LoopMeAd mLoopMeAd;
 
     public TrackerManager(LoopMeAd loopmeAd) {
-        if (loopmeAd != null) {
-            mLoopMeAd = loopmeAd;
-            mTrackersNamesList.addAll(mLoopMeAd.getAdParams().getTrackers());
+        if (loopmeAd == null) {
+            return;
         }
+        mLoopMeAd = loopmeAd;
+        mTrackersNamesList.addAll(mLoopMeAd.getAdParams().getTrackers());
     }
 
     public void startSdk() {
@@ -35,7 +37,6 @@ public class TrackerManager {
     public void onInitTracker(AdType adType) {
         for (String name : mTrackersNamesList) {
             Tracker tracker = null;
-
             if (isDv(name)) {
                 tracker = initTracker(Partner.DV, adType);
             }
@@ -52,14 +53,7 @@ public class TrackerManager {
     }
 
     private Tracker initTracker(Partner partner, AdType adType) {
-        Tracker tracker = null;
-        switch (partner) {
-            case DV: {
-                tracker = new DvTracker();
-                break;
-            }
-        }
-        return tracker;
+        return Objects.requireNonNull(partner) == Partner.DV ? new DvTracker() : null;
     }
 
     private boolean isDv(String name) {

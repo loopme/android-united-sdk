@@ -73,8 +73,8 @@ public class GdprChecker implements DntFetcher.OnDntFetcherListener {
         if (destroyed)
             return;
         IABPreferences
-                .getInstance(appContext)
-                .setGdprState(isAccepted, consentType);
+            .getInstance(appContext)
+            .setGdprState(isAccepted, consentType);
         checkedAtLeastOnce = true;
         // TODO. Ugly.
         Listener listener = this.listener;

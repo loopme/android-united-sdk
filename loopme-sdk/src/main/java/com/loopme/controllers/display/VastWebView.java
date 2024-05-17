@@ -27,10 +27,7 @@ public class VastWebView extends WebView {
         // TODO.
         setWebContentsDebuggingEnabled(true);
         setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
-        setWebChromeClient(new AdViewChromeClient(message -> {
-
-        }));
-
+        setWebChromeClient(new AdViewChromeClient(message -> { }));
         setWebViewClient(new Vast4WebViewClient());
     }
 
@@ -48,10 +45,8 @@ public class VastWebView extends WebView {
 
         clearCache(true);
         clearHistory();
-
         setWebViewClient(null);
         setWebChromeClient(null);
-
         loadUrl("about:blank");
         super.destroy();
     }

@@ -74,10 +74,11 @@ public class WrapperParser {
     }
 
     private void addSimpleImpressions(List<Impression> impressions) {
-        if (impressions != null) {
-            for (Impression impression : impressions) {
-                addImpression(impression);
-            }
+        if (impressions == null) {
+            return;
+        }
+        for (Impression impression : impressions) {
+            addImpression(impression);
         }
     }
 
@@ -144,20 +145,22 @@ public class WrapperParser {
     }
 
     private void addTrackingEvents(Wrapper wrapper) {
-        if (wrapper != null) {
-            List<Tracking> trackingList = wrapper.getCreativeTrackingList();
-            if (trackingList != null) {
-                mTrackingList.addAll(trackingList);
-            }
+        if (wrapper == null) {
+            return;
+        }
+        List<Tracking> trackingList = wrapper.getCreativeTrackingList();
+        if (trackingList != null) {
+            mTrackingList.addAll(trackingList);
         }
     }
 
     private void addViewableImpressions(ViewableImpression impressions) {
-        if (impressions != null) {
-            addImpression(Constants.VIEWABLE, impressions.getViewableImpressionUrl());
-            addImpression(Constants.NOT_VIEWABLE, impressions.getNotViewableImpressionUrl());
-            addImpression(Constants.VIEW_UNDETERMINED, impressions.getViewUndeterminedUrl());
+        if (impressions == null) {
+            return;
         }
+        addImpression(Constants.VIEWABLE, impressions.getViewableImpressionUrl());
+        addImpression(Constants.NOT_VIEWABLE, impressions.getNotViewableImpressionUrl());
+        addImpression(Constants.VIEW_UNDETERMINED, impressions.getViewUndeterminedUrl());
     }
 
     private void addImpression(String eventType, String eventUrl) {
@@ -175,11 +178,12 @@ public class WrapperParser {
     }
 
     private void createNewEventListWithType(String eventType, String eventUrl) {
-        if (areStringsValid(eventType, eventUrl)) {
-            ArrayList<String> eventsList = new ArrayList<>();
-            eventsList.add(eventUrl);
-            mViewableImpressionMap.put(eventType, eventsList);
+        if (!areStringsValid(eventType, eventUrl)) {
+            return;
         }
+        ArrayList<String> eventsList = new ArrayList<>();
+        eventsList.add(eventUrl);
+        mViewableImpressionMap.put(eventType, eventsList);
     }
 
     private boolean isEventListWithSuchTypeExist(String eventType) {
