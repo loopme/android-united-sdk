@@ -6,7 +6,6 @@ android {
     namespace = "com.loopme.interstitial_sample"
 
     defaultConfig {
-        minSdk = 24
         applicationId = "com.loopme.interstitial_sample"
         versionCode = 1
         versionName ="1.0"

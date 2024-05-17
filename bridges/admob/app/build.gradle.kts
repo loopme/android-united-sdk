@@ -6,7 +6,6 @@ android {
     namespace = "com.loopme.admob.app"
 
     defaultConfig {
-        minSdk = 24
         applicationId = "com.loopme.admob.app"
         versionCode = 1
         versionName ="1.0"

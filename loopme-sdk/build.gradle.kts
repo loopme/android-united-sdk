@@ -17,7 +17,7 @@ dependencies {
 
     api("androidx.appcompat:appcompat:1.6.1")
     api("androidx.recyclerview:recyclerview:1.3.2")
-    api("androidx.annotation:annotation:1.7.1")
+    api("androidx.annotation:annotation:1.8.0")
 
     implementation("androidx.preference:preference:1.2.1")
 
