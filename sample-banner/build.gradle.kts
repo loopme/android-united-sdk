@@ -6,7 +6,6 @@ android {
     namespace = "com.loopme.banner_sample"
 
     defaultConfig {
-        minSdk = 24
         applicationId = "com.loopme.banner_sample.app"
         versionCode = 1
         versionName ="1.0"

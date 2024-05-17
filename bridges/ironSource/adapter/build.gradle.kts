@@ -4,9 +4,6 @@ plugins {
 
 android {
     namespace = "com.ironsource.adapters.custom.loopme"
-    defaultConfig {
-        minSdk = 24
-    }
 }
 
 dependencies {

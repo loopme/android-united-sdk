@@ -6,7 +6,6 @@ android {
     namespace = "com.loopme.applovin.app"
 
     defaultConfig {
-        minSdk = 24
         applicationId = "com.loopme.applovin.app"
         versionCode = 1
         versionName ="1.0"

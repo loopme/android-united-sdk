@@ -23,10 +23,6 @@ public class RequestParamsUtils {
     // Map to store the sizes of each LoopMeAd by mAppKey
     private static final Map<String, int[]> adSizes = new HashMap<>();
 
-    private static int convertPixelToDp(Resources resources, int pixels) {
-        return resources == null ? 0 : (int) (pixels / resources.getDisplayMetrics().density);
-    }
-
     private static boolean isWithinAcceptableLimits(int sizeToCheck, int currentSize) {
         int minSizeToCheck = sizeToCheck - Constants.Banner.SIZE_DISCREPANCY;
         int maxSizeToCheck = sizeToCheck + Constants.Banner.SIZE_DISCREPANCY;

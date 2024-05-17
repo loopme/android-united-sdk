@@ -4,9 +4,6 @@ plugins {
 
 android {
     namespace = "com.applovin.mediation.adapters"
-    defaultConfig {
-        minSdk = 24
-    }
 }
 
 dependencies {
