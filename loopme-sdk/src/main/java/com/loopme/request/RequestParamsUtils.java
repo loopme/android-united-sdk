@@ -1,6 +1,7 @@
 package com.loopme.request;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.view.WindowManager;
@@ -54,11 +55,28 @@ public class RequestParamsUtils {
         
         final String appKey = baseAd.getAppKey();
         Resources resources = context.getResources();
+        Configuration configuration = resources.getConfiguration();
+        boolean isTablet = configuration.smallestScreenWidthDp >= 600; // 600dp is a common breakpoint for tablets
+        boolean isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE;
+
         if (baseAd instanceof LoopMeInterstitialGeneral) {
-            int widthInDp = convertPixelToDp(resources, getDeviceSize(context).x);
-            int heightInDp = convertPixelToDp(resources, getDeviceSize(context).y);
-            adSizeArray[0] = widthInDp;
-            adSizeArray[1] = heightInDp;
+            if (isTablet) {
+                if (isLandscape) {
+                    adSizeArray[0] = 1024;
+                    adSizeArray[1] = 768;
+                } else {
+                    adSizeArray[0] = 768;
+                    adSizeArray[1] = 1024;
+                }
+            } else {
+                if (isLandscape) {
+                    adSizeArray[0] = 480;
+                    adSizeArray[1] = 320;
+                } else {
+                    adSizeArray[0] = 320;
+                    adSizeArray[1] = 480;
+                }
+            }
         } else if (baseAd instanceof LoopMeBannerGeneral banner) {
             final FrameLayout bannerView = banner.getBannerView();
             if (bannerView != null) {
