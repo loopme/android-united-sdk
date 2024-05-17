@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 
 import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
 
 import com.ironsource.mediationsdk.adunit.adapter.BaseAdapter;
 import com.ironsource.mediationsdk.adunit.adapter.listener.NetworkInitializationListener;
@@ -54,9 +55,10 @@ public class LoopmeCustomAdapter extends BaseAdapter {
         return LoopMeSdk.getVersion();
     }
 
+    @NonNull
     @Override
     public String getAdapterVersion() {
-        return LoopMeSdk.getVersion();
+        return BuildConfig.VERSION_NAME;
     }
 
     private static void tryInitializeLoopMeSdk(
