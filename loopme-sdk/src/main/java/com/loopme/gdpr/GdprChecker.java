@@ -1,11 +1,8 @@
 package com.loopme.gdpr;
 
-import android.app.Activity;
 import android.content.Context;
 
 import com.loopme.IABPreferences;
-
-import java.lang.ref.WeakReference;
 
 /**
  * Created by katerina on 4/27/18.
@@ -16,16 +13,14 @@ public class GdprChecker implements DntFetcher.OnDntFetcherListener {
     private static final String LOG_TAG = GdprChecker.class.getSimpleName();
     private static GdprChecker instance;
     private static boolean checkedAtLeastOnce;
-    private WeakReference<Activity> activity;
     private Context appContext;
     private PublisherConsent publisherConsent;
     private String advId;
     private Listener listener;
     private boolean destroyed;
 
-    private GdprChecker(Activity activity, PublisherConsent publisherConsent, Listener listener) {
-        this.activity = new WeakReference<>(activity);
-        this.appContext = activity.getApplicationContext();
+    private GdprChecker(Context context, PublisherConsent publisherConsent, Listener listener) {
+        this.appContext = context.getApplicationContext();
         this.publisherConsent = publisherConsent;
         this.listener = listener;
     }
@@ -58,14 +53,14 @@ public class GdprChecker implements DntFetcher.OnDntFetcherListener {
         return checkedAtLeastOnce;
     }
 
-    public static void start (Activity activity, PublisherConsent publisherConsent, Listener listener) {
+    public static void start (Context context, PublisherConsent publisherConsent, Listener listener) {
         if (checkedAtLeastOnce()) {
             listener.onGdprChecked();
             return;
         }
         if (instance != null)
             instance.destroy();
-        instance = new GdprChecker(activity, publisherConsent, listener);
+        instance = new GdprChecker(context, publisherConsent, listener);
         instance.check();
     }
 
@@ -90,7 +85,6 @@ public class GdprChecker implements DntFetcher.OnDntFetcherListener {
     private void destroy() {
         destroyed = true;
         instance = null;
-        this.activity = new WeakReference<>(null);
         appContext = null;
         listener = null;
         publisherConsent = null;

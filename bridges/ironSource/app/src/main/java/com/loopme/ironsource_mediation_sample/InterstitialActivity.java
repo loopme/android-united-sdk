@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 
-import com.ironsource.adapters.custom.loopme.LoopmeCustomAdapter;
 import com.ironsource.mediationsdk.IronSource;
 
 public class InterstitialActivity extends Activity {
@@ -23,7 +22,6 @@ public class InterstitialActivity extends Activity {
     }
 
     public void onLoadClicked(View view) {
-        LoopmeCustomAdapter.setWeakActivity(this);
         IronSource.loadInterstitial();
     }
 

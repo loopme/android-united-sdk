@@ -1,6 +1,6 @@
 package com.loopme;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Looper;
 
 import androidx.annotation.MainThread;
@@ -52,7 +52,7 @@ public final class LoopMeSdk {
     }
 
     @MainThread
-    public static void initialize(@NonNull Activity activity,
+    public static void initialize(@NonNull Context context,
                                   @NonNull Configuration configuration,
                                   @NonNull LoopMeSdkListener loopMeSdkInitListener) {
 
@@ -65,8 +65,8 @@ public final class LoopMeSdk {
         }
 
         if (configuration.getUsPrivacy() != null)
-            IABPreferences.getInstance(activity).setUSPrivacy(configuration.getUsPrivacy());
-        IABPreferences.getInstance(activity).setCoppa(configuration.getCoppa());
+            IABPreferences.getInstance(context).setUSPrivacy(configuration.getUsPrivacy());
+        IABPreferences.getInstance(context).setCoppa(configuration.getCoppa());
 
         LoopMeSdk.loopMeSdkInitListener = loopMeSdkInitListener;
 
@@ -81,11 +81,11 @@ public final class LoopMeSdk {
             }
         };
         // Omid init.
-        OmidHelper.tryInitOmidAsync(activity.getApplicationContext(), omidListener);
+        OmidHelper.tryInitOmidAsync(context.getApplicationContext(), omidListener);
 
         // Gdpr.
         GdprChecker.Listener gdprCheckerListener = () -> checkInitStatus(ERROR_NONE, "");
-        GdprChecker.start(activity, configuration.getPublisherConsent(), gdprCheckerListener);
+        GdprChecker.start(context, configuration.getPublisherConsent(), gdprCheckerListener);
     }
 
     public static boolean isInitialized() {
