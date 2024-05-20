@@ -31,7 +31,7 @@ android {
 }
 
 dependencies {
-//    implementation(project(":bridges:admob:adapter"))
-    implementation("com.github.loopme.android-united-sdk:admob-adapter:AM_0.0.1")
+    implementation(project(":bridges:admob:adapter"))
+//    implementation("com.github.loopme.android-united-sdk:admob-adapter:AM_0.0.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 }
