@@ -1,6 +1,5 @@
 package com.admob.mediation.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -83,8 +82,7 @@ public class LoopMeMediationAdapter extends Adapter {
 
         new Handler(Looper.getMainLooper()).post(() -> {
             LoopMeSdk.Configuration loopMeConf = new LoopMeSdk.Configuration();
-            Activity activity = (Activity) context;
-            LoopMeSdk.initialize(activity, loopMeConf, new LoopMeSdk.LoopMeSdkListener() {
+            LoopMeSdk.initialize(context, loopMeConf, new LoopMeSdk.LoopMeSdkListener() {
                 @Override
                 public void onSdkInitializationSuccess() {
                     initializationCompleteCallback.onInitializationSucceeded();

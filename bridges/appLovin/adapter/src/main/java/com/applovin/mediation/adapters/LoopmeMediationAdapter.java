@@ -67,7 +67,7 @@ public class LoopmeMediationAdapter
 
         new Handler(Looper.getMainLooper()).post(() -> {
             LoopMeSdk.Configuration loopMeConf = new LoopMeSdk.Configuration();
-            LoopMeSdk.initialize(activity, loopMeConf, new LoopMeSdk.LoopMeSdkListener() {
+            LoopMeSdk.initialize(activity.getBaseContext(), loopMeConf, new LoopMeSdk.LoopMeSdkListener() {
                 @Override
                 public void onSdkInitializationSuccess() {
                     initializationStatus = InitializationStatus.INITIALIZED_SUCCESS;
