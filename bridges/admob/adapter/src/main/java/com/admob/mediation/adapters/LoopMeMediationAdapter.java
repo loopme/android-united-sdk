@@ -34,9 +34,7 @@ public class LoopMeMediationAdapter extends Adapter {
     private LoopMeInterstitialListener interstitialLoader;
     private LoopMeRewardedListener rewardedLoader;
     private LoopMeBannerListener bannerLoader;
-
-    private Context context;
-
+    
     @NonNull
     @Override
     public VersionInfo getSDKVersionInfo() {
@@ -73,7 +71,6 @@ public class LoopMeMediationAdapter extends Adapter {
         @NonNull InitializationCompleteCallback initializationCompleteCallback,
         @NonNull List<MediationConfiguration> list
     ) {
-        this.context = context;
         Log.d(LOG_TAG, "initialization");
         if (LoopMeSdk.isInitialized()) {
             initializationCompleteCallback.onInitializationSucceeded();
