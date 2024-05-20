@@ -25,7 +25,7 @@ subprojects {
             buildToolsVersion = "34.0.0"
             defaultConfig {
                 if (minSdkVersion == null)
-                    minSdk = 24
+                    minSdk = 21
                 targetSdk = 34
             }
             compileOptions {
