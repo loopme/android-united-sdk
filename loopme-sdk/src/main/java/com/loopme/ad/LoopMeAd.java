@@ -279,10 +279,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         return mAdParams != null && mAdParams.isMraidAd();
     }
 
-    public boolean isVideo360() {
-        return mAdParams != null && mAdParams.isVideo360();
-    }
-
     protected void buildAdView() {
         Logging.out(LOG_TAG, " build ad view interstitial " + mContainerView);
         if (mDisplayController == null) {

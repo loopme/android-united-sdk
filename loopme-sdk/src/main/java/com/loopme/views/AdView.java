@@ -59,13 +59,6 @@ public class AdView extends LoopMeWebView implements BridgeInterface, Bridge.Lis
     }
 
     @Override
-    public void send360Event(String event) {
-        String command = BridgeCommandBuilder.event360(event);
-        Logging.out(LOG_TAG, "send360Event(): " + event);
-        loadUrl(command);
-    }
-
-    @Override
     public void setVideoState(Constants.VideoState state) {
         if (mCurrentVideoState == state) {
             return;

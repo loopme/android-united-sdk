@@ -9,7 +9,6 @@ public class BridgeCommandBuilder {
     private BridgeCommandBuilder() { }
     public static final String MRAID_PREFIX = "javascript:mraidbridge.";
     public static final String LOOPME_PREFIX = "javascript:window.L.bridge.set";
-    private static final String PREFIX_360 = "javascript:window.L.track";
 
     public static String isNativeCallFinished(boolean b) {
         return LOOPME_PREFIX + "('webview', {isNativeCallFinished: " + "'" + b + "'});";
@@ -39,10 +38,6 @@ public class BridgeCommandBuilder {
 
     public static String fullscreenMode(boolean b) {
         return LOOPME_PREFIX + "('webview', {fullscreenMode: " + b + "});";
-    }
-
-    public static String event360(String event) {
-        return PREFIX_360 + "({eventType: 'INTERACTION', customEventName: 'video360&mode=" + event + "'});";
     }
 
     public static String mraidSetIsViewable(boolean isViewable) {

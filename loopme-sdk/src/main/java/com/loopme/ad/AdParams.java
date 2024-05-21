@@ -35,7 +35,6 @@ public class AdParams implements Serializable {
     private String mToken;
 
     private boolean mPartPreload;
-    private boolean mVideo360;
     private boolean mIsMraid;
     private boolean mOwnCloseButton;
     private boolean mIsDebug;
@@ -81,7 +80,6 @@ public class AdParams implements Serializable {
         mTrackersList = builder.mTrackersList;
         mToken = builder.mToken;
         mPartPreload = builder.mPartPreload;
-        mVideo360 = builder.mVideo360;
         mIsMraid = builder.mIsMraid;
         mIsDebug = builder.mIsDebug;
         mAdIds = builder.mAdIds;
@@ -98,10 +96,6 @@ public class AdParams implements Serializable {
 
     public boolean getPartPreload() {
         return mPartPreload;
-    }
-
-    public boolean isVideo360() {
-        return mVideo360;
     }
 
     public String getHtml() {
@@ -182,7 +176,6 @@ public class AdParams implements Serializable {
         private AdType mAdType;
 
         private boolean mPartPreload;
-        private boolean mVideo360;
         private boolean mIsMraid;
         private boolean mIsDebug;
         private AdIds mAdIds;
@@ -200,11 +193,6 @@ public class AdParams implements Serializable {
 
         public AdParamsBuilder trackersList(List<String> trackersList) {
             mTrackersList = trackersList;
-            return this;
-        }
-
-        public AdParamsBuilder video360(boolean b) {
-            mVideo360 = b;
             return this;
         }
 
