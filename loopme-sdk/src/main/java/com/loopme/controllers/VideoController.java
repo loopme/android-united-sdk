@@ -48,7 +48,6 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
     private int mQuarter75;
     private int mCurrentPosition;
     private int mVideoPositionWhenError;
-    private boolean mIs360;
     private boolean mWasError;
     private boolean mWaitForVideo;
     private boolean mMuteState = false;
@@ -205,7 +204,7 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
     }
 
     private boolean isPostponePlay() {
-        return !mWasError && !mIs360 && !mIsSurfaceTextureAvailable;
+        return !mWasError && !mIsSurfaceTextureAvailable;
     }
 
     private void pauseVideoInternal() {
@@ -402,10 +401,6 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
     public void surfaceTextureDestroyed() {
         setSurfaceTextureAvailable(false);
         setSurface(null);
-    }
-
-    public void setVideo360(boolean b) {
-        mIs360 = b;
     }
 
     private void startMediaPlayer() {

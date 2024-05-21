@@ -29,7 +29,6 @@ public class ResponseJsonModelParser extends BaseJSONParser {
     private static final String PARAM_SEAT_BID = "seatbid";
     private static final String PARAM_A_DOMAIN = "adomain";
 
-    private static final String PARAM_EXT_V360 = "v360";
     private static final String PARAM_EXT_DEBUG = "debug";
     private static final String PARAM_EXT_AUTOLOADING = "autoloading";
     private static final String PARAM_EXT_COMPANY = "company";
@@ -114,7 +113,6 @@ public class ResponseJsonModelParser extends BaseJSONParser {
     }
 
     private Ext getDefaultExt(String adm) {
-        int v360 = -1;
         int debug = -1;
         String advertiser = "";
         String lineitem = "";
@@ -135,11 +133,10 @@ public class ResponseJsonModelParser extends BaseJSONParser {
         List<String> measurePartners = new ArrayList<>();
         List<String> package_ids = new ArrayList<>();
         int autoloading = Constants.AUTO_LOADING_ABSENCE;
-        return new Ext(advertiser, v360, orientation, debug, lineitem, appname, crtype, campaign, measurePartners, autoloading, package_ids, developer, company);
+        return new Ext(advertiser, orientation, debug, lineitem, appname, crtype, campaign, measurePartners, autoloading, package_ids, developer, company);
     }
 
     private Ext parseExt(JSONObject jsonObject) throws JSONException {
-        int v360 = getInt(jsonObject, PARAM_EXT_V360, true);
         int debug = getInt(jsonObject, PARAM_EXT_DEBUG, false);
         String advertiser = getString(jsonObject, PARAM_EXT_ADVERTISER, false);
         String orientation = getString(jsonObject, PARAM_EXT_ORIENTATION, false);
@@ -152,7 +149,7 @@ public class ResponseJsonModelParser extends BaseJSONParser {
         List<String> measurePartners = parseStringsList(jsonObject, PARAM_EXT_MEASURE_PARTNERS);
         List<String> package_ids = parseStringsList(jsonObject, PARAM_EXT_PACKAGE_IDS);
         int autoloading = getAutoLoading(jsonObject, Constants.AUTO_LOADING_ABSENCE);
-        return new Ext(advertiser, v360, orientation, debug, lineitem, appname, crtype, campaign, measurePartners, autoloading, package_ids, developer, company);
+        return new Ext(advertiser, orientation, debug, lineitem, appname, crtype, campaign, measurePartners, autoloading, package_ids, developer, company);
     }
 
     private int getAutoLoading(JSONObject jsonObject, int defaultValue) {

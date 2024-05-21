@@ -68,7 +68,6 @@ public class ParseService {
         String html = retrieveAdm(bidObject);
         String orientation = retrieveOrientation(bidObject);
         String token = retrieveAdIdToken(bidObject);
-        boolean v360 = retrieveV360(bidObject);
         boolean debug = retrieveDebug(bidObject);
         List<String> measurePartners = retrieveMeasurePartners(bidObject);
         AdIds adIds = parseAdIds(bidObject, loopMeAd.getContext());
@@ -83,7 +82,6 @@ public class ParseService {
             .debug(debug)
             .trackersList(measurePartners)
             .packageIds(packageIds)
-            .video360(v360)
             .mraid(false)
             .adIds(adIds)
             .autoLoading(autoLoadingValue)
@@ -202,15 +200,6 @@ public class ParseService {
             ex.printStackTrace();
         }
         return PORTRAIT;
-    }
-
-    private static boolean retrieveV360(Bid bidObject) {
-        try {
-            return bidObject.getExt().getV360() == 1;
-        } catch (IllegalStateException | NullPointerException ex) {
-            ex.printStackTrace();
-        }
-        return false;
     }
 
     private static String retrieveAdm(Bid bidObject) {

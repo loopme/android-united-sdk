@@ -1,13 +1,12 @@
 package com.loopme.bridges;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.loopme.Constants;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 class BridgeCommandBuilderTest {
 
@@ -98,14 +97,6 @@ class BridgeCommandBuilderTest {
         assertEquals(
                 "javascript:window.L.bridge.set('webview', {fullscreenMode: false});",
                 BridgeCommandBuilder.fullscreenMode(false)
-        );
-    }
-
-    @Test
-    void event360() {
-        assertEquals(
-                "javascript:window.L.track({eventType: 'INTERACTION', customEventName: 'video360&mode=event'});",
-                BridgeCommandBuilder.event360("event")
         );
     }
 

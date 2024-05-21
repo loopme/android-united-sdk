@@ -56,7 +56,7 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
         return mLoopMeAd != null &&
             !mLoopMeAd.isMraidAd() &&
             !mLoopMeAd.isVpaidAd() &&
-            (mLoopMeAd.isVideo360() || mLoopMeAd.isVastAd());
+            mLoopMeAd.isVastAd();
     }
 
     private boolean isEventManagerNeeded() {

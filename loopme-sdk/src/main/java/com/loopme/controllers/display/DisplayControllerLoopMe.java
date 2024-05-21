@@ -4,7 +4,6 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.text.TextUtils;
-import android.view.Surface;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
@@ -28,7 +27,6 @@ import com.loopme.controllers.MraidController;
 import com.loopme.controllers.VideoController;
 import com.loopme.controllers.interfaces.LoopMeDisplayController;
 import com.loopme.controllers.view.IViewController;
-import com.loopme.controllers.view.View360Controller;
 import com.loopme.controllers.view.ViewControllerLoopMe;
 import com.loopme.listener.Listener;
 import com.loopme.loaders.FileLoaderNewImpl;
@@ -115,13 +113,8 @@ public class DisplayControllerLoopMe
     }
 
     public void initViewController() {
-        if (!mAdParams.isVideo360()) {
-            ViewControllerLoopMe.Callback viewCallback = initViewControllerCallback();
-            mViewController = new ViewControllerLoopMe(viewCallback);
-        } else {
-            View360Controller.Callback callback = initView360ControllerCallback();
-            mViewController = new View360Controller(callback);
-        }
+        ViewControllerLoopMe.Callback viewCallback = initViewControllerCallback();
+        mViewController = new ViewControllerLoopMe(viewCallback);
     }
 
     private void buildMraidContainer(FrameLayout containerView) {
@@ -163,7 +156,6 @@ public class DisplayControllerLoopMe
     private void handleVideoLoad(String videoUrl) {
         onMessage(Message.LOG, "JS command: resolve video " + videoUrl);
         mVideoPresented = true;
-        mVideoController.setVideo360(mAdParams.isVideo360());
         loadVideoFile(videoUrl);
     }
 
@@ -322,13 +314,7 @@ public class DisplayControllerLoopMe
     }
 
     private void injectTrackingJsForWeb() {
-        if (!isVideo360()) {
-            onAdInjectJs(mLoopMeAd);
-        }
-    }
-
-    private boolean isVideo360() {
-        return mLoopMeAd != null && mLoopMeAd.isVideo360();
+        onAdInjectJs(mLoopMeAd);
     }
 
     @Override
@@ -653,24 +639,6 @@ public class DisplayControllerLoopMe
         }
     }
 
-    private View360Controller.Callback initView360ControllerCallback() {
-        return new View360Controller.Callback() {
-            @Override
-            public void onSurfaceReady(Surface surface) {
-                onMessage(Message.LOG, "onSurfaceReady ####");
-                if (mVideoController != null) {
-                    mVideoController.setSurface(surface);
-                }
-            }
-            @Override
-            public void onEvent(String event) {
-                if (mAdView != null) {
-                    mAdView.send360Event(event);
-                }
-            }
-        };
-    }
-
     private ViewControllerLoopMe.Callback initViewControllerCallback() {
         return new ViewControllerLoopMe.Callback() {
             @Override
@@ -768,14 +736,6 @@ public class DisplayControllerLoopMe
                 setVideoState(Constants.VideoState.PLAYING);
             }
         }
-        if (mAdParams.isVideo360()) {
-            initVr360();
-        }
-    }
-
-    public void initVr360() {
-        mViewController.initVRLibrary(mLoopMeAd.getContext());
-        mViewController.onResume();
     }
 
     private void destroyVideoController() {

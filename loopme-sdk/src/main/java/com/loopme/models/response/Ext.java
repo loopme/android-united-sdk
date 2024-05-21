@@ -16,7 +16,6 @@ public class Ext implements Serializable, Parcelable {
 
     private final static long serialVersionUID = 2452708648583644210L;
 
-    private int v360;
     private int debug;
     private String advertiser;
     private String orientation;
@@ -38,7 +37,6 @@ public class Ext implements Serializable, Parcelable {
         public Ext createFromParcel(Parcel in) {
             Ext instance = new Ext();
             instance.advertiser = ((String) in.readValue((String.class.getClassLoader())));
-            instance.v360 = ((int) in.readValue((int.class.getClassLoader())));
             instance.orientation = ((String) in.readValue((String.class.getClassLoader())));
             instance.debug = ((int) in.readValue((int.class.getClassLoader())));
             instance.lineitem = ((String) in.readValue((String.class.getClassLoader())));
@@ -62,12 +60,11 @@ public class Ext implements Serializable, Parcelable {
 
     public Ext() { }
 
-    public Ext(String advertiser, int v360, String orientation, int debug, String lineitem,
+    public Ext(String advertiser, String orientation, int debug, String lineitem,
                String appname, String crtype, String campaign, List<String> measurePartners,
                int autoloading, List<String> packageIds, String developer, String company) {
         super();
         this.advertiser = advertiser;
-        this.v360 = v360;
         this.orientation = orientation;
         this.debug = debug;
         this.lineitem = lineitem;
@@ -91,19 +88,6 @@ public class Ext implements Serializable, Parcelable {
 
     public Ext withAdvertiser(String advertiser) {
         this.advertiser = advertiser;
-        return this;
-    }
-
-    public int getV360() {
-        return v360;
-    }
-
-    public void setV360(int v360) {
-        this.v360 = v360;
-    }
-
-    public Ext withV360(int v360) {
-        this.v360 = v360;
         return this;
     }
 
@@ -239,7 +223,6 @@ public class Ext implements Serializable, Parcelable {
 
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(advertiser);
-        dest.writeValue(v360);
         dest.writeValue(orientation);
         dest.writeValue(debug);
         dest.writeValue(lineitem);
