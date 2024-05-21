@@ -4,11 +4,20 @@ plugins {
 
 android {
     namespace = "com.loopme"
+    compileSdkVersion(34)
+
     defaultConfig {
         consumerProguardFiles("proguard-rules.pro")
         buildConfigField("String", "OM_SDK_JS_URL", project.findProperty("OM_SDK_JS_URL") as? String ?: "")
         buildConfigField("String", "OM_SDK_PARTNER", project.findProperty("OM_SDK_PARTNER") as? String ?: "")
         buildConfigField("String", "VERSION_NAME", project.findProperty("VERSION_NAME") as? String ?: "")
+        minSdkVersion(22)
+        targetSdkVersion(34)
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
 

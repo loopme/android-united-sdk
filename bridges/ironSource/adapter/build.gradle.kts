@@ -4,9 +4,17 @@ plugins {
 
 android {
     namespace = "com.ironsource.adapters.custom.loopme"
+    compileSdkVersion(34)
+
     defaultConfig {
         consumerProguardFiles("proguard-rules.pro")
         buildConfigField("String", "VERSION_NAME", project.findProperty("VERSION_NAME") as? String ?: "")
+        minSdkVersion(22)
+        targetSdkVersion(34)
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
 
