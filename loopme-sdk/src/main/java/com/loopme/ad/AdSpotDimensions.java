@@ -1,5 +1,7 @@
 package com.loopme.ad;
 
+import com.loopme.Constants;
+
 public class AdSpotDimensions {
 
     public AdSpotDimensions(int width, int height) {
@@ -42,4 +44,19 @@ public class AdSpotDimensions {
     public int hashCode() {
         return 31 * width + height;
     }
+
+    public static AdSpotDimensions getMpu() {
+        return new AdSpotDimensions(
+            Constants.Banner.MPU_BANNER_WIDTH,
+            Constants.Banner.MPU_BANNER_HEIGHT
+        );
+    }
+    public static AdSpotDimensions getExpandBanner() {
+        return new AdSpotDimensions(
+            Constants.Banner.EXPAND_BANNER_WIDTH,
+            Constants.Banner.EXPAND_BANNER_HEIGHT
+        );
+
+    }
+
 }

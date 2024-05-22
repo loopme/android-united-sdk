@@ -2,6 +2,8 @@ package com.loopme.ad;
 
 import android.content.Intent;
 
+import androidx.annotation.NonNull;
+
 import com.loopme.Constants;
 import com.loopme.LoopMeBannerGeneral;
 import com.loopme.LoopMeInterstitialGeneral;
@@ -25,14 +27,6 @@ public class LoopMeAdHolder {
         }
     }
 
-    private static LoopMeInterstitialGeneral findInterstitial(int adId) {
-        return mNewImplInterstitialMap.getOrDefault(adId, null);
-    }
-
-    private static LoopMeBannerGeneral findBanner(int adId) {
-        return mNewImplBannerMap.getOrDefault(adId, null);
-    }
-
     public static void removeAd(LoopMeAd loopMeAd) {
         if (loopMeAd == null) {
             return;
@@ -41,16 +35,13 @@ public class LoopMeAdHolder {
         mNewImplBannerMap.remove(loopMeAd.getAdId());
     }
 
-    public static LoopMeAd getAd(Intent intent) {
-        if (intent == null) {
-            return null;
-        }
+    public static LoopMeAd getAd(@NonNull Intent intent) {
         int adId = intent.getIntExtra(Constants.AD_ID_TAG, Constants.DEFAULT_AD_ID);
         int format = intent.getIntExtra(Constants.FORMAT_TAG, Constants.DEFAULT_AD_ID);
         if (Constants.AdFormat.fromInt(format) == Constants.AdFormat.BANNER) {
-            return LoopMeAdHolder.findBanner(adId);
+            return mNewImplBannerMap.getOrDefault(adId, null);
         } else {
-            return LoopMeAdHolder.findInterstitial(adId);
+            return mNewImplInterstitialMap.getOrDefault(adId, null);
         }
     }
 }

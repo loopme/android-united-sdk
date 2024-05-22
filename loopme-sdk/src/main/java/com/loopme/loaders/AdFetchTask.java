@@ -54,13 +54,18 @@ public class AdFetchTask implements Runnable, Observer {
         mExecutorService = ExecutorHelper.getExecutor();
     }
 
+    private void startRequestTimer() {
+        mHandler.post(() -> {
+            if (mTimers != null) {
+                mTimers.startTimer(TimersType.REQUEST_TIMER);
+            }
+        });
+    }
+
+    private void runFetchTask() { mFetchTask = mExecutorService.submit(this); }
     public void fetch() {
         startRequestTimer();
         runFetchTask();
-    }
-
-    private void runFetchTask() {
-        mFetchTask = mExecutorService.submit(this);
     }
 
     public void stopFetch() {
@@ -73,20 +78,6 @@ public class AdFetchTask implements Runnable, Observer {
             mVastWrapperFetcher.cancel();
             mVastWrapperFetcher = null;
         }
-    }
-
-    private void handleNoAds() {
-        if (!mFirstRequest || !isInterstitial()) {
-            onErrorResult(Errors.NO_ADS_FOUND);
-            return;
-        }
-        mFirstRequest = false;
-        mLoopMeAd.setReversOrientationRequest();
-        runFetchTask();
-    }
-
-    private boolean isInterstitial() {
-        return mLoopMeAd != null && mLoopMeAd.isInterstitial();
     }
 
     @Override
@@ -117,27 +108,6 @@ public class AdFetchTask implements Runnable, Observer {
         onErrorResult(Errors.SYNTAX_ERROR_IN_RESPONSE);
     }
 
-    protected void parseResponse(GetResponse<ResponseJsonModel> response) {
-        if (response.isSuccessful()) {
-            handleResponse(response.getBody());
-        } else {
-            handleError(response);
-        }
-    }
-
-    private void handleResponse(ResponseJsonModel body) {
-        if (!isVastWrapperCase(body)) {
-            handleNonWrapper(body);
-            return;
-        }
-        saveParams(body);
-        launchVastFetcher(body);
-    }
-
-    private boolean isVast(ResponseJsonModel body) {
-        return ParseService.isVastAd(body);
-    }
-
     private void handleNonWrapper(ResponseJsonModel body) {
         if (mIsVastVpaidAd && !XmlParseService.isValidXml(body)) {
             onErrorResult(Errors.SYNTAX_ERROR_IN_XML);
@@ -147,6 +117,16 @@ public class AdFetchTask implements Runnable, Observer {
         if (loopMeAd != null) {
             onSuccessResult(loopMeAd.getAdParams());
         }
+    }
+
+    private boolean isVastWrapperCase(ResponseJsonModel body) {
+        if (!ParseService.isVastAd(body)) {
+            return false;
+        }
+        mIsVastVpaidAd = ParseService.isVastVpaidAd(body);
+        String vastString = XmlParseService.getVastString(body);
+        VastInfo vastInfo = XmlParseService.getVastInfo(vastString);
+        return mIsVastVpaidAd && vastInfo != null && vastInfo.hasWrapper();
     }
 
     private void handleSuccess(AdParams adParams) {
@@ -162,13 +142,9 @@ public class AdFetchTask implements Runnable, Observer {
     private void launchVastFetcher(ResponseJsonModel body) {
         VastWrapperFetcher.Listener listener = new VastWrapperFetcher.Listener() {
             @Override
-            public void onCompleted(AdParams adParams) {
-                handleSuccess(adParams);
-            }
+            public void onCompleted(AdParams adParams) { handleSuccess(adParams); }
             @Override
-            public void onFailed(LoopMeError error) {
-                onErrorResult(error);
-            }
+            public void onFailed(LoopMeError error) { onErrorResult(error); }
         };
         mVastWrapperFetcher = new VastWrapperFetcher(
             XmlParseService.getVastString(body), listener
@@ -176,27 +152,33 @@ public class AdFetchTask implements Runnable, Observer {
         mVastWrapperFetcher.start();
     }
 
-    private void saveParams(ResponseJsonModel body) {
-        saveOrientation(body);
-        saveAdType(body);
-    }
-
-    private void saveAdType(ResponseJsonModel body) {
-        mAdType = ParseService.parseCreativeType(body);
-    }
-
-    private void saveOrientation(ResponseJsonModel body) {
-        mOrientation = XmlParseService.parseOrientation(body);
-    }
-
-    private boolean isVastWrapperCase(ResponseJsonModel body) {
-        if (!isVast(body)) {
-            return false;
+    private void handleResponse(ResponseJsonModel body) {
+        if (!isVastWrapperCase(body)) {
+            handleNonWrapper(body);
+            return;
         }
-        mIsVastVpaidAd = ParseService.isVastVpaidAd(body);
-        String vastString = XmlParseService.getVastString(body);
-        VastInfo vastInfo = XmlParseService.getVastInfo(vastString);
-        return mIsVastVpaidAd && vastInfo != null && vastInfo.hasWrapper();
+        mOrientation = XmlParseService.parseOrientation(body);
+        mAdType = ParseService.parseCreativeType(body);
+        launchVastFetcher(body);
+    }
+
+    protected void parseResponse(GetResponse<ResponseJsonModel> response) {
+        if (response.isSuccessful()) {
+            handleResponse(response.getBody());
+        } else {
+            handleError(response);
+        }
+    }
+
+    private void handleNoAds() {
+        boolean isInterstitial = mLoopMeAd != null && mLoopMeAd.isInterstitial();
+        if (!mFirstRequest || !isInterstitial) {
+            onErrorResult(Errors.NO_ADS_FOUND);
+            return;
+        }
+        mFirstRequest = false;
+        mLoopMeAd.setReversOrientationRequest();
+        runFetchTask();
     }
 
     private void handleError(GetResponse<ResponseJsonModel> response) {
@@ -218,17 +200,9 @@ public class AdFetchTask implements Runnable, Observer {
     public void update(Observable observable, Object arg) {
         if (observable instanceof Timers && arg instanceof TimersType) {
             if ((arg == TimersType.REQUEST_TIMER)) {
-                onRequestTimeout();
+                onErrorResult(Errors.REQUEST_TIMEOUT);
             }
         }
-    }
-
-    private void startRequestTimer() {
-        mHandler.post(() -> {
-            if (mTimers != null) {
-                mTimers.startTimer(TimersType.REQUEST_TIMER);
-            }
-        });
     }
 
     protected void stopRequestTimer() {
@@ -237,10 +211,6 @@ public class AdFetchTask implements Runnable, Observer {
                 mTimers.stopTimer(TimersType.REQUEST_TIMER);
             }
         });
-    }
-
-    private void onRequestTimeout() {
-        onErrorResult(Errors.REQUEST_TIMEOUT);
     }
 
     public void onSuccessResult(final AdParams adParams) {
