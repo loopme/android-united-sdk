@@ -3,6 +3,7 @@ package com.loopme.views.activity;
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
@@ -66,7 +67,8 @@ public final class BaseActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         Logging.out(LOG_TAG, "onCreate");
 
-        mLoopMeAd = LoopMeAdHolder.getAd(getIntent());
+        Intent intent = getIntent();
+        mLoopMeAd = intent == null ? null : LoopMeAdHolder.getAd(intent);
         mDisplayController = mLoopMeAd == null ? null : mLoopMeAd.getDisplayController();
 
         if (mLoopMeAd == null || mLoopMeAd.getAdParams() == null || mDisplayController == null) {

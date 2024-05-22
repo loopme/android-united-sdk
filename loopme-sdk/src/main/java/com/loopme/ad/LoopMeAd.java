@@ -27,8 +27,9 @@ import com.loopme.request.RequestParamsUtils;
 import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
 import com.loopme.tracker.partners.LoopMeTracker;
-import com.loopme.utils.ValidationHelper;
+import com.loopme.utils.InternetUtils;
 
+import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -45,7 +46,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     private AdParams mAdParams;
     private final Activity mContext;
-    private Type mPreferredAdType = Type.ALL;
+    private final Type mPreferredAdType = Type.ALL;
     private Timers mTimers;
     private AdFetchTask mAdFetchTask;
 
@@ -55,6 +56,16 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     protected boolean mIsReady;
     private final int mAdId;
     private volatile boolean mIsReverseOrientationRequest;
+
+    public final AdFetcherListener adFetchListener = new AdFetcherListener() {
+        @Override
+        public void onAdFetchCompleted(AdParams adParams) { LoopMeAd.this.onAdFetchCompleted(adParams); }
+        @Override
+        public void onAdFetchFailed(LoopMeError error) {
+            LoopMeAd.this.onAdFetchFailed(error);
+            stopFetchAdTask();
+        }
+    };
 
     public LoopMeAd(Activity context, String appKey) {
         if (context == null || TextUtils.isEmpty(appKey)) {
@@ -68,36 +79,50 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         Helpers.init(this);
     }
 
-    public boolean isBanner() {
-        return getAdFormat() == Constants.AdFormat.BANNER;
-    }
-
-    public boolean isInterstitial() {
-        return getAdFormat() == Constants.AdFormat.INTERSTITIAL;
-    }
+    /**
+     * Indicates whether ad content was loaded successfully and ready to be displayed.
+     * After you initialized a `LoopMeInterstitialVV`/`LoopMeBannerVV` object and triggered the `resolve` method,
+     * this property will be set to TRUE on it's successful completion.
+     * It is set to FALSE when loaded ad content has expired or already was presented,
+     * in this case it requires next `resolve` method triggering
+     */
+    public boolean isReady() { return mIsReady; }
+    /**
+     * Indicates whether `LoopMeInterstitialVV`/`LoopMeBannerVV` currently presented on screen.
+     * Ad status will be set to `AdState.SHOWING` after trigger `show` method
+     *
+     * @return true - if ad presented on screen
+     * false - if ad absent on scrren
+     */
+    public boolean isShowing() { return mAdState == Constants.AdState.SHOWING; }
+    /**
+     * Indicates whether `LoopMeInterstitial`/`LoopMeBanner` in "loading ad content" process.
+     * Ad status will be set to `AdState.LOADING` after trigger `resolve` method
+     *
+     * @return true - if ad is loading now
+     * false - if ad is not loading now
+     */
+    public boolean isLoading() { return mAdState == Constants.AdState.LOADING; }
+    public boolean isNoneState() { return mAdState == Constants.AdState.LOADING; }
+    public boolean isBanner() { return getAdFormat() == Constants.AdFormat.BANNER; }
+    public boolean isInterstitial() { return getAdFormat() == Constants.AdFormat.INTERSTITIAL; }
+    protected boolean isLoopMeAd() { return mAdParams != null && mAdParams.isLoopMeAd(); }
+    public boolean isVastAd() { return mAdParams != null && mAdParams.isVastAd(); }
+    public boolean isVpaidAd() { return mAdParams != null && mAdParams.isVpaidAd(); }
+    public boolean isMraidAd() { return mAdParams != null && mAdParams.isMraidAd(); }
+    public boolean isFullScreen() { return mDisplayController != null && mDisplayController.isFullScreen(); }
 
     public abstract Constants.AdFormat getAdFormat();
-
     public abstract AdSpotDimensions getAdSpotDimensions();
-
     public abstract void onAdExpired();
-
     public abstract void onAdLoadSuccess();
-
     public abstract void onAdAlreadyLoaded();
-
     public abstract void onAdLoadFail(LoopMeError errorCode);
-
     public abstract void onAdLeaveApp();
-
     public abstract void onAdClicked();
-
     public abstract void onAdVideoDidReachEnd();
-
     public abstract void dismiss();
-
     public abstract void show();
-
     public abstract void removeListener();
 
     /**
@@ -140,7 +165,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         mIsReady = false;
         setAdState(Constants.AdState.NONE);
         stopFetchAdTask();
-        clearTargetingData();
+        mAdTargetingData.clear();
         destroyTimers();
         destroyDisplayController();
         Helpers.reset();
@@ -152,10 +177,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         if (mAdFetchTask != null) {
             mAdFetchTask.stopFetch();
         }
-    }
-
-    private void clearTargetingData() {
-        mAdTargetingData.clear();
     }
 
     protected void destroyDisplayController() {
@@ -170,41 +191,119 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         }, Constants.DESTROY_TIME_DELAY);
     }
 
-    /**
-     * Indicates whether ad content was loaded successfully and ready to be displayed.
-     * After you initialized a `LoopMeInterstitialVV`/`LoopMeBannerVV` object and triggered the `resolve` method,
-     * this property will be set to TRUE on it's successful completion.
-     * It is set to FALSE when loaded ad content has expired or already was presented,
-     * in this case it requires next `resolve` method triggering
-     */
-    public boolean isReady() {
-        return mIsReady;
+    public void onInternalLoadFail(LoopMeError error) {
+        onAdLoadFail(error);
+        onSendPostWarning(error);
+    }
+
+    public void onSendPostWarning(LoopMeError error) { LoopMeTracker.post(error); }
+
+    private void startTimer(TimersType fetcherTimer, AdParams adParam) {
+        if (mTimers == null) {
+            return;
+        }
+        if (adParam != null) {
+            mTimers.setExpirationValidTime(adParam.getExpiredTime());
+        }
+        mTimers.startTimer(fetcherTimer);
+    }
+
+    protected void stopTimer(TimersType timersType) {
+        if (mTimers != null) {
+            mTimers.stopTimer(timersType);
+        }
+    }
+
+    protected void buildAdView() {
+        Logging.out(LOG_TAG, " build ad view interstitial " + mContainerView);
+        if (mDisplayController == null) {
+            return;
+        }
+        if (isLoopMeAd() || isMraidAd()) {
+            DisplayControllerLoopMe displayControllerLoopMe = (DisplayControllerLoopMe) mDisplayController;
+            displayControllerLoopMe.buildView(mContainerView);
+        } else if (isVastAd() || isVpaidAd()) {
+            mDisplayController.onBuildVideoAdView(mContainerView);
+        }
     }
 
     /**
-     * Indicates whether `LoopMeInterstitialVV`/`LoopMeBannerVV` currently presented on screen.
-     * Ad status will be set to `AdState.SHOWING` after trigger `show` method
-     *
-     * @return true - if ad presented on screen
-     * false - if ad absent on scrren
+     * Starts loading ad content process.
+     * It is recommended triggering it in advance to have interstitial/banner ad ready and to be able to display instantly in your
+     * application.
+     * After its execution, the interstitial/banner notifies whether the loading of the ad content failed or succeeded.
      */
-    public boolean isShowing() {
-        return mAdState == Constants.AdState.SHOWING;
+    public void load() { load(mIntegrationType); }
+
+    public AdFetchTask load(String url) {
+        setAdState(Constants.AdState.LOADING);
+        startTimer(TimersType.FETCHER_TIMER, null);
+        AdFetchTask adFetchTask = new AdFetchTaskByUrl(this, adFetchListener, url);
+        adFetchTask.fetch();
+        return adFetchTask;
     }
 
-    /**
-     * Indicates whether `LoopMeInterstitial`/`LoopMeBanner` in "loading ad content" process.
-     * Ad status will be set to `AdState.LOADING` after trigger `resolve` method
-     *
-     * @return true - if ad is loading now
-     * false - if ad is not loading now
-     */
-    public boolean isLoading() {
-        return mAdState == Constants.AdState.LOADING;
+    private AdFetchTask proceedFetchAd() {
+        setAdState(Constants.AdState.LOADING);
+        startTimer(TimersType.FETCHER_TIMER, null);
+        AdFetchTask adFetchTask = new AdFetchTask(this, adFetchListener);
+        adFetchTask.fetch();
+        return adFetchTask;
     }
 
-    public boolean isNoneState() {
-        return mAdState == Constants.AdState.LOADING;
+    private boolean isCouldLoadAd() {
+        String error;
+        if (getContext() == null) {
+            Logging.out(LOG_TAG, "Context should not be null and should be instance of Activity");
+            return false;
+        }
+        if (isLoading() || isShowing()) {
+            Logging.out(LOG_TAG, "Ad is already loading or showing");
+            return false;
+        }
+        boolean isCorrectIntegrationType = Arrays
+            .asList(IntegrationType.values()).contains(getIntegrationType());
+        if (!isCorrectIntegrationType) {
+            error = "Incorrect integration type. Please use one from list";
+            Logging.out(LOG_TAG, error);
+            onAdLoadFail(new LoopMeError(error));
+            return false;
+        }
+        if (!InternetUtils.isOnline(getContext())) {
+            error = "No connection";
+            Logging.out(LOG_TAG, error);
+            onAdLoadFail(new LoopMeError(error));
+            return false;
+        }
+        int[] adSize = RequestParamsUtils.getAdSize(mContext, this);
+        int width = adSize[0];
+        int height = adSize[1];
+        boolean isMpu = AdSpotDimensions.getMpu().equals(new AdSpotDimensions(width, height));
+        boolean isExpandBanner = AdSpotDimensions.getExpandBanner().equals(new AdSpotDimensions(width, height));
+        boolean isCustomBannerSize = isBanner() && !(isExpandBanner || isMpu);
+        boolean isExpandBannerSize = isBanner() && isExpandBanner;
+        boolean isCustomBannerHtml = isCustomBannerSize && mPreferredAdType == Type.HTML;
+        boolean isExpandBannerVideo = isExpandBannerSize && mPreferredAdType == Type.VIDEO;
+        if (isCustomBannerHtml || isExpandBannerVideo) {
+            error = "Container size is not valid for chosen ad type";
+            Logging.out(LOG_TAG, error);
+            onAdLoadFail(new LoopMeError(error));
+            return false;
+        }
+        return true;
+    }
+
+    public void load(IntegrationType integrationType) {
+        setIntegrationType(integrationType);
+        mStartLoadingTime = System.currentTimeMillis();
+        if (!isCouldLoadAd()) {
+            return;
+        }
+        if (isReady()) {
+            onAdAlreadyLoaded();
+        } else {
+            mAdFetchTask = proceedFetchAd();
+        }
     }
 
     private void initDisplayController() {
@@ -228,114 +327,16 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         LiveDebug.setLiveDebug(this.getContext(), adParams.isDebug(), this.getAppKey());
     }
 
-    private void onResponseReceived(AdParams adParam) {
-        if (adParam != null) {
-            LoopMeTracker.trackSdkFeedBack(adParam.getPackageIds(), adParam.getToken());
-            proceedPrepareAd(adParam);
+    private void onAdFetchCompleted(AdParams adParams) {
+        if (adParams != null) {
+            LoopMeTracker.trackSdkFeedBack(adParams.getPackageIds(), adParams.getToken());
+            proceedPrepareAd(adParams);
         } else {
             onInternalLoadFail(Errors.DOWNLOAD_ERROR);
         }
         mIsReverseOrientationRequest = false;
     }
-
-    public void onInternalLoadFail(LoopMeError error) {
-        onAdLoadFail(error);
-        onSendPostWarning(error);
-    }
-
-    public void onSendPostWarning(LoopMeError error) {
-        LoopMeTracker.post(error);
-    }
-
-    private void startTimer(TimersType fetcherTimer, AdParams adParam) {
-        if (mTimers == null) {
-            return;
-        }
-        if (adParam != null) {
-            mTimers.setExpirationValidTime(adParam.getExpiredTime());
-        }
-        mTimers.startTimer(fetcherTimer);
-    }
-
-    protected void stopTimer(TimersType timersType) {
-        if (mTimers != null) {
-            mTimers.stopTimer(timersType);
-        }
-    }
-
-    protected boolean isLoopMeAd() {
-        return mAdParams != null && mAdParams.isLoopMeAd();
-    }
-
-    public boolean isVastAd() {
-        return mAdParams != null && mAdParams.isVastAd();
-    }
-
-    public boolean isVpaidAd() {
-        return mAdParams != null && mAdParams.isVpaidAd();
-    }
-
-    public boolean isMraidAd() {
-        return mAdParams != null && mAdParams.isMraidAd();
-    }
-
-    protected void buildAdView() {
-        Logging.out(LOG_TAG, " build ad view interstitial " + mContainerView);
-        if (mDisplayController == null) {
-            return;
-        }
-        if (isLoopMeAd() || isMraidAd()) {
-            DisplayControllerLoopMe displayControllerLoopMe = (DisplayControllerLoopMe) mDisplayController;
-            displayControllerLoopMe.buildView(mContainerView);
-        } else if (isVastAd() || isVpaidAd()) {
-            mDisplayController.onBuildVideoAdView(mContainerView);
-        }
-    }
-
-    /**
-     * Starts loading ad content process.
-     * It is recommended triggering it in advance to have interstitial/banner ad ready and to be able to display instantly in your
-     * application.
-     * After its execution, the interstitial/banner notifies whether the loading of the ad content failed or succeeded.
-     */
-    public void load() {
-        load(mIntegrationType);
-    }
-
-    private void proceedFetchAd() {
-        setAdState(Constants.AdState.LOADING);
-        startTimer(TimersType.FETCHER_TIMER, null);
-        mAdFetchTask = new AdFetchTask(this, initAdFetcherListener());
-        mAdFetchTask.fetch();
-    }
-
-    public void load(IntegrationType integrationType) {
-        setIntegrationType(integrationType);
-        mStartLoadingTime = System.currentTimeMillis();
-        if (!ValidationHelper.isCouldLoadAd(this)) {
-            return;
-        }
-        if (isReady()) {
-            onAdAlreadyLoaded();
-        } else {
-            proceedFetchAd();
-        }
-    }
-
-    private AdFetcherListener initAdFetcherListener() {
-        return new AdFetcherListener() {
-            @Override
-            public void onAdFetchCompleted(AdParams adParams) { onResponseReceived(adParams); }
-
-            @Override
-            public void onAdFetchFailed(LoopMeError error) {
-                onResponseReceived(error);
-                stopFetchAdTask();
-            }
-        };
-    }
-
-    private void onResponseReceived(LoopMeError error) {
+    private void onAdFetchFailed(LoopMeError error) {
         if (TextUtils.isEmpty(error.getMessage())) {
             error.setErrorMessage(String.valueOf(error.getErrorCode()));
         }
@@ -343,49 +344,34 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         mIsReverseOrientationRequest = false;
     }
 
+    public AdTargetingData getAdTargetingData() { return mAdTargetingData; }
+    public IntegrationType getIntegrationType() { return mIntegrationType; }
+    public BaseTrackableController getDisplayController() { return mDisplayController; }
+    public AdParams getAdParams() { return mAdParams; }
+    public Type getPreferredAdType() { return mPreferredAdType; }
+    public Activity getContext() { return mContext; }
+    public String getAppKey() { return mAppKey; }
+    public FrameLayout getContainerView() { return mContainerView; }
+    public int getAdId() { return mAdId; }
+    public boolean isReverseOrientationRequest() { return mIsReverseOrientationRequest; }
+    public void setAdParams(AdParams mAdParams) { this.mAdParams = mAdParams; }
+    public void setReversOrientationRequest() { mIsReverseOrientationRequest = true; }
+    public void setAdState(Constants.AdState adState) { mAdState = adState; }
+    public void setReady(boolean ready) { mIsReady = ready; }
     @Override
-    public void setKeywords(String keywords) {
-        mAdTargetingData.setKeywords(keywords);
-    }
+    public void setKeywords(String keywords) { mAdTargetingData.setKeywords(keywords); }
     @Override
-    public void setGender(String gender) {
-        mAdTargetingData.setGender(gender);
-    }
+    public void setGender(String gender) { mAdTargetingData.setGender(gender); }
     @Override
-    public void setYearOfBirth(int year) {
-        mAdTargetingData.setYob(year);
-    }
-    @Override
-    public void addCustomParameter(String param, String paramValue) {
-        mAdTargetingData.setCustomParameters(param, paramValue);
-    }
-
-    public IntegrationType getIntegrationType() {
-        return mIntegrationType;
-    }
+    public void setYearOfBirth(int year) { mAdTargetingData.setYob(year); }
 
     public void setIntegrationType(IntegrationType mIntegrationType) {
         this.mIntegrationType = mIntegrationType != null ? mIntegrationType : IntegrationType.NORMAL;
     }
 
-    public BaseTrackableController getDisplayController() {
-        return mDisplayController;
-    }
-
-    public AdParams getAdParams() {
-        return mAdParams;
-    }
-
-    public void setAdParams(AdParams mAdParams) {
-        this.mAdParams = mAdParams;
-    }
-
-    public Type getPreferredAdType() {
-        return mPreferredAdType;
-    }
-
-    public Activity getContext() {
-        return mContext;
+    @Override
+    public void addCustomParameter(String param, String paramValue) {
+        mAdTargetingData.setCustomParameters(param, paramValue);
     }
 
     @Override
@@ -401,8 +387,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         }
     }
 
-    public String getAppKey() { return mAppKey; }
-
     public void runOnUiThread(Runnable runnable) {
         if (mHandler != null) {
             mHandler.post(runnable);
@@ -415,96 +399,15 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         }
     }
 
-    public void setAdState(Constants.AdState adState) { this.mAdState = adState; }
-    public void setReady(boolean ready) { this.mIsReady = ready; }
-
-    public boolean isFullScreen() {
-        return mDisplayController != null && mDisplayController.isFullScreen();
-    }
-
-    public FrameLayout getContainerView() { return mContainerView; }
-
-    public int getAdId() { return mAdId; }
-    public void setReversOrientationRequest() { mIsReverseOrientationRequest = true; }
-    public boolean isReverseOrientationRequest() { return mIsReverseOrientationRequest; }
-
-    private void rebuildView(FrameLayout loopMeContainerView) {
-        if (mDisplayController != null && mDisplayController instanceof DisplayControllerLoopMe) {
-            ((DisplayControllerLoopMe) mDisplayController).onRebuildView(loopMeContainerView);
-        }
-    }
-
-    public void onNewContainer(FrameLayout newContainerView) {
+    public void onNewContainer(FrameLayout containerView) {
         if (isInterstitial()) {
-            bindView(newContainerView);
+            bindView(containerView);
         } else {
-            rebuildView(newContainerView);
-        }
-    }
-
-    public void load(String url) {
-        setAdState(Constants.AdState.LOADING);
-        startTimer(TimersType.FETCHER_TIMER, null);
-        AdFetcherListener listener = new AdFetcherListener() {
-            @Override
-            public void onAdFetchCompleted(AdParams adParams) { onResponseReceived(adParams); }
-            @Override
-            public void onAdFetchFailed(LoopMeError error) {
-                onResponseReceived(error);
-                stopFetchAdTask();
+            if (mDisplayController != null && mDisplayController instanceof DisplayControllerLoopMe) {
+                ((DisplayControllerLoopMe) mDisplayController).onRebuildView(containerView);
             }
-        };
-        AdFetchTask adFetchTask = new AdFetchTaskByUrl(this, listener, url);
-        adFetchTask.fetch();
+        }
     }
 
     public enum Type { HTML, VIDEO, ALL }
-
-    public boolean isCustomBannerHtml() {
-        return isCustomBanner() && mPreferredAdType == Type.HTML;
-    }
-
-    private boolean isMpuBannerSize(int width, int height) {
-        AdSpotDimensions mpuBanner = new AdSpotDimensions(
-            Constants.Banner.MPU_BANNER_WIDTH,
-            Constants.Banner.MPU_BANNER_HEIGHT
-        );
-        AdSpotDimensions customSize = new AdSpotDimensions(width, height);
-        return mpuBanner.equals(customSize);
-    }
-
-    private boolean isExpandBannerSize(int width, int height) {
-        AdSpotDimensions expandBanner = new AdSpotDimensions(
-            Constants.Banner.EXPAND_BANNER_WIDTH,
-            Constants.Banner.EXPAND_BANNER_HEIGHT
-        );
-        AdSpotDimensions customSize = new AdSpotDimensions(width, height);
-        return expandBanner.equals(customSize);
-    }
-
-    private boolean isCustomBannerSize(int width, int height) {
-        return !(isExpandBannerSize(width, height) || isMpuBannerSize(width, height));
-    }
-
-    public boolean isCustomBanner() {
-        int[] adSize = RequestParamsUtils.getAdSize(mContext, this);
-        int width = adSize[0];
-        int height = adSize[1];
-        return isBanner() && isCustomBannerSize(width, height);
-    }
-
-    public boolean isExpandBannerVideo() {
-        return isExpandBanner() && mPreferredAdType == Type.VIDEO;
-    }
-
-    public boolean isExpandBanner() {
-        int[] adSize = RequestParamsUtils.getAdSize(mContext, this);
-        int width = adSize[0];
-        int height = adSize[1];
-        return isBanner() && isExpandBannerSize(width, height);
-    }
-
-    public AdTargetingData getAdTargetingData() {
-        return mAdTargetingData;
-    }
 }
