@@ -9,6 +9,7 @@ android {
         applicationId = "com.loopme.ironsource_mediation_sample"
         versionCode = 1
         versionName ="1.0"
+        minSdkVersion(22)
     }
 
     buildFeatures {

@@ -9,6 +9,7 @@ android {
         applicationId = "com.loopme.applovin.app"
         versionCode = 1
         versionName ="1.0"
+        minSdkVersion(22)
     }
 
     buildFeatures {
