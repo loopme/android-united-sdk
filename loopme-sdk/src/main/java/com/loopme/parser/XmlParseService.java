@@ -30,6 +30,7 @@ import com.loopme.xml.vast4.ViewableImpression;
 import com.loopme.xml.vast4.Wrapper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -356,17 +357,21 @@ public class XmlParseService {
     }
 
     private static List<MediaFile> filterAndSortSupportedMediaFiles(List<MediaFile> mediaFileList) {
-        if (mediaFileList == null)
+        if (mediaFileList == null) {
             return new ArrayList<>();
+        }
 
         List<MediaFile> supportedMediaFilesList = new ArrayList<>();
-        for (MediaFile mediaFile : mediaFileList)
-            if (isSupportedFormat(mediaFile))
+        for (MediaFile mediaFile : mediaFileList) {
+            if (isSupportedFormat(mediaFile)) {
                 supportedMediaFilesList.add(mediaFile);
+            }
+        }
 
-        supportedMediaFilesList.sort(
-            createMediaSizeComparator(Utils.getScreenWidth() * Utils.getScreenHeight())
-        );
+        Comparator<MediaFile> mediaSizeComparator =
+            createMediaSizeComparator(Utils.getScreenWidth() * Utils.getScreenHeight());
+
+        Collections.sort(supportedMediaFilesList, mediaSizeComparator);
         return supportedMediaFilesList;
     }
 
@@ -377,7 +382,7 @@ public class XmlParseService {
     }
 
     private static Comparator<MediaFile> createMediaSizeComparator(final int screenSquare) {
-        return new Comparator<>() {
+        return new Comparator<MediaFile>() {
             @Override
             public int compare(MediaFile mediaFile1, MediaFile mediaFile2) {
                 // TODO. Use resolution comparisons instead of squares?

@@ -30,7 +30,7 @@ public class Ext implements Serializable, Parcelable {
     private String company = "";
 
     private Map<String, Object> additionalProperties = new HashMap<>();
-    public final static Parcelable.Creator<Ext> CREATOR = new Creator<>() {
+    public final static Parcelable.Creator<Ext> CREATOR = new Creator<Ext>() {
         @SuppressWarnings({
                 "unchecked"
         })

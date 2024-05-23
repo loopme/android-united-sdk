@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -167,12 +169,17 @@ public class ViewAbilityUtils {
         return list;
     }
 
+    @NonNull
     private static ArrayList<Rect> createChildrenRectSortedArrayList(Set<Rect> rectSet) {
         ArrayList<Rect> childRectList = new ArrayList<>(rectSet);
-        childRectList.sort(Comparator.comparingInt(rect -> rect.top));
+        Collections.sort(childRectList, new Comparator<Rect>() {
+            @Override
+            public int compare(Rect o1, Rect o2) {
+                return Integer.compare(o1.top, o2.top);
+            }
+        });
         return childRectList;
     }
-
 
     private static boolean isTotalOverlapped(Rect rootRect, View checkedView, Set<Rect> rectSet) {
         View rootView = checkedView.getRootView();
@@ -194,13 +201,15 @@ public class ViewAbilityUtils {
             if (!isViewVisible(lastView))
                 continue;
 
-            if (lastView instanceof ViewGroup viewGroup && !(lastView instanceof ListView)) {
-                int childCount = viewGroup.getChildCount();
-
-                for (int i = childCount - 1; i >= 0; i--) {
-                    View childView = viewGroup.getChildAt(i);
-                    if (!isEmptyView(childView))
-                        arrayDeque.add(childView);
+            if (lastView instanceof ViewGroup) {
+                ViewGroup viewGroup = (ViewGroup) lastView;
+                if (!(lastView instanceof ListView)) {
+                    int childCount = viewGroup.getChildCount();
+                    for (int i = childCount - 1; i >= 0; i--) {
+                        View childView = viewGroup.getChildAt(i);
+                        if (!isEmptyView(childView))
+                            arrayDeque.add(childView);
+                    }
                 }
             }
 

@@ -365,7 +365,17 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         omidEventTrackerWrapper = null;
     }
 
-    private record OmidFinisher(AdSession adSession) implements Runnable {
+    public class OmidFinisher implements Runnable {
+        private final AdSession adSession;
+
+        public OmidFinisher(AdSession adSession) {
+            this.adSession = adSession;
+        }
+
+        public AdSession getAdSession() {
+            return adSession;
+        }
+
         @Override
         public void run() {
             if (adSession != null)

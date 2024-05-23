@@ -73,7 +73,8 @@ public class RequestParamsUtils {
                     adSizeArray[1] = 480;
                 }
             }
-        } else if (baseAd instanceof LoopMeBannerGeneral banner) {
+        } else if (baseAd instanceof LoopMeBannerGeneral ) {
+            LoopMeBannerGeneral banner = (LoopMeBannerGeneral) baseAd;
             final FrameLayout bannerView = banner.getBannerView();
             if (bannerView != null) {
                 adSizeArray[0] = banner.getWidth();

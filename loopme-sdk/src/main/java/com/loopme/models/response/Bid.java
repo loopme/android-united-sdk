@@ -17,7 +17,7 @@ public class Bid implements Serializable, Parcelable {
     private String iurl;
     private String cid;
     private String crid;
-    public final static Parcelable.Creator<Bid> CREATOR = new Creator<>() {
+    public final static Parcelable.Creator<Bid> CREATOR = new Creator<Bid>() {
         public Bid createFromParcel(Parcel in) {
             Bid instance = new Bid();
             instance.ext = ((Ext) in.readValue((Ext.class.getClassLoader())));
