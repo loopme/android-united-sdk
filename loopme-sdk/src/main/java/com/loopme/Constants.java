@@ -172,16 +172,24 @@ public class Constants {
         }
 
         public static String nameOf(int state) {
-            return switch (state) {
-                case IDLE_INTEGER -> IDLE.getName();
-                case READY_INTEGER -> READY.getName();
-                case PLAYING_INTEGER -> PLAYING.getName();
-                case PAUSED_INTEGER -> PAUSED.getName();
-                case COMPLETE_INTEGER -> COMPLETE.getName();
-                case BROKEN_INTEGER -> BROKEN.getName();
-                case BUFFERING_INTEGER -> BUFFERING.getName();
-                default -> UNKNOWN_NAME;
-            };
+            switch (state) {
+                case IDLE_INTEGER:
+                    return IDLE.getName();
+                case READY_INTEGER:
+                    return READY.getName();
+                case PLAYING_INTEGER:
+                    return PLAYING.getName();
+                case PAUSED_INTEGER:
+                    return PAUSED.getName();
+                case COMPLETE_INTEGER:
+                    return COMPLETE.getName();
+                case BROKEN_INTEGER:
+                    return BROKEN.getName();
+                case BUFFERING_INTEGER:
+                    return BUFFERING.getName();
+                default:
+                    return UNKNOWN_NAME;
+            }
         }
     }
 
@@ -212,12 +220,16 @@ public class Constants {
         }
 
         public static String nameOf(int state) {
-            return switch (state) {
-                case VISIBLE_INTEGER -> VISIBLE.getName();
-                case HIDDEN_INTEGER -> HIDDEN.getName();
-                case CLOSED_INTEGER -> CLOSED.getName();
-                default -> UNKNOWN_NAME;
-            };
+            switch (state) {
+                case VISIBLE_INTEGER:
+                    return VISIBLE.getName();
+                case HIDDEN_INTEGER:
+                    return HIDDEN.getName();
+                case CLOSED_INTEGER:
+                    return CLOSED.getName();
+                default:
+                    return UNKNOWN_NAME;
+            }
         }
     }
 

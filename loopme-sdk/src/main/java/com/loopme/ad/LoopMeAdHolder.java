@@ -39,9 +39,9 @@ public class LoopMeAdHolder {
         int adId = intent.getIntExtra(Constants.AD_ID_TAG, Constants.DEFAULT_AD_ID);
         int format = intent.getIntExtra(Constants.FORMAT_TAG, Constants.DEFAULT_AD_ID);
         if (Constants.AdFormat.fromInt(format) == Constants.AdFormat.BANNER) {
-            return mNewImplBannerMap.getOrDefault(adId, null);
+            return mNewImplBannerMap.get(adId);
         } else {
-            return mNewImplInterstitialMap.getOrDefault(adId, null);
+            return mNewImplInterstitialMap.get(adId);
         }
     }
 }

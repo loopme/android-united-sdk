@@ -52,7 +52,10 @@ public class ConnectionUtils {
             return Constants.ConnectionType.UNKNOWN;
         }
 
-        int networkType = telephonyManager.getDataNetworkType();
+        int networkType = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            networkType = telephonyManager.getDataNetworkType();
+        }
         switch (networkType) {
             case TelephonyManager.NETWORK_TYPE_GPRS:
             case TelephonyManager.NETWORK_TYPE_EDGE:

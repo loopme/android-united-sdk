@@ -10,7 +10,7 @@ import java.util.List;
 public class Seatbid implements Serializable, Parcelable {
     private final static long serialVersionUID = -4812741118671444258L;
     private List<Bid> bid = null;
-    public final static Parcelable.Creator<Seatbid> CREATOR = new Creator<>() {
+    public final static Parcelable.Creator<Seatbid> CREATOR = new Creator<Seatbid>() {
         public Seatbid createFromParcel(Parcel in) {
             Seatbid instance = new Seatbid();
             in.readList(instance.bid, (Bid.class.getClassLoader()));

@@ -42,11 +42,16 @@ public class UiUtils {
     }
 
     public static AdSpotDimensions getViewSize(MinimizedMode minimizedMode, LoopMeAd loopMeAd, Constants.DisplayMode displayMode) {
-        return switch (displayMode) {
-            case MINIMIZED -> getMinimizedViewSize(minimizedMode);
-            case NORMAL -> getNormalViewSize(loopMeAd);
-            case FULLSCREEN -> getFullScreenViewSize();
-        };
+        switch (displayMode) {
+            case MINIMIZED:
+                return getMinimizedViewSize(minimizedMode);
+            case NORMAL:
+                return getNormalViewSize(loopMeAd);
+            case FULLSCREEN:
+                return getFullScreenViewSize();
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     private static AdSpotDimensions getFullScreenViewSize() {
