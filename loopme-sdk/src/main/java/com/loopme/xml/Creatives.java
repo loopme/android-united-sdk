@@ -37,7 +37,7 @@ public class Creatives {
     }
 
     public boolean hasCreativeList() {
-        return creativeList != null && creativeList.size() > 0;
+        return creativeList != null && !creativeList.isEmpty();
     }
 
     public List<String> getCompanionTrackingEvents() {

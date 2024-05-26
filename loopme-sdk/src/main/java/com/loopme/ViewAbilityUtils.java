@@ -13,7 +13,6 @@ import androidx.annotation.NonNull;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -172,12 +171,7 @@ public class ViewAbilityUtils {
     @NonNull
     private static ArrayList<Rect> createChildrenRectSortedArrayList(Set<Rect> rectSet) {
         ArrayList<Rect> childRectList = new ArrayList<>(rectSet);
-        Collections.sort(childRectList, new Comparator<Rect>() {
-            @Override
-            public int compare(Rect o1, Rect o2) {
-                return Integer.compare(o1.top, o2.top);
-            }
-        });
+        Collections.sort(childRectList, (o1, o2) -> Integer.compare(o1.top, o2.top));
         return childRectList;
     }
 

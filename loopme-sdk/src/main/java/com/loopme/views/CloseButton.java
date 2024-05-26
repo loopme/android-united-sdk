@@ -3,6 +3,8 @@ package com.loopme.views;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -34,7 +36,7 @@ public class CloseButton extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
         int offsetPx = Utils.convertDpToPixel(OFFSET_DP);
         int viewSize = Utils.convertDpToPixel(CUSTOM_VIEW_SIZE_DP + OFFSET_DP);
         drawEdging(canvas, offsetPx, viewSize);

@@ -21,6 +21,6 @@ public class CompanionAds {
     }
 
     public boolean hasCompanionList() {
-        return companionList != null && companionList.size() > 0;
+        return companionList != null && !companionList.isEmpty();
     }
 }

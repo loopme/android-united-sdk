@@ -38,16 +38,6 @@ public class BannerActivity
         smallAdView.destroy();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
     public void onLoadClicked(View view) {
 
     }

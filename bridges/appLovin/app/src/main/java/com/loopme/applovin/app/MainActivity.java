@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.applovin.mediation.MaxMediatedNetworkInfo;
 import com.applovin.mediation.adapters.LoopmeMediationAdapter;
 import com.applovin.sdk.AppLovinSdk;
-import com.applovin.sdk.AppLovinSdkConfiguration;
 
 import java.util.List;
 

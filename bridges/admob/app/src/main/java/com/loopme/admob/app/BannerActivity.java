@@ -34,20 +34,6 @@ public class BannerActivity extends Activity {
         adView.loadAd(adRequest);
     }
 
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
     public void onLoadClicked(View view) {
 
     }

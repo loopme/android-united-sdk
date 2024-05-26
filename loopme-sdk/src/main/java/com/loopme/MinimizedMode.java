@@ -14,8 +14,8 @@ public class MinimizedMode {
     private final AdSpotDimensions mMinimizedViewDims = new AdSpotDimensions(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     private static final int DEFAULT_HEIGHT = 100;
     private static final int DEFAULT_WIDTH = 300;
-    private int mMarginRight = 10;
-    private int mMarginBottom = 10;
+    private final int mMarginRight = 10;
+    private final int mMarginBottom = 10;
     private ViewGroup mRoot;
     private RecyclerView mRecyclerView;
     private int mPosition;

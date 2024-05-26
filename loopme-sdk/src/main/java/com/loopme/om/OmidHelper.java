@@ -3,12 +3,11 @@ package com.loopme.om;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
+import android.webkit.WebView;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
-
-import android.text.TextUtils;
-import android.webkit.WebView;
 
 import com.iab.omid.library.loopme.Omid;
 import com.iab.omid.library.loopme.ScriptInjector;
@@ -108,33 +107,28 @@ public final class OmidHelper {
 
     // TODO. Prevent parallel calls or implement "initAsync" method for LoopMe SDK.
     private static void tryDownloadOMSDKJavaScriptAsync(final SDKInitListener sdkInitListener) {
-        ExecutorHelper.getExecutor().submit(new Runnable() {
-            @Override
-            public void run() {
-                final HttpRawResponse response = HttpUtils.doRequest(
-                        BuildConfig.OM_SDK_JS_URL,
-                        HttpUtils.Method.GET,
-                        null);
+        ExecutorHelper.getExecutor().submit(() -> {
+            final HttpRawResponse response = HttpUtils.doRequest(
+                    BuildConfig.OM_SDK_JS_URL,
+                    HttpUtils.Method.GET,
+                    null);
 
-                final byte[] rawBody = response.getBody();
+            final byte[] rawBody = response.getBody();
 
-                // Main thread callback.
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    public void run() {
-                        if (response.getCode() != HttpURLConnection.HTTP_OK ||
-                                rawBody == null ||
-                                rawBody.length == 0) {
-                            sdkInitListener.onError("OM SDK javascript download failed");
-                            return;
-                        }
+            // Main thread callback.
+            new Handler(Looper.getMainLooper()).post(() -> {
+                if (response.getCode() != HttpURLConnection.HTTP_OK ||
+                        rawBody == null ||
+                        rawBody.length == 0) {
+                    sdkInitListener.onError("OM SDK javascript download failed");
+                    return;
+                }
 
-                        omSDKJavaScript = new String(rawBody);
+                omSDKJavaScript = new String(rawBody);
 
-                        initialized = true;
-                        sdkInitListener.onReady();
-                    }
-                });
-            }
+                initialized = true;
+                sdkInitListener.onReady();
+            });
         });
     }
 

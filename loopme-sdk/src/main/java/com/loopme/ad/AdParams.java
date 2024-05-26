@@ -38,7 +38,6 @@ public class AdParams implements Serializable {
     private boolean mIsMraid;
     private boolean mOwnCloseButton;
     private boolean mIsDebug;
-    private AdIds mAdIds;
 
     private String mId;
     private int mDuration;
@@ -82,7 +81,6 @@ public class AdParams implements Serializable {
         mPartPreload = builder.mPartPreload;
         mIsMraid = builder.mIsMraid;
         mIsDebug = builder.mIsDebug;
-        mAdIds = builder.mAdIds;
         mAutoLoading = builder.mAutoLoading;
         mAdSpotDimensions = builder.mAdSpotDimensions;
         Logging.out(LOG_TAG, "Server response indicates  ad params: "

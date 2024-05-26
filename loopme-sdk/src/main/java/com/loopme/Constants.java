@@ -121,7 +121,7 @@ public class Constants {
         SHOWING
     }
 
-    public class ConnectionType {
+    public static class ConnectionType {
         public static final int UNKNOWN = 0;
         public static final int ETHERNET = 1;
         public static final int WIFI = 2;
@@ -233,7 +233,7 @@ public class Constants {
         }
     }
 
-    public class ErrorType {
+    public static class ErrorType {
         public static final String SERVER = "server";
         public static final String BAD_ASSET = "bad_asset";
         public static final String JS = "js";
@@ -243,7 +243,7 @@ public class Constants {
         public static final String DO_NOT_TRACK = "do not track";
     }
 
-    public class MraidState {
+    public static class MraidState {
         public static final String DEFAULT = "default";
         public static final String LOADING = "loading";
         public static final String EXPANDED = "expanded";

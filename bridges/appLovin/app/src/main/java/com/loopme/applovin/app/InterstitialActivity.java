@@ -2,7 +2,6 @@ package com.loopme.applovin.app;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -12,11 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.applovin.mediation.MaxAd;
 import com.applovin.mediation.MaxAdListener;
 import com.applovin.mediation.MaxError;
-import com.applovin.mediation.MaxMediatedNetworkInfo;
 import com.applovin.mediation.ads.MaxInterstitialAd;
-import com.applovin.sdk.AppLovinSdk;
-import com.applovin.sdk.AppLovinSdkConfiguration;
-import com.loopme.LoopMeSdk;
 
 public class InterstitialActivity extends AppCompatActivity implements MaxAdListener {
     private static final String LOG_TAG = InterstitialActivity.class.getSimpleName();
