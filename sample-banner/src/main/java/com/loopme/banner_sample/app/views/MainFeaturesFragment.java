@@ -49,13 +49,9 @@ public class MainFeaturesFragment extends Fragment {
     }
 
     private OnItemClickedListener initOnItemClickListener() {
-        return new OnItemClickedListener() {
-
-            @Override
-            public void onItemClicked(String item) {
-                if (mListener != null) {
-                    mListener.onItemClicked(item);
-                }
+        return item -> {
+            if (mListener != null) {
+                mListener.onItemClicked(item);
             }
         };
     }

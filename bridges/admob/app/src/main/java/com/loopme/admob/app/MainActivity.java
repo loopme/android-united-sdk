@@ -10,8 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.AdapterStatus;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
 import java.util.Map;
 
@@ -40,20 +38,17 @@ public class MainActivity extends AppCompatActivity {
         rewardedButton.setEnabled(false);
         rewardedButton.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), RewardedVideoActivity.class)));
 
-        MobileAds.initialize(this, new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {
-                Map<String, AdapterStatus> statusMap = initializationStatus.getAdapterStatusMap();
-                for (String adapterClass : statusMap.keySet()) {
-                    AdapterStatus status = statusMap.get(adapterClass);
-                    Log.d("MyApp", String.format(
-                            "Adapter name: %s, Description: %s, Latency: %d",
-                            adapterClass, status.getDescription(), status.getLatency()));
-                }
-
-                toast("AdMob SDK initialized\n" + initializationStatus);
-                initButtons();
+        MobileAds.initialize(this, initializationStatus -> {
+            Map<String, AdapterStatus> statusMap = initializationStatus.getAdapterStatusMap();
+            for (String adapterClass : statusMap.keySet()) {
+                AdapterStatus status = statusMap.get(adapterClass);
+                Log.d("MyApp", String.format(
+                        "Adapter name: %s, Description: %s, Latency: %d",
+                        adapterClass, status.getDescription(), status.getLatency()));
             }
+
+            toast("AdMob SDK initialized\n" + initializationStatus);
+            initButtons();
         });
 //                initializationStatus -> {
 

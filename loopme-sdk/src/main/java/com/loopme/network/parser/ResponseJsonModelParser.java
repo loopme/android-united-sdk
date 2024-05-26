@@ -117,12 +117,7 @@ public class ResponseJsonModelParser extends BaseJSONParser {
         String advertiser = "";
         String lineitem = "";
         String appname = "";
-        String crtype = "";
-        if (adm.trim().toUpperCase().startsWith("<VAST")) {
-            crtype = "VAST";
-        } else {
-            crtype = "MRAID";
-        }
+        String crtype = adm.trim().toUpperCase().startsWith("<VAST") ? "VAST" : "MRAID";
         String orientation = "portrait";
         if (crtype.equals("VAST")) {
             orientation = "landscape";

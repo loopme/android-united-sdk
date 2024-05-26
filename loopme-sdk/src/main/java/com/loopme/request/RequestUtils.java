@@ -95,7 +95,7 @@ public class RequestUtils {
         if (adType == LoopMeAd.Type.HTML) return RequestConstants.API_HTML;
         if (adType == LoopMeAd.Type.VIDEO) return RequestConstants.API_VIDEO;
         return RequestConstants.API_ALL;
-    };
+    }
     int getInstl() { return mInstl; }
     Location getLocation() { return location; }
     int getSkippable() { return mSkippable; }

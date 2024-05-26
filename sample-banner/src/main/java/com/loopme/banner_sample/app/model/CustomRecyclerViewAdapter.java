@@ -45,12 +45,7 @@ public class CustomRecyclerViewAdapter extends RecyclerView.Adapter<CustomRecycl
     }
 
     private View.OnClickListener initClickListener(final CustomListItem item) {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(mContext, "Clicked " + item.getTitle(), Toast.LENGTH_SHORT).show();
-            }
-        };
+        return v -> Toast.makeText(mContext, "Clicked " + item.getTitle(), Toast.LENGTH_SHORT).show();
     }
 
     protected class CustomViewHolder extends RecyclerView.ViewHolder {

@@ -53,10 +53,7 @@ public class HttpUtils {
             response.setMessage(connection.getResponseMessage());
             Logging.out(LOG_TAG, "responseCode " + responseCode);
 
-        } catch (MalformedURLException e) {
-            Logging.out(LOG_TAG, e.getMessage());
-            response.setMessage(e.getMessage());
-        } catch (ProtocolException e) {
+        } catch (MalformedURLException | ProtocolException e) {
             Logging.out(LOG_TAG, e.getMessage());
             response.setMessage(e.getMessage());
         } catch (IOException e) {

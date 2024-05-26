@@ -351,12 +351,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
 
     @Override
     public void onAdLoadFail(final LoopMeError error) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                onLoopMeBannerLoadFail(error);
-            }
-        });
+        mHandler.post(() -> onLoopMeBannerLoadFail(error));
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.loopme.interstitial_sample;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,18 +30,8 @@ public class MainActivity
     }
 
     private void initViews() {
-        findViewById(R.id.show_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onShowClicked();
-            }
-        });
-        findViewById(R.id.load_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onLoadClicked();
-            }
-        });
+        findViewById(R.id.show_button).setOnClickListener(view -> onShowClicked());
+        findViewById(R.id.load_button).setOnClickListener(view -> onLoadClicked());
         initProgressDialog();
     }
 

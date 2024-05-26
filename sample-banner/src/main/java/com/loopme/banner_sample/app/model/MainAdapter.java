@@ -31,12 +31,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.CustomViewHold
     public void onBindViewHolder(CustomViewHolder viewHolder, int position) {
         final String item = mData.get(position);
         viewHolder.textView.setText(item);
-        viewHolder.textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onItemClicked(item);
-            }
-        });
+        viewHolder.textView.setOnClickListener(v -> onItemClicked(item));
     }
 
     @Override
