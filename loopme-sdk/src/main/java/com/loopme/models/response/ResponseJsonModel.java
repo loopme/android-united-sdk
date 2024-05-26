@@ -4,10 +4,14 @@ package com.loopme.models.response;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.loopme.Logging;
+import com.loopme.ad.AdType;
+
 import java.io.Serializable;
 import java.util.List;
 
 public class ResponseJsonModel implements Serializable, Parcelable {
+    private static final String LOG_TAG = ResponseJsonModel.class.getSimpleName();
     private final static long serialVersionUID = 738802787497556038L;
     private String id;
     private List<Seatbid> seatbid = null;
@@ -35,22 +39,12 @@ public class ResponseJsonModel implements Serializable, Parcelable {
         this.id = id;
     }
 
-    public ResponseJsonModel withId(String id) {
-        this.id = id;
-        return this;
-    }
-
     public List<Seatbid> getSeatbid() {
         return seatbid;
     }
 
     public void setSeatbid(List<Seatbid> seatbid) {
         this.seatbid = seatbid;
-    }
-
-    public ResponseJsonModel withSeatbid(List<Seatbid> seatbid) {
-        this.seatbid = seatbid;
-        return this;
     }
 
     public void writeToParcel(Parcel dest, int flags) {
@@ -60,5 +54,14 @@ public class ResponseJsonModel implements Serializable, Parcelable {
 
     public int describeContents() {
         return 0;
+    }
+
+    public static String getCreativeType(ResponseJsonModel responseModel) {
+        try {
+            return responseModel.getSeatbid().get(0).getBid().get(0).getExt().getCrtype();
+        } catch (IllegalArgumentException | NullPointerException ex) {
+            Logging.out(LOG_TAG, ex.getMessage());
+            return AdType.HTML.name();
+        }
     }
 }

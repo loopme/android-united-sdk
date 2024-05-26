@@ -120,10 +120,13 @@ public class AdFetchTask implements Runnable, Observer {
     }
 
     private boolean isVastWrapperCase(ResponseJsonModel body) {
-        if (!ParseService.isVastAd(body)) {
+        if (!ParseService.isAdOfType(ResponseJsonModel.getCreativeType(body), AdType.VAST)) {
             return false;
         }
-        mIsVastVpaidAd = ParseService.isVastVpaidAd(body);
+        String creativeType = ResponseJsonModel.getCreativeType(body);
+        mIsVastVpaidAd =
+            ParseService.isAdOfType(creativeType, AdType.VAST) ||
+            ParseService.isAdOfType(creativeType, AdType.VPAID);
         String vastString = XmlParseService.getVastString(body);
         VastInfo vastInfo = XmlParseService.getVastInfo(vastString);
         return mIsVastVpaidAd && vastInfo != null && vastInfo.hasWrapper();
@@ -158,7 +161,7 @@ public class AdFetchTask implements Runnable, Observer {
             return;
         }
         mOrientation = XmlParseService.parseOrientation(body);
-        mAdType = ParseService.parseCreativeType(body);
+        mAdType = AdType.fromString(ResponseJsonModel.getCreativeType(body));
         launchVastFetcher(body);
     }
 

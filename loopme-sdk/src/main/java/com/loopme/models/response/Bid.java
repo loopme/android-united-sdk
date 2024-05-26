@@ -60,15 +60,6 @@ public class Bid implements Serializable, Parcelable {
         return ext;
     }
 
-    public void setExt(Ext ext) {
-        this.ext = ext;
-    }
-
-    public Bid withExt(Ext ext) {
-        this.ext = ext;
-        return this;
-    }
-
     public String getId() {
         return id;
     }
@@ -77,100 +68,16 @@ public class Bid implements Serializable, Parcelable {
         this.id = id;
     }
 
-    public Bid withId(String id) {
-        this.id = id;
-        return this;
-    }
-
-    public String getImpid() {
-        return impid;
-    }
-
-    public void setImpid(String impid) {
-        this.impid = impid;
-    }
-
-    public Bid withImpid(String impid) {
-        this.impid = impid;
-        return this;
-    }
-
     public String getAdid() {
         return adid;
-    }
-
-    public void setAdid(String adid) {
-        this.adid = adid;
-    }
-
-    public Bid withAdid(String adid) {
-        this.adid = adid;
-        return this;
     }
 
     public String getAdm() {
         return adm;
     }
 
-    public void setAdm(String adm) {
-        this.adm = adm;
-    }
-
-    public Bid withAdm(String adm) {
-        this.adm = adm;
-        return this;
-    }
-
-    public List<String> getAdomain() {
-        return adomain;
-    }
-
-    public void setAdomain(List<String> adomain) {
-        this.adomain = adomain;
-    }
-
-    public Bid withAdomain(List<String> adomain) {
-        this.adomain = adomain;
-        return this;
-    }
-
-    public String getIurl() {
-        return iurl;
-    }
-
-    public void setIurl(String iurl) {
-        this.iurl = iurl;
-    }
-
-    public Bid withIurl(String iurl) {
-        this.iurl = iurl;
-        return this;
-    }
-
-    public String getCid() {
-        return cid;
-    }
-
-    public void setCid(String cid) {
-        this.cid = cid;
-    }
-
-    public Bid withCid(String cid) {
-        this.cid = cid;
-        return this;
-    }
-
     public String getCrid() {
         return crid;
-    }
-
-    public void setCrid(String crid) {
-        this.crid = crid;
-    }
-
-    public Bid withCrid(String crid) {
-        this.crid = crid;
-        return this;
     }
 
     public void writeToParcel(Parcel dest, int flags) {

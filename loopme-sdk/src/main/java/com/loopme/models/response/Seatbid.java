@@ -32,15 +32,6 @@ public class Seatbid implements Serializable, Parcelable {
         return bid;
     }
 
-    public void setBid(List<Bid> bid) {
-        this.bid = bid;
-    }
-
-    public Seatbid withBid(List<Bid> bid) {
-        this.bid = bid;
-        return this;
-    }
-
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeList(bid);
     }

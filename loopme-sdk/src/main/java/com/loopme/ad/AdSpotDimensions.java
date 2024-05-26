@@ -58,5 +58,11 @@ public class AdSpotDimensions {
         );
 
     }
+    public static AdSpotDimensions getDefaultBanner() {
+        return new AdSpotDimensions(
+            Constants.DEFAULT_BANNER_WIDTH,
+            Constants.DEFAULT_BANNER_HEIGHT
+        );
+    }
 
 }

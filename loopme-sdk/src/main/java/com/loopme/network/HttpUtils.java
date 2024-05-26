@@ -10,7 +10,6 @@ import com.loopme.utils.IOUtils;
 import com.loopme.utils.Utils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -37,22 +36,17 @@ public class HttpUtils {
         try {
             connection = createConnection(url);
             connection.setRequestMethod(httpMethod.name());
-
             if (httpMethod == Method.POST) {
                 connection.setRequestProperty(HEADER_CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF_8);
                 writeBody(connection, body);
             }
-
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                InputStream inputStream = connection.getInputStream();
-                byte[] bytes = IOUtils.inputStreamToByteArray(inputStream);
-                response.setBody(bytes);
+                response.setBody(IOUtils.inputStreamToByteArray(connection.getInputStream()));
             }
             response.setCode(responseCode);
             response.setMessage(connection.getResponseMessage());
             Logging.out(LOG_TAG, "responseCode " + responseCode);
-
         } catch (MalformedURLException | ProtocolException e) {
             Logging.out(LOG_TAG, e.getMessage());
             response.setMessage(e.getMessage());
@@ -96,8 +90,7 @@ public class HttpUtils {
     }
 
     private static HttpURLConnection createConnection(String urlStr) throws IOException {
-        URL url = new URL(urlStr);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection connection = (HttpURLConnection) (new URL(urlStr)).openConnection();
         connection.setConnectTimeout(CONNECT_TIMEOUT);
         connection.setReadTimeout(READ_TIMEOUT);
         connection.setRequestProperty(HEADER_USER_AGENT, Utils.getUserAgent());
