@@ -1,6 +1,5 @@
 package com.loopme.parser;
 
-import android.content.Context;
 import android.text.TextUtils;
 
 import com.loopme.Constants;
@@ -17,41 +16,47 @@ import com.loopme.tracker.AdIds;
 import com.loopme.tracker.partners.LoopMeTracker;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ParseService {
 
+    private static final String LOG_TAG = ParseService.class.getSimpleName();
     private static final String DEFAULT = "default";
     private static final String PORTRAIT = "portrait";
 
-    private static final int FIRST_ELEMENT = 0;
+    public interface RetrieveOperation<T> {
+        T execute() throws Exception;
+    }
+    private static <T> T safelyRetrieve(RetrieveOperation<T> operation, T defaultValue) {
+        try {
+            return operation.execute();
+        } catch (Exception ex) {
+            Logging.out(LOG_TAG, ex.getMessage());
+            return defaultValue;
+        }
+    }
 
     public static LoopMeAd getLoopMeAdFromResponse(LoopMeAd loopMeAd, ResponseJsonModel responseModel) {
-        String creativeType = parseCreativeTypeFromModel(responseModel);
+        String creativeType = ResponseJsonModel.getCreativeType(responseModel);
         if (creativeType == null) {
             return null;
         }
         AdParams adParams = parse(responseModel, loopMeAd);
-        if (isHtmlAd(creativeType)) {
+        if (isAdOfType(creativeType, AdType.HTML)) {
             setAdType(adParams, AdType.HTML);
-        } else if (isVastAd(creativeType)) {
+        } else if (isAdOfType(creativeType, AdType.VAST)) {
             adParams = XmlParseService.parse(adParams, responseModel);
             setAdType(adParams, AdType.VAST);
-        } else if (isVpaidAd(creativeType)) {
+        } else if (isAdOfType(creativeType, AdType.VPAID)) {
             adParams = XmlParseService.parse(adParams, responseModel);
             setAdType(adParams, AdType.VPAID);
-        } else if (isMraidAd(creativeType)) {
+        } else if (isAdOfType(creativeType, AdType.MRAID)) {
             setAdType(adParams, AdType.MRAID);
         }
-        sendErrorIfParamsNull(loopMeAd, adParams);
-        loopMeAd.setAdParams(adParams);
-        return loopMeAd;
-    }
-
-    private static void sendErrorIfParamsNull(LoopMeAd loopMeAd, AdParams adParams) {
         if (adParams == null) {
             LoopMeTracker.post(Errors.PARSING_ERROR.getMessage());
         }
+        loopMeAd.setAdParams(adParams);
+        return loopMeAd;
     }
 
     private static void setAdType(AdParams adParams, AdType adType) {
@@ -61,53 +66,42 @@ public class ParseService {
     }
 
     public static AdParams parse(ResponseJsonModel responseModel, LoopMeAd loopMeAd) {
-        Bid bidObject = retrieveBidObject(responseModel);
+        Bid bidObject = safelyRetrieve(() -> responseModel.getSeatbid().get(0).getBid().get(0), null);
         if (bidObject == null) {
             return null;
         }
-        String html = retrieveAdm(bidObject);
-        String orientation = retrieveOrientation(bidObject);
-        String token = retrieveAdIdToken(bidObject);
-        boolean debug = retrieveDebug(bidObject);
-        List<String> measurePartners = retrieveMeasurePartners(bidObject);
-        AdIds adIds = parseAdIds(bidObject, loopMeAd.getContext());
-        boolean autoLoadingValue = retrieveAutoLoadingWithDefaultTrue(bidObject);
-        List<String> packageIds = retrievePackageIds(bidObject.getExt());
-        AdSpotDimensions adSpotDimensions = retrieveAdDimensionsForNoneVastOrDefault(bidObject);
 
         return new AdParams.AdParamsBuilder(retrieveAdFormat(loopMeAd))
-            .html(html)
-            .orientation(orientation)
-            .token(token)
-            .debug(debug)
-            .trackersList(measurePartners)
-            .packageIds(packageIds)
+            .html(safelyRetrieve(() -> bidObject.getAdm(), ""))
+            .orientation(safelyRetrieve(() -> {
+                String orientation = bidObject.getExt().getOrientation();
+                return orientation.equalsIgnoreCase(DEFAULT) ? PORTRAIT : orientation;
+            }, PORTRAIT))
+            .token(safelyRetrieve(() -> bidObject.getId(), ""))
+            .debug(safelyRetrieve(() -> bidObject.getExt().getDebug() == 1, false))
+            .trackersList(safelyRetrieve(() -> bidObject.getExt().getMeasurePartners(), new ArrayList<>()))
+            .packageIds(safelyRetrieve(() -> new ArrayList<>(bidObject.getExt().getPackageIds()), new ArrayList<>()))
             .mraid(false)
-            .adIds(adIds)
-            .autoLoading(autoLoadingValue)
-            .adSpotDimensions(adSpotDimensions)
+            .adIds(bidObject.getExt() == null ?
+                new AdIds() : parseAdIds(bidObject, loopMeAd.getContext().getPackageName())
+            )
+            .autoLoading(retrieveAutoLoadingWithDefaultTrue(bidObject))
+            .adSpotDimensions(retrieveAdDimensionsForNoneVastOrDefault(bidObject))
             .build();
     }
 
     private static AdSpotDimensions retrieveAdDimensionsForNoneVastOrDefault(Bid bidObject) {
-        String creativeType = parseCreativeTypeFromBid(bidObject);
-        if (!isHtmlAd(creativeType) && !isMraidAd(creativeType)) {
-            return new AdSpotDimensions(
-                Constants.DEFAULT_BANNER_WIDTH, Constants.DEFAULT_BANNER_HEIGHT
-            );
-        }
-        HtmlParser parser = new HtmlParser(retrieveAdm(bidObject));
-        return new AdSpotDimensions(parser.getAdWidth(), parser.getAdHeight());
-    }
-
-    private static List<String> retrievePackageIds(Ext ext) {
-        List<String> packageIds = new ArrayList<>();
+        String creativeType = AdType.HTML.name();
         try {
-            packageIds.addAll(ext.getPackageIds());
-        } catch (IllegalStateException | NullPointerException ex) {
-            Logging.out("param", "package ids is absence");
+            creativeType = bidObject.getExt().getCrtype();
+        } catch (IllegalArgumentException | NullPointerException ex) {
+            Logging.out(LOG_TAG, ex.getMessage());
         }
-        return packageIds;
+        if (!isAdOfType(creativeType, AdType.HTML) && !isAdOfType(creativeType, AdType.MRAID)) {
+            return AdSpotDimensions.getDefaultBanner();
+        }
+        HtmlParser parser = new HtmlParser(safelyRetrieve(() -> bidObject.getAdm(), ""));
+        return new AdSpotDimensions(parser.getAdWidth(), parser.getAdHeight());
     }
 
     private static boolean retrieveAutoLoadingWithDefaultTrue(Bid bidObject) {
@@ -116,7 +110,7 @@ public class ParseService {
         try {
             autoLoadingValue = bidObject.getExt().getAutoLoading();
         } catch (IllegalStateException | NullPointerException ex) {
-            ex.printStackTrace();
+            Logging.out(LOG_TAG, ex.getMessage());
         }
         if (autoLoadingValue == Constants.AUTO_LOADING_ABSENCE) {
             Logging.out(ParseService.class.getSimpleName(), "autoLoadingValue is absence");
@@ -126,14 +120,9 @@ public class ParseService {
         return autoLoadingValue == 1;
     }
 
-    private static AdIds parseAdIds(Bid bid, Context context) {
-        AdIds adIds = new AdIds();
-
-        if (bid == null || bid.getExt() == null) {
-            return adIds;
-        }
-
+    private static AdIds parseAdIds(Bid bid, String packageName) {
         Ext ext = bid.getExt();
+        AdIds adIds = new AdIds();
         adIds.setAdvertiserId(ext.getAdvertiser());
         adIds.setCampaignId(ext.getCampaign());
         adIds.setLineItemId(ext.getLineitem());
@@ -143,7 +132,7 @@ public class ParseService {
         adIds.setCompany(ext.getCompany());
         adIds.setDeveloper(ext.getDeveloper());
         adIds.setAppName(ext.getAppname());
-        adIds.setAppBundle(context.getPackageName());
+        adIds.setAppBundle(packageName);
 
         return adIds;
     }
@@ -156,105 +145,7 @@ public class ParseService {
             Constants.BANNER_TAG : Constants.INTERSTITIAL_TAG;
     }
 
-    private static String retrieveAdIdToken(Bid bidObject) {
-        try {
-            return bidObject.getId();
-        } catch (IllegalStateException | NullPointerException ex) {
-            ex.printStackTrace();
-        }
-        return "";
-    }
-
-    private static Bid retrieveBidObject(ResponseJsonModel responseModel) {
-        try {
-            return responseModel.getSeatbid().get(FIRST_ELEMENT).getBid().get(FIRST_ELEMENT);
-        } catch (IllegalArgumentException | NullPointerException ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
-
-    private static boolean retrieveDebug(Bid bidObject) {
-        try {
-            return bidObject.getExt().getDebug() == 1;
-        } catch (IllegalStateException | NullPointerException ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
-    private static List<String> retrieveMeasurePartners(Bid bidObject) {
-        try {
-            return bidObject.getExt().getMeasurePartners();
-        } catch (IllegalStateException | NullPointerException ex) {
-            ex.printStackTrace();
-        }
-        return new ArrayList<>();
-    }
-
-    private static String retrieveOrientation(Bid bidObject) {
-        try {
-            String orientation = bidObject.getExt().getOrientation();
-            return orientation.equalsIgnoreCase(DEFAULT) ? PORTRAIT : orientation;
-        } catch (IllegalStateException | NullPointerException ex) {
-            ex.printStackTrace();
-        }
-        return PORTRAIT;
-    }
-
-    private static String retrieveAdm(Bid bidObject) {
-        try {
-            return bidObject.getAdm();
-        } catch (IllegalStateException | NullPointerException ex) {
-            ex.printStackTrace();
-        }
-        return "";
-    }
-
-    private static String parseCreativeTypeFromModel(ResponseJsonModel responseModel) {
-        try {
-            return responseModel.getSeatbid().get(FIRST_ELEMENT).getBid().get(FIRST_ELEMENT).getExt().getCrtype();
-        } catch (IllegalArgumentException | NullPointerException ex) {
-            ex.printStackTrace();
-        }
-        return AdType.HTML.name();
-    }
-
-    private static String parseCreativeTypeFromBid(Bid bid) {
-        try {
-            return bid.getExt().getCrtype();
-        } catch (IllegalArgumentException | NullPointerException ex) {
-            ex.printStackTrace();
-        }
-        return AdType.HTML.name();
-    }
-
-    public static boolean isVastVpaidAd(ResponseJsonModel responseModel) {
-        String creativeType = parseCreativeTypeFromModel(responseModel);
-        return isVastAd(creativeType) || isVpaidAd(creativeType);
-    }
-
-    private static boolean isVpaidAd(String creativeType) {
-        return !TextUtils.isEmpty(creativeType) && creativeType.equalsIgnoreCase(AdType.VPAID.name());
-    }
-
-    private static boolean isVastAd(String creativeType) {
-        return !TextUtils.isEmpty(creativeType) && creativeType.equalsIgnoreCase(AdType.VAST.name());
-    }
-
-    public static boolean isVastAd(ResponseJsonModel responseJsonModel) {
-        return isVastAd(parseCreativeTypeFromModel(responseJsonModel));
-    }
-
-    private static boolean isHtmlAd(String creativeType) {
-        return !TextUtils.isEmpty(creativeType) && creativeType.equalsIgnoreCase(AdType.HTML.name());
-    }
-
-    public static AdType parseCreativeType(ResponseJsonModel body) {
-        return AdType.fromString(parseCreativeTypeFromModel(body));
-    }
-
-    public static boolean isMraidAd(String creativeType) {
-        return !TextUtils.isEmpty(creativeType) && creativeType.equalsIgnoreCase(AdType.MRAID.name());
+    public static boolean isAdOfType(String creativeType, AdType adType) {
+        return !TextUtils.isEmpty(creativeType) && creativeType.equalsIgnoreCase(adType.name());
     }
 }

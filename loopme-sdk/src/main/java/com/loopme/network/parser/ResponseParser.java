@@ -15,6 +15,7 @@ import java.net.HttpURLConnection;
 
 public class ResponseParser {
 
+    private static final String LOG_TAG = ResponseParser.class.getSimpleName();
     @NonNull
     public static GetResponse<String> parseStringBody(HttpRawResponse rawResponse) {
         GetResponse<String> response = new GetResponse<>();
@@ -27,60 +28,50 @@ public class ResponseParser {
             response.setMessage(Errors.ERROR_MESSAGE_BROKEN_SERVERS_RESPONSE);
             return response;
         }
-        String bodyAsString = new String(rawResponse.getBody()).intern();
         response.setCode(rawResponse.getCode());
-        response.setBody(bodyAsString);
+        response.setBody(new String(rawResponse.getBody()).intern());
         return response;
     }
 
     @NonNull
     public static GetResponse<ResponseJsonModel> parse(HttpRawResponse rawResponse) {
         GetResponse<ResponseJsonModel> response = new GetResponse<>();
-        if (rawResponse.getCode() != HttpURLConnection.HTTP_OK) {
-            response.setCode(rawResponse.getCode());
+        int code = rawResponse.getCode();
+        byte[] body = rawResponse.getBody();
+        if (code != HttpURLConnection.HTTP_OK) {
+            response.setCode(code);
             response.setMessage(rawResponse.getMessage());
             return response;
         }
-        if (!isBodyParcelable(rawResponse)) {
+        String bodyAsString = new String(body).intern();
+        ResponseJsonModel responseJsonModel = convertToResponseJsonModel(bodyAsString);
+        boolean isBodyParcelable =
+            body != null &&
+            parseToJsonObject(bodyAsString) != null &&
+            responseJsonModel != null;
+        if (!isBodyParcelable) {
             response.setMessage(Errors.ERROR_MESSAGE_BROKEN_SERVERS_RESPONSE);
             return response;
         }
-        String bodyAsString = new String(rawResponse.getBody()).intern();
-        ResponseJsonModel responseJsonModel = convertToResponseJsonModel(bodyAsString);
-        response.setCode(rawResponse.getCode());
+        response.setCode(code);
         response.setBody(responseJsonModel);
         return response;
     }
 
-    private static boolean isBodyParcelable(HttpRawResponse response) {
-        byte[] body = response.getBody();
-        return body != null && isParcelableAsJson(body) && isParcelableAsResponseJsonModel(body);
-    }
-
-    private static boolean isParcelableAsResponseJsonModel(byte[] data) {
-        return convertToResponseJsonModel(new String(data).intern()) != null;
-    }
-
-    private static boolean isParcelableAsJson(byte[] data) {
-        return parseToJsonObject(data) != null;
-    }
-
-    private static JSONObject parseToJsonObject(byte[] data) {
+    private static JSONObject parseToJsonObject(String body) {
         try {
-            String bodyAsString = new String(data).intern();
-            return new JSONObject(bodyAsString);
+            return new JSONObject(body);
         } catch (JSONException | UnsupportedOperationException e) {
-            Logging.out(ResponseParser.class.getSimpleName(), e.getMessage());
+            Logging.out(LOG_TAG, e.getMessage());
+            return null;
         }
-        return null;
     }
 
     private static ResponseJsonModel convertToResponseJsonModel(String body) {
         try {
-            ResponseJsonModelParser parser = new ResponseJsonModelParser();
-            return parser.parse(new JSONObject(body));
+            return (new ResponseJsonModelParser()).parse(new JSONObject(body));
         } catch (JSONException e) {
-            e.printStackTrace();
+            Logging.out(LOG_TAG, e.getMessage());
         }
         return null;
     }
