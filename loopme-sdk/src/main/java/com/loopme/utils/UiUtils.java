@@ -95,6 +95,7 @@ public class UiUtils {
         }
         Intent intent = new Intent();
         intent.setAction(intentAction);
+        intent.setPackage(context.getPackageName());
         if (adId != Constants.DEFAULT_AD_ID) {
             intent.putExtra(Constants.AD_ID_TAG, adId);
         }
