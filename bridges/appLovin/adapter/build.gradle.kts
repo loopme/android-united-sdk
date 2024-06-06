@@ -11,8 +11,8 @@ android {
 }
 
 dependencies {
-    api(project(":loopme-sdk"))
-//    api("com.github.loopme.android-united-sdk:loopme-sdk:9.0.2")
+//    api(project(":loopme-sdk"))
+    api("com.github.loopme.android-united-sdk:loopme-sdk:9.0.3")
     api("com.applovin:applovin-sdk:12.5.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.12.0")
