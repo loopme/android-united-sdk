@@ -26,13 +26,11 @@ public class LoopMeWebView extends WebView {
     public LoopMeWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
         configureWebSettings();
-        allowCookies();
     }
 
     public LoopMeWebView(Context context) {
         super(context);
         configureWebSettings();
-        allowCookies();
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -48,22 +46,15 @@ public class LoopMeWebView extends WebView {
         webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
-        setDebugConfig();
-        Logging.out(LOG_TAG, "Encoding: " + getSettings().getDefaultTextEncodingName());
-    }
-
-    private void allowCookies() {
-        CookieManager cookieManager = CookieManager.getInstance();
-        cookieManager.setAcceptCookie(true);
-        cookieManager.setAcceptThirdPartyCookies(this, true);
-    }
-
-    private void setDebugConfig() {
         if (BuildConfig.DEBUG || Constants.sDebugMode) {
-            getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+            webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
             clearCache(true);
             setWebContentsDebuggingEnabled(true);
         }
+        Logging.out(LOG_TAG, "Encoding: " + getSettings().getDefaultTextEncodingName());
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);
+        cookieManager.setAcceptThirdPartyCookies(this, true);
     }
 
     public void loadHtml(String html) {
@@ -80,7 +71,12 @@ public class LoopMeWebView extends WebView {
         setWebChromeClient(new AdViewChromeClient());
     }
 
-    // TODO. Refactor.
+    private void tryRemoveFromParent() {
+        ViewParent parent = getParent();
+        if (parent != null)
+            ((ViewGroup) parent).removeView(this);
+    }
+
     @Override
     public void destroy() {
         tryRemoveFromParent();
@@ -90,27 +86,9 @@ public class LoopMeWebView extends WebView {
         setWebViewClient(null);
         setWebChromeClient(null);
         loadCommand("about:blank");
-        super.destroy();
-    }
-
-    // TODO. Refactor.
-    protected void destroyGracefully() {
-        tryRemoveFromParent();
-
-        clearCache(true);
-        clearHistory();
-
-        setWebViewClient(null);
-        setWebChromeClient(null);
-
+        // This helps Omid to send sessionFinish js event when ad is about to be destroyed.
         new Handler(Looper.getMainLooper())
             .postDelayed(LoopMeWebView.super::destroy, com.loopme.om.OmidHelper.FINISH_AD_SESSION_DELAY_MILLIS);
-    }
-
-    private void tryRemoveFromParent() {
-        ViewParent parent = getParent();
-        if (parent != null)
-            ((ViewGroup) parent).removeView(this);
     }
 
     public void setWebViewState(Constants.WebviewState webviewState) {
@@ -118,13 +96,10 @@ public class LoopMeWebView extends WebView {
             return;
         }
         mViewState = webviewState;
-        String command = BridgeCommandBuilder.webviewState(BridgeCommandBuilder.LOOPME_PREFIX, mViewState);
-        Logging.out(LOG_TAG, "setWebViewState() : " + webviewState.name());
-        loadCommand(command);
+        loadCommand(BridgeCommandBuilder.webviewState(BridgeCommandBuilder.LOOPME_PREFIX, mViewState));
     }
 
     protected void loadCommand(String command) {
-        Logging.out(LOG_TAG, command);
         loadUrl(command);
     }
 

@@ -8,7 +8,9 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
@@ -23,13 +25,11 @@ import androidx.fragment.app.FragmentActivity;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.R;
-import com.loopme.SensorManagerExtension;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.ad.LoopMeAdHolder;
 import com.loopme.controllers.display.BaseTrackableController;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
 import com.loopme.receiver.AdReceiver;
-import com.loopme.receiver.MraidAdCloseButtonReceiver;
 import com.loopme.utils.PermissionUtils;
 import com.loopme.views.CloseButton;
 import com.loopme.views.LoopMeWebView;
@@ -38,14 +38,9 @@ import com.loopme.views.webclient.AdViewChromeClient;
 import java.util.List;
 
 
-public final class BaseActivity extends FragmentActivity
-        implements AdReceiver.Listener,
-        MraidAdCloseButtonReceiver.MraidAdCloseButtonListener,
-        SensorManagerExtension.OnLoopMeSensorListener, AdViewChromeClient.PermissionResolver {
-
+public final class BaseActivity extends FragmentActivity implements AdViewChromeClient.PermissionResolver {
     private static final String LOG_TAG = BaseActivity.class.getSimpleName();
     private static final int START_DEFAULT_POSITION = 0;
-
     private static final int REQUEST_GENERAL_PERMISSIONS = 0;
     private static final int REQUEST_LOCATION_PERMISSIONS = 1;
 
@@ -59,14 +54,39 @@ public final class BaseActivity extends FragmentActivity
 
     // MRAID
     private CloseButton mMraidCloseButton;
-    private MraidAdCloseButtonReceiver mMraidCloseButtonReceiver;
     private boolean mIsDestroyBroadcastReceived;
+    private String[] generalPermissionsFromWebViewRequest;
+    private static final String[] LOCATION_PERMISSIONS = new String[]{
+        ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION
+    };
+
+    private void registerDestroyReceiver() {
+        mAdReceiver = new AdReceiver(new AdReceiver.Listener() {
+            @Override
+            public void onDestroyBroadcast() {
+                Logging.out(LOG_TAG, "onDestroyBroadcast");
+                mIsDestroyBroadcastReceived = true;
+                if (mLoopMeAd.isBanner())
+                    ((DisplayControllerLoopMe) mDisplayController).switchToPreviousMode();
+                unregisterDestroyReceiver();
+                finish();
+            }
+
+            @Override
+            public void onClickBroadcast() {
+                Logging.out(LOG_TAG, "onClickBroadcast()");
+            }
+        }, mLoopMeAd.getAdId());
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Constants.DESTROY_INTENT);
+        filter.addAction(Constants.CLICK_INTENT);
+        ContextCompat.registerReceiver(this, mAdReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Logging.out(LOG_TAG, "onCreate");
-
         Intent intent = getIntent();
         mLoopMeAd = intent == null ? null : LoopMeAdHolder.getAd(intent);
         mDisplayController = mLoopMeAd == null ? null : mLoopMeAd.getDisplayController();
@@ -77,7 +97,13 @@ public final class BaseActivity extends FragmentActivity
             return;
         }
 
-        goHWAcceleratedFullscreenMode();
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         setRequestedOrientation(mDisplayController.getOrientation());
@@ -95,44 +121,35 @@ public final class BaseActivity extends FragmentActivity
         registerDestroyReceiver();
 
         if (mLoopMeAd.isMraidAd()) {
-            initMraidCloseButton();
-            registerMraidCloseButtonReceiver();
+            mMraidCloseButton = new CloseButton(this);
+            mMraidCloseButton.registerReceiver();
+
+            DisplayControllerLoopMe dc = (DisplayControllerLoopMe) mDisplayController;
+            if (mLoopMeAd.isInterstitial()) {
+                mMraidCloseButton.setOnClickListener(v -> dc.closeMraidAd());
+            } else {
+                mMraidCloseButton.setOnClickListener(v -> dc.collapseMraidBanner());
+            }
+            dc.tryAddOmidFriendlyObstructionCloseButton(mMraidCloseButton);
+            mLoopMeContainerView.addView(mMraidCloseButton, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.END
+            ));
         }
-    }
-
-    private void goHWAcceleratedFullscreenMode() {
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
-                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
     }
 
     private void setContentView() {
         setContentView(R.layout.base_activity_main);
-
-        // Debug obstruction visibility.
         Bundle b = getIntent().getExtras();
-
-        View debugObstruction = findViewById(R.id.debug_obstruction);
-        debugObstruction.setVisibility(
-                b != null && b.getBoolean(Constants.EXTRAS_DEBUG_OBSTRUCTION_ENABLED)
-                        ? View.VISIBLE
-                        : View.GONE);
-
+        boolean isDebugObstructionEnabled = b != null && b.getBoolean(Constants.EXTRAS_DEBUG_OBSTRUCTION_ENABLED);
+        findViewById(R.id.debug_obstruction).setVisibility(isDebugObstructionEnabled ? View.VISIBLE : View.GONE);
         mLoopMeContainerView = findViewById(R.id.loopme_container_view);
         mLoopMeAd.onNewContainer(mLoopMeContainerView);
     }
 
     // TODO. Ugly. For permission dialogs.
     private static void trySetPermissionResolveListener(
-            WebView webView,
-            AdViewChromeClient.PermissionResolver permissionResolver) {
-
+        WebView webView, AdViewChromeClient.PermissionResolver permissionResolver
+    ) {
         AdViewChromeClient chromeClient = tryGetAdViewChromeClient(webView);
         if (chromeClient != null)
             chromeClient.setPermissionResolveListener(permissionResolver);
@@ -147,34 +164,29 @@ public final class BaseActivity extends FragmentActivity
         return wcc instanceof AdViewChromeClient ? (AdViewChromeClient) wcc : null;
     }
 
-    private void hideSystemUI() {
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
-    }
-
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus)
-            hideSystemUI();
+        if (!hasFocus) {
+            return;
+        }
+        getWindow().getDecorView().setSystemUiVisibility(
+            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+        );
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
         if (!mFirstLaunch) {
             mLoopMeAd.resume();
             return;
         }
-
         mFirstLaunch = false;
-
         if (mLoopMeAd.isInterstitial())
             mDisplayController.onPlay(START_DEFAULT_POSITION);
-
         if (mDisplayController instanceof DisplayControllerLoopMe)
             mLoopMeAd.resume();
     }
@@ -182,29 +194,31 @@ public final class BaseActivity extends FragmentActivity
     @Override
     protected void onPause() {
         super.onPause();
-
         if (!mIsDestroyBroadcastReceived)
             mLoopMeAd.pause();
     }
 
+    private void unregisterDestroyReceiver() {
+        if (mAdReceiver != null)
+            unregisterReceiver(mAdReceiver);
+        mAdReceiver = null;
+    }
+
     @Override
     protected void onDestroy() {
-
         if (mDisplayController != null)
             trySetPermissionResolveListener(mDisplayController.getWebView(), null);
-
-        if (mDisplayController instanceof DisplayControllerLoopMe)
-            ((DisplayControllerLoopMe) mDisplayController)
+        if (mDisplayController instanceof DisplayControllerLoopMe) {
+            if (mMraidCloseButton != null) {
+                ((DisplayControllerLoopMe) mDisplayController)
                     .tryRemoveOmidFriendlyObstruction(mMraidCloseButton);
-
+                mMraidCloseButton.unregisterReceiver();
+            }
+        }
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-
         if (mLoopMeContainerView != null)
             mLoopMeContainerView.removeAllViews();
-
         unregisterDestroyReceiver();
-        unregisterMraidCloseButtonReceiver();
-
         super.onDestroy();
     }
 
@@ -212,92 +226,11 @@ public final class BaseActivity extends FragmentActivity
     public void onBackPressed() {
         if (!mLoopMeAd.isBanner())
             return;
-
         DisplayControllerLoopMe dc = (DisplayControllerLoopMe) mDisplayController;
-
         dc.collapseMraidBanner();
         dc.switchToPreviousMode();
         dc.onAdExitedFullScreenEvent();
-
         super.onBackPressed();
-    }
-
-    @Override
-    public void onDestroyBroadcast() {
-        Logging.out(LOG_TAG, "onDestroyBroadcast");
-        mIsDestroyBroadcastReceived = true;
-
-        if (mLoopMeAd.isBanner())
-            ((DisplayControllerLoopMe) mDisplayController).switchToPreviousMode();
-
-        unregisterDestroyReceiver();
-
-        finish();
-    }
-
-    @Override
-    public void onClickBroadcast() {
-        Logging.out(LOG_TAG, "onClickBroadcast()");
-    }
-
-    private void initMraidCloseButton() {
-        final DisplayControllerLoopMe dc = (DisplayControllerLoopMe) mDisplayController;
-
-        mMraidCloseButton = new CloseButton(this);
-        mMraidCloseButton.addInLayout(mLoopMeContainerView);
-        mMraidCloseButton.setOnClickListener(v -> {
-            if (mLoopMeAd.isInterstitial())
-                dc.closeMraidAd();
-            else
-                dc.collapseMraidBanner();
-        });
-
-        onCloseButtonVisibilityChanged(mLoopMeAd.getAdParams().isOwnCloseButton());
-
-        dc.tryAddOmidFriendlyObstructionCloseButton(mMraidCloseButton);
-    }
-
-    @Override
-    public void onCloseButtonVisibilityChanged(boolean customCloseButton) {
-        mMraidCloseButton.setVisibility((mLoopMeAd.isMraidAd() || !customCloseButton) ? View.VISIBLE : View.GONE);
-    }
-
-    @Override
-    public void onAdShake() {
-        mDisplayController.onAdShake();
-    }
-
-    private void registerDestroyReceiver() {
-        mAdReceiver = new AdReceiver(this, mLoopMeAd.getAdId());
-
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Constants.DESTROY_INTENT);
-        filter.addAction(Constants.CLICK_INTENT);
-
-        ContextCompat.registerReceiver(this, mAdReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
-    }
-
-    private void unregisterDestroyReceiver() {
-        if (mAdReceiver != null)
-            unregisterReceiver(mAdReceiver);
-
-        mAdReceiver = null;
-    }
-
-    private void registerMraidCloseButtonReceiver() {
-        mMraidCloseButtonReceiver = new MraidAdCloseButtonReceiver(this);
-
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Constants.MRAID_NEED_CLOSE_BUTTON);
-
-        ContextCompat.registerReceiver(this, mMraidCloseButtonReceiver, intentFilter, ContextCompat.RECEIVER_NOT_EXPORTED);
-    }
-
-    private void unregisterMraidCloseButtonReceiver() {
-        if (mMraidCloseButtonReceiver != null)
-            unregisterReceiver(mMraidCloseButtonReceiver);
-
-        mMraidCloseButtonReceiver = null;
     }
 
     @Override
@@ -310,11 +243,11 @@ public final class BaseActivity extends FragmentActivity
 
         if (requestCode == REQUEST_GENERAL_PERMISSIONS) {
             chromeClient.setGeneralPermissionsResponse(
-                    PermissionUtils.groupPermissions(
-                            this,
-                            generalPermissionsFromWebViewRequest)
-                            .getGrantedPermissions()
-                            .toArray(new String[0])
+                PermissionUtils.groupPermissions(
+                    this,
+                    generalPermissionsFromWebViewRequest)
+                    .getGrantedPermissions()
+                    .toArray(new String[0])
             );
             generalPermissionsFromWebViewRequest = null;
         }
@@ -350,8 +283,6 @@ public final class BaseActivity extends FragmentActivity
         );
     }
 
-    private String[] generalPermissionsFromWebViewRequest;
-
     @Override
     public void onCancelGeneralPermissionsRequest() {
         generalPermissionsFromWebViewRequest = null;
@@ -366,10 +297,10 @@ public final class BaseActivity extends FragmentActivity
 
         if (deniedPermissions.isEmpty()) {
             AdViewChromeClient chromeClient = tryGetAdViewChromeClient(mDisplayController.getWebView());
-            if (chromeClient != null) {
-                chromeClient.setLocationPermissionGranted(!groupedPermissions.getGrantedPermissions().isEmpty());
+            if (chromeClient == null) {
+                return;
             }
-            return;
+            chromeClient.setLocationPermissionGranted(!groupedPermissions.getGrantedPermissions().isEmpty());
         }
 
         ActivityCompat.requestPermissions(
@@ -379,8 +310,4 @@ public final class BaseActivity extends FragmentActivity
 
     @Override
     public void onCancelLocationPermissionRequest() { }
-
-    private static final String[] LOCATION_PERMISSIONS = new String[]{
-        ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION
-    };
 }

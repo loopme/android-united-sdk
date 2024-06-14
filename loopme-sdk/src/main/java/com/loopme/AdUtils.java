@@ -27,7 +27,7 @@ public class AdUtils {
             Logging.out(LOG_TAG, "Starting Ad Activity");
 
             Intent intent = new Intent(loopMeAd.getContext(), BaseActivity.class);
-
+            intent.setPackage(loopMeAd.getContext().getPackageName());
             intent.putExtra(Constants.AD_ID_TAG, loopMeAd.getAdId());
             intent.putExtra(Constants.FORMAT_TAG, loopMeAd.getAdFormat().ordinal());
             intent.putExtra(Constants.EXTRAS_CUSTOM_CLOSE, customClose);

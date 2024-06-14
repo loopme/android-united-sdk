@@ -27,11 +27,10 @@ public class AdView extends LoopMeWebView implements BridgeInterface, Bridge.Lis
         modifyUserAgentForKrPano();
     }
 
-    // This helps Omid to send sessionFinish js event when ad is about to be destroyed.
     @Override
     public void destroy() {
         mBridgeListener = null;
-        destroyGracefully();
+        super.destroy();
     }
 
     public void addBridgeListener(Bridge.Listener listener) {

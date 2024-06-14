@@ -1,85 +1,73 @@
 package com.loopme.views;
 
 import android.content.Context;
+import android.content.IntentFilter;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
-
-import androidx.annotation.NonNull;
-import androidx.core.content.res.ResourcesCompat;
-import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
-import com.loopme.R;
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+
+import com.loopme.Constants;
+import com.loopme.receiver.MraidAdCloseButtonReceiver;
 import com.loopme.utils.Utils;
 
 public class CloseButton extends View {
-    private static final int EDGING_DP = 2;
-    private static final int THICKNESS_DP = 4;
-    private static final int OFFSET_DP = 14;
-    private static final int CUSTOM_VIEW_SIZE_DP = 16;
-    private static final int CLICKABLE_VIEW_SIZE_DP = CUSTOM_VIEW_SIZE_DP * 3;
+    private static final int THICKNESS_OUTER = Utils.convertDpToPixel(6);
+    private static final int THICKNESS_INNER = Utils.convertDpToPixel(4);
+    private static final int OFFSET = Utils.convertDpToPixel(14);
+    private static final int VIEW_SIZE = Utils.convertDpToPixel(30);
+    private static final int CLICKABLE_VIEW_SIZE = Utils.convertDpToPixel(40);
+
+    private MraidAdCloseButtonReceiver mMraidCloseButtonReceiver;
     private final Paint mPaint = new Paint();
 
-    public CloseButton(Context context) {
-        super(context);
+    public CloseButton(Context context) { super(context); }
+
+    public void registerReceiver() {
+        if (mMraidCloseButtonReceiver != null)
+            return;
+        mMraidCloseButtonReceiver = new MraidAdCloseButtonReceiver(customCloseButton -> {
+            this.setVisibility(!customCloseButton ? View.VISIBLE : View.GONE);
+        });
+        ContextCompat.registerReceiver(
+            this.getContext(),
+            mMraidCloseButtonReceiver,
+            new IntentFilter(Constants.MRAID_NEED_CLOSE_BUTTON),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        );
     }
 
-    public CloseButton(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public CloseButton(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+    public void unregisterReceiver() {
+        if (mMraidCloseButtonReceiver == null)
+            return;
+        this.getContext().unregisterReceiver(mMraidCloseButtonReceiver);
+        mMraidCloseButtonReceiver = null;
     }
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
-        int offsetPx = Utils.convertDpToPixel(OFFSET_DP);
-        int viewSize = Utils.convertDpToPixel(CUSTOM_VIEW_SIZE_DP + OFFSET_DP);
-        drawEdging(canvas, offsetPx, viewSize);
-        drawWitheCross(canvas, offsetPx, viewSize);
+        drawCross(canvas, Color.BLACK, THICKNESS_OUTER);
+        drawCross(canvas, Color.WHITE, THICKNESS_INNER);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int sizePx = Utils.convertDpToPixel(CLICKABLE_VIEW_SIZE_DP);
-        setMeasuredDimension(sizePx, sizePx);
+        setMeasuredDimension(CLICKABLE_VIEW_SIZE, CLICKABLE_VIEW_SIZE);
     }
 
-    private void drawEdging(Canvas canvas, int offsetDp, int viewSize) {
-        float thickness = Utils.convertDpToPixel(THICKNESS_DP + EDGING_DP);
-
+    private void drawCross(Canvas canvas, @ColorInt int color, float thickness) {
+        mPaint.setColor(color);
         mPaint.setStrokeWidth(thickness);
-        mPaint.setColor(ResourcesCompat.getColor(this.getResources(), R.color.black, null));
-        drawCross(canvas, offsetDp, viewSize, thickness, mPaint);
-    }
 
-    private void drawWitheCross(Canvas canvas, int offsetDp, int viewSize) {
-        int thickness = Utils.convertDpToPixel(THICKNESS_DP);
-
-        mPaint.setStrokeWidth(thickness);
-        mPaint.setColor(ResourcesCompat.getColor(this.getResources(), R.color.white, null));
-        drawCross(canvas, offsetDp, viewSize, thickness, mPaint);
-    }
-
-    private void drawCross(Canvas canvas, int offsetDp, int viewSize, float thickness, Paint mPaint) {
-        canvas.drawLine(offsetDp, offsetDp, viewSize, viewSize, mPaint);
-        canvas.drawLine(offsetDp, viewSize, viewSize, offsetDp, mPaint);
-
-        canvas.drawCircle(offsetDp, offsetDp, thickness / 2, mPaint);
-        canvas.drawCircle(viewSize, viewSize, thickness / 2, mPaint);
-        canvas.drawCircle(offsetDp, viewSize, thickness / 2, mPaint);
-        canvas.drawCircle(viewSize, offsetDp, thickness / 2, mPaint);
-    }
-
-    public void addInLayout(FrameLayout parentLayout) {
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.gravity = Gravity.END;
-        parentLayout.addView(this, layoutParams);
+        canvas.drawLine(OFFSET, OFFSET, VIEW_SIZE, VIEW_SIZE, mPaint);
+        canvas.drawLine(OFFSET, VIEW_SIZE, VIEW_SIZE, OFFSET, mPaint);
+        canvas.drawCircle(OFFSET, OFFSET, thickness / 2, mPaint);
+        canvas.drawCircle(VIEW_SIZE, VIEW_SIZE, thickness / 2, mPaint);
+        canvas.drawCircle(OFFSET, VIEW_SIZE, thickness / 2, mPaint);
+        canvas.drawCircle(VIEW_SIZE, OFFSET, thickness / 2, mPaint);
     }
 }
