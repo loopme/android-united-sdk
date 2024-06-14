@@ -15,40 +15,28 @@ public class MraidVideoActivity extends Activity {
 
     private static final String LOG_TAG = MraidVideoActivity.class.getSimpleName();
     private static final String EXTRAS_VIDEO_URL = "videoUrl";
-    private RelativeLayout mRelativeLayout;
     private View mAdView;
-    private CloseButton mCloseButton;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRelativeLayout = new RelativeLayout(this);
-        String url = getIntent().getStringExtra(EXTRAS_VIDEO_URL);
-        if (TextUtils.isEmpty(url)) {
-            mAdView = new ImageView(this);
-        } else {
-            mAdView = new VideoView(this);
+        CloseButton mCloseButton = new CloseButton(this);
+        mCloseButton.setOnClickListener(v -> finish());
 
-            ((VideoView) mAdView).setVideoPath(getIntent().getStringExtra(EXTRAS_VIDEO_URL));
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.MATCH_PARENT
+        );
+        RelativeLayout mRelativeLayout = new RelativeLayout(this);
+        String url = getIntent().getStringExtra(EXTRAS_VIDEO_URL);
+        mAdView = TextUtils.isEmpty(url) ? new ImageView(this) : new VideoView(this);
+        if (mAdView instanceof VideoView) {
+            ((VideoView) mAdView).setVideoPath(url);
             ((VideoView) mAdView).setOnPreparedListener(MediaPlayer::start);
             ((VideoView) mAdView).setOnCompletionListener(mp -> mCloseButton.setVisibility(View.VISIBLE));
         }
-        setLayoutParams();
-        setContentView(mRelativeLayout);
-        initCloseButton();
-    }
-
-    private void setLayoutParams() {
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-            RelativeLayout.LayoutParams.MATCH_PARENT,
-            RelativeLayout.LayoutParams.MATCH_PARENT);
         mRelativeLayout.addView(mAdView, lp);
-    }
-
-    private void initCloseButton() {
-        mCloseButton = new CloseButton(this);
-        mCloseButton.setOnClickListener(v -> MraidVideoActivity.this.finish());
+        setContentView(mRelativeLayout);
     }
 
     @Override

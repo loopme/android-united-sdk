@@ -43,14 +43,10 @@ public class UiUtils {
 
     public static AdSpotDimensions getViewSize(MinimizedMode minimizedMode, LoopMeAd loopMeAd, Constants.DisplayMode displayMode) {
         switch (displayMode) {
-            case MINIMIZED:
-                return getMinimizedViewSize(minimizedMode);
-            case NORMAL:
-                return getNormalViewSize(loopMeAd);
-            case FULLSCREEN:
-                return getFullScreenViewSize();
-            default:
-                throw new IllegalArgumentException();
+            case MINIMIZED: return getMinimizedViewSize(minimizedMode);
+            case NORMAL: return getNormalViewSize(loopMeAd);
+            case FULLSCREEN: return getFullScreenViewSize();
+            default: throw new IllegalArgumentException();
         }
     }
 
@@ -79,8 +75,9 @@ public class UiUtils {
             return null;
         }
         FrameLayout frameLayout = new FrameLayout(context);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(dimensions.getWidth(), dimensions.getHeight());
-        frameLayout.setLayoutParams(params);
+        frameLayout.setLayoutParams(new FrameLayout.LayoutParams(
+            dimensions.getWidth(), dimensions.getHeight()
+        ));
         addBordersToView(frameLayout);
         return frameLayout;
     }
@@ -93,8 +90,7 @@ public class UiUtils {
         if (context == null || TextUtils.isEmpty(intentAction)) {
             return;
         }
-        Intent intent = new Intent();
-        intent.setAction(intentAction);
+        Intent intent = new Intent(intentAction);
         intent.setPackage(context.getPackageName());
         if (adId != Constants.DEFAULT_AD_ID) {
             intent.putExtra(Constants.AD_ID_TAG, adId);

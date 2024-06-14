@@ -27,12 +27,9 @@ public class MraidBridge extends WebViewClientCompat {
     private static final String QUERY_PARAMETER_URI = "uri";
     private static final String QUERY_PARAMETER_WIDTH = "width";
     private static final String QUERY_PARAMETER_HEIGHT = "height";
-    private static final String QUERY_PARAMETER_CUSTOM_CLOSE = "shouldUseCustomClose";
-    private static final String SET_ORIENTATION_PROPERTIES = "setOrientationProperties";
-
     private static final String QUERY_PARAMETER_ALLOW_ORIENTATION_CHANGE = "allowOrientationChange";
     private static final String QUERY_PARAMETER_FORCE_ORIENTATION = "forceOrientation";
-
+    private static final String SET_ORIENTATION_PROPERTIES = "setOrientationProperties";
     private static final String CLOSE = "close";
     private static final String OPEN = "open";
     private static final String PLAY_VIDEO = "playVideo";
@@ -61,10 +58,6 @@ public class MraidBridge extends WebViewClientCompat {
         }
     }
 
-    private boolean detectBooleanQueryParameter(Uri uri, String parameter) {
-        return Boolean.parseBoolean(detectQueryParameter(uri, parameter));
-    }
-
     private MraidOrientation detectOrientation(Uri uri) {
         String orientation = detectQueryParameter(uri, QUERY_PARAMETER_FORCE_ORIENTATION);
         if (Constants.ORIENTATION_PORT.equals(orientation))
@@ -75,11 +68,11 @@ public class MraidBridge extends WebViewClientCompat {
     }
 
     private void handleCommand(Uri uri, String command) {
-        boolean useCustomClose = detectBooleanQueryParameter(uri, QUERY_PARAMETER_CUSTOM_CLOSE);
-        if (command.equals(WEBVIEW_FAIL)) {
+        boolean useCustomClose = false;
+        if (WEBVIEW_FAIL.equals(command)) {
             mOnMraidBridgeListener.onLoadFail(Errors.SPECIFIC_WEBVIEW_ERROR);
         }
-        if (command.equals(WEBVIEW_SUCCESS)) {
+        if (WEBVIEW_SUCCESS.equals(command)) {
             mOnMraidBridgeListener.onLoadSuccess();
             if (adReadyListener != null)
                 adReadyListener.onCall();
@@ -96,7 +89,7 @@ public class MraidBridge extends WebViewClientCompat {
                 Utils.convertDpToPixel(Integer.parseInt(detectQueryParameter(uri, QUERY_PARAMETER_HEIGHT)))
             );
         }
-        if (command.equals(WEBVIEW_CLOSE)) {
+        if (WEBVIEW_CLOSE.equals(command)) {
             mOnMraidBridgeListener.close();
         }
         if (CLOSE.equals(command)) {
@@ -111,10 +104,9 @@ public class MraidBridge extends WebViewClientCompat {
             mOnMraidBridgeListener.playVideo(videoUrl);
         }
         if (SET_ORIENTATION_PROPERTIES.equals(command)) {
-            mOnMraidBridgeListener.setOrientationProperties(
-                detectBooleanQueryParameter(uri, QUERY_PARAMETER_ALLOW_ORIENTATION_CHANGE),
-                detectOrientation(uri)
-            );
+            boolean isAllowOrientationChange = Boolean
+                .parseBoolean(detectQueryParameter(uri, QUERY_PARAMETER_ALLOW_ORIENTATION_CHANGE));
+            mOnMraidBridgeListener.setOrientationProperties(isAllowOrientationChange, detectOrientation(uri));
         }
         mOnMraidBridgeListener.onMraidCallComplete(uri.toString());
         mOnMraidBridgeListener.onLoopMeCallComplete(uri.toString());

@@ -204,8 +204,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         if (omidEventTrackerWrapper != null) {
             omidEventTrackerWrapper.sendOneTimeImpression();
             omidEventTrackerWrapper.sendOneTimeStartEvent(
-                mAdParams.getDuration(),
-                mViewControllerVast.isMute()
+                mAdParams.getDuration(), mViewControllerVast.isMute()
             );
         }
         mLoopMePlayer.start();

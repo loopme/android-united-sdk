@@ -32,9 +32,6 @@ public class Constants {
     public static boolean sDebugMode = false;
     public static final String MRAID_SCRIPT = "<script src=\"mraid.js\"></script>";
 
-    private Constants() {
-    }
-
     public static final String HTTPS_SCHEME = "https";
     public static final String HTTP_PROTOCOL = "http";
     public static final String MP4_FORMAT = ".mp4";
@@ -130,9 +127,6 @@ public class Constants {
         public static final int MOBILE_2G = 4;
         public static final int MOBILE_3G = 5;
         public static final int MOBILE_4G = 6;
-
-        private ConnectionType() {
-        }
     }
 
     public enum DisplayMode { NORMAL, MINIMIZED, FULLSCREEN }
@@ -174,22 +168,14 @@ public class Constants {
 
         public static String nameOf(int state) {
             switch (state) {
-                case IDLE_INTEGER:
-                    return IDLE.getName();
-                case READY_INTEGER:
-                    return READY.getName();
-                case PLAYING_INTEGER:
-                    return PLAYING.getName();
-                case PAUSED_INTEGER:
-                    return PAUSED.getName();
-                case COMPLETE_INTEGER:
-                    return COMPLETE.getName();
-                case BROKEN_INTEGER:
-                    return BROKEN.getName();
-                case BUFFERING_INTEGER:
-                    return BUFFERING.getName();
-                default:
-                    return UNKNOWN_NAME;
+                case IDLE_INTEGER: return IDLE.getName();
+                case READY_INTEGER: return READY.getName();
+                case PLAYING_INTEGER: return PLAYING.getName();
+                case PAUSED_INTEGER: return PAUSED.getName();
+                case COMPLETE_INTEGER: return COMPLETE.getName();
+                case BROKEN_INTEGER: return BROKEN.getName();
+                case BUFFERING_INTEGER: return BUFFERING.getName();
+                default: return UNKNOWN_NAME;
             }
         }
     }
@@ -222,14 +208,10 @@ public class Constants {
 
         public static String nameOf(int state) {
             switch (state) {
-                case VISIBLE_INTEGER:
-                    return VISIBLE.getName();
-                case HIDDEN_INTEGER:
-                    return HIDDEN.getName();
-                case CLOSED_INTEGER:
-                    return CLOSED.getName();
-                default:
-                    return UNKNOWN_NAME;
+                case VISIBLE_INTEGER: return VISIBLE.getName();
+                case HIDDEN_INTEGER: return HIDDEN.getName();
+                case CLOSED_INTEGER: return CLOSED.getName();
+                default: return UNKNOWN_NAME;
             }
         }
     }

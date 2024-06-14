@@ -23,25 +23,23 @@ public class AdReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (mListener == null) {
-            return;
-        }
-        if (getAdId(intent) != mAdId) {
+        if (mListener == null || intent == null) {
             return;
         }
         String action = intent.getAction();
         if (action == null) {
             return;
         }
+        int adId = intent.getExtras() == null ?
+            Constants.DEFAULT_AD_ID : intent.getExtras().getInt(Constants.AD_ID_TAG);
+        if (adId != mAdId) {
+            return;
+        }
         if (action.equalsIgnoreCase(Constants.DESTROY_INTENT)) {
             mListener.onDestroyBroadcast();
-        } else if (action.equalsIgnoreCase(Constants.CLICK_INTENT)) {
+        }
+        if (action.equalsIgnoreCase(Constants.CLICK_INTENT)) {
             mListener.onClickBroadcast();
         }
-    }
-
-    private int getAdId(Intent intent) {
-        return (intent == null || intent.getExtras() == null) ?
-            Constants.DEFAULT_AD_ID : intent.getExtras().getInt(Constants.AD_ID_TAG);
     }
 }
