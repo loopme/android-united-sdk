@@ -20,7 +20,7 @@ public class CloseButton extends View {
     private static final int THICKNESS_INNER = Utils.convertDpToPixel(4);
     private static final int OFFSET = Utils.convertDpToPixel(14);
     private static final int VIEW_SIZE = Utils.convertDpToPixel(30);
-    private static final int CLICKABLE_VIEW_SIZE = Utils.convertDpToPixel(40);
+    private static final int CLICKABLE_VIEW_SIZE = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI);
 
     private MraidAdCloseButtonReceiver mMraidCloseButtonReceiver;
     private final Paint mPaint = new Paint();
@@ -59,15 +59,16 @@ public class CloseButton extends View {
         setMeasuredDimension(CLICKABLE_VIEW_SIZE, CLICKABLE_VIEW_SIZE);
     }
 
+    // TODO: Replace with image
     private void drawCross(Canvas canvas, @ColorInt int color, float thickness) {
         mPaint.setColor(color);
         mPaint.setStrokeWidth(thickness);
 
-        canvas.drawLine(OFFSET, OFFSET, VIEW_SIZE, VIEW_SIZE, mPaint);
-        canvas.drawLine(OFFSET, VIEW_SIZE, VIEW_SIZE, OFFSET, mPaint);
-        canvas.drawCircle(OFFSET, OFFSET, thickness / 2, mPaint);
+        canvas.drawLine(CLICKABLE_VIEW_SIZE - OFFSET, OFFSET, VIEW_SIZE, VIEW_SIZE, mPaint);
+        canvas.drawLine(CLICKABLE_VIEW_SIZE - OFFSET, VIEW_SIZE, VIEW_SIZE, OFFSET, mPaint);
+        canvas.drawCircle(CLICKABLE_VIEW_SIZE - OFFSET, OFFSET, thickness / 2, mPaint);
+        canvas.drawCircle(CLICKABLE_VIEW_SIZE - OFFSET, VIEW_SIZE, thickness / 2, mPaint);
         canvas.drawCircle(VIEW_SIZE, VIEW_SIZE, thickness / 2, mPaint);
-        canvas.drawCircle(OFFSET, VIEW_SIZE, thickness / 2, mPaint);
         canvas.drawCircle(VIEW_SIZE, OFFSET, thickness / 2, mPaint);
     }
 }

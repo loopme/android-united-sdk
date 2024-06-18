@@ -22,7 +22,7 @@ public class Constants {
     public static final int DEFAULT_AD_ID = -1;
     public static final long ONE_SECOND_IN_MILLIS = 1000;
     public static final int AUTO_LOADING_ABSENCE = -1;
-    public static final int BUTTON_SIZE_DPI = 40;
+    public static final int BUTTON_SIZE_DPI = 60;
 
     // TODO: Why default banner size is 350x250?
     public static final int DEFAULT_BANNER_WIDTH = 350;

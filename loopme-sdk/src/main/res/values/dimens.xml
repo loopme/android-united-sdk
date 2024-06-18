@@ -10,14 +10,14 @@
     <dimen name="close_view_size">40dp</dimen>
 
     <dimen name="time_textview_margin">6dp</dimen>
-    <dimen name="mute_imageview_width">40dp</dimen>
-    <dimen name="mute_imageview_heigth">40dp</dimen>
-    <dimen name="skip_imageview_width">40dp</dimen>
-    <dimen name="skip_imageview_heigth">40dp</dimen>
-    <dimen name="replay_imageview_width">40dp</dimen>
-    <dimen name="replay_imageview_heigth">40dp</dimen>
-    <dimen name="close_imageview_heigth">40dp</dimen>
-    <dimen name="close_imageview_width">40dp</dimen>
+    <dimen name="mute_imageview_width">60dp</dimen>
+    <dimen name="mute_imageview_heigth">60dp</dimen>
+    <dimen name="skip_imageview_width">60dp</dimen>
+    <dimen name="skip_imageview_heigth">60dp</dimen>
+    <dimen name="replay_imageview_width">60dp</dimen>
+    <dimen name="replay_imageview_heigth">60dp</dimen>
+    <dimen name="close_imageview_heigth">60dp</dimen>
+    <dimen name="close_imageview_width">60dp</dimen>
 
     <dimen name="ad_browser_progress_button_width">30dp</dimen>
     <dimen name="ad_browser_progress_button_height">20dp</dimen>
