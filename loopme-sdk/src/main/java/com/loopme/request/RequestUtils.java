@@ -255,4 +255,8 @@ public class RequestUtils {
             mSkippable = 1;
         }
     }
+
+    boolean isFullscreenSize() {
+        return mWidth >= 320 && mHeight >= 320;
+    }
 }
