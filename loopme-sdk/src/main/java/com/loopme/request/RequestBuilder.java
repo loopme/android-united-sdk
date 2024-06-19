@@ -106,7 +106,8 @@ public class RequestBuilder implements Serializable {
         AdTargetingData data = loopMeAd.getAdTargetingData();
         LoopMeAd.Type adType = loopMeAd.getPreferredAdType();
         boolean isBanner = LoopMeAd.Type.ALL == adType || LoopMeAd.Type.HTML == adType;
-        boolean isVideo = LoopMeAd.Type.ALL == adType || LoopMeAd.Type.VIDEO == adType;
+        boolean isFullscreenSize = requestUtils.isFullscreenSize();
+        boolean isVideo = isFullscreenSize && (LoopMeAd.Type.ALL == adType || LoopMeAd.Type.VIDEO == adType);
 
         return new JSONBuilder()
             .put(TMAX, RequestConstants.MAX_TIME_TO_SUBMIT_BID)
