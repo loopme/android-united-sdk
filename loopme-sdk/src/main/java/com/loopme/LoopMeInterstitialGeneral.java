@@ -26,6 +26,16 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
 
     private transient Listener mAdListener;
 
+    private boolean isRewarded = false;
+
+    public void setRewarded(boolean rewarded) {
+        isRewarded = rewarded;
+    }
+
+    public boolean isRewarded() {
+        return isRewarded;
+    }
+
     public LoopMeInterstitialGeneral(Activity activity, String appKey) {
         super(activity, appKey);
         Logging.out(LOG_TAG, "Start creating interstitial with app key: " + appKey);

@@ -41,6 +41,23 @@ public final class LoopMeInterstitial extends AdWrapper {
     }
 
     /**
+     * Creates new `LoopMeInterstitial` object with the given appKey
+     *
+     * @param activity - application context
+     * @param appKey   - your app key
+     * @throws IllegalArgumentException if any of parameters is null
+     */
+    private LoopMeInterstitial(Activity activity, String appKey, boolean isRewarded) {
+        super(activity, appKey);
+        mFirstLoopMeAd = LoopMeInterstitialGeneral.getInstance(appKey, activity);
+        ((LoopMeInterstitialGeneral) mFirstLoopMeAd).setRewarded(isRewarded);
+        if (isAutoLoadingEnabled()) {
+            mSecondLoopMeAd = LoopMeInterstitialGeneral.getInstance(appKey, activity);
+            ((LoopMeInterstitialGeneral) mSecondLoopMeAd).setRewarded(isRewarded);
+        }
+    }
+
+    /**
      * Getting already initialized ad object or create new one with specified appKey
      *
      * @param appKey   your app key
@@ -52,6 +69,21 @@ public final class LoopMeInterstitial extends AdWrapper {
     public static LoopMeInterstitial getInstance(String appKey, Activity activity) {
         return LoopMeSdk.isInitialized()
                 ? new LoopMeInterstitial(activity, appKey)
+                : null;
+    }
+
+    /**
+     * Getting already initialized ad object or create new one with specified appKey
+     *
+     * @param appKey   your app key
+     * @param activity activity context
+     * @return instance of LoopMeInterstitial;
+     * null - android version is under API 21 (5.0 LOLLIPOP) or SDK isn't initialized
+     */
+    @Nullable
+    public static LoopMeInterstitial getInstance(String appKey, Activity activity, boolean isRewarded) {
+        return LoopMeSdk.isInitialized()
+                ? new LoopMeInterstitial(activity, appKey, isRewarded)
                 : null;
     }
 
