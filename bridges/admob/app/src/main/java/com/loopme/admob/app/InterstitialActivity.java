@@ -67,7 +67,7 @@ public class InterstitialActivity extends AppCompatActivity {
                     AdapterResponseInfo adapterResponseInfo = ad.getResponseInfo().getLoadedAdapterResponseInfo();
                     String appkey = (String) adapterResponseInfo.getCredentials().get("parameter");
                     String adapterClassName = adapterResponseInfo.getAdapterClassName();
-                    mShowButton.setText(String.format("Show Rewarded \nAppKey: %s\nAdapter: %s", appkey, adapterClassName));
+                    mShowButton.setText(String.format("Show Interstitial \nAppKey: %s\nAdapter: %s", appkey, adapterClassName));
                     mShowButton.setEnabled(true);
                 }
 

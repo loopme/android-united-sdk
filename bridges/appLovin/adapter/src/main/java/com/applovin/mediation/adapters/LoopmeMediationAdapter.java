@@ -200,7 +200,7 @@ public class LoopmeMediationAdapter
         String appkey = maxAdapterResponseParameters.getThirdPartyAdPlacementId();
         try {
             mRewardedListener = maxRewardedAdapterListener;
-            mRewarded = LoopMeInterstitial.getInstance(appkey, activity);
+            mRewarded = LoopMeInterstitial.getInstance(appkey, activity, true);
             mRewarded.setListener(mLoopMeRewardedListener);
             mRewarded.setAutoLoading(false);
             activity.runOnUiThread(() -> mRewarded.load(IntegrationType.NORMAL));

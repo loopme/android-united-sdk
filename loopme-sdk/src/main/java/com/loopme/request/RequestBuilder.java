@@ -5,6 +5,7 @@ import android.location.Location;
 
 import com.loopme.AdTargetingData;
 import com.loopme.JSONBuilder;
+import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.debugging.LiveDebug;
 import com.loopme.om.OmidHelper;
@@ -82,6 +83,7 @@ public class RequestBuilder implements Serializable {
     private static final String PLACEMENT_TYPE = "placementType";
     private static final String VIDEO_TYPE = "videotype";
     private static final String RWDD = "rwdd";
+    private static final String REWARDED = "rewarded";
     private static final String PARAM_CONSENT_TYPE = "consent_type";
     private static final String EXP_DIR = "expdir";
     private static final String USER = "user";
@@ -108,7 +110,9 @@ public class RequestBuilder implements Serializable {
         boolean isBanner = LoopMeAd.Type.ALL == adType || LoopMeAd.Type.HTML == adType;
         boolean isFullscreenSize = requestUtils.isFullscreenSize();
         boolean isVideo = isFullscreenSize && (LoopMeAd.Type.ALL == adType || LoopMeAd.Type.VIDEO == adType);
+        boolean isRewarded = loopMeAd instanceof LoopMeInterstitialGeneral && ((LoopMeInterstitialGeneral) loopMeAd).isRewarded();
 
+        JSONObject video = null;
         return new JSONBuilder()
             .put(TMAX, RequestConstants.MAX_TIME_TO_SUBMIT_BID)
             .put(BCAT, new JSONArray(RequestConstants.BCAT))
@@ -204,25 +208,7 @@ public class RequestBuilder implements Serializable {
                     .put(API, new JSONArray(requestUtils.getApi()))
                     .build() : null
                 )
-                .put(VIDEO, isVideo ? new JSONBuilder()
-                    .put(MAX_DURATION, RequestConstants.DEFAULT_MAX_DURATION)
-                    .put(LINEARITY, RequestConstants.LINEAR_IN_STREAM)
-                    .put(BOXING_ALLOWED, RequestConstants.BOXING_DEFAULT)
-                    .put(START_DELAY, RequestConstants.START_DELAY_DEFAULT_VALUE)
-                    .put(SEQUENCE, RequestConstants.SEQUENCE_DEFAULT_VALUE)
-                    // TODO: Why min duration is set to MIN_BITRATE_DEFAULT_VALUE?
-                    .put(MIN_DURATION, RequestConstants.MIN_BITRATE_DEFAULT_VALUE)
-                    .put(MAX_BITRATE, RequestConstants.MAX_BITRATE_DEFAULT_VALUE)
-                    .put(PROTOCOLS, new JSONArray(RequestConstants.PROTOCOLS))
-                    .put(BATTR, new JSONArray(RequestConstants.BATTERY_INFO))
-                    .put(MIME_TYPE, new JSONArray(RequestConstants.MIME_TYPES))
-                    .put(DELIVERY, new JSONArray(RequestConstants.DELIVERY_METHODS))
-                    .put(SKIP, requestUtils.getSkippable())
-                    .put(WIDTH, requestUtils.getWidth())
-                    .put(HEIGHT, requestUtils.getHeight())
-                    .put(API, new JSONArray(requestUtils.getApi()))
-                    .build() : null
-                )
+                .put(VIDEO, isVideo ? getVideo(isRewarded, requestUtils) : null)
                 .put(SECURE, RequestConstants.SECURE_IMPRESSION)
                 .put(BID_FLOOR, RequestConstants.BID_FLOOR_DEFAULT_VALUE)
                 .put(DISPLAY_MANAGER, RequestConstants.LOOPME_SDK)
@@ -236,6 +222,63 @@ public class RequestBuilder implements Serializable {
                 )
                 .build()
             }))
+            .put(EXT, isRewarded ? new JSONBuilder()
+                .put(PLACEMENT_TYPE, REWARDED)
+                .build() : null
+            )
             .build();
+    }
+
+    private static JSONObject getVideo(boolean isRewarded, RequestUtils requestUtils) throws JSONException {
+        return !isRewarded ?
+            new JSONBuilder()
+                .put(MAX_DURATION, RequestConstants.DEFAULT_MAX_DURATION)
+                .put(LINEARITY, RequestConstants.LINEAR_IN_STREAM)
+                .put(BOXING_ALLOWED, RequestConstants.BOXING_DEFAULT)
+                .put(START_DELAY, RequestConstants.START_DELAY_DEFAULT_VALUE)
+                .put(SEQUENCE, RequestConstants.SEQUENCE_DEFAULT_VALUE)
+                // TODO: Why min duration is set to MIN_BITRATE_DEFAULT_VALUE?
+                .put(MIN_DURATION, RequestConstants.MIN_BITRATE_DEFAULT_VALUE)
+                .put(MAX_BITRATE, RequestConstants.MAX_BITRATE_DEFAULT_VALUE)
+                .put(PROTOCOLS, new JSONArray(RequestConstants.PROTOCOLS))
+                .put(BATTR, new JSONArray(RequestConstants.BATTERY_INFO))
+                .put(MIME_TYPE, new JSONArray(RequestConstants.MIME_TYPES))
+                .put(DELIVERY, new JSONArray(RequestConstants.DELIVERY_METHODS))
+                .put(WIDTH, requestUtils.getWidth())
+                .put(HEIGHT, requestUtils.getHeight())
+                .put(API, new JSONArray(requestUtils.getApi()))
+                .put(SKIP, 1)
+                .put(SKIP_AFTER, 5)
+                .put(EXT, new JSONBuilder()
+                    .put(REWARDED, 0)
+                    .build()
+                )
+                .build() :
+            new JSONBuilder()
+                .put(MAX_DURATION, RequestConstants.DEFAULT_MAX_DURATION)
+                .put(LINEARITY, RequestConstants.LINEAR_IN_STREAM)
+                .put(BOXING_ALLOWED, RequestConstants.BOXING_DEFAULT)
+                .put(START_DELAY, RequestConstants.START_DELAY_DEFAULT_VALUE)
+                .put(SEQUENCE, RequestConstants.SEQUENCE_DEFAULT_VALUE)
+                // TODO: Why min duration is set to MIN_BITRATE_DEFAULT_VALUE?
+                .put(MIN_DURATION, RequestConstants.MIN_BITRATE_DEFAULT_VALUE)
+                .put(MAX_BITRATE, RequestConstants.MAX_BITRATE_DEFAULT_VALUE)
+                .put(PROTOCOLS, new JSONArray(RequestConstants.PROTOCOLS))
+                .put(BATTR, new JSONArray(RequestConstants.BATTERY_INFO))
+                .put(MIME_TYPE, new JSONArray(RequestConstants.MIME_TYPES))
+                .put(DELIVERY, new JSONArray(RequestConstants.DELIVERY_METHODS))
+                .put(WIDTH, requestUtils.getWidth())
+                .put(HEIGHT, requestUtils.getHeight())
+                .put(API, new JSONArray(requestUtils.getApi()))
+                .put(RWDD, 1)
+                .put(SKIP, 0)
+                .put(SKIP_MIN, 0)
+                .put(SKIP_AFTER, 0)
+                .put(EXT, new JSONBuilder()
+                    .put(REWARDED, 1)
+                    .put(VIDEO_TYPE, REWARDED)
+                    .build()
+                )
+                .build();
     }
 }

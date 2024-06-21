@@ -33,7 +33,7 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
         try {
             this.rewardedVideoAdListener = rewardedVideoAdListener;
             String appkey = adData.getConfiguration().get("instancekey").toString();
-            mRewarded = LoopMeInterstitial.getInstance(appkey, activity);
+            mRewarded = LoopMeInterstitial.getInstance(appkey, activity, true);
             mRewarded.setAutoLoading(false);
             mRewarded.setListener(new LoopMeInterstitial.Listener() {
                 @Override

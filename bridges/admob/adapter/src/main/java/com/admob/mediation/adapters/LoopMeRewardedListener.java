@@ -106,7 +106,7 @@ public class LoopMeRewardedListener implements LoopMeInterstitial.Listener, Medi
             .getServerParameters()
             .getString(MediationConfiguration.CUSTOM_EVENT_SERVER_PARAMETER_FIELD);
         Activity activity = (Activity) mediationRewardedAdConfiguration.getContext();
-        rewardedAd = LoopMeInterstitial.getInstance(appkey, activity);
+        rewardedAd = LoopMeInterstitial.getInstance(appkey, activity, true);
         rewardedAd.setListener(this);
         rewardedAd.setAutoLoading(false);
         activity.runOnUiThread(() -> rewardedAd.load());
