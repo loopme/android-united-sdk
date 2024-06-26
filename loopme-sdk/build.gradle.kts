@@ -15,12 +15,11 @@ android {
 dependencies {
     implementation(files("libs/omsdk-android-1.3.3-loopme.jar"))
 
-    api("androidx.appcompat:appcompat:1.7.0")
+    api("androidx.appcompat:appcompat:1.6.0")
     api("androidx.recyclerview:recyclerview:1.3.2")
-    api("androidx.annotation:annotation:1.8.0")
+//    api("androidx.annotation:annotation:1.8.0")
 
     implementation("androidx.preference:preference:1.2.1")
-
     implementation("com.google.android.gms:play-services-ads-identifier:18.1.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
