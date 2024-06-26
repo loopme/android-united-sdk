@@ -17,6 +17,7 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     api("com.ironsource.sdk:mediationsdk:8.0.0")
-    api(project(":loopme-sdk"))
+//    api(project(":loopme-sdk"))
 //    api("com.github.loopme.android-united-sdk:loopme-sdk:9.0.3")
+    api("com.github.loopme.android-united-sdk:loopme-sdk:test-1.6.0")
 }
