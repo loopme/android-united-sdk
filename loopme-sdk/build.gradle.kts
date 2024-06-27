@@ -15,9 +15,10 @@ android {
 dependencies {
     implementation(files("libs/omsdk-android-1.3.3-loopme.jar"))
 
-    api("androidx.appcompat:appcompat:1.7.0")
+    // appcompat and material > 1.6.0 does not supported by Unity 2021
+    api("androidx.appcompat:appcompat:1.6.0")
+
     api("androidx.recyclerview:recyclerview:1.3.2")
-    api("androidx.annotation:annotation:1.8.0")
 
     implementation("androidx.preference:preference:1.2.1")
 
