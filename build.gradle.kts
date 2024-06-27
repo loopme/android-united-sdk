@@ -4,7 +4,7 @@ import com.android.build.gradle.LibraryExtension
 plugins {
     id("java")
     id("maven-publish")
-    id("com.android.library") version "8.4.1" apply false
+    id("com.android.library") version "8.5.0" apply false
 }
 
 group = "com.github.loopme.android-united-sdk"
