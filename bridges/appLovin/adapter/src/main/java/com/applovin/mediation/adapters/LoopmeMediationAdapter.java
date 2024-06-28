@@ -49,6 +49,8 @@ public class LoopmeMediationAdapter
     private LoopMeInterstitial mRewarded;
     private final LoopMeRewardedListener mLoopMeRewardedListener = new LoopMeRewardedListener();
     private MaxRewardedAdapterListener mRewardedListener;
+    private boolean isAlreadyRewarded = false;
+
 
     public LoopmeMediationAdapter(final AppLovinSdk appLovinSdk) {
         super(appLovinSdk);
@@ -275,6 +277,10 @@ public class LoopmeMediationAdapter
         }
         @Override
         public void onLoopMeInterstitialHide(LoopMeInterstitial arg0) {
+            if (!isAlreadyRewarded) {
+                mRewardedListener.onUserRewarded(getReward());
+                isAlreadyRewarded = true;
+            }
             mRewardedListener.onRewardedAdHidden();
         }
         @Override
@@ -285,6 +291,7 @@ public class LoopmeMediationAdapter
         @Override
         public void onLoopMeInterstitialLoadSuccess(LoopMeInterstitial arg0) {
             Log.d(LOG_TAG, "loopme's ad loaded");
+            isAlreadyRewarded = false;
             mRewardedListener.onRewardedAdLoaded();
         }
         @Override
@@ -298,7 +305,10 @@ public class LoopmeMediationAdapter
         public void onLoopMeInterstitialLeaveApp(LoopMeInterstitial arg0) { }
         @Override
         public void onLoopMeInterstitialVideoDidReachEnd(LoopMeInterstitial interstitial) {
-            mRewardedListener.onUserRewarded(getReward());
+            if (!isAlreadyRewarded) {
+                mRewardedListener.onUserRewarded(getReward());
+                isAlreadyRewarded = true;
+            }
         }
     }
 }

@@ -457,6 +457,11 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
     }
 
     @Override
+    public void onTimeUpdate(int currentTime, int duration) {
+        // TODO: onDurationChangedEvent or onTimeUpdate?
+    }
+
+    @Override
     public void onErrorOccurred(Exception e) {
         setVideoState(Constants.VideoState.BROKEN);
     }

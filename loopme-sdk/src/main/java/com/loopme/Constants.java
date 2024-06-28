@@ -83,6 +83,9 @@ public class Constants {
     public static final String EXTRAS_ALLOW_ORIENTATION_CHANGE = "allowOrientationChange";
     public static final String EXTRAS_FORCE_ORIENTATION = "forceOrientation";
 
+    public static final int SKIP_DELAY_REWARDED = 30000;
+    public static final int SKIP_DELAY_INTERSTITIAL = 5000;
+
 
     public enum AdFormat {
         BANNER, INTERSTITIAL, EXPANDABLE_BANNER;
