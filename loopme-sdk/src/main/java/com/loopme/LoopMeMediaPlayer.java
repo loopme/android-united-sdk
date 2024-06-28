@@ -3,6 +3,7 @@ package com.loopme;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Handler;
 import android.view.Surface;
 
 import com.loopme.utils.Utils;
@@ -17,6 +18,8 @@ public class LoopMeMediaPlayer {
     private static final float DEFAULT_LEFT_VOLUME = 0f;
     private final MediaPlayer mMediaPlayer;
     private LoopMeMediaPlayerListener mListener;
+    private Handler handler = new Handler();
+    private int interval = 1000;
 
     public LoopMeMediaPlayer(String source, LoopMeMediaPlayerListener listener) {
         mMediaPlayer = new MediaPlayer();
@@ -25,6 +28,17 @@ public class LoopMeMediaPlayer {
         setListener(listener);
         prepareAsync();
     }
+
+    private final Runnable onTimeChange = new Runnable() {
+        @Override
+        public void run() {
+            if (mMediaPlayer.isPlaying()) {
+                mListener.onTimeUpdate(mMediaPlayer.getCurrentPosition(), mMediaPlayer.getDuration());
+                // Schedule the next update
+                handler.postDelayed(this, interval);
+            }
+        }
+    };
 
     private void configurePlayer() {
         if (mMediaPlayer != null) {
@@ -77,6 +91,7 @@ public class LoopMeMediaPlayer {
 
     public void releasePlayer() {
         if (mMediaPlayer != null) {
+            handler.removeCallbacks(onTimeChange);
             mMediaPlayer.reset();
             mMediaPlayer.release();
         }
@@ -133,6 +148,7 @@ public class LoopMeMediaPlayer {
     public void pauseMediaPlayer() {
         try {
             if (isPlaying()) {
+                handler.removeCallbacks(onTimeChange);
                 mMediaPlayer.pause();
             }
         } catch (IllegalStateException e) {
@@ -144,6 +160,8 @@ public class LoopMeMediaPlayer {
         try {
             if (!isPlaying()) {
                 mMediaPlayer.start();
+                handler.removeCallbacks(onTimeChange);
+                handler.postDelayed(onTimeChange, interval);
             }
         } catch (IllegalStateException e) {
             onErrorOccurred(e);
@@ -187,6 +205,7 @@ public class LoopMeMediaPlayer {
             MediaPlayer.OnCompletionListener,
             MediaPlayer.OnErrorListener {
 
+        void onTimeUpdate(int currentTime, int duration);
         void onErrorOccurred(Exception e);
         void onVolumeChanged(float volume, int currentPosition);
     }

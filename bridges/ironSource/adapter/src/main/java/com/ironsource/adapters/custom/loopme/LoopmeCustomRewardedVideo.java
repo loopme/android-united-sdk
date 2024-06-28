@@ -24,6 +24,8 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
 
     private RewardedVideoAdListener rewardedVideoAdListener;
 
+    private boolean isAlreadyRewarded = false;
+
     public LoopmeCustomRewardedVideo(NetworkSettings networkSettings) {
         super(networkSettings);
     }
@@ -31,6 +33,7 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
     @Override
     public void loadAd(AdData adData, Activity activity, @NotNull RewardedVideoAdListener rewardedVideoAdListener) {
         try {
+            isAlreadyRewarded = false;
             this.rewardedVideoAdListener = rewardedVideoAdListener;
             String appkey = adData.getConfiguration().get("instancekey").toString();
             mRewarded = LoopMeInterstitial.getInstance(appkey, activity, true);
@@ -47,6 +50,10 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
 
                 @Override
                 public void onLoopMeInterstitialHide(LoopMeInterstitial arg0) {
+                    if (!isAlreadyRewarded) {
+                        rewardedVideoAdListener.onAdRewarded();
+                        isAlreadyRewarded = true;
+                    }
                     rewardedVideoAdListener.onAdClosed();
                 }
 
@@ -72,8 +79,11 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
 
                 @Override
                 public void onLoopMeInterstitialVideoDidReachEnd(LoopMeInterstitial interstitial) {
+                    if (!isAlreadyRewarded) {
+                        rewardedVideoAdListener.onAdRewarded();
+                        isAlreadyRewarded = true;
+                    }
                     rewardedVideoAdListener.onAdEnded();
-                    rewardedVideoAdListener.onAdRewarded();
                 }
             });
             mRewarded.load(IntegrationType.NORMAL);

@@ -24,6 +24,8 @@ public class LoopMeRewardedListener implements LoopMeInterstitial.Listener, Medi
     /** Configuration for requesting the interstitial ad from the third-party network. */
     private final MediationRewardedAdConfiguration mediationRewardedAdConfiguration;
 
+    private boolean isAlreadyRewarded = false;
+
     /** Callback for interstitial ad events. */
     private MediationRewardedAdCallback rewardedAdCallback;
     /** Callback that fires on loading success or failure. */
@@ -46,6 +48,7 @@ public class LoopMeRewardedListener implements LoopMeInterstitial.Listener, Medi
 
     @Override
     public void onLoopMeInterstitialLoadSuccess(LoopMeInterstitial interstitial) {
+        isAlreadyRewarded = false;
         rewardedAdCallback = mediationAdLoadCallback.onSuccess(this);
     }
 
@@ -64,6 +67,10 @@ public class LoopMeRewardedListener implements LoopMeInterstitial.Listener, Medi
 
     @Override
     public void onLoopMeInterstitialHide(LoopMeInterstitial interstitial) {
+        if (!isAlreadyRewarded) {
+            rewardUser();
+            isAlreadyRewarded = true;
+        }
         rewardedAdCallback.onAdClosed();
     }
 
@@ -83,7 +90,14 @@ public class LoopMeRewardedListener implements LoopMeInterstitial.Listener, Medi
 
     @Override
     public void onLoopMeInterstitialVideoDidReachEnd(LoopMeInterstitial interstitial) {
+        if (!isAlreadyRewarded) {
+            rewardUser();
+            isAlreadyRewarded = true;
+        }
         rewardedAdCallback.onVideoComplete();
+    }
+
+    private void rewardUser() {
         // TODO: Replace with real reward values
         RewardItem rewardItem = new RewardItem() {
             @NonNull

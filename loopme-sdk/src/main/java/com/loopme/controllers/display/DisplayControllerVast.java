@@ -1,5 +1,8 @@
 package com.loopme.controllers.display;
 
+import static com.loopme.Constants.SKIP_DELAY_INTERSTITIAL;
+import static com.loopme.Constants.SKIP_DELAY_REWARDED;
+
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,6 +19,7 @@ import com.iab.omid.library.loopme.adsession.VerificationScriptResource;
 import com.iab.omid.library.loopme.adsession.media.MediaEvents;
 import com.loopme.Constants;
 import com.loopme.Logging;
+import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.LoopMeMediaPlayer;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.controllers.view.ViewControllerVast;
@@ -23,7 +27,6 @@ import com.loopme.models.Errors;
 import com.loopme.om.OmidEventTrackerWrapper;
 import com.loopme.om.OmidHelper;
 import com.loopme.time.TimeUtils;
-import com.loopme.time.TimerWithPause;
 import com.loopme.tracker.constants.EventConstants;
 import com.loopme.utils.ApiLevel;
 import com.loopme.utils.Utils;
@@ -41,14 +44,12 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     private static final String LOG_TAG = DisplayControllerVast.class.getSimpleName();
 
     private static final int DELAY_UNTIL_EXECUTE = 100;
-    private static final int COUNTDOWN_INTERVAL = 100;
 
     private final ViewControllerVast mViewControllerVast;
     private List<TrackingEvent> mTrackingEventsList = new ArrayList<>();
     private LoopMeMediaPlayer mLoopMePlayer;
     private int mSkipTimeMillis;
     private int mVideoDuration;
-    private TimerWithPause mVideoTimer;
 
     private boolean mIsAdSkipped;
     // TODO. Refactor.
@@ -208,13 +209,6 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
             );
         }
         mLoopMePlayer.start();
-        resumeVideoTimer();
-    }
-
-    private void resumeVideoTimer() {
-        if (mVideoTimer != null) {
-            mVideoTimer.resume();
-        }
     }
 
     private Surface getSurface() {
@@ -290,7 +284,9 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     private void initSkipTime(int duration) {
-        mSkipTimeMillis = TimeUtils.retrieveSkipTime(mAdParams.getSkipTime(), duration);
+        boolean isRewarded = mLoopMeAd instanceof LoopMeInterstitialGeneral &&
+            ((LoopMeInterstitialGeneral) mLoopMeAd).isRewarded();
+        mSkipTimeMillis = isRewarded ? SKIP_DELAY_REWARDED : SKIP_DELAY_INTERSTITIAL;
     }
 
     private void createProgressPoints(int duration) {
@@ -328,11 +324,8 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     private String getCurrentPositionAsString() {
-        return String.valueOf(getPassedTime() / Constants.MILLIS_IN_SECOND);
-    }
-
-    private int getPassedTime() {
-        return mVideoTimer != null ? (int) mVideoTimer.timePassed() : 0;
+        // TODO: replace 0 with value;
+        return String.valueOf(0);
     }
 
     private boolean isPlaying() {
@@ -351,7 +344,6 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         super.onDestroy();
         destroyOmid();
         destroyMediaPlayer();
-        destroyVideoTimer();
         destroyWebView();
         mViewControllerVast.dismiss();
         mViewControllerVast.destroy();
@@ -395,7 +387,6 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     private void skipVideo(boolean skipEvent) {
         mIsAdSkipped = true;
         pauseMediaPlayer();
-        destroyVideoTimer();
         if (TextUtils.isEmpty(mImageUri)) {
             closeSelf();
         } else {
@@ -425,13 +416,6 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
             return;
         }
         mLoopMePlayer.pauseMediaPlayer();
-        pauseVideoTimer();
-    }
-
-    private void pauseVideoTimer() {
-        if (mVideoTimer != null) {
-            mVideoTimer.pause();
-        }
     }
 
     @Override
@@ -443,20 +427,6 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
         if (omidEventTrackerWrapper != null)
             omidEventTrackerWrapper.sendOneTimeCompleteEvent();
-    }
-
-    private void createVideoTimer(final int duration) {
-        mVideoTimer = initVideoTimer(duration);
-        mVideoTimer.create();
-    }
-
-    private void destroyVideoTimer() {
-        if (mVideoTimer == null) {
-            return;
-        }
-        mVideoTimer.pause();
-        mVideoTimer.cancel();
-        mVideoTimer = null;
     }
 
     // TODO. Refactor.
@@ -472,7 +442,6 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         playerPrepared = true;
         mVideoDuration = mp.getDuration();
         mViewControllerVast.adjustLayoutParams(mp.getVideoWidth(), mp.getVideoHeight(), mLoopMeAd.isBanner());
-        createVideoTimer(mVideoDuration);
         prepareControls(mVideoDuration);
         resumeMediaPlayer(getSurface());
         postEvents(mp);
@@ -482,6 +451,15 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     private void postEvents(MediaPlayer mediaPlayer) {
         onAdPreparedEvent(mediaPlayer, mViewControllerVast.getPlayerView());
         onAdStartedEvent();
+    }
+
+    @Override
+    public void onTimeUpdate(int currentTime, int duration) {
+        int doneMillis = duration - currentTime;
+        setProgress(doneMillis);
+        showSkipButton(currentTime);
+        trackDurationsEvents(currentTime);
+        muteVideo(mViewControllerVast.isMute(), false);
     }
 
     // TODO. Refactor.
@@ -505,23 +483,4 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     public void setFullScreen(boolean isFullScreen) { }
-
-    private TimerWithPause initVideoTimer(final int duration) {
-        return new TimerWithPause(duration, COUNTDOWN_INTERVAL, true) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                onDurationChanged(millisUntilFinished);
-            }
-            @Override
-            public void onFinish() { }
-        };
-    }
-
-    private void onDurationChanged(long millisUntilFinished) {
-        int doneMillis = mVideoDuration - (int) millisUntilFinished + Constants.MILLIS_IN_SECOND;
-        setProgress((int) millisUntilFinished);
-        showSkipButton(doneMillis);
-        trackDurationsEvents(doneMillis);
-        muteVideo(mViewControllerVast.isMute(), false);
-    }
 }

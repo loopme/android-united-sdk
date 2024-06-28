@@ -3,11 +3,14 @@ package com.loopme.views.activity;
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
+import static com.loopme.Constants.SKIP_DELAY_INTERSTITIAL;
+
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -123,7 +126,6 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
         if (mLoopMeAd.isMraidAd()) {
             mMraidCloseButton = new CloseButton(this);
             mMraidCloseButton.registerReceiver();
-
             DisplayControllerLoopMe dc = (DisplayControllerLoopMe) mDisplayController;
             if (mLoopMeAd.isInterstitial()) {
                 mMraidCloseButton.setOnClickListener(v -> dc.closeMraidAd());
@@ -131,9 +133,12 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
                 mMraidCloseButton.setOnClickListener(v -> dc.collapseMraidBanner());
             }
             dc.tryAddOmidFriendlyObstructionCloseButton(mMraidCloseButton);
-            mLoopMeContainerView.addView(mMraidCloseButton, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.END
-            ));
+
+            new Handler().postDelayed(() -> {
+                mLoopMeContainerView.addView(mMraidCloseButton, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.END
+                ));
+            }, SKIP_DELAY_INTERSTITIAL);
         }
     }
 

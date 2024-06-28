@@ -90,7 +90,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAdClicked(Placement placement, AdInfo adInfo) { toast("onRewardedAdClicked"); }
             @Override
-            public void onAdRewarded(Placement placement, AdInfo adInfo) { toast("onRewardedAdRewarded"); }
+            public void onAdRewarded(Placement placement, AdInfo adInfo) {
+                toast("onRewardedAdRewarded:\n" + placement.getRewardName() + " (" + placement.getRewardAmount() + ")");
+            }
             @Override
             public void onAdClosed(AdInfo adInfo) { toast("onRewardedAdClosed"); }
         });

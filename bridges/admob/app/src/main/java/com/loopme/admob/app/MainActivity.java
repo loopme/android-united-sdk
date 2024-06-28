@@ -46,13 +46,9 @@ public class MainActivity extends AppCompatActivity {
                         "Adapter name: %s, Description: %s, Latency: %d",
                         adapterClass, status.getDescription(), status.getLatency()));
             }
-
             toast("AdMob SDK initialized\n" + initializationStatus);
             initButtons();
         });
-//                initializationStatus -> {
-
-//        });
     }
 
     private void initButtons() {
