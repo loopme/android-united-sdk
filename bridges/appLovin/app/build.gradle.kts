@@ -32,7 +32,8 @@ android {
 
 dependencies {
     implementation(project(":bridges:appLovin:adapter"))
-//    implementation("com.github.loopme.android-united-sdk:appLovin-adapter:AL_0.0.1")
+//    implementation("com.github.loopme.android-united-sdk:appLovin-adapter:AL_0.0.6")
+    implementation("net.pubnative:hybid.adapters.applovin:3.0.0")
 
     // appcompat and material > 1.6.0 does not supported by Unity 2021
     implementation("androidx.appcompat:appcompat:1.6.0")
