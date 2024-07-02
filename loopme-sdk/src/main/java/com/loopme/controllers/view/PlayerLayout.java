@@ -28,55 +28,66 @@ import java.util.Locale;
 public class PlayerLayout extends FrameLayout
         implements GestureDetector.OnGestureListener, TextureView.SurfaceTextureListener {
 
-    private static final int PROGRESS_HEIGHT = Utils.convertDpToPixel(3);
     private static final int TIME_MARGIN = Utils.convertDpToPixel(6);
     private static final float TEXT_SIZE = 12;
-
     private final int SKIP_BUTTON_ID = View.generateViewId();
-    private final int PLAYER_VIEW_ID = View.generateViewId();
-    private final int WEBVIEW_ID = View.generateViewId();
     private final int MUTE_BUTTON_ID = View.generateViewId();
 
     private int mViewPosition;
     private boolean mMuteState;
     private Surface mSurface;
-    private final WebView mWebView;
     private TextView mTextView;
     private ProgressBar mProgressBar;
-
     private ImageView mMuteButton;
     private ImageView mSkipButton;
     private TextureView mPlayerTextureView;
-
     private View[] buttonViews;
-
     private final OnPlayerListener mListener;
-    private static final String TIME_FINISHED = "00:00";
-    private static final int MINIMAL_TIME_STEP = 200;
 
     public PlayerLayout(@NonNull Context context, WebView webView, OnPlayerListener listener) {
         super(context);
-        mWebView = webView;
         mListener = listener;
-        configureViews();
-        buildLayout();
-    }
 
-    private void configureViews() {
-        configureSkipButton();
-        configureMuteButton();
-        configureProgressBar();
-        configureTextureView();
-        configureTimeTextView();
-        configureWebView();
+        int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI, getContext());
+
+        mSkipButton = new ImageView(getContext());
+        mSkipButton.setId(SKIP_BUTTON_ID);
+        mSkipButton.setScaleType(ImageView.ScaleType.CENTER);
+        mSkipButton.setImageResource(R.drawable.l_skip);
+        mSkipButton.setVisibility(View.INVISIBLE);
+        mSkipButton.setLayoutParams(new FrameLayout.LayoutParams(btnSizePx, btnSizePx, Gravity.END));
+
+        mMuteButton = new ImageView(getContext());
+        mMuteButton.setId(MUTE_BUTTON_ID);
+        mMuteButton.setScaleType(ImageView.ScaleType.CENTER);
+        mMuteButton.setImageResource(R.drawable.l_unmute);
+        mMuteButton.setVisibility(View.VISIBLE);
+        mMuteButton.setLayoutParams(new FrameLayout.LayoutParams(btnSizePx, btnSizePx, Gravity.START));
+
+        mProgressBar = new ProgressBar(getContext(), null, android.R.style.Widget_ProgressBar_Horizontal);
+        mProgressBar.setProgressDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.l_progress_bar, null));
+        int PROGRESS_HEIGHT = Utils.convertDpToPixel(3);
+        mProgressBar.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, PROGRESS_HEIGHT, Gravity.BOTTOM));
+
+        mPlayerTextureView = new TextureView(getContext());
+        mPlayerTextureView.setId(View.generateViewId());
+        mPlayerTextureView.setLayoutParams(Utils.createMatchParentLayoutParams());
+        mPlayerTextureView.setSurfaceTextureListener(this);
+
+        mTextView = new TextView(getContext());
+        mTextView.setTextSize(TEXT_SIZE);
+        mTextView.setTextColor(getContext().getResources().getColor(R.color.white_pale));
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
+        params.setMargins(TIME_MARGIN, 0, 0, TIME_MARGIN);
+        mTextView.setLayoutParams(params);
+        if (webView != null) {
+            webView.setId(View.generateViewId());
+        }
         buttonViews = new View[]{mMuteButton, mSkipButton};
-    }
-
-    private void buildLayout() {
         setLayoutParams(Utils.createMatchParentLayoutParams());
         addView(mPlayerTextureView, generateViewPosition());
-        if (mWebView != null) {
-            addView(mWebView, generateViewPosition());
+        if (webView != null) {
+            addView(webView, generateViewPosition());
         }
         addView(mSkipButton, generateViewPosition());
         addView(mMuteButton, generateViewPosition());
@@ -96,67 +107,12 @@ public class PlayerLayout extends FrameLayout
         return mSurface;
     }
 
-    private void configureWebView() {
-        if (mWebView != null)
-            mWebView.setId(WEBVIEW_ID);
-    }
-
-    private void configureTimeTextView() {
-        mTextView = new TextView(getContext());
-        mTextView.setTextSize(TEXT_SIZE);
-        mTextView.setTextColor(getContext().getResources().getColor(R.color.white_pale));
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
-        params.gravity = Gravity.BOTTOM;
-        params.setMargins(TIME_MARGIN, 0, 0, TIME_MARGIN);
-        mTextView.setLayoutParams(params);
-    }
-
-    private void configureProgressBar() {
-        mProgressBar = new ProgressBar(getContext(), null, android.R.style.Widget_ProgressBar_Horizontal);
-        mProgressBar.setProgressDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.l_progress_bar, null));
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, PROGRESS_HEIGHT, Gravity.BOTTOM);
-        mProgressBar.setLayoutParams(params);
-    }
-
-    private void configureSkipButton() {
-        mSkipButton = new ImageView(getContext());
-        mSkipButton.setId(SKIP_BUTTON_ID);
-        mSkipButton.setScaleType(ImageView.ScaleType.CENTER);
-        mSkipButton.setImageResource(R.drawable.l_skip);
-        mSkipButton.setVisibility(View.INVISIBLE);
-        int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI, getContext());
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-            btnSizePx, btnSizePx, Gravity.END
-        );
-        mSkipButton.setLayoutParams(params);
-    }
-
-    private void configureMuteButton() {
-        mMuteButton = new ImageView(getContext());
-        mMuteButton.setId(MUTE_BUTTON_ID);
-        mMuteButton.setScaleType(ImageView.ScaleType.CENTER);
-        mMuteButton.setImageResource(R.drawable.l_unmute);
-        mMuteButton.setVisibility(View.VISIBLE);
-        int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI, getContext());
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-            btnSizePx, btnSizePx, Gravity.START
-        );
-        mMuteButton.setLayoutParams(params);
-    }
-
-    private void configureTextureView() {
-        mPlayerTextureView = new TextureView(getContext());
-        mPlayerTextureView.setId(PLAYER_VIEW_ID);
-        mPlayerTextureView.setLayoutParams(Utils.createMatchParentLayoutParams());
-        mPlayerTextureView.setSurfaceTextureListener(this);
-    }
+    private final GestureDetector gestureDetector = new GestureDetector(getContext(), this);
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         return gestureDetector.onTouchEvent(event);
     }
-
-    private final GestureDetector gestureDetector = new GestureDetector(getContext(), this);
 
     @Override
     public boolean onDown(MotionEvent e) {
@@ -169,12 +125,17 @@ public class PlayerLayout extends FrameLayout
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
         View v = ViewUtils.findVisibleView(buttonViews, e);
-        if (v == null)
-            onPlayerClick();
-        else if (v.getId() == MUTE_BUTTON_ID)
-            muteVideo();
-        else if (v.getId() == SKIP_BUTTON_ID)
-            onSkipClick();
+        if (mListener != null) {
+            if (v == null) {
+                mListener.onPlayerClick();
+            } else if (v.getId() == MUTE_BUTTON_ID) {
+                mMuteState = !mMuteState;
+                mMuteButton.setImageResource(mMuteState ? R.drawable.l_mute : R.drawable.l_unmute);
+                mListener.onMuteClick(mMuteState);
+            } else if (v.getId() == SKIP_BUTTON_ID) {
+                mListener.onSkipClick();
+            }
+        }
         return true;
     }
 
@@ -200,38 +161,20 @@ public class PlayerLayout extends FrameLayout
         return mMuteState;
     }
 
-    private void muteVideo() {
-        mMuteState = !mMuteState;
-        switchButton();
-        onMuteClick(mMuteState);
-    }
-
-    private void switchButton() {
-        mMuteButton.setImageResource(mMuteState ? R.drawable.l_mute : R.drawable.l_unmute);
-    }
-
-    private String createTimeStamp(int progress) {
-        int timeLeft = progress / Constants.MILLIS_IN_SECOND;
+    public void setProgress(int progress) {
+        int maxDuration = mProgressBar == null ? 0 : mProgressBar.getMax();
+        if (mProgressBar != null) {
+            mProgressBar.setProgress(maxDuration - progress);
+        }
+        if (progress < 200) {
+            String TIME_FINISHED = "00:00";
+            mTextView.setText(TIME_FINISHED);
+            return;
+        }
+        int timeLeft = (progress + Constants.MILLIS_IN_SECOND) / Constants.MILLIS_IN_SECOND;
         int minutes = timeLeft / Constants.SECONDS_IN_MINUTE;
         int seconds = timeLeft % Constants.SECONDS_IN_MINUTE;
-        return String.format(Locale.US, "%02d:%02d", minutes, seconds);
-    }
-
-    public void setProgress(int progress) {
-        setProgressInProgressBar(getMaxDuration() - progress);
-        String timeStamp = progress < MINIMAL_TIME_STEP ?
-            TIME_FINISHED : createTimeStamp(progress + Constants.MILLIS_IN_SECOND);
-        mTextView.setText(timeStamp);
-    }
-
-    private int getMaxDuration() {
-        return mProgressBar == null ? 0 : mProgressBar.getMax();
-    }
-
-    private void setProgressInProgressBar(int progress) {
-        if (mProgressBar != null) {
-            mProgressBar.setProgress(progress);
-        }
+        mTextView.setText(String.format(Locale.US, "%02d:%02d", minutes, seconds));
     }
 
     public void setMaxProgress(int duration) {
@@ -243,7 +186,9 @@ public class PlayerLayout extends FrameLayout
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
         mSurface = new Surface(surfaceTexture);
-        onSurfaceTextureReady(mSurface);
+        if (mListener != null) {
+            mListener.onSurfaceTextureReady(mSurface);
+        }
     }
 
     @Override
@@ -256,30 +201,6 @@ public class PlayerLayout extends FrameLayout
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) { }
-
-    private void onSurfaceTextureReady(Surface surface) {
-        if (mListener != null) {
-            mListener.onSurfaceTextureReady(surface);
-        }
-    }
-
-    private void onPlayerClick() {
-        if (mListener != null) {
-            mListener.onPlayerClick();
-        }
-    }
-
-    private void onMuteClick(boolean mute) {
-        if (mListener != null) {
-            mListener.onMuteClick(mute);
-        }
-    }
-
-    private void onSkipClick() {
-        if (mListener != null) {
-            mListener.onSkipClick();
-        }
-    }
 
     public TextureView getPlayerView() {
         return mPlayerTextureView;

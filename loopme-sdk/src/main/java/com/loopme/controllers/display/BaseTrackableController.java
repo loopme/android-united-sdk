@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.webkit.WebView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.loopme.AdUtils;
@@ -32,10 +33,6 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
 
     public BaseTrackableController(LoopMeAd loopMeAd) {
         mLoopMeAd = loopMeAd;
-        setOrientation();
-    }
-
-    private void setOrientation() {
         if (mLoopMeAd != null) {
             mOrientation = mLoopMeAd.getAdParams().getAdOrientation();
         }
@@ -43,28 +40,27 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
 
     @Override
     public void onStartLoad() {
-        if (isEventManagerNeeded())
+        if (mLoopMeAd == null) {
+            return;
+        }
+        AdParams adParams = mLoopMeAd.getAdParams();
+        if (adParams != null && !adParams.getTrackers().isEmpty())
             mEventManager = new EventManager(mLoopMeAd);
     }
 
-    protected void initTrackers() {
-        onInitTracker(isNativeAd() ? AdType.NATIVE : AdType.WEB);
+    @Override
+    public void onInitTracker(AdType type) {
+        if (mEventManager != null) {
+            mEventManager.onInitTracker(type);
+        }
     }
 
-    // TODO.
-    private boolean isNativeAd() {
-        return mLoopMeAd != null &&
+    protected void initTrackers() {
+        boolean isNativeAd = mLoopMeAd != null &&
             !mLoopMeAd.isMraidAd() &&
             !mLoopMeAd.isVpaidAd() &&
             mLoopMeAd.isVastAd();
-    }
-
-    private boolean isEventManagerNeeded() {
-        if (mLoopMeAd == null) {
-            return false;
-        }
-        AdParams adParams = mLoopMeAd.getAdParams();
-        return adParams != null && !adParams.getTrackers().isEmpty();
+        onInitTracker(isNativeAd ? AdType.NATIVE : AdType.WEB);
     }
 
     protected void onInternalLoadFail(final LoopMeError error) {
@@ -275,13 +271,6 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     }
 
     @Override
-    public void onInitTracker(AdType type) {
-        if (mEventManager != null) {
-            mEventManager.onInitTracker(type);
-        }
-    }
-
-    @Override
     public void onStartWebMeasuringDelayed() {
         mLoopMeAd.getContainerView().postDelayed(() -> {
             if (mEventManager != null) {
@@ -336,9 +325,7 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     }
 
     @Override
-    public int getOrientation() {
-        return getOrientationFromAdParams();
-    }
+    public int getOrientation() { return getOrientationFromAdParams(); }
 
     protected int getOrientationFromAdParams() {
         if (TextUtils.equals(mOrientation, Constants.ORIENTATION_PORT)) {
@@ -350,9 +337,7 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
         return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
     }
 
-    protected boolean isTrackerAvailable() {
-        return mEventManager != null;
-    }
+    protected boolean isTrackerAvailable() { return mEventManager != null; }
 
     @Override
     public void onNewActivity(Activity activity) {

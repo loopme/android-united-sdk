@@ -55,6 +55,8 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     private volatile String mCurrentVideoTime;
     private final int mVideoDuration;
     private boolean mIsFirstLaunch = true;
+
+    private enum CreativeType { VIDEO_MP4_WEBM, VIDEO_OTHER_TYPE, NONE_VIDEO }
     private CreativeType mCreativeType = CreativeType.NONE_VIDEO;
 
     public DisplayControllerVpaid(LoopMeAd loopMeAd) {
@@ -102,7 +104,9 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     protected WebView createWebView() {
         WebView wv = new LoopMeWebView(mLoopMeAd.getContext());
         wv.setWebChromeClient(new AdViewChromeClient(this));
-        wv.setWebViewClient(initVast4WebViewClient());
+        Vast4WebViewClient vast4WebViewClient = new Vast4WebViewClient();
+        vast4WebViewClient.setOnPageLoadedListener(this);
+        wv.setWebViewClient(vast4WebViewClient);
         wv.addJavascriptInterface(mVpaidBridge, ANDROID_JS_INTERFACE);
         return wv;
     }
@@ -163,20 +167,16 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     //endregion
 
     @Override
-    public void runOnUiThread(Runnable runnable) {
-        onUiThread(runnable);
-    }
+    public void runOnUiThread(Runnable runnable) { onUiThread(runnable); }
 
     //region BridgeEventHandler methods
     @Override
     public void callJsMethod(final String url) {
-        onUiThread(() -> loadUrlToWebView(url));
-    }
-
-    private void loadUrlToWebView(String url) {
-        WebView wv = getWebView();
-        if (wv != null)
-            wv.loadUrl("javascript:" + url);
+        onUiThread(() -> {
+            WebView wv = getWebView();
+            if (wv != null)
+                wv.loadUrl("javascript:" + url);
+        });
     }
 
     @Override
@@ -261,39 +261,17 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     @Override
     public void postEvent(String eventType) {
         postVideoEvent(eventType);
-        cancelExtraCloseButtonIfFirstQuartile(eventType);
+        if (TextUtils.equals(eventType, EventConstants.FIRST_QUARTILE) && mCreativeType == CreativeType.VIDEO_OTHER_TYPE) {
+            Logging.out(LOG_TAG, "Event video 25% is posted. Dismiss extra close button timer");
+            cancelExtraCloseButton();
+        }
     }
     //endregion
 
     //region other methods
 
-    private WebViewClient initVast4WebViewClient() {
-        Vast4WebViewClient vast4WebViewClient = new Vast4WebViewClient();
-        vast4WebViewClient.setOnPageLoadedListener(this);
-        return vast4WebViewClient;
-    }
-
     @Override
     public void onErrorFromJs(String message) {
-        postVpaidError(message);
-    }
-
-    @Override
-    public void onVideoSource(String source) {
-        videoSourceEventOccurred(source);
-    }
-
-    @Override
-    public void onPageLoaded() {
-        if (!mIsWaitingForWebView) {
-            return;
-        }
-        Logging.out(LOG_TAG, "Init webView done");
-        callBridgeMethod(BridgeMethods.VPAID_PREPARE_AD);
-        mIsWaitingForWebView = false;
-    }
-
-    private void postVpaidError(String message) {
         Logging.out(LOG_TAG, "Error from JS " + message);
         LoopMeError error = mIsStarted ? new LoopMeError(Errors.GENERAL_VPAID_ERROR) : new LoopMeError(Errors.VPAID_FILE_NOT_FOUND);
         error.addToMessage(message);
@@ -305,12 +283,24 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     }
 
     @Override
+    public void onVideoSource(String source) { videoSourceEventOccurred(source); }
+
+    @Override
+    public void onPageLoaded() {
+        if (!mIsWaitingForWebView) {
+            return;
+        }
+        Logging.out(LOG_TAG, "Init webView done");
+        callBridgeMethod(BridgeMethods.VPAID_PREPARE_AD);
+        mIsWaitingForWebView = false;
+    }
+
+    @Override
     public void closeSelf() {
         mIsWaitingForWebView = false;
         callBridgeMethod(BridgeMethods.VPAID_STOP_AD);
         dismissAd();
     }
-
 
     //endregion
     @Override
@@ -334,10 +324,6 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     public void adStarted() {
         mImpressionTimer = new SimpleTimer(IMPRESSION_TIMER, this::onAdImpression);
         mImpressionTimer.start();
-        startCloseButtonTimerOnUiThread();
-    }
-
-    private void startCloseButtonTimerOnUiThread() {
         if (mCreativeType != CreativeType.VIDEO_OTHER_TYPE) {
             return;
         }
@@ -414,25 +400,11 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     private void videoSourceEventOccurred(String source) {
         Logging.out(LOG_TAG, "Video source event received");
         hideCloseButtonOnce();
-        checkVideoFormat(source);
-    }
 
-    private void hideCloseButtonOnce() {
-        if (!mIsFirstLaunch || mViewControllerVpaid == null) {
-            return;
-        }
-        mViewControllerVpaid.enableCloseButton(false);
-        mIsFirstLaunch = false;
-    }
-
-    private boolean isUsualFormat(String source) {
         int lastIndex = source.lastIndexOf("/");
         String fileName = TextUtils.isEmpty(source) || lastIndex < 0 ? "" : source.substring(lastIndex);
-        return fileName.contains(Constants.MP4_FORMAT_EXT) || fileName.contains(Constants.WEBM_FORMAT_EXT);
-    }
-
-    private void checkVideoFormat(String source) {
-        if (isUsualFormat(source)) {
+        boolean isUsualFormat = fileName.contains(Constants.MP4_FORMAT_EXT) || fileName.contains(Constants.WEBM_FORMAT_EXT);
+        if (isUsualFormat) {
             cancelExtraCloseButton();
             mCreativeType = CreativeType.VIDEO_MP4_WEBM;
             return;
@@ -443,11 +415,12 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         onPostWarning(error);
     }
 
-    private void cancelExtraCloseButtonIfFirstQuartile(String eventType) {
-        if (TextUtils.equals(eventType, EventConstants.FIRST_QUARTILE) && mCreativeType == CreativeType.VIDEO_OTHER_TYPE) {
-            Logging.out(LOG_TAG, "Event video 25% is posted. Dismiss extra close button timer");
-            cancelExtraCloseButton();
+    private void hideCloseButtonOnce() {
+        if (!mIsFirstLaunch || mViewControllerVpaid == null) {
+            return;
         }
+        mViewControllerVpaid.enableCloseButton(false);
+        mIsFirstLaunch = false;
     }
 
     private void cancelExtraCloseButton() {
@@ -457,6 +430,4 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         mViewControllerVpaid.cancelCloseButtonTimer();
         mViewControllerVpaid.enableCloseButton(false);
     }
-
-    private enum CreativeType { VIDEO_MP4_WEBM, VIDEO_OTHER_TYPE, NONE_VIDEO }
 }
