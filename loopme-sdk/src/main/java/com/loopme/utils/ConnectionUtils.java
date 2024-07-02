@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
-
 import com.loopme.Constants;
 
 /**
@@ -54,7 +53,12 @@ public class ConnectionUtils {
 
         int networkType = 0;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            networkType = telephonyManager.getDataNetworkType();
+            try {
+                // Because it is static method we can't use permission check here
+                networkType = telephonyManager.getDataNetworkType();
+            } catch (SecurityException e) {
+                return Constants.ConnectionType.UNKNOWN;
+            }
         }
         switch (networkType) {
             case TelephonyManager.NETWORK_TYPE_GPRS:
