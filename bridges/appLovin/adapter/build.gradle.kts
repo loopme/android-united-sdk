@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.applovin.mediation.adapters"
+    namespace = "com.applovin.mediation.adapters.loopme"
     defaultConfig {
         consumerProguardFiles("proguard-rules.pro")
         buildConfigField("String", "VERSION_NAME", project.findProperty("VERSION_NAME") as? String ?: "")
