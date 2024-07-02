@@ -11,23 +11,21 @@ import com.loopme.vast.VastVpaidEventTracker;
 import java.util.List;
 
 class ViewableImpressionTracker {
-    private static final String LOG_TAG = ViewableImpressionTracker.class.getSimpleName();
     static final int IMPRESSION_TIME_NATIVE_VIDEO = 2000;
-    private static final double FIFTY_PERCENTS = 0.5;
 
     private boolean mIsImpressionTracked;
     private final AdParams mAdParams;
     private View mAdView;
 
-    ViewableImpressionTracker(AdParams adParams) {
-        mAdParams = adParams;
-    }
+    ViewableImpressionTracker(AdParams adParams) { mAdParams = adParams; }
 
     void postViewableEvents(final int doneMillis) {
         if (mIsImpressionTracked || doneMillis < IMPRESSION_TIME_NATIVE_VIDEO)
             return;
         ExecutorHelper.getExecutor().execute(() -> {
-            List<String> impressions = isVideoVisible()
+            ViewAbilityUtils.ViewAbilityInfo viewAbilityInfo =
+                ViewAbilityUtils.calculateViewAbilityInfo(mAdView);
+            List<String> impressions = viewAbilityInfo.getVisibility() > 0.5
                 ? mAdParams.getVisibleImpressions() : mAdParams.getNotVisibleImpressions();
             for (String url : impressions)
                 VastVpaidEventTracker.trackVastEvent(url, "");
@@ -35,14 +33,5 @@ class ViewableImpressionTracker {
         mIsImpressionTracked = true;
     }
 
-    private boolean isVideoVisible() {
-        ViewAbilityUtils.ViewAbilityInfo viewAbilityInfo =
-            ViewAbilityUtils.calculateViewAbilityInfo(mAdView);
-        Logging.out(LOG_TAG, "visibility: " + viewAbilityInfo.getVisibility());
-        return viewAbilityInfo.getVisibility() > FIFTY_PERCENTS;
-    }
-
-    void setAdView(View adView) {
-        this.mAdView = adView;
-    }
+    void setAdView(View adView) { this.mAdView = adView; }
 }

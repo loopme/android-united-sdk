@@ -26,8 +26,7 @@ public class ViewControllerVpaid implements View.OnClickListener {
 
     private WebView mWebView;
     private View mEndCardLayout;
-    private FrameLayout mContainerView;
-    private ImageView mEndCardView;
+
     private TimerWithPause mCloseButtonTimer;
     private ImageView mCloseImageView;
 
@@ -36,104 +35,53 @@ public class ViewControllerVpaid implements View.OnClickListener {
     }
 
     public void buildVideoAdView(FrameLayout containerView, WebView webView, Context context) {
-        mContainerView = containerView;
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
+        );
         mWebView = webView;
-        clearViews();
-        initViews(context);
-        setListeners();
-        configureViews();
-        addViewsToContainer();
-    }
-
-    private void addViewsToContainer() {
-        FrameLayout.LayoutParams params = createParams();
-        mEndCardLayout.setLayoutParams(params);
-        mWebView.setLayoutParams(params);
-        mContainerView.addView(mEndCardLayout, 0);
-        mContainerView.addView(mWebView, 1);
-        mContainerView.addView(mCloseImageView, 2);
-    }
-
-    private void configureViews() {
         mWebView.setBackgroundColor(Color.TRANSPARENT);
-        mContainerView.setBackgroundColor(Color.TRANSPARENT);
-    }
-
-    private void setListeners() {
-        (mEndCardLayout.findViewById(R.id.close_imageview)).setOnClickListener(this);
-        (mEndCardLayout.findViewById(R.id.replay_imageview)).setOnClickListener(this);
-        mCloseImageView.setOnClickListener(this);
-    }
-
-    private void initViews(Context context) {
-        mEndCardLayout = LayoutInflater.from(context).inflate(R.layout.end_card, mContainerView, false);
+        mWebView.setLayoutParams(params);
+        if (mWebView.getParent() != null) {
+            ((ViewGroup) mWebView.getParent()).removeAllViews();
+        }
+        containerView.removeAllViews();
+        mEndCardLayout = LayoutInflater.from(context).inflate(R.layout.end_card, containerView, false);
         mEndCardLayout.setVisibility(View.GONE);
-        mEndCardView = mEndCardLayout.findViewById(R.id.end_card_imageview);
-        configureCloseView(context);
+        mEndCardLayout.findViewById(R.id.close_imageview).setOnClickListener(this);
+        mEndCardLayout.findViewById(R.id.replay_imageview).setOnClickListener(this);
+        mEndCardLayout.setLayoutParams(params);
+        containerView.setBackgroundColor(Color.TRANSPARENT);
+        containerView.addView(mEndCardLayout, 0);
+        containerView.addView(mWebView, 1);
+        containerView.addView(getCloseView(context), 2);
     }
 
-    private void configureCloseView(Context context) {
+    private ImageView getCloseView(Context context) {
+        int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI, context);
         mCloseImageView = new ImageView(context);
         mCloseImageView.setId(CLOSE_BUTTON_ID);
         mCloseImageView.setScaleType(ImageView.ScaleType.CENTER);
         mCloseImageView.setImageResource(R.drawable.l_close);
-        int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI, context);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-            btnSizePx, btnSizePx, Gravity.END
-        );
-        mCloseImageView.setLayoutParams(params);
+        mCloseImageView.setLayoutParams(new FrameLayout.LayoutParams(btnSizePx, btnSizePx, Gravity.END));
+        mCloseImageView.setOnClickListener(this);
         enableCloseButton(false);
-    }
-
-    private FrameLayout.LayoutParams createParams() {
-        return new FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
-        );
-    }
-
-    private void clearViews() {
-        if (mWebView.getParent() != null) {
-            ((ViewGroup) mWebView.getParent()).removeAllViews();
-        }
-        mContainerView.removeAllViews();
-    }
-
-    private void showControls() {
-        mEndCardLayout.setVisibility(View.GONE);
-        mWebView.setVisibility(View.VISIBLE);
-    }
-
-    public void showEndCard(String imageUri) {
-        mEndCardLayout.setVisibility(View.VISIBLE);
-        mWebView.setVisibility(View.GONE);
-        ImageUtils.setScaledImage(mEndCardView, imageUri);
+        return mCloseImageView;
     }
 
     @Override
     public void onClick(View view) {
         int id = view.getId();
         if (id == R.id.close_imageview || id == CLOSE_BUTTON_ID) {
-            closeSelf();
+            if (mDisplayControllerVpaid != null) {
+                mDisplayControllerVpaid.closeSelf();
+            }
         }
         if (id == R.id.replay_imageview) {
-            onReplayButtonClicked();
-        }
-    }
-
-    private void onReplayButtonClicked() {
-        showControls();
-        onPlay();
-    }
-
-    private void onPlay() {
-        if (mDisplayControllerVpaid != null) {
-            mDisplayControllerVpaid.onPlay(Constants.START_POSITION);
-        }
-    }
-
-    private void closeSelf() {
-        if (mDisplayControllerVpaid != null) {
-            mDisplayControllerVpaid.closeSelf();
+            mEndCardLayout.setVisibility(View.GONE);
+            mWebView.setVisibility(View.VISIBLE);
+            if (mDisplayControllerVpaid != null) {
+                mDisplayControllerVpaid.onPlay(Constants.START_POSITION);
+            }
         }
     }
 
@@ -146,9 +94,7 @@ public class ViewControllerVpaid implements View.OnClickListener {
                 Logging.out(LOG_TAG, "Till extra close button " + millisUntilFinished / 1000);
             }
             @Override
-            public void onFinish() {
-                enableCloseButton(true);
-            }
+            public void onFinish() { enableCloseButton(true); }
         };
         mCloseButtonTimer.create();
     }

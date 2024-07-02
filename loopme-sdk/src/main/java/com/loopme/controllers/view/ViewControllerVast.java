@@ -31,17 +31,17 @@ public class ViewControllerVast {
         if (containerView == null || context == null) {
             return;
         }
+
+        mPlayerLayout = new PlayerLayout(context, webView, initOnPlayerListener());
+        mEndCardLayout = new EndCardLayout(context, initOnEndCardListener());
+        mAdLayout = new FrameLayout(containerView.getContext());
+        mAdLayout.setLayoutParams(Utils.createMatchParentLayoutParams());
+        mAdLayout.addView(mPlayerLayout);
+        mAdLayout.addView(mEndCardLayout);
+
         mContainerView = containerView;
         mContainerView.removeAllViews();
         mContainerView.setBackgroundColor(Color.TRANSPARENT);
-        mPlayerLayout = new PlayerLayout(context, webView, initOnPlayerListener());
-        mEndCardLayout = new EndCardLayout(context, initOnEndCardListener());
-
-        mAdLayout = new FrameLayout(containerView.getContext());
-        mAdLayout.setLayoutParams(Utils.createMatchParentLayoutParams());
-
-        mAdLayout.addView(mPlayerLayout);
-        mAdLayout.addView(mEndCardLayout);
         mContainerView.addView(mAdLayout);
     }
 
@@ -53,11 +53,17 @@ public class ViewControllerVast {
             }
             @Override
             public void onCloseClick() {
-                closeSelf();
+                if (mDisplayControllerVast != null) {
+                    mDisplayControllerVast.closeSelf();
+                }
             }
             @Override
             public void onReplayClick() {
-                replayVideo();
+                setEndCardVisibility(View.GONE);
+                setVideoPlayerVisibility(View.VISIBLE);
+                if (mDisplayControllerVast != null) {
+                    mDisplayControllerVast.onPlay(Constants.START_POSITION);
+                }
             }
         };
     }
@@ -66,7 +72,9 @@ public class ViewControllerVast {
         return new PlayerLayout.OnPlayerListener() {
             @Override
             public void onSurfaceTextureReady(Surface surface) {
-                onSurfaceReady(surface);
+                if (mListener != null) {
+                    mListener.onSurfaceTextureReady(surface);
+                }
             }
             @Override
             public void onPlayerClick() {
@@ -74,23 +82,23 @@ public class ViewControllerVast {
             }
             @Override
             public void onMuteClick(boolean mute) {
-                onVolumeMute(mute);
+                if (mDisplayControllerVast != null) {
+                    mDisplayControllerVast.onVolumeMute(mute);
+                }
             }
             @Override
             public void onSkipClick() {
-                skipVideo();
+                if (mDisplayControllerVast != null) {
+                    mDisplayControllerVast.skipVideo();
+                }
             }
         };
     }
 
-    private void onSurfaceReady(Surface surface) {
-        if (mListener != null) {
-            mListener.onSurfaceTextureReady(surface);
-        }
-    }
-
     public void adjustLayoutParams(int width, int height, boolean isBanner) {
-        adjustPlayerParams(width, height);
+        if (mPlayerLayout != null) {
+            mPlayerLayout.adjustLayoutParams(width, height, mContainerView.getWidth(), mContainerView.getHeight());
+        }
         if (!isBanner) {
             return;
         }
@@ -98,12 +106,6 @@ public class ViewControllerVast {
         ViewGroup.LayoutParams paramTo = mAdLayout.getLayoutParams();
         paramTo.width = paramFrom.width;
         paramTo.height = paramFrom.height;
-    }
-
-    private void adjustPlayerParams(int width, int height) {
-        if (mPlayerLayout != null) {
-            mPlayerLayout.adjustLayoutParams(width, height, mContainerView.getWidth(), mContainerView.getHeight());
-        }
     }
 
     public Surface getSurface() {
@@ -130,7 +132,6 @@ public class ViewControllerVast {
         }
     }
 
-
     public boolean isEndCard() {
         return mEndCardLayout != null && mEndCardLayout.getVisibility() == View.VISIBLE;
     }
@@ -147,39 +148,8 @@ public class ViewControllerVast {
         }
     }
 
-    private void replayVideo() {
-        setEndCardVisibility(View.GONE);
-        setVideoPlayerVisibility(View.VISIBLE);
-        onPlay();
-    }
-
-
-    private void skipVideo() {
-        if (mDisplayControllerVast != null) {
-            mDisplayControllerVast.skipVideo();
-        }
-    }
-
-    private void closeSelf() {
-        if (mDisplayControllerVast != null) {
-            mDisplayControllerVast.closeSelf();
-        }
-    }
-
-    private void onPlay() {
-        if (mDisplayControllerVast != null) {
-            mDisplayControllerVast.onPlay(Constants.START_POSITION);
-        }
-    }
-
-    private void onVolumeMute(boolean muteState) {
-        if (mDisplayControllerVast != null) {
-            mDisplayControllerVast.onVolumeMute(muteState);
-        }
-    }
-
     public TextureView getPlayerView() {
-        return mPlayerLayout != null ? mPlayerLayout.getPlayerView() : null;
+        return mPlayerLayout == null ? null : mPlayerLayout.getPlayerView();
     }
 
     public void destroy() {

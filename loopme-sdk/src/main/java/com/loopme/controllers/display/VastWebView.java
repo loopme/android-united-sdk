@@ -13,14 +13,10 @@ import com.loopme.views.webclient.AdViewChromeClient;
 
 public class VastWebView extends WebView {
 
+    @SuppressLint("SetJavaScriptEnabled")
     public VastWebView(Context context) {
         super(context);
-        configure();
-        allowCookies();
-    }
 
-    @SuppressLint("SetJavaScriptEnabled")
-    private void configure() {
         getSettings().setJavaScriptEnabled(true);
         getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         setBackgroundColor(Color.TRANSPARENT);
@@ -29,9 +25,7 @@ public class VastWebView extends WebView {
         setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
         setWebChromeClient(new AdViewChromeClient(message -> { }));
         setWebViewClient(new Vast4WebViewClient());
-    }
 
-    private void allowCookies() {
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
         cookieManager.setAcceptThirdPartyCookies(this, true);

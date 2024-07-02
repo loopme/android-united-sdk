@@ -59,11 +59,25 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     public final AdFetcherListener adFetchListener = new AdFetcherListener() {
         @Override
-        public void onAdFetchCompleted(AdParams adParams) { LoopMeAd.this.onAdFetchCompleted(adParams); }
+        public void onAdFetchCompleted(AdParams adParams) {
+            if (adParams != null) {
+                LoopMeTracker.trackSdkFeedBack(adParams.getPackageIds(), adParams.getToken());
+                proceedPrepareAd(adParams);
+            } else {
+                onInternalLoadFail(Errors.DOWNLOAD_ERROR);
+            }
+            mIsReverseOrientationRequest = false;
+        }
         @Override
         public void onAdFetchFailed(LoopMeError error) {
-            LoopMeAd.this.onAdFetchFailed(error);
-            stopFetchAdTask();
+            if (TextUtils.isEmpty(error.getMessage())) {
+                error.setErrorMessage(String.valueOf(error.getErrorCode()));
+            }
+            onInternalLoadFail(error);
+            mIsReverseOrientationRequest = false;
+            if (mAdFetchTask != null) {
+                mAdFetchTask.stopFetch();
+            }
         }
     };
 
@@ -153,30 +167,21 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         Logging.out(LOG_TAG, "Ad paused");
     }
 
-    private void destroyTimers() {
-        if (mTimers == null) {
-            return;
-        }
-        mTimers.destroy();
-        mTimers = null;
-    }
-
     public void destroy() {
         mIsReady = false;
         setAdState(Constants.AdState.NONE);
-        stopFetchAdTask();
+        if (mAdFetchTask != null) {
+            mAdFetchTask.stopFetch();
+        }
         mAdTargetingData.clear();
-        destroyTimers();
+        if (mTimers != null) {
+            mTimers.destroy();
+            mTimers = null;
+        }
         destroyDisplayController();
         Helpers.reset();
         LoopMeAdHolder.removeAd(this);
         Logging.out(LOG_TAG, "Ad is destroyed");
-    }
-
-    private void stopFetchAdTask() {
-        if (mAdFetchTask != null) {
-            mAdFetchTask.stopFetch();
-        }
     }
 
     protected void destroyDisplayController() {
@@ -243,14 +248,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         return adFetchTask;
     }
 
-    private AdFetchTask proceedFetchAd() {
-        setAdState(Constants.AdState.LOADING);
-        startTimer(TimersType.FETCHER_TIMER, null);
-        AdFetchTask adFetchTask = new AdFetchTask(this, adFetchListener);
-        adFetchTask.fetch();
-        return adFetchTask;
-    }
-
     private boolean isCouldLoadAd() {
         String error;
         if (getContext() == null) {
@@ -302,11 +299,17 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         if (isReady()) {
             onAdAlreadyLoaded();
         } else {
-            mAdFetchTask = proceedFetchAd();
+            setAdState(Constants.AdState.LOADING);
+            startTimer(TimersType.FETCHER_TIMER, null);
+            mAdFetchTask = new AdFetchTask(this, adFetchListener);
+            mAdFetchTask.fetch();
         }
     }
 
-    private void initDisplayController() {
+    private void proceedPrepareAd(AdParams adParams) {
+        setBackendAutoLoadingValue(adParams.getAutoLoading());
+        startTimer(TimersType.EXPIRATION_TIMER, adParams);
+        setAdParams(adParams);
         if (isVpaidAd()) {
             mDisplayController = new DisplayControllerVpaid(this);
         } else if (isVastAd()) {
@@ -317,31 +320,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         if (mDisplayController != null) {
             mDisplayController.onStartLoad();
         }
-    }
-
-    private void proceedPrepareAd(AdParams adParams) {
-        setBackendAutoLoadingValue(adParams.getAutoLoading());
-        startTimer(TimersType.EXPIRATION_TIMER, adParams);
-        setAdParams(adParams);
-        initDisplayController();
         LiveDebug.setLiveDebug(this.getContext(), adParams.isDebug(), this.getAppKey());
-    }
-
-    private void onAdFetchCompleted(AdParams adParams) {
-        if (adParams != null) {
-            LoopMeTracker.trackSdkFeedBack(adParams.getPackageIds(), adParams.getToken());
-            proceedPrepareAd(adParams);
-        } else {
-            onInternalLoadFail(Errors.DOWNLOAD_ERROR);
-        }
-        mIsReverseOrientationRequest = false;
-    }
-    private void onAdFetchFailed(LoopMeError error) {
-        if (TextUtils.isEmpty(error.getMessage())) {
-            error.setErrorMessage(String.valueOf(error.getErrorCode()));
-        }
-        onInternalLoadFail(error);
-        mIsReverseOrientationRequest = false;
     }
 
     public AdTargetingData getAdTargetingData() { return mAdTargetingData; }
@@ -402,10 +381,10 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     public void onNewContainer(FrameLayout containerView) {
         if (isInterstitial()) {
             bindView(containerView);
-        } else {
-            if (mDisplayController != null && mDisplayController instanceof DisplayControllerLoopMe) {
-                ((DisplayControllerLoopMe) mDisplayController).onRebuildView(containerView);
-            }
+            return ;
+        }
+        if (mDisplayController != null && mDisplayController instanceof DisplayControllerLoopMe) {
+            ((DisplayControllerLoopMe) mDisplayController).onRebuildView(containerView);
         }
     }
 

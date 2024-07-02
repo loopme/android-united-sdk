@@ -16,6 +16,5 @@ public interface IViewController {
     void onPause();
     void onResume();
     void onDestroy();
-    boolean handleTouchEvent(MotionEvent event);
-    void initVRLibrary(Context context);
+    void handleTouchEvent(MotionEvent event);
 }

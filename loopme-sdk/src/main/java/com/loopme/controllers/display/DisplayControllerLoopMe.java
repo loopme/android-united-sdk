@@ -8,6 +8,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.iab.omid.library.loopme.adsession.AdEvents;
@@ -69,11 +70,8 @@ public class DisplayControllerLoopMe
     private OmidEventTrackerWrapper omidEventTrackerWrapper;
     private boolean needWaitOmidJsLoad;
 
-    public DisplayControllerLoopMe(LoopMeAd loopMeAd) {
+    public DisplayControllerLoopMe(@NonNull LoopMeAd loopMeAd) {
         super(loopMeAd);
-        if (loopMeAd == null) {
-            return;
-        }
         mLoopMeAd = loopMeAd;
         mAdParams = mLoopMeAd.getAdParams();
         mDisplayModeResolver = new DisplayModeResolver(this, loopMeAd);
@@ -83,11 +81,13 @@ public class DisplayControllerLoopMe
 
     public void initControllers() {
         if (isMraidAd()) {
-            initMraidControllers();
+            onMessage(Message.LOG, "initMraidController");
+            mMraidController = new MraidController(mLoopMeAd);
+            mMraidView = new MraidView(mLoopMeAd.getContext(), mMraidController, createAdReadyListener());
             return;
         }
         initLoopMeControllers();
-        initVideoController();
+        mVideoController = new VideoController(mAdView, initVideoControllerCallback(), mLoopMeAd.getAdFormat());
         initViewController();
     }
 
@@ -96,20 +96,11 @@ public class DisplayControllerLoopMe
         mAdView = new AdView(mLoopMeAd.getContext(), createAdReadyListener());
         mBridgeListener = initBridgeListener();
         mAdView.addBridgeListener(mBridgeListener);
-        mOnTouchListener = initOnTouchListener();
+        mOnTouchListener = (v, event) -> {
+            mViewController.handleTouchEvent(event);
+            return false;
+        };
         mAdView.setOnTouchListener(mOnTouchListener);
-    }
-
-    private void initMraidControllers() {
-        onMessage(Message.LOG, "initMraidController");
-        mMraidController = new MraidController(mLoopMeAd);
-        mMraidView = new MraidView(
-            mLoopMeAd.getContext(), mMraidController, createAdReadyListener()
-        );
-    }
-
-    public void initVideoController() {
-        mVideoController = new VideoController(mAdView, initVideoControllerCallback(), mLoopMeAd.getAdFormat());
     }
 
     public void initViewController() {
@@ -157,18 +148,7 @@ public class DisplayControllerLoopMe
     private void handleVideoLoad(String videoUrl) {
         onMessage(Message.LOG, "JS command: resolve video " + videoUrl);
         mVideoPresented = true;
-        loadVideoFile(videoUrl);
-    }
-
-    private void loadVideoFile(final String videoUrl) {
-        mFileLoader = new FileLoaderNewImpl(
-            videoUrl, mLoopMeAd.getContext(), initFileLoaderCallback(mAdParams.getPartPreload())
-        );
-        mFileLoader.start();
-    }
-
-    private FileLoaderNewImpl.Callback initFileLoaderCallback(final boolean preload) {
-        return new FileLoaderNewImpl.Callback() {
+        FileLoaderNewImpl.Callback callback = new FileLoaderNewImpl.Callback() {
             @Override
             public void onError(LoopMeError error) {
                 onAdLoadFail(error);
@@ -176,30 +156,18 @@ public class DisplayControllerLoopMe
             @Override
             public void onFileFullLoaded(String filePath) {
                 onMessage(Message.LOG, "fullVideoLoaded: " + filePath);
-                fullVideoLoaded(filePath, preload, mLoopMeAd.isShowing());
+                if (mVideoController != null) {
+                    mVideoController.fullVideoLoaded(filePath, mAdParams.getPartPreload(), mLoopMeAd.isShowing());
+                }
             }
         };
+        mFileLoader = new FileLoaderNewImpl(videoUrl, mLoopMeAd.getContext(), callback);
+        mFileLoader.start();
     }
 
-    private void fullVideoLoaded(String filePath, boolean preload, boolean adShowing) {
-        if (mVideoController != null) {
-            mVideoController.fullVideoLoaded(filePath, preload, adShowing);
-        }
-    }
+    private boolean isInterstitial() { return mLoopMeAd != null && mLoopMeAd.isInterstitial(); }
 
-    private boolean isInterstitial() {
-        return mLoopMeAd != null && mLoopMeAd.isInterstitial();
-    }
-
-    private boolean isBanner() {
-        return mLoopMeAd != null && mLoopMeAd.isBanner();
-    }
-
-    private void handleLoadSuccess() {
-        if (mLoopMeAd != null) {
-            mLoopMeAd.onAdLoadSuccess();
-        }
-    }
+    private boolean isBanner() { return mLoopMeAd != null && mLoopMeAd.isBanner(); }
 
     private void onAdVideoDidReachEnd() {
         if (mLoopMeAd != null) {
@@ -330,37 +298,43 @@ public class DisplayControllerLoopMe
     @Override
     public void onResume() {
         if (isBanner()) {
-            resumeBanner();
+            if (isFullScreen()) {
+                setWebViewState(Constants.WebviewState.VISIBLE);
+                return ;
+            }
+            if (!isBanner() || mLoopMeAd == null) {
+                return;
+            }
+            ViewAbilityUtils.calculateViewAbilitySyncDelayed(mLoopMeAd.getContainerView(), info -> {
+                if (!info.isVisibleMore50Percents()) {
+                    setWebViewState(Constants.WebviewState.HIDDEN);
+                    return;
+                }
+                setWebViewState(Constants.WebviewState.VISIBLE);
+                onNewActivity(mLoopMeAd.getContext());
+                onStartWebMeasuringDelayed();
+            });
         } else {
-            resumeInterstitial();
+            if (mMraidView != null) {
+                mMraidView.notifySizeChangeEvent(MRAID_WIDTH, MRAID_HEIGHT);
+                mMraidView.setIsViewable(true);
+            }
+            resumeViewController();
+            if (mVideoController != null) {
+                mVideoController.resumeVideo();
+            }
+            setWebViewState(Constants.WebviewState.VISIBLE);
         }
         super.onResume();
-    }
-
-    private void resumeBanner() {
-        if (isFullScreen()) {
-            setWebViewState(Constants.WebviewState.VISIBLE);
-        } else {
-            checkBannerVisibility();
-        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        pauseControllers();
-    }
-
-    private void resumeInterstitial() {
-        resumeMraid();
-        resumeViewController();
-        resumeVideoController();
-        setWebViewState(Constants.WebviewState.VISIBLE);
-    }
-
-    private void pauseControllers() {
         pauseViewController();
-        pauseMraid();
+        if (mMraidView != null) {
+            mMraidView.setIsViewable(false);
+        }
         if (!isInterstitial()) {
             return;
         }
@@ -368,29 +342,9 @@ public class DisplayControllerLoopMe
         setWebViewState(Constants.WebviewState.HIDDEN);
     }
 
-    private void resumeMraid() {
-        if (mMraidView == null) {
-            return;
-        }
-        mMraidView.notifySizeChangeEvent(MRAID_WIDTH, MRAID_HEIGHT);
-        mMraidView.setIsViewable(true);
-    }
-
-    private void resumeVideoController() {
-        if (mVideoController != null) {
-            mVideoController.resumeVideo();
-        }
-    }
-
     private void resumeViewController() {
         if (mViewController != null) {
             mViewController.onResume();
-        }
-    }
-
-    private void pauseMraid() {
-        if (mMraidView != null) {
-            mMraidView.setIsViewable(false);
         }
     }
 
@@ -432,10 +386,18 @@ public class DisplayControllerLoopMe
         omidEventTrackerWrapper = null;
         needWaitOmidJsLoad = false;
         destroyMraidController();
-        destroyVideoController();
-        stopVideoLoader();
-        clearWebView(mAdView);
-        clearWebView(mMraidView);
+        if (mVideoController != null) {
+            mVideoController.destroy();
+        }
+        if (mFileLoader != null) {
+            mFileLoader.stop();
+        }
+        if (mAdView != null) {
+            mAdView.destroy();
+        }
+        if (mMraidView != null) {
+            mMraidView.destroy();
+        }
         mAdView = null;
         mMraidView = null;
         mBridgeListener = null;
@@ -504,32 +466,10 @@ public class DisplayControllerLoopMe
         return isVideoPresented();
     }
 
-    private void checkBannerVisibility() {
-        if (!isBanner() || mLoopMeAd == null) {
-            return;
-        }
-        ViewAbilityUtils.calculateViewAbilitySyncDelayed(mLoopMeAd.getContainerView(), info -> {
-            if (info.isVisibleMore50Percents()) {
-                setWebViewState(Constants.WebviewState.VISIBLE);
-                dispatchEvent();
-            } else {
-                setWebViewState(Constants.WebviewState.HIDDEN);
-            }
-        });
-    }
-
-    private void dispatchEvent() {
-        onNewActivity(mLoopMeAd.getContext());
-        onStartWebMeasuringDelayed();
-    }
-
     @Override
     public boolean isFullScreen() {
-        return (mDisplayModeResolver != null && mDisplayModeResolver.isFullScreenMode()) || isMraidExpandMode();
-    }
-
-    private boolean isMraidExpandMode() {
-        return mMraidController != null && mMraidController.isExpanded();
+        boolean isMraidExpandMode = mMraidController != null && mMraidController.isExpanded();
+        return (mDisplayModeResolver != null && mDisplayModeResolver.isFullScreenMode()) || isMraidExpandMode;
     }
 
     public void setFullScreen(boolean isFullScreen) {
@@ -545,13 +485,6 @@ public class DisplayControllerLoopMe
             return getOrientationFromAdParams();
         }
         return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
-    }
-
-    private void handleVideoStretch(boolean videoStretch) {
-        onMessage(Message.LOG, "JS command: stretch video ");
-        Constants.StretchOption stretch = videoStretch ?
-            Constants.StretchOption.STRETCH : Constants.StretchOption.NO_STRETCH;
-        mViewController.setStretchParam(stretch);
     }
 
     public boolean isVideoPresented() {
@@ -571,13 +504,6 @@ public class DisplayControllerLoopMe
             mMraidView.setWebViewState(state);
         if (omidEventTrackerWrapper != null && state == Constants.WebviewState.VISIBLE)
             omidEventTrackerWrapper.sendOneTimeImpression();
-    }
-
-    private View.OnTouchListener initOnTouchListener() {
-        return (v, event) -> {
-            mViewController.handleTouchEvent(event);
-            return false;
-        };
     }
 
     private Bridge.Listener initBridgeListener() {
@@ -602,7 +528,9 @@ public class DisplayControllerLoopMe
             }
             @Override
             public void onJsLoadSuccess() {
-                handleLoadSuccess();
+                if (mLoopMeAd != null) {
+                    mLoopMeAd.onAdLoadSuccess();
+                }
             }
             @Override
             public void onJsClose() {
@@ -615,23 +543,22 @@ public class DisplayControllerLoopMe
             }
             @Override
             public void onJsFullscreenMode(boolean isFullScreen) {
-                switchToFullScreenMode(isFullScreen);
+                if (mDisplayModeResolver != null) {
+                    mDisplayModeResolver.switchToFullScreenMode(isFullScreen);
+                }
             }
             @Override
             public void onNonLoopMe(String url) {
                 onRedirect(url, mLoopMeAd);
             }
             @Override
-            public void onJsVideoStretch(boolean b) {
-                handleVideoStretch(b);
+            public void onJsVideoStretch(boolean videoStretch) {
+                onMessage(Message.LOG, "JS command: stretch video ");
+                Constants.StretchOption stretch = videoStretch ?
+                    Constants.StretchOption.STRETCH : Constants.StretchOption.NO_STRETCH;
+                mViewController.setStretchParam(stretch);
             }
         };
-    }
-
-    private void switchToFullScreenMode(boolean isFullScreen) {
-        if (mDisplayModeResolver != null) {
-            mDisplayModeResolver.switchToFullScreenMode(isFullScreen);
-        }
     }
 
     public void switchToPreviousMode() {
@@ -645,36 +572,23 @@ public class DisplayControllerLoopMe
             @Override
             public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture) {
                 onMessage(Message.LOG, "onSurfaceTextureAvailable");
-                surfaceTextureAvailable(surfaceTexture);
-                setViewSize();
+                if (mVideoController != null) {
+                    mVideoController.setSurfaceTextureAvailable(true);
+                    mVideoController.setSurfaceTexture(surfaceTexture);
+                }
+                MinimizedMode minimizedMode = mDisplayModeResolver.getMinimizedMode();
+                Constants.DisplayMode currentDisplayMode = mDisplayModeResolver.getDisplayMode();
+                AdSpotDimensions viewSize = UiUtils.getViewSize(minimizedMode, mLoopMeAd, currentDisplayMode);
+                mViewController.setViewSize(viewSize.getWidth(), viewSize.getHeight());
             }
             @Override
             public void onSurfaceTextureDestroyed() {
                 onMessage(Message.LOG, "onSurfaceTextureDestroyed");
-                surfaceTextureDestroyed();
+                if (mVideoController != null) {
+                    mVideoController.surfaceTextureDestroyed();
+                }
             }
         };
-    }
-
-    private void setViewSize() {
-        MinimizedMode minimizedMode = mDisplayModeResolver.getMinimizedMode();
-        Constants.DisplayMode currentDisplayMode = mDisplayModeResolver.getDisplayMode();
-        AdSpotDimensions viewSize = UiUtils.getViewSize(minimizedMode, mLoopMeAd, currentDisplayMode);
-        mViewController.setViewSize(viewSize.getWidth(), viewSize.getHeight());
-    }
-
-    private void surfaceTextureAvailable(SurfaceTexture surfaceTexture) {
-        if (mVideoController == null) {
-            return;
-        }
-        mVideoController.setSurfaceTextureAvailable(true);
-        mVideoController.setSurfaceTexture(surfaceTexture);
-    }
-
-    private void surfaceTextureDestroyed() {
-        if (mVideoController != null) {
-            mVideoController.surfaceTextureDestroyed();
-        }
     }
 
     private VideoController.Callback initVideoControllerCallback() {
@@ -691,7 +605,9 @@ public class DisplayControllerLoopMe
             }
             @Override
             public void onVideoSizeChanged(int width, int height) {
-                setVideoSize(width, height);
+                if (mViewController != null) {
+                    mViewController.setVideoSize(width, height);
+                }
             }
             @Override
             public void onPlaybackFinishedWithError() {
@@ -708,18 +624,6 @@ public class DisplayControllerLoopMe
         };
     }
 
-    private void setVideoSize(int width, int height) {
-        if (mViewController != null) {
-            mViewController.setVideoSize(width, height);
-        }
-    }
-
-    private void clearWebView(LoopMeWebView webView) {
-        if (webView != null) {
-            webView.destroy();
-        }
-    }
-
     public void closeMraidAd() {
         if (mMraidController != null) {
             mMraidController.close();
@@ -729,32 +633,18 @@ public class DisplayControllerLoopMe
     public void buildView(FrameLayout containerView) {
         if (isMraidAd()) {
             onBuildMraidView(containerView);
-        } else {
-            if (isNativeAd()) {
-                onBuildVideoAdView(containerView);
-            } else {
-                onBuildStaticAdView(containerView);
-                setVideoState(Constants.VideoState.PLAYING);
-            }
+            return ;
         }
-    }
-
-    private void destroyVideoController() {
-        if (mVideoController != null) {
-            mVideoController.destroy();
+        if (isNativeAd()) {
+            onBuildVideoAdView(containerView);
+            return ;
         }
-    }
-
-    private void stopVideoLoader() {
-        if (mFileLoader != null) {
-            mFileLoader.stop();
-        }
+        onBuildStaticAdView(containerView);
+        setVideoState(Constants.VideoState.PLAYING);
     }
 
     @Override
-    public WebView getWebView() {
-        return isMraidAd() ? mMraidView : mAdView;
-    }
+    public WebView getWebView() { return isMraidAd() ? mMraidView : mAdView; }
 
     public void setFullscreenMode(boolean isFullScreen) {
         if (mAdView != null) {
@@ -796,24 +686,16 @@ public class DisplayControllerLoopMe
         }
     }
 
-    public boolean isVideoPlaying() {
-        return getCurrentVideoState() == Constants.VideoState.PLAYING;
-    }
+    public boolean isVideoPlaying() { return getCurrentVideoState() == Constants.VideoState.PLAYING; }
 
-    public boolean isVideoPaused() {
-        return getCurrentVideoState() == Constants.VideoState.PAUSED;
-    }
+    public boolean isVideoPaused() { return getCurrentVideoState() == Constants.VideoState.PAUSED; }
 
     public int getMraidOrientation() {
         return mMraidController != null ?
             mMraidController.getForceOrientation() : ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
     }
 
-    public void dismiss() {
-        setWebViewState(Constants.WebviewState.CLOSED);
-    }
+    public void dismiss() { setWebViewState(Constants.WebviewState.CLOSED); }
 
-    private boolean isMraidAd() {
-        return mLoopMeAd != null && mLoopMeAd.isMraidAd();
-    }
+    private boolean isMraidAd() { return mLoopMeAd != null && mLoopMeAd.isMraidAd(); }
 }

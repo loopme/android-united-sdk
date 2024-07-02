@@ -7,9 +7,7 @@ import com.loopme.views.webclient.WebViewClientCompat;
 public class Vast4WebViewClient extends WebViewClientCompat {
     private OnPageLoadedListener mPageLoadedListener;
 
-    void setOnPageLoadedListener(OnPageLoadedListener listener) {
-        mPageLoadedListener = listener;
-    }
+    void setOnPageLoadedListener(OnPageLoadedListener listener) { mPageLoadedListener = listener; }
 
     @Override
     public void onPageFinished(WebView view, String url) {
