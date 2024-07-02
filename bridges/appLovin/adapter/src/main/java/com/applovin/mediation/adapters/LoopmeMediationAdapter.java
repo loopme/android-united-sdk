@@ -20,6 +20,7 @@ import com.applovin.mediation.adapter.listeners.MaxInterstitialAdapterListener;
 import com.applovin.mediation.adapter.listeners.MaxRewardedAdapterListener;
 import com.applovin.mediation.adapter.parameters.MaxAdapterInitializationParameters;
 import com.applovin.mediation.adapter.parameters.MaxAdapterResponseParameters;
+import com.applovin.mediation.adapters.loopme.BuildConfig;
 import com.applovin.sdk.AppLovinSdk;
 import com.loopme.IntegrationType;
 import com.loopme.LoopMeBanner;
