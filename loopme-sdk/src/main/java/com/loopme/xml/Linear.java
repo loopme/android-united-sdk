@@ -67,4 +67,9 @@ public class Linear {
         }
         return new ArrayList<>();
     }
+
+    public String getOrientation() {
+        MediaFile mediafile = getMediaFiles().getMediaFileList().get(0);
+        return mediafile.getHeight() > mediafile.getWidth() ? "portrait" : "landscape";
+    }
 }

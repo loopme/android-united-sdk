@@ -112,6 +112,7 @@ public class XmlParseService {
         setParamVideoRedirectUrl(linear);
         setParamVideoClicks(linear);
         setVastVpaid(linear);
+        setOrientation(linear);
 
         List<Companion> companionList = getCompanionList(getCreativeList(inLine));
 
@@ -127,6 +128,12 @@ public class XmlParseService {
         setParamEndCardClicks(companion);
         setParamCompanionCreativeViewEvents(companion);
         return sAdParams;
+    }
+
+    private static void setOrientation(Linear linear) {
+        if (linear.getOrientation() != null) {
+            sAdParams.setOrientation(linear.getOrientation());
+        }
     }
 
     private static void setErrorUrl(Error error) {
