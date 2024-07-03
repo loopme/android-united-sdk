@@ -23,6 +23,7 @@ import com.google.android.gms.ads.mediation.MediationRewardedAd;
 import com.google.android.gms.ads.mediation.MediationRewardedAdCallback;
 import com.google.android.gms.ads.mediation.MediationRewardedAdConfiguration;
 import com.loopme.LoopMeSdk;
+import com.admob.mediation.adapters.loopme.BuildConfig;
 
 import java.util.List;
 
