@@ -87,7 +87,9 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         }
         mContext = context;
         mAppKey = appKey;
-        mTimers = new Timers(this);
+        context.runOnUiThread(() -> {
+            mTimers = new Timers(this);
+        });
         mAdId = IdGenerator.generateId();
         LiveDebug.init(context);
         Helpers.init(this);
