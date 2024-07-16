@@ -1,5 +1,7 @@
 package com.loopme.ad;
 
+import static com.loopme.debugging.Params.ERROR_MSG;
+
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
@@ -30,6 +32,7 @@ import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.InternetUtils;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -149,11 +152,13 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         if (containerView != null) {
             mContainerView = containerView;
         } else {
-            LoopMeTracker.post("Bind view is null");
+            HashMap<String, String> errorInfo = new HashMap<>();
+            errorInfo.put(ERROR_MSG, "Bind view is null");
+            LoopMeTracker.post(errorInfo);
         }
     }
 
-    public void resume() {
+        public void resume() {
         if (mDisplayController != null && isReady()) {
             mDisplayController.onResume();
             Logging.out(LOG_TAG, "Ad resumed");
@@ -201,7 +206,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         onSendPostWarning(error);
     }
 
-    public void onSendPostWarning(LoopMeError error) { LoopMeTracker.post(error); }
+    public void onSendPostWarning(LoopMeError error) { LoopMeTracker.post(error);}
 
     private void startTimer(TimersType fetcherTimer, AdParams adParam) {
         if (mTimers == null) {

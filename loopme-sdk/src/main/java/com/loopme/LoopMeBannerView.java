@@ -1,10 +1,14 @@
 package com.loopme;
 
+import static com.loopme.debugging.Params.ERROR_MSG;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 import com.loopme.tracker.partners.LoopMeTracker;
+
+import java.util.HashMap;
 
 /**
  * Deprecated since sdk version 6.0. Use {@link FrameLayout} instead.
@@ -61,7 +65,9 @@ public class LoopMeBannerView extends FrameLayout {
         super.onAttachedToWindow();
         if (!isHardwareAccelerated()) {
             Logging.out(LOG_TAG, "Warning: hardware acceleration is off");
-            LoopMeTracker.post("Hardware acceleration is off");
+            HashMap<String, String> errorInfo = new HashMap<>();
+            errorInfo.put(ERROR_MSG, "Hardware acceleration is off");
+            LoopMeTracker.post(errorInfo);
         }
     }
 }

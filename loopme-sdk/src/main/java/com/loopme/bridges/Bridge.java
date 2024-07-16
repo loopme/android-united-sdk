@@ -1,5 +1,9 @@
 package com.loopme.bridges;
 
+import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.debugging.Params.ERROR_TYPE;
+import static com.loopme.debugging.Params.ERROR_URL;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -12,6 +16,8 @@ import com.loopme.Logging;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.views.AdView;
 import com.loopme.views.webclient.WebViewClientCompat;
+
+import java.util.HashMap;
 
 public class Bridge extends WebViewClientCompat {
 
@@ -77,7 +83,11 @@ public class Bridge extends WebViewClientCompat {
             uri = Uri.parse(url);
         } catch (Exception e) {
             Logging.out(LOG_TAG, e.toString());
-            LoopMeTracker.post("Broken redirect in bridge: " + url, Constants.ErrorType.JS);
+            HashMap<String, String> errorInfo = new HashMap<>();
+            errorInfo.put(ERROR_MSG, "Broken redirect in bridge: ");
+            errorInfo.put(ERROR_TYPE, Constants.ErrorType.JS);
+            errorInfo.put(ERROR_URL, url);
+            LoopMeTracker.post(errorInfo);
             return true;
         }
         if (!LOOPME.equalsIgnoreCase(uri.getScheme())) {
@@ -151,7 +161,11 @@ public class Bridge extends WebViewClientCompat {
         try {
             String modeString = detectQueryParameter(uri, QUERY_PARAM_FULLSCREEN_MODE);
             if (!isValidBooleanParameter(modeString)) {
-                LoopMeTracker.post("Empty parameter in js command: fullscreen mode", Constants.ErrorType.JS);
+                HashMap<String, String> errorInfo = new HashMap<>();
+                errorInfo.put(ERROR_MSG, "Empty parameter in js command: fullscreen mode");
+                errorInfo.put(ERROR_URL, uri.toString());
+                errorInfo.put(ERROR_TYPE, Constants.ErrorType.JS);
+                LoopMeTracker.post(errorInfo);
             } else {
                 onJsFullscreenMode(Boolean.parseBoolean(modeString));
             }
@@ -192,7 +206,11 @@ public class Bridge extends WebViewClientCompat {
         if (isValidBooleanParameter(muteString)) {
             onJsVideoMute(Boolean.parseBoolean(muteString));
         } else {
-            LoopMeTracker.post("Empty parameter in js command: mute", Constants.ErrorType.JS);
+            HashMap<String, String> errorInfo = new HashMap<>();
+            errorInfo.put(ERROR_MSG, "Empty parameter in js command: mute");
+            errorInfo.put(ERROR_URL, uri.toString());
+            errorInfo.put(ERROR_TYPE, Constants.ErrorType.JS);
+            LoopMeTracker.post(errorInfo);
         }
     }
 
@@ -201,7 +219,11 @@ public class Bridge extends WebViewClientCompat {
         if (!TextUtils.isEmpty(videoUrl)) {
             onJsVideoLoad(videoUrl);
         } else {
-            LoopMeTracker.post("Empty parameter in js command: src", Constants.ErrorType.JS);
+            HashMap<String, String> errorInfo = new HashMap<>();
+            errorInfo.put(ERROR_MSG, "Empty parameter in js command: src");
+            errorInfo.put(ERROR_URL, uri.toString());
+            errorInfo.put(ERROR_TYPE, Constants.ErrorType.JS);
+            LoopMeTracker.post(errorInfo);
         }
     }
 

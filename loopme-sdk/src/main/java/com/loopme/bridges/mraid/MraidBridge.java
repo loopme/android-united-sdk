@@ -1,5 +1,8 @@
 package com.loopme.bridges.mraid;
 
+import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.debugging.Params.ERROR_URL;
+
 import android.net.Uri;
 import android.text.TextUtils;
 import android.webkit.WebResourceError;
@@ -16,6 +19,8 @@ import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.Utils;
 import com.loopme.views.MraidView;
 import com.loopme.views.webclient.WebViewClientCompat;
+
+import java.util.HashMap;
 
 public class MraidBridge extends WebViewClientCompat {
 
@@ -118,8 +123,11 @@ public class MraidBridge extends WebViewClientCompat {
         try {
             uri = Uri.parse(url);
         } catch (Exception e) {
-            String errorMessage = "Broken redirect in bridge: " + url;
-            LoopMeTracker.post(errorMessage);
+            String errorMessage = "Broken redirect in bridge: ";
+            HashMap<String, String> errorInfo = new HashMap<>();
+            errorInfo.put(ERROR_MSG, errorMessage);
+            errorInfo.put(ERROR_URL, url);
+            LoopMeTracker.post(errorInfo);
             Logging.out(LOG_TAG, errorMessage);
             ((MraidView) webView).notifyError();
             return true;

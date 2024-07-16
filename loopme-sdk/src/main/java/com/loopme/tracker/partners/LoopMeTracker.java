@@ -1,5 +1,8 @@
 package com.loopme.tracker.partners;
 
+import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.debugging.Params.ERROR_TYPE;
+
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -45,22 +48,14 @@ public class LoopMeTracker {
         sVastErrorUrlSet.addAll(errorUrlList);
     }
 
-    public static void post(String errorMessage) {
-        post(errorMessage, Constants.ErrorType.CUSTOM);
-    }
-
-    public static void post(String errorMessage, String errorType) {
-        Logging.out(LOG_TAG, errorType + " - " + errorMessage);
-        String request = buildRequest(errorType, errorMessage);
-        proceedBuildEvent(request);
-    }
-
-    private static String buildRequest(String errorType, String errorMessage) {
+    public static void post(HashMap<String, String> errorInfo) {
+        Logging.out(LOG_TAG, errorInfo.toString());
         Map<String, String> params = new HashMap<>(getGeneralInfo());
-        params.put(Params.MSG, Constants.SDK_ERROR_MSG);
-        params.put(Params.ERROR_TYPE, errorType);
-        params.put(Params.ERROR_MSG, errorMessage);
-        return obtainRequestString(params);
+        params.putAll(errorInfo);
+        if (!params.containsKey(ERROR_TYPE)) {
+            params.put(ERROR_TYPE, Constants.ErrorType.CUSTOM);
+        }
+        proceedBuildEvent(obtainRequestString(params));
     }
 
     private static void sendDataToServer(final String errorUrl, final String request) {
@@ -104,7 +99,7 @@ public class LoopMeTracker {
 
     private static String buildDebugRequest(String param, String value) {
         Map<String, String> params = new HashMap<>(getGeneralInfo());
-        params.put(Params.ERROR_TYPE, Constants.ErrorType.CUSTOM);
+        params.put(ERROR_TYPE, Constants.ErrorType.CUSTOM);
         params.put(param, value);
         return obtainRequestString(params);
     }
@@ -117,6 +112,7 @@ public class LoopMeTracker {
         params.put(Params.DEVICE_ID, RequestUtils.getIfa());
         params.put(Params.APP_KEY, sAppKey);
         params.put(Params.PACKAGE_ID, sPackageId);
+        params.put(Params.MSG, Constants.SDK_ERROR_MSG);
         return params;
     }
 
@@ -128,7 +124,10 @@ public class LoopMeTracker {
         if (!shouldTrack(error)) {
             return;
         }
-        post(error.getMessage(), error.getErrorType());
+        HashMap<String, String> errorInfo = new HashMap<>();
+        errorInfo.put(ERROR_MSG, error.getMessage());
+        errorInfo.put(ERROR_TYPE, error.getErrorType());
+        post(errorInfo);
         if (isVastError(error.getErrorType())) {
             postVastError(String.valueOf(error.getErrorCode()));
         }
@@ -140,7 +139,7 @@ public class LoopMeTracker {
 
     private static boolean isVastError(String errorType) {
         return TextUtils.equals(errorType, Constants.ErrorType.VAST) ||
-            TextUtils.equals(errorType, Constants.ErrorType.VPAID);
+                TextUtils.equals(errorType, Constants.ErrorType.VPAID);
     }
 
     public static String obtainRequestString(Map<String, String> params) {

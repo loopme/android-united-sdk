@@ -25,6 +25,7 @@ public class Params {
     //Error Log
     public static final String ERROR_TYPE = "error_type";//["server"|"bad_asset"|"js"|"custom"]
     public static final String ERROR_MSG = "error_msg";//examples depends on error_type:
+    public static final String ERROR_URL = "url";
 //            "server" -> "Timeout"
 //            "server" -> "Server code 502"
 //            "bad_asset" -> "Wrong encoding: https://i.loopme.me/fd192b26e6c548af.mp4"

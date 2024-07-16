@@ -1,5 +1,7 @@
 package com.loopme.parser;
 
+import static com.loopme.debugging.Params.ERROR_MSG;
+
 import android.text.TextUtils;
 
 import com.loopme.Constants;
@@ -16,6 +18,7 @@ import com.loopme.tracker.AdIds;
 import com.loopme.tracker.partners.LoopMeTracker;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ParseService {
 
@@ -53,7 +56,9 @@ public class ParseService {
             setAdType(adParams, AdType.MRAID);
         }
         if (adParams == null) {
-            LoopMeTracker.post(Errors.PARSING_ERROR.getMessage());
+            HashMap<String, String> errorInfo = new HashMap<>();
+            errorInfo.put(ERROR_MSG, Errors.PARSING_ERROR.getMessage());
+            LoopMeTracker.post(errorInfo);
         }
         loopMeAd.setAdParams(adParams);
         return loopMeAd;

@@ -1,5 +1,7 @@
 package com.loopme;
 
+import static com.loopme.debugging.Params.ERROR_MSG;
+
 import android.app.Activity;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -10,6 +12,8 @@ import com.loopme.common.LoopMeError;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
 import com.loopme.time.TimersType;
 import com.loopme.tracker.partners.LoopMeTracker;
+
+import java.util.HashMap;
 
 /**
  * The `LoopMeBanner` class provides facilities to display a custom size ads
@@ -93,7 +97,9 @@ public class LoopMeBannerGeneral extends LoopMeAd {
             mBannerView = frameLayout;
             mContainerView = frameLayout;
         } else {
-            LoopMeTracker.post("Bind view is null");
+            HashMap<String, String> errorInfo = new HashMap<>();
+            errorInfo.put(ERROR_MSG, "Bind view is null");
+            LoopMeTracker.post(errorInfo);
         }
     }
 
@@ -127,7 +133,9 @@ public class LoopMeBannerGeneral extends LoopMeAd {
             showInternal();
             Logging.out(LOG_TAG, "Banner did start showing ad (native)");
         } else {
-            LoopMeTracker.post("Banner is not ready");
+            HashMap<String, String> errorInfo = new HashMap<>();
+            errorInfo.put(ERROR_MSG, "Banner is not ready");
+            LoopMeTracker.post(errorInfo);
         }
     }
 

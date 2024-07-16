@@ -1,11 +1,15 @@
 package com.loopme.views;
 
+import static com.loopme.debugging.Params.ERROR_MSG;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 import com.loopme.Logging;
 import com.loopme.tracker.partners.LoopMeTracker;
+
+import java.util.HashMap;
 
 public class LoopMeContainerView extends FrameLayout {
 
@@ -55,8 +59,11 @@ public class LoopMeContainerView extends FrameLayout {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         if (!isHardwareAccelerated()) {
+            HashMap<String, String> errorInfo = new HashMap<>();
+            errorInfo.put(ERROR_MSG, "Hardware acceleration is off");
             Logging.out(LOG_TAG, "Warning: hardware acceleration is off");
-            LoopMeTracker.post("Hardware acceleration is off");
+            LoopMeTracker.post(errorInfo);
         }
     }
+
 }

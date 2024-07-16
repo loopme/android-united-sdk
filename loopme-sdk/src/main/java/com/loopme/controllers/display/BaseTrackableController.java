@@ -1,5 +1,7 @@
 package com.loopme.controllers.display;
 
+import static com.loopme.debugging.Params.ERROR_MSG;
+
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
@@ -22,6 +24,8 @@ import com.loopme.tracker.AdEvents;
 import com.loopme.tracker.EventManager;
 import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.partners.LoopMeTracker;
+
+import java.util.HashMap;
 
 public abstract class BaseTrackableController implements DisplayController, AdEvents {
     private static final long DELAY_UNTIL_EXECUTE = 100;
@@ -110,7 +114,9 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     public void onMessage(Message type, String message) {
         switch (type) {
             case ERROR: {
-                LoopMeTracker.post(message);
+                HashMap<String, String> errorInfo = new HashMap<>();
+                errorInfo.put(ERROR_MSG, message);
+                LoopMeTracker.post(errorInfo);
                 onAdErrorEvent(message);
                 break;
             }
