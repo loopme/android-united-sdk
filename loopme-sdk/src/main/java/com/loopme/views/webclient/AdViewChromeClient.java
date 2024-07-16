@@ -1,6 +1,9 @@
 package com.loopme.views.webclient;
 
+import static com.loopme.debugging.Params.ERROR_CONSOLE;
+import static com.loopme.debugging.Params.ERROR_CONSOLE_LEVEL;
 import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.debugging.Params.ERROR_CONSOLE_SOURCE_ID;
 import static com.loopme.debugging.Params.ERROR_TYPE;
 
 import android.Manifest;
@@ -10,6 +13,8 @@ import android.webkit.GeolocationPermissions;
 import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+
+import androidx.annotation.NonNull;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
@@ -138,7 +143,7 @@ public class AdViewChromeClient extends WebChromeClient {
             Logging.out(LOG_TAG, "Console Message: " + consoleMessage.message() + " " + consoleMessage.sourceId());
         }
         if (consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
-            onErrorFromJs(consoleMessage.message() + ". Source: " + consoleMessage.sourceId());
+            onErrorFromJs(consoleMessage);
         }
         if (isVideoSourceEvent(consoleMessage.message())) {
             onVideoSource(getSourceUrl(consoleMessage.message()));
@@ -156,12 +161,15 @@ public class AdViewChromeClient extends WebChromeClient {
         super.onProgressChanged(view, newProgress);
     }
 
-    private void onErrorFromJs(String message) {
-        if (mCallback != null && message != null && message.contains(UNCAUGHT_ERROR) && isNewError(message)) {
-            mCallback.onErrorFromJs(message);
+    private void onErrorFromJs(@NonNull ConsoleMessage message) {
+        if (mCallback != null && message.message().contains(UNCAUGHT_ERROR) && isNewError(message.message())) {
+            mCallback.onErrorFromJs(message.message());
         } else if (mCallback == null) {
             HashMap<String, String> errorInfo = new HashMap<>();
-            errorInfo.put(ERROR_MSG, "Error from js console: " + message);
+            errorInfo.put(ERROR_MSG, "Error from js console: ");
+            errorInfo.put(ERROR_CONSOLE, message.message());
+            errorInfo.put(ERROR_CONSOLE_SOURCE_ID, message.sourceId());
+            errorInfo.put(ERROR_CONSOLE_LEVEL, message.messageLevel().toString());
             errorInfo.put(ERROR_TYPE, Constants.ErrorType.JS);
             LoopMeTracker.post(errorInfo);
         }
