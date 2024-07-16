@@ -2,6 +2,7 @@ package com.loopme.interstitial_sample;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +21,9 @@ public class MainActivity
     private LoopMeInterstitial mInterstitial;
     private ProgressDialog mProgressDialog;
 
+    private Button showBtn;
+    private Button loadBtn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,8 +34,14 @@ public class MainActivity
     }
 
     private void initViews() {
-        findViewById(R.id.show_button).setOnClickListener(view -> onShowClicked());
-        findViewById(R.id.load_button).setOnClickListener(view -> onLoadClicked());
+        showBtn = findViewById(R.id.show_button);
+        showBtn.setEnabled(false);
+        showBtn.setOnClickListener(view -> onShowClicked());
+
+        loadBtn = findViewById(R.id.load_button);
+        loadBtn.setEnabled(false);
+        loadBtn.setOnClickListener(view -> onLoadClicked());
+
         initProgressDialog();
     }
 
@@ -65,6 +75,7 @@ public class MainActivity
 
             // Start loading immediately
             mInterstitial.load();
+            showBtn.setEnabled(false);
         }
     }
 
@@ -111,6 +122,7 @@ public class MainActivity
 
     @Override
     public void onLoopMeInterstitialLoadSuccess(LoopMeInterstitial interstitial) {
+        showBtn.setEnabled(true);
         dismissProgress();
     }
 
@@ -126,6 +138,7 @@ public class MainActivity
 
     @Override
     public void onLoopMeInterstitialHide(LoopMeInterstitial interstitial) {
+        showBtn.setEnabled(false);
     }
 
     @Override
@@ -147,6 +160,7 @@ public class MainActivity
 
     @Override
     public void onSdkInitializationSuccess() {
+        loadBtn.setEnabled(true);
         Toast.makeText(this, "LoopMe SDK initialized. Good to go…", Toast.LENGTH_SHORT).show();
     }
 
