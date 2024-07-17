@@ -85,7 +85,6 @@ public class RequestBuilder implements Serializable {
     private static final String RWDD = "rwdd";
     private static final String REWARDED = "rewarded";
     private static final String PARAM_CONSENT_TYPE = "consent_type";
-    private static final String EXP_DIR = "expdir";
     private static final String USER = "user";
     private static final String REGS = "regs";
     private static final String COPPA = "coppa";
@@ -202,7 +201,6 @@ public class RequestBuilder implements Serializable {
                 .put(BANNER, isBanner ? new JSONBuilder()
                     .put(ID, 1)
                     .put(BATTR, new JSONArray(RequestConstants.BATTERY_INFO))
-                    .put(EXP_DIR, new JSONArray(RequestConstants.EXPANDABLE_DIRECTION_FULLSCREEN))
                     .put(WIDTH, requestUtils.getWidth())
                     .put(HEIGHT, requestUtils.getHeight())
                     .put(API, new JSONArray(requestUtils.getApi()))
