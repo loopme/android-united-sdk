@@ -1,5 +1,9 @@
 package com.loopme.loaders;
 
+import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.debugging.Params.ERROR_TYPE;
+import static com.loopme.debugging.Params.ERROR_URL;
+
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,6 +18,7 @@ import com.loopme.utils.FileUtils;
 import com.loopme.utils.IOUtils;
 import com.loopme.utils.InternetUtils;
 import com.loopme.utils.ExecutorHelper;
+import com.loopme.tracker.partners.LoopMeTracker;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -24,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.util.HashMap;
 
 public class FileLoaderNewImpl implements Loader {
 
@@ -108,14 +114,14 @@ public class FileLoaderNewImpl implements Loader {
             error.addToMessage(fileUrl);
             onError(error);
         } catch (SocketTimeoutException e) {
-            onError(Errors.REQUEST_TIMEOUT);
+            onErrorTracking(Errors.REQUEST_TIMEOUT, e);
         } catch (MalformedURLException e) {
-            onError(Errors.BAD_ASSET);
+            onErrorTracking(Errors.BAD_ASSET, e);
         } catch (IOException e) {
             Logging.out(LOG_TAG, "Exception: " + e.getMessage());
             LoopMeError error = new LoopMeError(Errors.VAST_BAD_ASSET);
             error.addToMessage(fileUrl);
-            onError(error);
+            onErrorTracking(error, e);
         } finally {
             IOUtils.closeQuietly(outputStream);
             IOUtils.closeQuietly(inputStream);
@@ -196,6 +202,18 @@ public class FileLoaderNewImpl implements Loader {
             if (callback != null)
                 callback.onError(error);
         });
+    }
+
+    private void onErrorTracking(final LoopMeError error, final Exception exception) {
+        if (exception != null) {
+            Logging.out(LOG_TAG, "Exception: " + exception.getMessage());
+        }
+        HashMap<String, String> errorInfo = new HashMap<>();
+        errorInfo.put(ERROR_MSG, error.getMessage());
+        errorInfo.put(ERROR_TYPE, error.getErrorType());
+        errorInfo.put(ERROR_URL, fileUrl);
+        LoopMeTracker.post(errorInfo);
+        onError(error);
     }
 
     private static String createFilePath(Context context, String filename) {
