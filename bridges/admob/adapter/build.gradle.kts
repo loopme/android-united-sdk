@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.admob.mediation.adapters"
+    namespace = "com.admob.mediation.adapters.loopme"
     defaultConfig {
         consumerProguardFiles("proguard-rules.pro")
         buildConfigField("String", "VERSION_NAME", project.findProperty("VERSION_NAME") as? String ?: "")
@@ -12,6 +12,6 @@ android {
 
 dependencies {
     api("com.google.android.gms:play-services-ads:23.1.0")
-//    api(project(":loopme-sdk"))
-    api("com.github.loopme.android-united-sdk:loopme-sdk:9.0.5")
+    api(project(":loopme-sdk"))
+//    api("com.github.loopme.android-united-sdk:loopme-sdk:9.0.5")
 }

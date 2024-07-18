@@ -105,8 +105,10 @@ public class ParseService {
         if (!isAdOfType(creativeType, AdType.HTML) && !isAdOfType(creativeType, AdType.MRAID)) {
             return AdSpotDimensions.getDefaultBanner();
         }
-        HtmlParser parser = new HtmlParser(safelyRetrieve(() -> bidObject.getAdm(), ""));
-        return new AdSpotDimensions(parser.getAdWidth(), parser.getAdHeight());
+        if (bidObject.getWidth() == 0 || bidObject.getHeight() == 0) {
+            return AdSpotDimensions.getDefaultBanner();
+        }
+        return new AdSpotDimensions(bidObject.getWidth(), bidObject.getHeight());
     }
 
     private static boolean retrieveAutoLoadingWithDefaultTrue(Bid bidObject) {

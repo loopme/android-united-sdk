@@ -85,9 +85,10 @@ public class MraidBridge extends WebViewClientCompat {
         if (USE_CUSTOM_CLOSE.equals(command)) {
             mOnMraidBridgeListener.onChangeCloseButtonVisibility(useCustomClose);
         }
-        if (EXPAND.equals(command)) {
-            mOnMraidBridgeListener.expand(useCustomClose);
-        }
+        // TODO: temporary disable expandable banners
+//        if (EXPAND.equals(command)) {
+//            mOnMraidBridgeListener.expand(useCustomClose);
+//        }
         if (RESIZE.equals(command)) {
             mOnMraidBridgeListener.resize(
                 Utils.convertDpToPixel(Integer.parseInt(detectQueryParameter(uri, QUERY_PARAMETER_WIDTH))),
