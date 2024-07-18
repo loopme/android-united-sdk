@@ -29,6 +29,8 @@ public class ResponseJsonModelParser {
     private static final String PARAM_IMP_ID = "impid";
     private static final String PARAM_SEAT_BID = "seatbid";
     private static final String PARAM_A_DOMAIN = "adomain";
+    private static final String PARAM_WIDTH = "w";
+    private static final String PARAM_HEIGHT = "h";
 
     private static final String PARAM_EXT_DEBUG = "debug";
     private static final String PARAM_EXT_AUTOLOADING = "autoloading";
@@ -94,7 +96,9 @@ public class ResponseJsonModelParser {
             parseStringsList(jsonObject, PARAM_A_DOMAIN),
             getString(jsonObject, PARAM_I_URL, false),
             getString(jsonObject, PARAM_C_ID, false),
-            getString(jsonObject, PARAM_CR_ID, false)
+            getString(jsonObject, PARAM_CR_ID, false),
+            getInt(jsonObject, PARAM_WIDTH, false),
+            getInt(jsonObject, PARAM_HEIGHT, false)
         );
     }
 

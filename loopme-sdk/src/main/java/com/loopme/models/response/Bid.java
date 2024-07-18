@@ -17,6 +17,8 @@ public class Bid implements Serializable, Parcelable {
     private String iurl;
     private String cid;
     private String crid;
+    private int width;
+    private int height;
     public final static Parcelable.Creator<Bid> CREATOR = new Creator<Bid>() {
         public Bid createFromParcel(Parcel in) {
             Bid instance = new Bid();
@@ -29,6 +31,8 @@ public class Bid implements Serializable, Parcelable {
             instance.iurl = ((String) in.readValue((String.class.getClassLoader())));
             instance.cid = ((String) in.readValue((String.class.getClassLoader())));
             instance.crid = ((String) in.readValue((String.class.getClassLoader())));
+            instance.width = in.readInt();
+            instance.height = in.readInt();
             return instance;
         }
 
@@ -43,7 +47,7 @@ public class Bid implements Serializable, Parcelable {
      */
     public Bid() { }
 
-    public Bid(Ext ext, String id, String impid, String adid, String adm, List<String> adomain, String iurl, String cid, String crid) {
+    public Bid(Ext ext, String id, String impid, String adid, String adm, List<String> adomain, String iurl, String cid, String crid, int width, int height) {
         super();
         this.ext = ext;
         this.id = id;
@@ -54,6 +58,8 @@ public class Bid implements Serializable, Parcelable {
         this.iurl = iurl;
         this.cid = cid;
         this.crid = crid;
+        this.width = width;
+        this.height = height;
     }
 
     public Ext getExt() {
@@ -80,6 +86,14 @@ public class Bid implements Serializable, Parcelable {
         return crid;
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(ext);
         dest.writeValue(id);
@@ -90,6 +104,8 @@ public class Bid implements Serializable, Parcelable {
         dest.writeValue(iurl);
         dest.writeValue(cid);
         dest.writeValue(crid);
+        dest.writeInt(width);
+        dest.writeInt(height);
     }
 
     public int describeContents() {
