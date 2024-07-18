@@ -10,7 +10,7 @@ public class BridgeCommandBuilder {
     private static final String LOG_TAG = BridgeCommandBuilder.class.getSimpleName();
     private BridgeCommandBuilder() { }
     public static final String MRAID_PREFIX = "javascript:mraidbridge.";
-    public static final String LOOPME_PREFIX = "javascript:window.L.bridge.set";
+    public static final String LOOPME_PREFIX = "javascript:window.L && window.L.bridge && window.L.bridge.set";
 
     private static String withLog(String command) {
         Logging.out(LOG_TAG, command);
