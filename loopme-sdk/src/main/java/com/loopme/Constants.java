@@ -25,8 +25,8 @@ public class Constants {
     public static final int BUTTON_SIZE_DPI = 60;
 
     // TODO: Why default banner size is 350x250?
-    public static final int DEFAULT_BANNER_WIDTH = 350;
-    public static final int DEFAULT_BANNER_HEIGHT = 250;
+    public static final int DEFAULT_BANNER_WIDTH = 320;
+    public static final int DEFAULT_BANNER_HEIGHT = 50;
     public static final long DESTROY_TIME_DELAY = 200;
 
     public static boolean sDebugMode = false;
