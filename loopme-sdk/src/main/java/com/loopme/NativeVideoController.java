@@ -1,5 +1,7 @@
 package com.loopme;
 
+import static com.loopme.debugging.Params.ERROR_MSG;
+
 import android.app.Activity;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -17,6 +19,7 @@ import com.loopme.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 class NativeVideoController {
@@ -134,7 +137,9 @@ class NativeVideoController {
         mItemCount = itemsCount;
 
         if (mAppKeysMap.size() == 0) {
-            LoopMeTracker.post("No ads added for loading");
+            HashMap<String, String> errorInfo = new HashMap<>();
+            errorInfo.put(ERROR_MSG, "No ads added for loading");
+            LoopMeTracker.post(errorInfo);
         } else {
             initBanners();
         }

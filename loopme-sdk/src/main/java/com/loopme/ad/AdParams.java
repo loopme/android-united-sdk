@@ -1,5 +1,8 @@
 package com.loopme.ad;
 
+import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.debugging.Params.ERROR_TYPE;
+
 import android.text.TextUtils;
 
 import com.loopme.Constants;
@@ -211,7 +214,10 @@ public class AdParams implements Serializable {
 
         public AdParamsBuilder html(String html) {
             if (TextUtils.isEmpty(html)) {
-                LoopMeTracker.post("Broken response [empty html]", Constants.ErrorType.SERVER);
+                HashMap<String, String> errorInfo = new HashMap<>();
+                errorInfo.put(ERROR_MSG, "Broken response [empty html]");
+                errorInfo.put(ERROR_TYPE, Constants.ErrorType.SERVER);
+                LoopMeTracker.post(errorInfo);
             }
             mBuilderHtml = html;
             return this;
@@ -231,11 +237,16 @@ public class AdParams implements Serializable {
             if (isValidOrientationValue(orientation)) {
                 mBuilderOrientation = orientation;
             } else {
-                if (!TextUtils.isEmpty(mBuilderFormat) && mBuilderFormat.equalsIgnoreCase(Constants.INTERSTITIAL_TAG))
-                    LoopMeTracker.post("Broken response [invalid orientation: " + orientation + "]", Constants.ErrorType.SERVER);
+                if (!TextUtils.isEmpty(mBuilderFormat) && mBuilderFormat.equalsIgnoreCase(Constants.INTERSTITIAL_TAG)) {
+                    HashMap<String, String> errorInfo = new HashMap<>();
+                    errorInfo.put(ERROR_MSG, "Broken response [invalid orientation: " + orientation + "]");
+                    errorInfo.put(ERROR_TYPE, Constants.ErrorType.SERVER);
+                    LoopMeTracker.post(errorInfo);
+                }
             }
             return this;
         }
+
 
         private boolean isValidFormatValue() {
             if (mBuilderFormat == null) {

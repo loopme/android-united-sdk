@@ -1,5 +1,7 @@
 package com.loopme.controllers;
 
+import static com.loopme.debugging.Params.ERROR_MSG;
+
 import android.graphics.SurfaceTexture;
 import android.media.MediaPlayer;
 import android.os.CountDownTimer;
@@ -335,7 +337,9 @@ public class VideoController implements LoopMeMediaPlayer.LoopMeMediaPlayerListe
             }
             @Override
             public void onFinish() {
-                LoopMeTracker.post("Buffering 2 seconds");
+                HashMap<String, String> errorInfo = new HashMap<>();
+                errorInfo.put(ERROR_MSG, "Buffering 2 seconds");
+                LoopMeTracker.post(errorInfo);
             }
         };
         mBufferingTimer.start();

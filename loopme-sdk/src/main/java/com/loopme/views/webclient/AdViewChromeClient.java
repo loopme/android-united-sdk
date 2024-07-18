@@ -1,5 +1,8 @@
 package com.loopme.views.webclient;
 
+import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.debugging.Params.ERROR_TYPE;
+
 import android.Manifest;
 import android.text.TextUtils;
 import android.webkit.ConsoleMessage;
@@ -13,6 +16,7 @@ import com.loopme.Logging;
 import com.loopme.tracker.partners.LoopMeTracker;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class AdViewChromeClient extends WebChromeClient {
@@ -156,10 +160,13 @@ public class AdViewChromeClient extends WebChromeClient {
         if (mCallback != null && message != null && message.contains(UNCAUGHT_ERROR) && isNewError(message)) {
             mCallback.onErrorFromJs(message);
         } else if (mCallback == null) {
-            LoopMeTracker.post("Error from js console: " + message, Constants.ErrorType.JS);
+            HashMap<String, String> errorInfo = new HashMap<>();
+            errorInfo.put(ERROR_MSG, "Error from js console: " + message);
+            errorInfo.put(ERROR_TYPE, Constants.ErrorType.JS);
+            LoopMeTracker.post(errorInfo);
         }
     }
-
+    
     private boolean isNewError(String newErrorMessage) {
         if ((!TextUtils.equals(newErrorMessage, mPrevErrorMessage))) {
             mPrevErrorMessage = newErrorMessage;
