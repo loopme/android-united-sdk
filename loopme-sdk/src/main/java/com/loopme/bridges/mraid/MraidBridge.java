@@ -26,6 +26,7 @@ public class MraidBridge extends WebViewClientCompat {
 
     private static final String LOG_TAG = MraidBridge.class.getSimpleName();
 
+    private static final String DATA_SCHEME = "data";
     private static final String LOOPME_SCHEME = "loopme";
     private static final String MRAID_SCHEME = "mraid";
     private static final String QUERY_PARAMETER_URL = "url";
@@ -133,10 +134,11 @@ public class MraidBridge extends WebViewClientCompat {
             ((MraidView) webView).notifyError();
             return true;
         }
-        if (mOnMraidBridgeListener == null) {
-            return true;
-        }
         String scheme = uri.getScheme();
+        // Do not handle data scheme or if listener is null
+        if (mOnMraidBridgeListener == null || DATA_SCHEME.equalsIgnoreCase(scheme)) {
+            return false;
+        }
         String command = "";
         if (MRAID_SCHEME.equalsIgnoreCase(scheme)) {
             command = uri.getHost();
