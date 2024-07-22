@@ -1,5 +1,6 @@
 package com.loopme.controllers.display;
 
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
@@ -41,8 +42,10 @@ import com.loopme.views.AdView;
 import com.loopme.views.LoopMeWebView;
 import com.loopme.views.MraidView;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class DisplayControllerLoopMe
         extends BaseTrackableController
@@ -209,25 +212,28 @@ public class DisplayControllerLoopMe
         preloadHtml();
     }
 
-    private static String addMraidScript(String html) {
-        if (TextUtils.isEmpty(html)) {
-            return "";
+    public static String loadAssetFileAsString(Context context, String fileName) {
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            InputStream inputStream = context.getAssets().open(fileName);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line).append("\n");
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        Pattern SCRIPT_TAG_PATTERN = Pattern.compile("<\\s*script\\b[^>]*>");
-        Matcher m = SCRIPT_TAG_PATTERN.matcher(html);
-        if (!m.find()) {
-            Logging.out(LOG_TAG, "Couldn't find <script>");
-            return html;
-        }
-        // TODO. Performance?
-        return new StringBuilder(html).insert(m.start(), Constants.MRAID_SCRIPT).toString();
+        return stringBuilder.toString();
     }
 
     private void preloadHtml() {
         onAdRegisterView(mLoopMeAd.getContext(), getWebView());
         injectTrackingJsForWeb();
-        final String preInjectOmidHtml =
-            isMraidAd() ? addMraidScript(mAdParams.getHtml()) : mAdParams.getHtml();
+        boolean isMraid = mAdParams.getHtml().contains("mraid.js");
+        String mraid = "<script>" + loadAssetFileAsString(mLoopMeAd.getContext(), "mraid.js") + "</script>";
+        final String preInjectOmidHtml = isMraid ? mraid + mAdParams.getHtml() : mAdParams.getHtml();
 
         OmidHelper.injectScriptContentIntoHtmlAsync(
             mLoopMeAd.getContext().getApplicationContext(),
