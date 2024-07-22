@@ -27,7 +27,7 @@ public class MraidView extends LoopMeWebView {
     @Override
     public void loadHtml(String html) {
         loadDataWithBaseURL(
-            Constants.MRAID_ANDROID_ASSET,
+            null,
             html,
             Constants.MIME_TYPE_TEXT_HTML,
             Constants.UTF_8,
