@@ -4,10 +4,8 @@ import static com.loopme.debugging.Params.ERROR_MSG;
 import static com.loopme.debugging.Params.ERROR_TYPE;
 import static com.loopme.debugging.Params.ERROR_URL;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Vibrator;
 import android.text.TextUtils;
 import android.webkit.WebView;
 
@@ -97,7 +95,7 @@ public class Bridge extends WebViewClientCompat {
         ((AdView) webView).sendNativeCallFinished();
         String host = uri.getHost();
         if (WEBVIEW.equalsIgnoreCase(host)) {
-            handleWebViewCommands(uri, webView.getContext());
+            handleWebViewCommands(uri);
             return true;
         }
         if (VIDEO.equalsIgnoreCase(host)) {
@@ -107,7 +105,7 @@ public class Bridge extends WebViewClientCompat {
         return true;
     }
 
-    private void handleWebViewCommands(Uri uri, Context context) {
+    private void handleWebViewCommands(Uri uri) {
         String command = uri.getPath();
         if (TextUtils.isEmpty(command))
             return;
