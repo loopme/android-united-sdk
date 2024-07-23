@@ -11,7 +11,7 @@ public class Constants {
     public static final String VIEW_UNDETERMINED = "VIEW_UNDETERMINED";
     public static final String WEBM_FORMAT_EXT = "webm";
     public static final String LOOPME_SDK_TYPE = "loopme";
-    public static final String ADNROID_DEVICE_OS = "android";
+    public static final String ANDROID_DEVICE_OS = "android";
     public static final String SDK_DEBUG_MSG = "sdk_debug";
     public static final String SDK_ERROR_MSG = "sdk_error";
     public static final String BAD_SERVERS_CODE = "Bad servers response code ";
