@@ -1,8 +1,16 @@
 package com.loopme.ad;
 
 import com.loopme.Constants;
+import com.loopme.utils.Utils;
 
 public class AdSpotDimensions {
+
+    public static final AdSpotDimensions DEFAULT_DIMENSIONS = new AdSpotDimensions(0, 0);
+
+    public AdSpotDimensions(AdSpotDimensions adSpotDimensions) {
+        this.width = adSpotDimensions.width;
+        this.height = adSpotDimensions.height;
+    }
 
     public AdSpotDimensions(int width, int height) {
         this.width = width;
@@ -10,24 +18,12 @@ public class AdSpotDimensions {
     }
 
     private int width;
+    public int getWidth() { return width; }
+    public void setWidth(int width) { this.width = width; }
 
     private int height;
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
+    public int getHeight() { return height; }
+    public void setHeight(int height) { this.height = height; }
 
     @Override
     public boolean equals(Object o) {
@@ -41,9 +37,7 @@ public class AdSpotDimensions {
     }
 
     @Override
-    public int hashCode() {
-        return 31 * width + height;
-    }
+    public int hashCode() { return 31 * width + height; }
 
     public static AdSpotDimensions getMpu() {
         return new AdSpotDimensions(
@@ -63,6 +57,10 @@ public class AdSpotDimensions {
             Constants.DEFAULT_BANNER_WIDTH,
             Constants.DEFAULT_BANNER_HEIGHT
         );
+    }
+
+    public static AdSpotDimensions getFullscreen() {
+        return new AdSpotDimensions(Utils.getScreenWidth(), Utils.getScreenHeight());
     }
 
 }

@@ -414,10 +414,4 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     public void onVolumeChanged(float volume, int currentPosition) {
         onAdVolumeChangedEvent(volume, currentPosition);
     }
-
-    @Override
-    public void onAdShake() { }
-
-    @Override
-    public void setFullScreen(boolean isFullScreen) { }
 }

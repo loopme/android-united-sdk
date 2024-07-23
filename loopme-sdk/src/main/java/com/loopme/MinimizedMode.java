@@ -3,6 +3,7 @@ package com.loopme;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.loopme.ad.AdSpotDimensions;
@@ -11,20 +12,24 @@ import com.loopme.utils.Utils;
 public class MinimizedMode {
 
     private static final String LOG_TAG = MinimizedMode.class.getSimpleName();
-    private final AdSpotDimensions mMinimizedViewDims = new AdSpotDimensions(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     private static final int DEFAULT_HEIGHT = 100;
     private static final int DEFAULT_WIDTH = 300;
-    private final int mMarginRight = 10;
-    private final int mMarginBottom = 10;
-    private ViewGroup mRoot;
-    private RecyclerView mRecyclerView;
+    private final AdSpotDimensions mMinimizedViewDims = new AdSpotDimensions(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    private final ViewGroup mRoot;
+    private final RecyclerView mRecyclerView;
     private int mPosition;
 
-    public MinimizedMode(ViewGroup root, RecyclerView recyclerView) {
-        if (root == null || recyclerView == null) {
-            Logging.out(LOG_TAG, "Error: Root view or recyclerView should be not null. Minimized mode will not work");
-            return;
-        }
+    public int getWidth() { return mMinimizedViewDims.getWidth(); }
+    public int getHeight() { return mMinimizedViewDims.getHeight(); }
+
+    public int getMarginRight() { return 10; }
+    public int getMarginBottom() { return 10; }
+
+    public ViewGroup getRootView() { return mRoot; }
+    public AdSpotDimensions getDimensions() { return mMinimizedViewDims; }
+    public void setPosition(int position) { mPosition = position; }
+
+    public MinimizedMode(@NonNull ViewGroup root, @NonNull RecyclerView recyclerView) {
         mRoot = root;
         mRecyclerView = recyclerView;
         if (mMinimizedViewDims != null) {
@@ -39,35 +44,10 @@ public class MinimizedMode {
         mMinimizedViewDims.setHeight(heightInPx);
     }
 
-    public int getWidth() {
-        return mMinimizedViewDims.getWidth();
-    }
-
-    public int getHeight() {
-        return mMinimizedViewDims.getHeight();
-    }
-
-    public ViewGroup getRootView() {
-        return mRoot;
-    }
-
-    public int getMarginRight() {
-        return mMarginRight;
-    }
-
-    public int getMarginBottom() {
-        return mMarginBottom;
-    }
-
-    public AdSpotDimensions getMinimizedViewDims() {
-        return mMinimizedViewDims;
-    }
-
     public void addView(FrameLayout view) {
         if (mRoot != null) {
             mRoot.addView(view);
         }
-
     }
 
     public void onViewClicked() {
@@ -76,7 +56,4 @@ public class MinimizedMode {
         }
     }
 
-    public void setPosition(int position) {
-        mPosition = position;
-    }
 }

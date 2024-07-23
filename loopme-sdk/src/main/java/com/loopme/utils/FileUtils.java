@@ -6,7 +6,11 @@ import android.text.TextUtils;
 import com.loopme.Constants;
 import com.loopme.Logging;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.security.MessageDigest;
 
 /**
@@ -130,5 +134,21 @@ public class FileUtils {
         }
         String[] components = fileUrl.split("/");
         return components[components.length - 1];
+    }
+
+    public static String loadAssetFileAsString(Context context, String fileName) {
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            InputStream inputStream = context.getAssets().open(fileName);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line).append("\n");
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return stringBuilder.toString();
     }
 }

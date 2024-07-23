@@ -20,7 +20,6 @@ import com.loopme.ad.LoopMeAd;
 public class UiUtils {
 
     private static final String LOG_TAG = UiUtils.class.getSimpleName();
-    private static final AdSpotDimensions DEFAULT_DIMENSIONS = new AdSpotDimensions(0, 0);
 
     @SuppressLint("NewApi")
     private static void addBordersToView(FrameLayout bannerView) {
@@ -39,35 +38,6 @@ public class UiUtils {
         lp.bottomMargin = minimizedMode.getMarginBottom();
         lp.rightMargin = minimizedMode.getMarginRight();
         bannerView.setLayoutParams(lp);
-    }
-
-    public static AdSpotDimensions getViewSize(MinimizedMode minimizedMode, LoopMeAd loopMeAd, Constants.DisplayMode displayMode) {
-        switch (displayMode) {
-            case MINIMIZED: return getMinimizedViewSize(minimizedMode);
-            case NORMAL: return getNormalViewSize(loopMeAd);
-            case FULLSCREEN: return getFullScreenViewSize();
-            default: throw new IllegalArgumentException();
-        }
-    }
-
-    private static AdSpotDimensions getFullScreenViewSize() {
-        return new AdSpotDimensions(Utils.getScreenWidth(), Utils.getScreenHeight());
-    }
-
-    private static AdSpotDimensions getNormalViewSize(LoopMeAd loopMeAd) {
-        if (loopMeAd != null) {
-            return loopMeAd.getAdSpotDimensions();
-        }
-        Logging.out(LOG_TAG, "WARNING: LoopMeAd is null");
-        return DEFAULT_DIMENSIONS;
-    }
-
-    private static AdSpotDimensions getMinimizedViewSize(MinimizedMode minimizedMode) {
-        if (minimizedMode != null) {
-            return new AdSpotDimensions(minimizedMode.getWidth(), minimizedMode.getHeight());
-        }
-        Logging.out(LOG_TAG, "WARNING: MinimizedMode is null");
-        return DEFAULT_DIMENSIONS;
     }
 
     public static FrameLayout createFrameLayout(Context context, AdSpotDimensions dimensions) {

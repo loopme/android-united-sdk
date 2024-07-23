@@ -342,14 +342,6 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         mCurrentVideoTime = String.valueOf(mVideoDuration - time);
     }
 
-    @Override
-    public void onAdShake() {
-        Logging.out(LOG_TAG, "onAdShake stub");
-    }
-
-    @Override
-    public void setFullScreen(boolean isFullScreen) { }
-
     private void callBridgeMethod(BridgeMethods method) {
         onUiThread(new CallBridgeRunnable(method));
     }
