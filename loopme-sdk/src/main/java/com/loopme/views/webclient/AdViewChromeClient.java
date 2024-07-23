@@ -2,17 +2,15 @@ package com.loopme.views.webclient;
 
 import static com.loopme.debugging.Params.ERROR_CONSOLE;
 import static com.loopme.debugging.Params.ERROR_CONSOLE_LEVEL;
-import static com.loopme.debugging.Params.ERROR_MSG;
 import static com.loopme.debugging.Params.ERROR_CONSOLE_SOURCE_ID;
+import static com.loopme.debugging.Params.ERROR_MSG;
 import static com.loopme.debugging.Params.ERROR_TYPE;
 
-import android.Manifest;
 import android.text.TextUtils;
 import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions;
 import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
-import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 
@@ -20,15 +18,21 @@ import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.tracker.partners.LoopMeTracker;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class AdViewChromeClient extends WebChromeClient {
-    private OnErrorFromJsCallback mCallback;
-    private String mPrevErrorMessage = "";
+    private static final String LOG_TAG = AdViewChromeClient.class.getSimpleName();
     private static final String UNCAUGHT_ERROR = "Uncaught";
     private static final String VIDEO_SOURCE = "VIDEO_SOURCE";
+
+    private OnErrorFromJsCallback mCallback;
+    private String mPrevErrorMessage = "";
+
+    private PermissionResolver permissionResolveListener;
+    private PermissionRequest permissionRequest;
+
+    private String locationPermissionOrigin;
+    private GeolocationPermissions.Callback geolocationPermissionsCallback;
 
     public AdViewChromeClient() { }
 
@@ -36,62 +40,44 @@ public class AdViewChromeClient extends WebChromeClient {
         this.mCallback = callback;
     }
 
-    private static final String LOG_TAG = AdViewChromeClient.class.getSimpleName();
-
     public void setPermissionResolveListener(PermissionResolver permissionResolveListener) {
-        onPermissionRequestCanceled(null);
-        onGeolocationPermissionsHidePrompt();
         this.permissionResolveListener = permissionResolveListener;
     }
 
-    private PermissionResolver permissionResolveListener;
-
     @Override
     public void onPermissionRequest(PermissionRequest request) {
-        onPermissionRequestCanceled(null);
-
         if (permissionResolveListener == null) {
             request.deny();
             return;
         }
 
-        String[] androidPermissions = toAndroidPermissions(request.getResources());
-        if (androidPermissions == null || androidPermissions.length == 0) {
-            request.deny();
-            return;
-        }
-
         permissionRequest = request;
-        permissionResolveListener.onRequestGeneralPermissions(androidPermissions);
+        permissionResolveListener.onRequestGeneralPermissions(request.getResources());
     }
 
     @Override
     public void onPermissionRequestCanceled(PermissionRequest request) {
         permissionRequest = null;
 
-        if (permissionResolveListener != null)
+        if (permissionResolveListener != null) {
             permissionResolveListener.onCancelGeneralPermissionsRequest();
+        }
     }
 
-    public void setGeneralPermissionsResponse(String[] grantedAndroidPermissions) {
-        if (permissionRequest == null)
-            return;
+    public void setGeneralPermissionsResponse(String[] grantedPermissions) {
+        if (permissionRequest == null) return;
 
-        String[] webkitPermissions = toWebkitPermissions(grantedAndroidPermissions);
-        if (webkitPermissions == null || webkitPermissions.length == 0)
+        if (grantedPermissions == null || grantedPermissions.length == 0) {
             permissionRequest.deny();
-        else
-            permissionRequest.grant(webkitPermissions);
+        } else {
+            permissionRequest.grant(grantedPermissions);
+        }
 
         permissionRequest = null;
     }
 
-    private PermissionRequest permissionRequest;
-
     @Override
     public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
-        onGeolocationPermissionsHidePrompt();
-
         if (permissionResolveListener == null) {
             callback.invoke(origin, false, false);
             return;
@@ -108,22 +94,19 @@ public class AdViewChromeClient extends WebChromeClient {
         locationPermissionOrigin = null;
         geolocationPermissionsCallback = null;
 
-        if (permissionResolveListener != null)
+        if (permissionResolveListener != null) {
             permissionResolveListener.onCancelLocationPermissionRequest();
+        }
     }
 
     public void setLocationPermissionGranted(boolean granted) {
-        if (locationPermissionOrigin == null || geolocationPermissionsCallback == null)
-            return;
+        if (locationPermissionOrigin == null || geolocationPermissionsCallback == null) return;
 
         geolocationPermissionsCallback.invoke(locationPermissionOrigin, granted, false);
 
         locationPermissionOrigin = null;
         geolocationPermissionsCallback = null;
     }
-
-    private String locationPermissionOrigin;
-    private GeolocationPermissions.Callback geolocationPermissionsCallback;
 
     private String getSourceUrl(String message) {
         String result = "";
@@ -154,11 +137,6 @@ public class AdViewChromeClient extends WebChromeClient {
     private boolean isVideoSourceEvent(String message) {
         String[] tokens = message.split(":");
         return TextUtils.equals(tokens[0], VIDEO_SOURCE);
-    }
-
-    @Override
-    public void onProgressChanged(WebView view, int newProgress) {
-        super.onProgressChanged(view, newProgress);
     }
 
     private void onErrorFromJs(@NonNull ConsoleMessage message) {
@@ -199,52 +177,10 @@ public class AdViewChromeClient extends WebChromeClient {
         void onVideoSource(String source);
     }
 
-    private static String[] toAndroidPermissions(String[] webkitPermissions) {
-        if (webkitPermissions == null || webkitPermissions.length == 0)
-            return null;
-
-        List<String> result = new ArrayList<>();
-        for (String wkPermission : webkitPermissions) {
-            switch (wkPermission) {
-                case PermissionRequest.RESOURCE_AUDIO_CAPTURE:
-                    result.add(Manifest.permission.RECORD_AUDIO);
-                    break;
-                case PermissionRequest.RESOURCE_VIDEO_CAPTURE:
-                    result.add(Manifest.permission.CAMERA);
-                    break;
-            }
-        }
-
-        return result.toArray(new String[0]);
-    }
-
-    private static String[] toWebkitPermissions(String[] androidPermissions) {
-        if (androidPermissions == null || androidPermissions.length == 0)
-            return null;
-
-        List<String> result = new ArrayList<>();
-        for (String androidPermission : androidPermissions) {
-            switch (androidPermission) {
-                case Manifest.permission.RECORD_AUDIO:
-                    result.add(PermissionRequest.RESOURCE_AUDIO_CAPTURE);
-                    break;
-
-                case Manifest.permission.CAMERA:
-                    result.add(PermissionRequest.RESOURCE_VIDEO_CAPTURE);
-                    break;
-            }
-        }
-
-        return result.toArray(new String[0]);
-    }
-
     public interface PermissionResolver {
-        void onRequestGeneralPermissions(String[] androidPermissions);
-
+        void onRequestGeneralPermissions(String[] permissions);
         void onCancelGeneralPermissionsRequest();
-
         void onRequestLocationPermission(String origin);
-
         void onCancelLocationPermissionRequest();
     }
 }

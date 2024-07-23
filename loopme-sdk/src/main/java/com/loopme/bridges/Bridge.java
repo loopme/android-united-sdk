@@ -4,10 +4,8 @@ import static com.loopme.debugging.Params.ERROR_MSG;
 import static com.loopme.debugging.Params.ERROR_TYPE;
 import static com.loopme.debugging.Params.ERROR_URL;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Vibrator;
 import android.text.TextUtils;
 import android.webkit.WebView;
 
@@ -30,7 +28,6 @@ public class Bridge extends WebViewClientCompat {
     private static final String WEBVIEW_CLOSE = "/close";
     private static final String WEBVIEW_FAIL = "/fail";
     private static final String WEBVIEW_SUCCESS = "/success";
-    private static final String WEBVIEW_VIBRATE = "/vibrate";
     private static final String WEBVIEW_FULLSCREEN = "/fullscreenMode";
 
     private static final String VIDEO_LOAD = "/load";
@@ -98,7 +95,7 @@ public class Bridge extends WebViewClientCompat {
         ((AdView) webView).sendNativeCallFinished();
         String host = uri.getHost();
         if (WEBVIEW.equalsIgnoreCase(host)) {
-            handleWebViewCommands(uri, webView.getContext());
+            handleWebViewCommands(uri);
             return true;
         }
         if (VIDEO.equalsIgnoreCase(host)) {
@@ -108,16 +105,13 @@ public class Bridge extends WebViewClientCompat {
         return true;
     }
 
-    private void handleWebViewCommands(Uri uri, Context context) {
+    private void handleWebViewCommands(Uri uri) {
         String command = uri.getPath();
         if (TextUtils.isEmpty(command))
             return;
         switch (command) {
             case WEBVIEW_CLOSE:
                 onJsClose();
-                break;
-            case WEBVIEW_VIBRATE:
-                handleVibrate(context);
                 break;
             case WEBVIEW_FAIL:
                 onJsLoadFail("Ad received specific URL loopme://webview/fail");
@@ -178,17 +172,6 @@ public class Bridge extends WebViewClientCompat {
         return !TextUtils.isEmpty(param) &&
             (param.equalsIgnoreCase(Boolean.TRUE.toString()) ||
             param.equalsIgnoreCase(Boolean.FALSE.toString()));
-    }
-
-    private void handleVibrate(Context context) {
-        try {
-            Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-            if (vibrator != null) {
-                vibrator.vibrate(500);
-            }
-        } catch (Exception e) {
-            Logging.out(LOG_TAG, "Missing permission for vibrate");
-        }
     }
 
     private void handleVideoPause(Uri uri) {
