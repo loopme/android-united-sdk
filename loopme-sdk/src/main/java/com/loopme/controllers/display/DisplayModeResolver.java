@@ -11,6 +11,7 @@ import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.LoopMeGestureListener;
 import com.loopme.MinimizedMode;
+import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.utils.UiUtils;
 
@@ -77,8 +78,7 @@ public class DisplayModeResolver {
     }
 
     public void switchToNormalMode() {
-        boolean isNormalMode = mCurrentDisplayMode == Constants.DisplayMode.NORMAL;
-        if (isNormalMode) {
+        if (mCurrentDisplayMode == Constants.DisplayMode.NORMAL) {
             return;
         }
         setDisplayMode(Constants.DisplayMode.NORMAL);
@@ -92,20 +92,18 @@ public class DisplayModeResolver {
     }
 
     public void switchToMinimizedMode() {
-        boolean isMinimizedMode = mCurrentDisplayMode == Constants.DisplayMode.MINIMIZED;
-        if (isMinimizedMode) {
-            boolean isCurrentVideoStatePaused =
-                mDisplayControllerLoopMe != null && mDisplayControllerLoopMe.isVideoPaused();
-            boolean isCurrentVideoStatePlaying =
-                mDisplayControllerLoopMe != null && mDisplayControllerLoopMe.isVideoPlaying();
-            boolean isVideoPausedOrPlaying = isCurrentVideoStatePaused || isCurrentVideoStatePlaying;
-            if (isVideoPausedOrPlaying) {
-                setWebViewState(Constants.WebviewState.VISIBLE);
+        if (mCurrentDisplayMode == Constants.DisplayMode.MINIMIZED) {
+            if (mDisplayControllerLoopMe != null) {
+                boolean isPaused = mDisplayControllerLoopMe.isVideoPaused();
+                boolean isPlaying = mDisplayControllerLoopMe.isVideoPlaying();
+                if (isPaused || isPlaying) {
+                    setWebViewState(Constants.WebviewState.VISIBLE);
+                }
             }
             return;
         }
         setDisplayMode(Constants.DisplayMode.MINIMIZED);
-        mMinimizedView = UiUtils.createFrameLayout(mLoopMeAd.getContext(), mMinimizedMode.getMinimizedViewDims());
+        mMinimizedView = UiUtils.createFrameLayout(mLoopMeAd.getContext(), mMinimizedMode.getDimensions());
         mMinimizedMode.addView(mMinimizedView);
         UiUtils.configMinimizedViewLayoutParams(mMinimizedView, mMinimizedMode);
         mMinimizedView.setOnTouchListener(initGestureListener());
@@ -157,13 +155,14 @@ public class DisplayModeResolver {
         });
     }
 
-    public Constants.DisplayMode getDisplayMode() { return mCurrentDisplayMode; }
-
     public boolean isFullScreenMode() {
         return mCurrentDisplayMode == Constants.DisplayMode.FULLSCREEN;
     }
 
-    public MinimizedMode getMinimizedMode() { return mMinimizedMode; }
+    public AdSpotDimensions getMinimizedModeDimension() {
+        return mMinimizedMode != null ?
+            new AdSpotDimensions(mMinimizedMode.getDimensions()) : AdSpotDimensions.DEFAULT_DIMENSIONS;
+    }
 
     private void setFullscreenMode(boolean mIsFirstFullScreen) {
         if (mDisplayControllerLoopMe != null) {
@@ -184,6 +183,18 @@ public class DisplayModeResolver {
     private void setWebViewState(Constants.WebviewState webViewState) {
         if (mDisplayControllerLoopMe != null) {
             mDisplayControllerLoopMe.setWebViewState(webViewState);
+        }
+    }
+
+    public AdSpotDimensions getDimensionByDisplayMode() {
+        AdSpotDimensions minimized = getMinimizedModeDimension();
+        AdSpotDimensions normal = mLoopMeAd != null ? mLoopMeAd.getAdSpotDimensions() : AdSpotDimensions.DEFAULT_DIMENSIONS;
+        AdSpotDimensions fullscreen = AdSpotDimensions.getFullscreen();
+        switch (mCurrentDisplayMode) {
+            case MINIMIZED: return minimized;
+            case NORMAL: return normal;
+            case FULLSCREEN: return fullscreen;
+            default: return AdSpotDimensions.DEFAULT_DIMENSIONS;
         }
     }
 }

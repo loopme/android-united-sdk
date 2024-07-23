@@ -19,7 +19,5 @@ public interface DisplayController {
     void onMessage(Message type, String message);
     boolean isFullScreen();
     WebView getWebView();
-    void onAdShake();
-    void setFullScreen(boolean isFullScreen);
     int getOrientation();
 }
