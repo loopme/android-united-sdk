@@ -31,7 +31,6 @@ public class VastWebView extends WebView {
         cookieManager.setAcceptThirdPartyCookies(this, true);
     }
 
-    // TODO. Refactor. Duplicate of LoopMeWebView.
     public void destroy() {
         ViewParent parent = getParent();
         if (parent != null)

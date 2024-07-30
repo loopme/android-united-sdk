@@ -20,31 +20,9 @@ public class BridgeCommandBuilder {
     public static String isNativeCallFinished(boolean b) {
         return withLog(LOOPME_PREFIX + "('webview', {isNativeCallFinished: '" + b + "'});");
     }
-    public static String shake(boolean b) {
-        return withLog(LOOPME_PREFIX + "('webview', {shake: '" + b + "'});");
-    }
-    public static String videoMute(boolean mute) {
-        return withLog(LOOPME_PREFIX + "('video', {mute: '" + mute + "'});");
-    }
 
-    public static String videoCurrentTime(int time) {
-        return withLog(LOOPME_PREFIX + "('video', {currentTime: '" + time + "'});");
-    }
-
-    public static String videoDuration(int time) {
-        return withLog(LOOPME_PREFIX + "('video', {duration: '" + time + "'});");
-    }
-
-    public static String videoState(Constants.VideoState state) {
-        return withLog(LOOPME_PREFIX + "('video', {state: '" + state.name() + "'});");
-    }
-
-    public static String webviewState(String sdkPrefix, Constants.WebviewState state) {
-        return withLog(sdkPrefix + "('webview', {state: '" + state.name() + "'});");
-    }
-
-    public static String fullscreenMode(boolean b) {
-        return withLog(LOOPME_PREFIX + "('webview', {fullscreenMode: " + b + "});");
+    public static String webviewState(Constants.WebviewState state) {
+        return withLog(LOOPME_PREFIX + "('webview', {state: '" + state.name() + "'});");
     }
 
     public static String mraidSetIsViewable(boolean isViewable) {

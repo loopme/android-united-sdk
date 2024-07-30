@@ -93,13 +93,6 @@ public class DisplayModeResolver {
 
     public void switchToMinimizedMode() {
         if (mCurrentDisplayMode == Constants.DisplayMode.MINIMIZED) {
-            if (mDisplayControllerLoopMe != null) {
-                boolean isPaused = mDisplayControllerLoopMe.isVideoPaused();
-                boolean isPlaying = mDisplayControllerLoopMe.isVideoPlaying();
-                if (isPaused || isPlaying) {
-                    setWebViewState(Constants.WebviewState.VISIBLE);
-                }
-            }
             return;
         }
         setDisplayMode(Constants.DisplayMode.MINIMIZED);
@@ -111,11 +104,7 @@ public class DisplayModeResolver {
         setWebViewState(Constants.WebviewState.VISIBLE);
     }
 
-    private void rebuildView(FrameLayout view, Constants.DisplayMode displayMode) {
-        if (mDisplayControllerLoopMe != null) {
-            mDisplayControllerLoopMe.rebuildView(view, displayMode);
-        }
-    }
+    private void rebuildView(FrameLayout view, Constants.DisplayMode displayMode) { }
 
     private void removeMinimizedView() {
         if (mMinimizedView != null && mMinimizedView.getParent() != null) {
@@ -164,11 +153,7 @@ public class DisplayModeResolver {
             new AdSpotDimensions(mMinimizedMode.getDimensions()) : AdSpotDimensions.DEFAULT_DIMENSIONS;
     }
 
-    private void setFullscreenMode(boolean mIsFirstFullScreen) {
-        if (mDisplayControllerLoopMe != null) {
-            mDisplayControllerLoopMe.setFullscreenMode(mIsFirstFullScreen);
-        }
-    }
+    private void setFullscreenMode(boolean mIsFirstFullScreen) { }
 
     private void setDisplayMode(Constants.DisplayMode mode) {
         mPreviousDisplayMode = mCurrentDisplayMode;

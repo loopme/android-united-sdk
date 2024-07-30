@@ -16,8 +16,10 @@ import com.loopme.bridges.vpaid.BridgeEventHandler;
 import com.loopme.bridges.vpaid.VpaidBridge;
 import com.loopme.bridges.vpaid.VpaidBridgeImpl;
 import com.loopme.common.LoopMeError;
+import com.loopme.controllers.MraidController;
 import com.loopme.controllers.interfaces.VastVpaidDisplayController;
 import com.loopme.controllers.view.ViewControllerVpaid;
+import com.loopme.listener.AdReadyListener;
 import com.loopme.models.BridgeMethods;
 import com.loopme.models.Errors;
 import com.loopme.models.Message;
@@ -26,7 +28,7 @@ import com.loopme.tracker.constants.EventConstants;
 import com.loopme.utils.IOUtils;
 import com.loopme.utils.UiUtils;
 import com.loopme.utils.Utils;
-import com.loopme.views.LoopMeWebView;
+import com.loopme.views.MraidView;
 import com.loopme.views.webclient.AdViewChromeClient;
 import com.loopme.xml.Tracking;
 
@@ -96,13 +98,13 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         onAdInjectJsVpaid(htmlBuilder);
         String html = htmlBuilder.toString().replace(VPAID_CREATIVE_URL_STRING, mAdParams.getVpaidJsUrl());
         mIsWaitingForWebView = true;
-        ((LoopMeWebView) getWebView()).loadHtml(html);
+        ((MraidView) getWebView()).loadHtml(html);
     }
 
     @SuppressLint("JavascriptInterface")
     @Override
     protected WebView createWebView() {
-        WebView wv = new LoopMeWebView(mLoopMeAd.getContext());
+        WebView wv = new MraidView(mLoopMeAd.getContext(), new MraidController(mLoopMeAd), () -> { });
         wv.setWebChromeClient(new AdViewChromeClient(this));
         Vast4WebViewClient vast4WebViewClient = new Vast4WebViewClient();
         vast4WebViewClient.setOnPageLoadedListener(this);

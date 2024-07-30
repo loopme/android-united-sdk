@@ -250,11 +250,9 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
 
     @Override
     public void dismiss() {
-        if (isShowing()) {
-            UiUtils.broadcastIntent(getContext(), Constants.DESTROY_INTENT, getAdId());
-            onLoopMeInterstitialHide();
-            Logging.out(LOG_TAG, "Dismiss ad");
-        }
+        UiUtils.broadcastIntent(getContext(), Constants.DESTROY_INTENT, getAdId());
+        onLoopMeInterstitialHide();
+        Logging.out(LOG_TAG, "Dismiss ad");
     }
 
     public interface Listener {
