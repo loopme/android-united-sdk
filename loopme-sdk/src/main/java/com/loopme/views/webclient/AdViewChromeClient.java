@@ -1,10 +1,13 @@
 package com.loopme.views.webclient;
 
+import static com.loopme.debugging.Params.CID;
+import static com.loopme.debugging.Params.CRID;
 import static com.loopme.debugging.Params.ERROR_CONSOLE;
 import static com.loopme.debugging.Params.ERROR_CONSOLE_LEVEL;
 import static com.loopme.debugging.Params.ERROR_CONSOLE_SOURCE_ID;
 import static com.loopme.debugging.Params.ERROR_MSG;
 import static com.loopme.debugging.Params.ERROR_TYPE;
+import static com.loopme.debugging.Params.REQUEST_ID;
 
 import android.text.TextUtils;
 import android.webkit.ConsoleMessage;
@@ -14,6 +17,7 @@ import android.webkit.WebChromeClient;
 
 import androidx.annotation.NonNull;
 
+import com.loopme.BidManager;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.tracker.partners.LoopMeTracker;
@@ -149,6 +153,9 @@ public class AdViewChromeClient extends WebChromeClient {
             errorInfo.put(ERROR_CONSOLE_SOURCE_ID, message.sourceId());
             errorInfo.put(ERROR_CONSOLE_LEVEL, message.messageLevel().toString());
             errorInfo.put(ERROR_TYPE, Constants.ErrorType.JS);
+            errorInfo.put(REQUEST_ID, BidManager.getInstance().getRequestId());
+            errorInfo.put(CID, BidManager.getInstance().getCurrentCid());
+            errorInfo.put(CRID, BidManager.getInstance().getCurrentCrid());
             LoopMeTracker.post(errorInfo);
         }
     }

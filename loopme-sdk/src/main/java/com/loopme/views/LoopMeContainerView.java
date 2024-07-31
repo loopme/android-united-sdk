@@ -1,11 +1,15 @@
 package com.loopme.views;
 
+import static com.loopme.debugging.Params.CID;
+import static com.loopme.debugging.Params.CRID;
 import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.debugging.Params.REQUEST_ID;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
+import com.loopme.BidManager;
 import com.loopme.Logging;
 import com.loopme.tracker.partners.LoopMeTracker;
 
@@ -62,6 +66,9 @@ public class LoopMeContainerView extends FrameLayout {
             HashMap<String, String> errorInfo = new HashMap<>();
             errorInfo.put(ERROR_MSG, "Hardware acceleration is off");
             Logging.out(LOG_TAG, "Warning: hardware acceleration is off");
+            errorInfo.put(REQUEST_ID, BidManager.getInstance().getRequestId());
+            errorInfo.put(CID, BidManager.getInstance().getCurrentCid());
+            errorInfo.put(CRID, BidManager.getInstance().getCurrentCrid());
             LoopMeTracker.post(errorInfo);
         }
     }

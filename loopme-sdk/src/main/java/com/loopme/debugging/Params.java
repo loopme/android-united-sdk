@@ -20,6 +20,11 @@ public class Params {
     public static final String SDK_READY = "sdk_ready";
     public static final String SDK_SHOW = "sdk_show";
     public static final String SDK_MISSED = "sdk_missed";
+    public static final String CID = "cid";
+    public static final String CRID= "crid";
+    public static final String REQUEST_ID= "request_id";
+
+
 
     //Live Debug
     public static final String DEBUG_LOGS = "debug_logs";// example: "ui: Debug.LoopMe.BaseAd: Start fetcher timeout timer, ui: Debug.LoopMe.FileUtils: In cache 2 file(s)..."

@@ -1,14 +1,18 @@
 package com.loopme.loaders;
 
+import static com.loopme.debugging.Params.CID;
+import static com.loopme.debugging.Params.CRID;
 import static com.loopme.debugging.Params.ERROR_MSG;
 import static com.loopme.debugging.Params.ERROR_TYPE;
 import static com.loopme.debugging.Params.ERROR_URL;
+import static com.loopme.debugging.Params.REQUEST_ID;
 
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import androidx.annotation.NonNull;
 
+import com.loopme.BidManager;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.common.LoopMeError;
@@ -212,6 +216,9 @@ public class FileLoaderNewImpl implements Loader {
         errorInfo.put(ERROR_MSG, error.getMessage());
         errorInfo.put(ERROR_TYPE, error.getErrorType());
         errorInfo.put(ERROR_URL, fileUrl);
+        errorInfo.put(REQUEST_ID, BidManager.getInstance().getRequestId());
+        errorInfo.put(CID, BidManager.getInstance().getCurrentCid());
+        errorInfo.put(CRID, BidManager.getInstance().getCurrentCrid());
         LoopMeTracker.post(errorInfo);
         onError(error);
     }

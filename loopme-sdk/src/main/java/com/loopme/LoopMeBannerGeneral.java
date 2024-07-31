@@ -1,6 +1,9 @@
 package com.loopme;
 
+import static com.loopme.debugging.Params.CID;
+import static com.loopme.debugging.Params.CRID;
 import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.debugging.Params.REQUEST_ID;
 
 import android.app.Activity;
 import android.view.View;
@@ -99,6 +102,9 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         } else {
             HashMap<String, String> errorInfo = new HashMap<>();
             errorInfo.put(ERROR_MSG, "Bind view is null");
+            errorInfo.put(REQUEST_ID, BidManager.getInstance().getRequestId());
+            errorInfo.put(CID, BidManager.getInstance().getCurrentCid());
+            errorInfo.put(CRID, BidManager.getInstance().getCurrentCrid());
             LoopMeTracker.post(errorInfo);
         }
     }
@@ -135,6 +141,9 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         } else {
             HashMap<String, String> errorInfo = new HashMap<>();
             errorInfo.put(ERROR_MSG, "Banner is not ready");
+            errorInfo.put(REQUEST_ID, BidManager.getInstance().getRequestId());
+            errorInfo.put(CID, BidManager.getInstance().getCurrentCid());
+            errorInfo.put(CRID, BidManager.getInstance().getCurrentCrid());
             LoopMeTracker.post(errorInfo);
         }
     }

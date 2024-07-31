@@ -1,10 +1,14 @@
 package com.loopme.ad;
 
+import static com.loopme.debugging.Params.CID;
+import static com.loopme.debugging.Params.CRID;
 import static com.loopme.debugging.Params.ERROR_MSG;
 import static com.loopme.debugging.Params.ERROR_TYPE;
+import static com.loopme.debugging.Params.REQUEST_ID;
 
 import android.text.TextUtils;
 
+import com.loopme.BidManager;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.tracker.AdIds;
@@ -217,6 +221,9 @@ public class AdParams implements Serializable {
                 HashMap<String, String> errorInfo = new HashMap<>();
                 errorInfo.put(ERROR_MSG, "Broken response [empty html]");
                 errorInfo.put(ERROR_TYPE, Constants.ErrorType.SERVER);
+                errorInfo.put(REQUEST_ID, BidManager.getInstance().getRequestId());
+                errorInfo.put(CID, BidManager.getInstance().getCurrentCid());
+                errorInfo.put(CRID, BidManager.getInstance().getCurrentCrid());
                 LoopMeTracker.post(errorInfo);
             }
             mBuilderHtml = html;
@@ -241,6 +248,9 @@ public class AdParams implements Serializable {
                     HashMap<String, String> errorInfo = new HashMap<>();
                     errorInfo.put(ERROR_MSG, "Broken response [invalid orientation: " + orientation + "]");
                     errorInfo.put(ERROR_TYPE, Constants.ErrorType.SERVER);
+                    errorInfo.put(REQUEST_ID, BidManager.getInstance().getRequestId());
+                    errorInfo.put(CID, BidManager.getInstance().getCurrentCid());
+                    errorInfo.put(CRID, BidManager.getInstance().getCurrentCrid());
                     LoopMeTracker.post(errorInfo);
                 }
             }

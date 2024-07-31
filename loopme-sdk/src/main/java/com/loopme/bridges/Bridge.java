@@ -1,14 +1,18 @@
 package com.loopme.bridges;
 
+import static com.loopme.debugging.Params.CID;
+import static com.loopme.debugging.Params.CRID;
 import static com.loopme.debugging.Params.ERROR_MSG;
 import static com.loopme.debugging.Params.ERROR_TYPE;
 import static com.loopme.debugging.Params.ERROR_URL;
+import static com.loopme.debugging.Params.REQUEST_ID;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.webkit.WebView;
 
+import com.loopme.BidManager;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.tracker.partners.LoopMeTracker;
@@ -84,6 +88,9 @@ public class Bridge extends WebViewClientCompat {
             errorInfo.put(ERROR_MSG, "Broken redirect in bridge: ");
             errorInfo.put(ERROR_TYPE, Constants.ErrorType.JS);
             errorInfo.put(ERROR_URL, url);
+            errorInfo.put(REQUEST_ID, BidManager.getInstance().getRequestId());
+            errorInfo.put(CID, BidManager.getInstance().getCurrentCid());
+            errorInfo.put(CRID, BidManager.getInstance().getCurrentCrid());
             LoopMeTracker.post(errorInfo);
             return true;
         }
@@ -159,6 +166,9 @@ public class Bridge extends WebViewClientCompat {
                 errorInfo.put(ERROR_MSG, "Empty parameter in js command: fullscreen mode");
                 errorInfo.put(ERROR_URL, uri.toString());
                 errorInfo.put(ERROR_TYPE, Constants.ErrorType.JS);
+                errorInfo.put(REQUEST_ID, BidManager.getInstance().getRequestId());
+                errorInfo.put(CID, BidManager.getInstance().getCurrentCid());
+                errorInfo.put(CRID, BidManager.getInstance().getCurrentCrid());
                 LoopMeTracker.post(errorInfo);
             } else {
                 onJsFullscreenMode(Boolean.parseBoolean(modeString));
@@ -193,6 +203,9 @@ public class Bridge extends WebViewClientCompat {
             errorInfo.put(ERROR_MSG, "Empty parameter in js command: mute");
             errorInfo.put(ERROR_URL, uri.toString());
             errorInfo.put(ERROR_TYPE, Constants.ErrorType.JS);
+            errorInfo.put(REQUEST_ID, BidManager.getInstance().getRequestId());
+            errorInfo.put(CID, BidManager.getInstance().getCurrentCid());
+            errorInfo.put(CRID, BidManager.getInstance().getCurrentCrid());
             LoopMeTracker.post(errorInfo);
         }
     }
@@ -206,6 +219,9 @@ public class Bridge extends WebViewClientCompat {
             errorInfo.put(ERROR_MSG, "Empty parameter in js command: src");
             errorInfo.put(ERROR_URL, uri.toString());
             errorInfo.put(ERROR_TYPE, Constants.ErrorType.JS);
+            errorInfo.put(REQUEST_ID, BidManager.getInstance().getRequestId());
+            errorInfo.put(CID, BidManager.getInstance().getCurrentCid());
+            errorInfo.put(CRID, BidManager.getInstance().getCurrentCrid());
             LoopMeTracker.post(errorInfo);
         }
     }

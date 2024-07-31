@@ -1,9 +1,13 @@
 package com.loopme.parser;
 
+import static com.loopme.debugging.Params.CID;
+import static com.loopme.debugging.Params.CRID;
 import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.debugging.Params.REQUEST_ID;
 
 import android.text.TextUtils;
 
+import com.loopme.BidManager;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.ad.AdParams;
@@ -58,6 +62,9 @@ public class ParseService {
         if (adParams == null) {
             HashMap<String, String> errorInfo = new HashMap<>();
             errorInfo.put(ERROR_MSG, Errors.PARSING_ERROR.getMessage());
+            errorInfo.put(REQUEST_ID, BidManager.getInstance().getRequestId());
+            errorInfo.put(CID, BidManager.getInstance().getCurrentCid());
+            errorInfo.put(CRID, BidManager.getInstance().getCurrentCrid());
             LoopMeTracker.post(errorInfo);
         }
         loopMeAd.setAdParams(adParams);
@@ -75,6 +82,8 @@ public class ParseService {
         if (bidObject == null) {
             return null;
         }
+
+        BidManager.getInstance().setCurrentBid(bidObject);
 
         return new AdParams.AdParamsBuilder(retrieveAdFormat(loopMeAd))
             .html(safelyRetrieve(() -> bidObject.getAdm(), ""))

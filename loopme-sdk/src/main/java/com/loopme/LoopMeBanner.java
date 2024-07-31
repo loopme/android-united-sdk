@@ -1,6 +1,9 @@
 package com.loopme;
 
+import static com.loopme.debugging.Params.CID;
+import static com.loopme.debugging.Params.CRID;
 import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.debugging.Params.REQUEST_ID;
 
 import android.app.Activity;
 import android.text.TextUtils;
@@ -10,6 +13,7 @@ import androidx.annotation.Nullable;
 
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
+import com.loopme.models.response.Bid;
 import com.loopme.tracker.partners.LoopMeTracker;
 
 import java.util.HashMap;
@@ -93,6 +97,9 @@ public final class LoopMeBanner extends AdWrapper {
         } else {
             HashMap<String, String> errorInfo = new HashMap<>();
             errorInfo.put(ERROR_MSG, "Banner is already showing");
+            errorInfo.put(REQUEST_ID, BidManager.getInstance().getRequestId());
+            errorInfo.put(CID, BidManager.getInstance().getCurrentCid());
+            errorInfo.put(CRID, BidManager.getInstance().getCurrentCrid());
             LoopMeTracker.post(errorInfo);
         }
     }

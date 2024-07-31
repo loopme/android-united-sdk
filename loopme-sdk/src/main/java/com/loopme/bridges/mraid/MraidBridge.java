@@ -1,7 +1,10 @@
 package com.loopme.bridges.mraid;
 
+import static com.loopme.debugging.Params.CID;
+import static com.loopme.debugging.Params.CRID;
 import static com.loopme.debugging.Params.ERROR_MSG;
 import static com.loopme.debugging.Params.ERROR_URL;
+import static com.loopme.debugging.Params.REQUEST_ID;
 
 import android.net.Uri;
 import android.text.TextUtils;
@@ -9,6 +12,7 @@ import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 
+import com.loopme.BidManager;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.MraidOrientation;
@@ -129,6 +133,9 @@ public class MraidBridge extends WebViewClientCompat {
             HashMap<String, String> errorInfo = new HashMap<>();
             errorInfo.put(ERROR_MSG, errorMessage);
             errorInfo.put(ERROR_URL, url);
+            errorInfo.put(REQUEST_ID, BidManager.getInstance().getRequestId());
+            errorInfo.put(CID, BidManager.getInstance().getCurrentCid());
+            errorInfo.put(CRID, BidManager.getInstance().getCurrentCrid());
             LoopMeTracker.post(errorInfo);
             Logging.out(LOG_TAG, errorMessage);
             ((MraidView) webView).notifyError();
