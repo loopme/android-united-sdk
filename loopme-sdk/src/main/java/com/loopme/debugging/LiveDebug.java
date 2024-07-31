@@ -1,10 +1,16 @@
 package com.loopme.debugging;
 
+import static com.loopme.debugging.Params.CID;
+import static com.loopme.debugging.Params.CRID;
+import static com.loopme.debugging.Params.REQUEST_ID;
+
 import android.content.Context;
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.loopme.BidManager;
 import com.loopme.BuildConfig;
 import com.loopme.Constants;
 import com.loopme.Logging;

@@ -1,11 +1,15 @@
 package com.loopme.tracker.partners;
 
+import static com.loopme.debugging.Params.CID;
+import static com.loopme.debugging.Params.CRID;
 import static com.loopme.debugging.Params.ERROR_MSG;
 import static com.loopme.debugging.Params.ERROR_TYPE;
+import static com.loopme.debugging.Params.REQUEST_ID;
 
 import android.os.Build;
 import android.text.TextUtils;
 
+import com.loopme.BidManager;
 import com.loopme.BuildConfig;
 import com.loopme.Constants;
 import com.loopme.Logging;
@@ -109,9 +113,15 @@ public class LoopMeTracker {
         params.put(Params.DEVICE_OS, Constants.ADNROID_DEVICE_OS);
         params.put(Params.SDK_TYPE, Constants.LOOPME_SDK_TYPE);
         params.put(Params.SDK_VERSION, BuildConfig.VERSION_NAME);
+        params.put(Params.DEVICE_OS_VERSION, Build.VERSION.RELEASE);
+        params.put(Params.DEVICE_MODEL, Build.MODEL);
+        params.put(Params.DEVICE_MANUFACTURER, Build.MANUFACTURER);
         params.put(Params.DEVICE_ID, RequestUtils.getIfa());
         params.put(Params.APP_KEY, sAppKey);
         params.put(Params.PACKAGE_ID, sPackageId);
+        params.put(REQUEST_ID, BidManager.getInstance().getRequestId());
+        params.put(CID, BidManager.getInstance().getCurrentCid());
+        params.put(CRID, BidManager.getInstance().getCurrentCrid());
         params.put(Params.MSG, Constants.SDK_ERROR_MSG);
         return params;
     }

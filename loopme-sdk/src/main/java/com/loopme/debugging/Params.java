@@ -7,6 +7,9 @@ public class Params {
     public static final String SDK_TYPE = "sdk_type";//const ["loopme"|"vast"]
     public static final String SDK_VERSION = "sdk_version";//example: "6.1.0"
     public static final String DEVICE_ID = "device_id";//example: "ae98582a-a9f2-4caa-8c20-f4e3ab37d001"
+    public static final String DEVICE_OS_VERSION = "device_os_version";//example: 13
+    public static final String DEVICE_MODEL = "device_model";//example: A201
+    public static final String DEVICE_MANUFACTURER = "device_manufacturer";//example: Samsung
     public static final String PACKAGE_ID = "package";// example: "com.loopme.tester"
     public static final String APP_KEY = "app_key";// example: "c693a45a79"
     public static final String MSG = "msg";//const "sdk_debug" or "sdk_error"
@@ -17,6 +20,9 @@ public class Params {
     public static final String SDK_READY = "sdk_ready";
     public static final String SDK_SHOW = "sdk_show";
     public static final String SDK_MISSED = "sdk_missed";
+    public static final String CID = "cid";
+    public static final String CRID= "crid";
+    public static final String REQUEST_ID= "request_id";
 
     //Live Debug
     public static final String DEBUG_LOGS = "debug_logs";// example: "ui: Debug.LoopMe.BaseAd: Start fetcher timeout timer, ui: Debug.LoopMe.FileUtils: In cache 2 file(s)..."
