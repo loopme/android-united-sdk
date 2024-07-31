@@ -15,7 +15,7 @@ import com.loopme.LoopMeBannerGeneral;
 import com.loopme.MraidOrientation;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
-import com.loopme.bridges.mraid.MraidBridge;
+import com.loopme.bridges.MraidBridgeListener;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
 import com.loopme.utils.UiUtils;
@@ -23,7 +23,7 @@ import com.loopme.utils.Utils;
 import com.loopme.views.MraidView;
 import com.loopme.views.activity.MraidVideoActivity;
 
-public class MraidController implements MraidBridge.OnMraidBridgeListener {
+public class MraidController implements MraidBridgeListener {
 
     private static final String LOG_TAG = MraidController.class.getSimpleName();
     private static final String EXTRAS_VIDEO_URL = "videoUrl";
@@ -34,7 +34,6 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     private int mWidth;
     private int mHeight;
 
-    private boolean mAllowOrientationChange = true;
     private MraidOrientation mForceOrientation = MraidOrientation.NONE;
 
     public MraidController(@NonNull LoopMeAd loopMeAd) {
@@ -78,20 +77,19 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
     @Override
     public void onMraidCallComplete(String command) {
         if (mMraidView != null) {
-            mMraidView.onMraidCallComplete(command);
+            mMraidView.onMraidCallComplete();
         }
     }
 
     @Override
     public void onLoopMeCallComplete(String command) {
         if (mMraidView != null) {
-            mMraidView.onLoopMeCallComplete(command);
+            mMraidView.onLoopMeCallComplete();
         }
     }
 
     @Override
     public void setOrientationProperties(boolean allowOrientationChange, MraidOrientation forceOrientation) {
-        mAllowOrientationChange = allowOrientationChange;
         mForceOrientation = forceOrientation;
     }
 
@@ -159,23 +157,16 @@ public class MraidController implements MraidBridge.OnMraidBridgeListener {
             mMraidView.setState(Constants.MraidState.DEFAULT);
             mMraidView.notifyReady();
         }
-        if (mLoopMeAd != null) {
-            mLoopMeAd.onAdLoadSuccess();
-        }
+        mLoopMeAd.onAdLoadSuccess();
     }
 
     @Override
     public void onLoadFail(LoopMeError error) {
-        if (mLoopMeAd != null) {
-            mLoopMeAd.onInternalLoadFail(error);
-        }
+        mLoopMeAd.onInternalLoadFail(error);
     }
 
     @Override
     public void onChangeCloseButtonVisibility(boolean hasOwnCloseButton) {
-        if (mLoopMeAd == null) {
-            return;
-        }
         mLoopMeAd.getAdParams().setOwnCloseButton(hasOwnCloseButton);
         Intent intent = new Intent(Constants.MRAID_NEED_CLOSE_BUTTON);
         intent.setPackage(mLoopMeAd.getContext().getPackageName());

@@ -35,7 +35,7 @@ import com.loopme.controllers.display.DisplayControllerLoopMe;
 import com.loopme.receiver.AdReceiver;
 import com.loopme.utils.PermissionUtils;
 import com.loopme.views.CloseButton;
-import com.loopme.views.LoopMeWebView;
+import com.loopme.views.MraidView;
 import com.loopme.views.webclient.AdViewChromeClient;
 
 import java.util.List;
@@ -161,7 +161,7 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
     }
 
     private static AdViewChromeClient tryGetAdViewChromeClient(WebView webView) {
-        LoopMeWebView lwv = webView instanceof LoopMeWebView ? (LoopMeWebView) webView : null;
+        MraidView lwv = webView instanceof MraidView ? (MraidView) webView : null;
         if (lwv == null)
             return null;
 
