@@ -6,6 +6,8 @@ import android.app.Activity;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import androidx.annotation.NonNull;
+
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
@@ -59,12 +61,12 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         void onLoopMeBannerExpired(LoopMeBannerGeneral banner);
     }
 
-    public LoopMeBannerGeneral(Activity activity, String appKey) {
+    public LoopMeBannerGeneral(@NonNull Activity activity, @NonNull String appKey) {
         super(activity, appKey);
         Logging.out(LOG_TAG, "Start creating banner with app key: " + appKey);
     }
 
-    public static LoopMeBannerGeneral getInstance(String appKey, Activity activity) {
+    public static LoopMeBannerGeneral getInstance(@NonNull String appKey, @NonNull Activity activity) {
         return new LoopMeBannerGeneral(activity, appKey);
     }
 

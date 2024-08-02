@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
+import com.loopme.bridges.MraidBridge;
 import com.loopme.bridges.vpaid.BridgeEventHandler;
 import com.loopme.bridges.vpaid.VpaidBridge;
 import com.loopme.bridges.vpaid.VpaidBridgeImpl;
@@ -104,7 +105,9 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     @SuppressLint("JavascriptInterface")
     @Override
     protected WebView createWebView() {
-        WebView wv = new MraidView(mLoopMeAd.getContext(), new MraidController(mLoopMeAd), () -> { });
+        MraidView wv = new MraidView(mLoopMeAd.getContext());
+        MraidController mraidController = new MraidController(mLoopMeAd, wv);
+        wv.setWebViewClient(new MraidBridge(mraidController, () -> { }));
         wv.setWebChromeClient(new AdViewChromeClient(this));
         Vast4WebViewClient vast4WebViewClient = new Vast4WebViewClient();
         vast4WebViewClient.setOnPageLoadedListener(this);

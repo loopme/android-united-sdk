@@ -74,7 +74,6 @@ public class VpaidBridgeImpl implements VpaidBridge {
 
     //endregion
 
-    //region Helpers
     private void runOnUiThread(Runnable runnable) {
         mBridge.runOnUiThread(runnable);
     }

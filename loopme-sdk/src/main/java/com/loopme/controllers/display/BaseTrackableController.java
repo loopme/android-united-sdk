@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 
@@ -28,103 +29,49 @@ import com.loopme.tracker.partners.LoopMeTracker;
 import java.util.HashMap;
 
 public abstract class BaseTrackableController implements DisplayController, AdEvents {
-    private static final long DELAY_UNTIL_EXECUTE = 100;
     protected String mLogTag;
-    private EventManager mEventManager;
+    private final EventManager mEventManager;
     private final LoopMeAd mLoopMeAd;
     private boolean mIsImpressionTracked;
-    private String mOrientation;
+    private final String mOrientation;
 
-    public BaseTrackableController(LoopMeAd loopMeAd) {
+    public BaseTrackableController(@NonNull LoopMeAd loopMeAd) {
         mLoopMeAd = loopMeAd;
-        if (mLoopMeAd != null) {
-            mOrientation = mLoopMeAd.getAdParams().getAdOrientation();
-        }
-    }
-
-    @Override
-    public void onStartLoad() {
-        if (mLoopMeAd == null) {
-            return;
-        }
-        AdParams adParams = mLoopMeAd.getAdParams();
-        if (adParams != null && !adParams.getTrackers().isEmpty())
-            mEventManager = new EventManager(mLoopMeAd);
-    }
-
-    @Override
-    public void onInitTracker(AdType type) {
-        if (mEventManager != null) {
-            mEventManager.onInitTracker(type);
-        }
+        mOrientation = mLoopMeAd.getAdParams().getAdOrientation();
+        mEventManager = new EventManager(mLoopMeAd);
     }
 
     protected void initTrackers() {
-        boolean isNativeAd = mLoopMeAd != null &&
-            !mLoopMeAd.isMraidAd() &&
-            !mLoopMeAd.isVpaidAd() &&
-            mLoopMeAd.isVastAd();
+        boolean isNativeAd = !mLoopMeAd.isMraidAd() && !mLoopMeAd.isVpaidAd() && mLoopMeAd.isVastAd();
         onInitTracker(isNativeAd ? AdType.NATIVE : AdType.WEB);
     }
 
     protected void onInternalLoadFail(final LoopMeError error) {
-        onUiThread(() -> {
-            if (mLoopMeAd != null) {
-                mLoopMeAd.onInternalLoadFail(error);
-            }
-        });
+        onUiThread(() -> mLoopMeAd.onInternalLoadFail(error));
     }
 
     protected void onPostWarning(final LoopMeError error) {
-        onUiThread(() -> {
-            if (mLoopMeAd != null) {
-                mLoopMeAd.onSendPostWarning(error);
-            }
-        });
+        onUiThread(() -> mLoopMeAd.onSendPostWarning(error));
     }
 
     protected void onUiThread(Runnable runnable) {
-        if (mLoopMeAd != null) {
-            mLoopMeAd.runOnUiThread(runnable);
-        }
+        mLoopMeAd.runOnUiThread(runnable);
     }
 
     protected void postDelayed(Runnable action, long delayMillis) {
-        if (mLoopMeAd != null) {
-            mLoopMeAd.runOnUiThreadDelayed(action, delayMillis);
-        }
-    }
-
-    @Override
-    public void onResume() {
-        onAdResumedEvent();
-    }
-
-    @Override
-    public void onPause() {
-        onAdPausedEvent();
-    }
-
-    @Override
-    public void onDestroy() {
-        onAdDestroyedEvent();
+        mLoopMeAd.runOnUiThreadDelayed(action, delayMillis);
     }
 
     @Override
     public void onMessage(Message type, String message) {
-        switch (type) {
-            case ERROR: {
-                HashMap<String, String> errorInfo = new HashMap<>();
-                errorInfo.put(ERROR_MSG, message);
-                LoopMeTracker.post(errorInfo);
-                onAdErrorEvent(message);
-                break;
-            }
-            case LOG: {
-                Logging.out(mLogTag, message);
-                break;
-            }
+        if (type != Message.ERROR) {
+            Log.d(mLogTag, message);
+            return;
         }
+        HashMap<String, String> errorInfo = new HashMap<>();
+        errorInfo.put(ERROR_MSG, message);
+        LoopMeTracker.post(errorInfo);
+        onAdErrorEvent(message);
     }
 
     @Override
@@ -137,187 +84,81 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
 
     // events region
     @Override
+    public void onStartLoad() { }
+    @Override
+    public void onInitTracker(AdType type) { mEventManager.onInitTracker(type); }
+    @Override
+    public void onResume() { onAdResumedEvent(); }
+    @Override
+    public void onPause() { onAdPausedEvent(); }
+    @Override
+    public void onDestroy() { onAdDestroyedEvent(); }
+    @Override
+    public void onAdDestroyedEvent() { mEventManager.onAdDestroyedEvent(); }
+    @Override
+    public void onAdResumedEvent() { mEventManager.onAdResumedEvent(); }
+    @Override
+    public void onAdStartedEvent() { mEventManager.onAdStartedEvent(); }
+    @Override
+    public void onAdPausedEvent() { mEventManager.onAdPausedEvent(); }
+    @Override
+    public void onAdErrorEvent(String message) { mEventManager.onAdErrorEvent(message); }
+    @Override
+    public void onAdLoadedEvent() { mEventManager.onAdLoadedEvent(); }
+    @Override
+    public void onAdStoppedEvent() { mEventManager.onAdStoppedEvent(); }
+    @Override
+    public void onAdClickedEvent() { mEventManager.onAdClickedEvent(); }
+    @Override
+    public void onAdCompleteEvent() { mEventManager.onAdCompleteEvent(); }
+    @Override
+    public void onAdUserMinimizeEvent() { mEventManager.onAdUserMinimizeEvent(); }
+    @Override
+    public void onAdUserCloseEvent() { mEventManager.onAdUserCloseEvent(); }
+    @Override
+    public void onAdEnteredFullScreenEvent() { mEventManager.onAdEnteredFullScreenEvent(); }
+    @Override
+    public void onAdExitedFullScreenEvent() { mEventManager.onAdExitedFullScreenEvent(); }
+    @Override
+    public void onAdSkippedEvent() { mEventManager.onAdSkippedEvent(); }
+    @Override
+    public void onAdUserAcceptInvitationEvent() { mEventManager.onAdUserAcceptInvitationEvent(); }
+    @Override
+    public void onAdImpressionEvent() { mEventManager.onAdImpressionEvent(); }
+    @Override
+    public void onAdRecordReady() { mEventManager.onAdRecordReady(); }
+    @Override
+    public void onAdInjectJs(LoopMeAd loopMeAd) { mEventManager.onAdInjectJs(loopMeAd); }
+    @Override
+    public void onAdInjectJsVpaid(StringBuilder html) { mEventManager.onAdInjectJsVpaid(html); }
+    @Override
+    public void onAdRecordAdClose() { mEventManager.onAdRecordAdClose(); }
+    @Override
+    public void onNewActivity(Activity activity) { mEventManager.onNewActivity(activity); }
+
+    @Override
     public void onAdDurationEvents(int currentPosition, int videoDuration) {
-        if (mEventManager != null) {
-            mEventManager.onAdDurationEvents(currentPosition, videoDuration);
-        }
+        mEventManager.onAdDurationEvents(currentPosition, videoDuration);
     }
-
-    @Override
-    public void onAdDestroyedEvent() {
-        if (mEventManager != null) {
-            mEventManager.onAdDestroyedEvent();
-        }
-    }
-
-    @Override
-    public void onAdResumedEvent() {
-        if (mEventManager != null) {
-            mEventManager.onAdResumedEvent();
-        }
-    }
-
-    @Override
-    public void onAdStartedEvent() {
-        if (mEventManager != null) {
-            mEventManager.onAdStartedEvent();
-        }
-    }
-
     @Override
     public void onAdStartedEvent(WebView webView, MediaPlayer mediaPlayer) {
-        if (mEventManager != null) {
-            mEventManager.onAdStartedEvent(webView, mediaPlayer);
-        }
+        mEventManager.onAdStartedEvent(webView, mediaPlayer);
     }
-
-    @Override
-    public void onAdPausedEvent() {
-        if (mEventManager != null) {
-            mEventManager.onAdPausedEvent();
-        }
-    }
-
-    @Override
-    public void onAdErrorEvent(String message) {
-        if (mEventManager != null) {
-            mEventManager.onAdErrorEvent(message);
-        }
-    }
-
-    @Override
-    public void onAdLoadedEvent() {
-        if (mEventManager != null) {
-            mEventManager.onAdLoadedEvent();
-        }
-    }
-
-    @Override
-    public void onAdStoppedEvent() {
-        if (mEventManager != null) {
-            mEventManager.onAdStoppedEvent();
-        }
-    }
-
-    @Override
-    public void onAdClickedEvent() {
-        if (mEventManager != null) {
-            mEventManager.onAdClickedEvent();
-        }
-    }
-
-    @Override
-    public void onAdCompleteEvent() {
-        if (mEventManager != null) {
-            mEventManager.onAdCompleteEvent();
-        }
-    }
-
     @Override
     public void onAdVolumeChangedEvent(float volume, int currentPosition) {
-        if (mEventManager != null) {
-            mEventManager.onAdVolumeChangedEvent(volume, currentPosition);
-        }
+        mEventManager.onAdVolumeChangedEvent(volume, currentPosition);
     }
-
-    @Override
-    public void onAdUserMinimizeEvent() {
-        if (mEventManager != null) {
-            mEventManager.onAdUserMinimizeEvent();
-        }
-    }
-
-    @Override
-    public void onAdUserCloseEvent() {
-        if (mEventManager != null) {
-            mEventManager.onAdUserCloseEvent();
-        }
-    }
-
-    @Override
-    public void onAdEnteredFullScreenEvent() {
-        if (mEventManager != null) {
-            mEventManager.onAdEnteredFullScreenEvent();
-        }
-    }
-
-    @Override
-    public void onAdExitedFullScreenEvent() {
-        if (mEventManager != null) {
-            mEventManager.onAdExitedFullScreenEvent();
-        }
-    }
-
-    @Override
-    public void onAdSkippedEvent() {
-        if (mEventManager != null) {
-            mEventManager.onAdSkippedEvent();
-        }
-    }
-
-    @Override
-    public void onAdUserAcceptInvitationEvent() {
-        if (mEventManager != null) {
-            mEventManager.onAdUserAcceptInvitationEvent();
-        }
-    }
-
-    @Override
-    public void onAdImpressionEvent() {
-        if (mEventManager != null) {
-            mEventManager.onAdImpressionEvent();
-        }
-    }
-
     @Override
     public void onAdPreparedEvent(MediaPlayer mediaPlayer, View playerView) {
-        if (mEventManager != null) {
-            mEventManager.onAdPreparedEvent(mediaPlayer, playerView);
-        }
+        mEventManager.onAdPreparedEvent(mediaPlayer, playerView);
     }
-
     @Override
     public void onStartWebMeasuringDelayed() {
-        mLoopMeAd.getContainerView().postDelayed(() -> {
-            if (mEventManager != null) {
-                mEventManager.onStartWebMeasuringDelayed();
-            }
-        }, DELAY_UNTIL_EXECUTE);
+        mLoopMeAd.getContainerView().postDelayed(mEventManager::onStartWebMeasuringDelayed, 100);
     }
-
-    @Override
-    public void onAdRecordReady() {
-        if (mEventManager != null) {
-            mEventManager.onAdRecordReady();
-        }
-    }
-
     @Override
     public void onAdRegisterView(Activity activity, View view) {
-        if (mEventManager != null) {
-            mEventManager.onAdRegisterView(activity, view);
-        }
-    }
-
-    @Override
-    public void onAdInjectJs(LoopMeAd loopMeAd) {
-        if (mEventManager != null) {
-            mEventManager.onAdInjectJs(loopMeAd);
-        }
-    }
-
-    @Override
-    public void onAdInjectJsVpaid(StringBuilder html) {
-        if (mEventManager != null) {
-            mEventManager.onAdInjectJsVpaid(html);
-        }
-    }
-
-    @Override
-    public void onAdRecordAdClose() {
-        if (mEventManager != null) {
-            mEventManager.onAdRecordAdClose();
-        }
+        mEventManager.onAdRegisterView(activity, view);
     }
 
     public void postImpression() {
@@ -345,10 +186,4 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
 
     protected boolean isTrackerAvailable() { return mEventManager != null; }
 
-    @Override
-    public void onNewActivity(Activity activity) {
-        if (mEventManager != null) {
-            mEventManager.onNewActivity(activity);
-        }
-    }
 }

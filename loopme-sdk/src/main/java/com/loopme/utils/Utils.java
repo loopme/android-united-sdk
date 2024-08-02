@@ -8,9 +8,7 @@ import android.graphics.Point;
 import android.media.AudioManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -39,11 +37,7 @@ public class Utils {
     private static PackageManager sPackageManager;
     public static String sUserAgent;
 
-    public static void init(Context context) {
-        if (context == null) {
-            Log.d(LOG_TAG, "Could not init utils, context is null");
-            return;
-        }
+    public static void init(@NonNull Context context) {
         sUserAgent = WebSettings.getDefaultUserAgent(context);
         sResources = context.getResources();
         sPackageManager = context.getPackageManager();
@@ -79,8 +73,7 @@ public class Utils {
     }
 
     public static boolean isPackageInstalled(List<String> packageIds) {
-        List<String> installedList = getInstalledPackagesAsStringsList();
-        for (String packageName : installedList) {
+        for (String packageName : getInstalledPackagesAsStringsList()) {
             for (int i = 0; i < packageIds.size(); i++) {
                 if (packageIds.get(i).equalsIgnoreCase(packageName)) {
                     return true;
@@ -173,15 +166,11 @@ public class Utils {
                 event.timeMillis = duration * 3 / 4;
                 trackingEventsList.add(event);
             }
-            if (tracking.isProgressEvent()) {
-                if (tracking.getOffset() != null) {
-                    if (tracking.getOffset().contains("%")) {
-                        event.timeMillis = duration * Utils.parsePercent(adParams.getSkipTime()) / 100;
-                    } else {
-                        event.timeMillis = Utils.parseDuration(tracking.getOffset()) * 1000;
-                    }
-                    trackingEventsList.add(event);
-                }
+            if (tracking.isProgressEvent() && tracking.getOffset() != null) {
+                event.timeMillis = tracking.getOffset().contains("%") ?
+                    duration * Utils.parsePercent(adParams.getSkipTime()) / 100 :
+                    Utils.parseDuration(tracking.getOffset()) * 1000;
+                trackingEventsList.add(event);
             }
         }
         return trackingEventsList;
@@ -193,14 +182,11 @@ public class Utils {
      */
     public static int parseDuration(String duration) {
         try {
-            String DIVIDER = ":";
-            String[] time = duration.split(DIVIDER);
+            String[] time = duration.split(":");
             int hours = Integer.parseInt(time[0]);
             int minutes = Integer.parseInt(time[1]);
             int seconds = Integer.parseInt(time[2]);
-            int SECONDS_IN_MINUTE = 60;
-            int SECONDS_IN_HOUR = 3600;
-            return seconds + SECONDS_IN_MINUTE * minutes + SECONDS_IN_HOUR * hours;
+            return seconds + 60 * minutes + 60 * 60 * hours;
         } catch (NumberFormatException e) {
             e.printStackTrace();
             return ZERO;
@@ -239,9 +225,8 @@ public class Utils {
         if (sWindowManager == null) {
             return ZERO;
         }
-        Display display = sWindowManager.getDefaultDisplay();
         Point size = new Point();
-        display.getSize(size);
+        sWindowManager.getDefaultDisplay().getSize(size);
         return size.x;
     }
 
@@ -249,9 +234,8 @@ public class Utils {
         if (sWindowManager == null) {
             return ZERO;
         }
-        Display display = sWindowManager.getDefaultDisplay();
         Point size = new Point();
-        display.getSize(size);
+        sWindowManager.getDefaultDisplay().getSize(size);
         return size.y;
     }
 
@@ -264,7 +248,7 @@ public class Utils {
         return (float) Math.round((float) (volumeLevel * 100) / max) / 100;
     }
 
-    public static DisplayMetrics getDisplayMetrics() {
+    private static DisplayMetrics getDisplayMetrics() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         if (sWindowManager != null) {
             sWindowManager.getDefaultDisplay().getMetrics(displayMetrics);
@@ -272,17 +256,14 @@ public class Utils {
         return displayMetrics;
     }
 
-    private static float getDensity() {
-        float DEFAULT_DENSITY = 1;
-        return sResources != null ? sResources.getDisplayMetrics().density : DEFAULT_DENSITY;
-    }
-
     public static int getHeight() {
-        return (int) (getDisplayMetrics().heightPixels / getDensity());
+        float density = sResources != null ? sResources.getDisplayMetrics().density : 1;
+        return (int) (getDisplayMetrics().heightPixels / density);
     }
 
     public static int getWidth() {
-        return (int) (getDisplayMetrics().widthPixels / getDensity());
+        float density = sResources != null ? sResources.getDisplayMetrics().density : 1;
+        return (int) (getDisplayMetrics().widthPixels / density);
     }
 
     public static int convertDpToPixel(float dp) {
@@ -308,15 +289,12 @@ public class Utils {
     }
 
     public static ViewGroup.LayoutParams createMatchParentLayoutParams() {
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+        return new FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            Gravity.CENTER
         );
-        params.gravity = Gravity.CENTER;
-        return params;
     }
 
-    public static String getUserAgent() {
-        return sUserAgent;
-    }
+    public static String getUserAgent() { return sUserAgent; }
 }

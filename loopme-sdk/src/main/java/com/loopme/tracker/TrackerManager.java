@@ -1,62 +1,21 @@
 package com.loopme.tracker;
 
-import android.text.TextUtils;
-
+import android.util.Log;
+import androidx.annotation.NonNull;
 import com.loopme.ad.LoopMeAd;
-import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.constants.Event;
-import com.loopme.tracker.constants.Partner;
-import com.loopme.tracker.partners.DvTracker;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.Arrays;
 
 public class TrackerManager {
 
-    private final List<Tracker> mTrackers = new ArrayList<>();
-    private final List<String> mTrackersNamesList = new ArrayList<>();
-    private LoopMeAd mLoopMeAd;
-
-    public TrackerManager(LoopMeAd loopmeAd) {
-        if (loopmeAd == null) {
-            return;
-        }
+    private static final String LOG_TAG = TrackerManager.class.getSimpleName();
+    private final LoopMeAd mLoopMeAd;
+    public TrackerManager(@NonNull LoopMeAd loopmeAd) {
         mLoopMeAd = loopmeAd;
-        mTrackersNamesList.addAll(mLoopMeAd.getAdParams().getTrackers());
-    }
-
-    public void startSdk() {
-        for (String name : mTrackersNamesList) {
-            if (isDv(name)) {
-                DvTracker.startSdk(mLoopMeAd);
-            }
-        }
-    }
-
-    public void onInitTracker(AdType adType) {
-        for (String name : mTrackersNamesList) {
-            Tracker tracker = null;
-            if (isDv(name)) {
-                tracker = initTracker(Partner.DV, adType);
-            }
-            if (tracker != null) {
-                mTrackers.add(tracker);
-            }
-        }
+        Log.d(LOG_TAG, "TrackerManager for appkey: " + mLoopMeAd.getAppKey() + "(" + mLoopMeAd.getAdId() + ")");
     }
 
     public void track(Event event, Object... args) {
-        for (Tracker tracker : mTrackers) {
-            tracker.track(event, args);
-        }
-    }
-
-    private Tracker initTracker(Partner partner, AdType adType) {
-        return Objects.requireNonNull(partner) == Partner.DV ? new DvTracker() : null;
-    }
-
-    private boolean isDv(String name) {
-        return !TextUtils.isEmpty(name) && name.equalsIgnoreCase(Partner.DV.name());
+        Log.d(LOG_TAG, "Track " + mLoopMeAd.getAppKey() + "(" + mLoopMeAd + "): " + event + " with args: " + Arrays.toString(args));
     }
 }

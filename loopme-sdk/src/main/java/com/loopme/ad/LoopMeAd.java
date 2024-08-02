@@ -8,10 +8,11 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.widget.FrameLayout;
 
+import androidx.annotation.NonNull;
+
 import com.loopme.AdTargeting;
 import com.loopme.AdTargetingData;
 import com.loopme.Constants;
-import com.loopme.Helpers;
 import com.loopme.IdGenerator;
 import com.loopme.IntegrationType;
 import com.loopme.Logging;
@@ -30,6 +31,7 @@ import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.InternetUtils;
+import com.loopme.utils.Utils;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -84,8 +86,8 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         }
     };
 
-    public LoopMeAd(Activity context, String appKey) {
-        if (context == null || TextUtils.isEmpty(appKey)) {
+    public LoopMeAd(@NonNull Activity context, @NonNull String appKey) {
+        if (TextUtils.isEmpty(appKey)) {
             throw new IllegalArgumentException(WRONG_PARAMETERS);
         }
         mContext = context;
@@ -95,7 +97,8 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         });
         mAdId = IdGenerator.generateId();
         LiveDebug.init(context);
-        Helpers.init(this);
+        Utils.init(getContext());
+        LoopMeTracker.init(this);
     }
 
     /**
@@ -160,7 +163,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         }
     }
 
-        public void resume() {
+    public void resume() {
         if (mDisplayController != null && isReady()) {
             mDisplayController.onResume();
             Logging.out(LOG_TAG, "Ad resumed");
@@ -186,7 +189,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
             mTimers = null;
         }
         destroyDisplayController();
-        Helpers.reset();
+        Utils.reset();
         LoopMeAdHolder.removeAd(this);
         Logging.out(LOG_TAG, "Ad is destroyed");
     }
@@ -208,7 +211,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         onSendPostWarning(error);
     }
 
-    public void onSendPostWarning(LoopMeError error) { LoopMeTracker.post(error);}
+    public void onSendPostWarning(LoopMeError error) { LoopMeTracker.post(error); }
 
     private void startTimer(TimersType fetcherTimer, AdParams adParam) {
         if (mTimers == null) {
@@ -385,7 +388,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         }
     }
 
-    public void onNewContainer(FrameLayout containerView) {
+    public void onNewContainer(@NonNull FrameLayout containerView) {
         if (isInterstitial()) {
             bindView(containerView);
             return ;

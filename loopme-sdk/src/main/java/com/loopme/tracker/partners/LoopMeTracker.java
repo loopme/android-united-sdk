@@ -5,6 +5,9 @@ import static com.loopme.debugging.Params.ERROR_TYPE;
 
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.loopme.BuildConfig;
 import com.loopme.Constants;
@@ -36,10 +39,7 @@ public class LoopMeTracker {
 
     private LoopMeTracker() { }
 
-    public static void init(LoopMeAd loopMeAd) {
-        if (loopMeAd == null) {
-            return;
-        }
+    public static void init(@NonNull LoopMeAd loopMeAd) {
         sAppKey = loopMeAd.getAppKey();
         sPackageId = loopMeAd.getContext().getPackageName();
     }
@@ -55,7 +55,7 @@ public class LoopMeTracker {
         if (!params.containsKey(ERROR_TYPE)) {
             params.put(ERROR_TYPE, Constants.ErrorType.CUSTOM);
         }
-        proceedBuildEvent(obtainRequestString(params));
+        sendDataToServer(Constants.ERROR_URL, obtainRequestString(params));
     }
 
     private static void sendDataToServer(final String errorUrl, final String request) {
@@ -70,38 +70,29 @@ public class LoopMeTracker {
         }
     }
 
-    public static void clear() {
-        sVastErrorUrlSet.clear();
-    }
+    public static void clear() { sVastErrorUrlSet.clear(); }
 
     public static void trackSdkFeedBack(List<String> packageIds, String token) {
-        if (Utils.isPackageInstalled(packageIds)) {
-            sendDataToServer(buildSdkFeedBackUrl(token), null);
+        if (!Utils.isPackageInstalled(packageIds)) {
+            return;
         }
-    }
-
-    private static String buildSdkFeedBackUrl(String token) {
         String url = Constants.BASE_EVENT_URL + "?";
         Map<String, String> requestParams = new HashMap<>();
         requestParams.put(Params.EVENT_TYPE, Params.SDK_FEEDBACK);
         requestParams.put(Params.R, "1");
         requestParams.put(Params.ID, token);
-        return url + obtainRequestString(requestParams);
+        sendDataToServer(url + obtainRequestString(requestParams), null);
     }
 
     public static void postDebugEvent(String param, String value) {
         if (!LiveDebug.isDebugOn()) {
             return;
         }
-        Logging.out(LOG_TAG, param + "=" + value);
-        proceedBuildEvent(buildDebugRequest(param, value));
-    }
-
-    private static String buildDebugRequest(String param, String value) {
+        Log.d(LOG_TAG, param + "=" + value);
         Map<String, String> params = new HashMap<>(getGeneralInfo());
         params.put(ERROR_TYPE, Constants.ErrorType.CUSTOM);
         params.put(param, value);
-        return obtainRequestString(params);
+        sendDataToServer(Constants.ERROR_URL, obtainRequestString(params));
     }
 
     private static Map<String, String> getGeneralInfo() {
@@ -116,30 +107,23 @@ public class LoopMeTracker {
         return params;
     }
 
-    private static void proceedBuildEvent(String request) {
-        sendDataToServer(Constants.ERROR_URL, request);
-    }
-
     public static void post(LoopMeError error) {
-        if (!shouldTrack(error)) {
+        boolean shouldTrack = error != null &&
+            !TextUtils.isEmpty(error.getErrorType()) &&
+            !error.getErrorType().equalsIgnoreCase(Constants.ErrorType.DO_NOT_TRACK);
+        if (!shouldTrack) {
             return;
         }
         HashMap<String, String> errorInfo = new HashMap<>();
         errorInfo.put(ERROR_MSG, error.getMessage());
         errorInfo.put(ERROR_TYPE, error.getErrorType());
         post(errorInfo);
-        if (isVastError(error.getErrorType())) {
+        String errorType = error.getErrorType();
+        boolean isVastError = TextUtils.equals(errorType, Constants.ErrorType.VAST) ||
+            TextUtils.equals(errorType, Constants.ErrorType.VPAID);
+        if (isVastError) {
             postVastError(String.valueOf(error.getErrorCode()));
         }
-    }
-
-    private static boolean shouldTrack(LoopMeError error) {
-        return error != null && !TextUtils.isEmpty(error.getErrorType()) && !error.getErrorType().equalsIgnoreCase(Constants.ErrorType.DO_NOT_TRACK);
-    }
-
-    private static boolean isVastError(String errorType) {
-        return TextUtils.equals(errorType, Constants.ErrorType.VAST) ||
-                TextUtils.equals(errorType, Constants.ErrorType.VPAID);
     }
 
     public static String obtainRequestString(Map<String, String> params) {
