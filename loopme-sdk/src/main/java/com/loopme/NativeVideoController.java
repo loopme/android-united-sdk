@@ -7,6 +7,7 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -38,10 +39,10 @@ class NativeVideoController {
     private DataChangeListener mDataChangeListener;
     private final AdChecker mAdChecker;
 
-    public NativeVideoController(Activity activity, AdChecker checker) {
+    public NativeVideoController(@NonNull Activity activity, AdChecker checker) {
         mActivity = activity;
         mAdChecker = checker;
-        Utils.init(activity);
+        Utils.init(mActivity);
     }
 
     public void refreshAdPlacement(int itemCount) {

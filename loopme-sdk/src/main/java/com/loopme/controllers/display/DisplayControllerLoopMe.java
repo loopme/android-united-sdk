@@ -21,6 +21,7 @@ import com.loopme.MinimizedMode;
 import com.loopme.ViewAbilityUtils;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.LoopMeAd;
+import com.loopme.bridges.MraidBridge;
 import com.loopme.controllers.MraidController;
 import com.loopme.controllers.interfaces.LoopMeDisplayController;
 import com.loopme.om.OmidEventTrackerWrapper;
@@ -46,13 +47,14 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
         mLoopMeAd = loopMeAd;
         mAdParams = mLoopMeAd.getAdParams();
         mDisplayModeResolver = new DisplayModeResolver(this, loopMeAd);
-        mMraidController = new MraidController(mLoopMeAd);
-        mMraidView = new MraidView(mLoopMeAd.getContext(), mMraidController, this::tryCreateOmidAdSession);
+        mMraidView = new MraidView(mLoopMeAd.getContext());
+        mMraidController = new MraidController(mLoopMeAd, mMraidView);
+        mMraidView.setWebViewClient(new MraidBridge(mMraidController, this::tryCreateOmidAdSession));
     }
 
     // TODO. Ugly.
-    public void tryAddOmidFriendlyObstructionCloseButton(View view) {
-        if (omidAdSession == null || view == null)
+    public void tryAddOmidFriendlyObstructionCloseButton(@NonNull View view) {
+        if (omidAdSession == null)
             return;
         try {
             omidAdSession.addFriendlyObstruction(view, FriendlyObstructionPurpose.CLOSE_AD, null);
@@ -62,16 +64,15 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     }
 
     // TODO. Ugly.
-    public void tryRemoveOmidFriendlyObstruction(View view) {
-        if (omidAdSession == null || view == null)
-            return;
-        omidAdSession.removeFriendlyObstruction(view);
+    public void tryRemoveOmidFriendlyObstruction(@NonNull View view) {
+        if (omidAdSession != null) {
+            omidAdSession.removeFriendlyObstruction(view);
+        }
     }
 
     public void collapseMraidBanner() {
         if (mLoopMeAd.isMraidAd() && mLoopMeAd instanceof LoopMeBannerGeneral) {
-            LoopMeBannerGeneral banner = (LoopMeBannerGeneral) mLoopMeAd;
-            mMraidController.buildMraidContainer(banner.getBannerView());
+            mMraidController.buildMraidContainer(((LoopMeBannerGeneral)mLoopMeAd).getBannerView());
             mMraidController.onCollapseBanner();
         }
     }
@@ -199,20 +200,14 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     public void onVolumeMute(boolean mute) { }
 
     @Override
-    public void onBuildStaticAdView(FrameLayout containerView) { }
-
-    @Override
-    public void onBuildMraidView(FrameLayout containerView) {
-        if (containerView == null) {
-            return;
-        }
+    public void onBuildMraidView(@NonNull FrameLayout containerView) {
         mMraidController.buildMraidContainer(containerView);
         mMraidView.setIsViewable(true);
         mMraidView.notifyStateChange();
     }
 
     @Override
-    public void onRebuildView(FrameLayout containerView) {
+    public void onRebuildView(@NonNull FrameLayout containerView) {
         if (mLoopMeAd.isMraidAd()) {
             mMraidController.onRebuildView(containerView);
         }
@@ -246,7 +241,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
         }
     }
 
-    public void buildView(FrameLayout containerView) {
+    public void buildView(@NonNull FrameLayout containerView) {
         if (mLoopMeAd.isMraidAd()) {
             onBuildMraidView(containerView);
         }

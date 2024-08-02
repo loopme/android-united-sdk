@@ -10,6 +10,8 @@ import android.text.TextUtils;
 import android.view.Surface;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.iab.omid.library.loopme.adsession.AdEvents;
 import com.iab.omid.library.loopme.adsession.AdSession;
@@ -52,7 +54,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     private AdSession omidAdSession;
     private OmidEventTrackerWrapper omidEventTrackerWrapper;
 
-    public DisplayControllerVast(LoopMeAd loopMeAd) {
+    public DisplayControllerVast(@NonNull LoopMeAd loopMeAd) {
         super(loopMeAd);
         mViewControllerVast = new ViewControllerVast(this, this);
         mLogTag = DisplayControllerVast.class.getSimpleName();
@@ -60,9 +62,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     @Override
-    public void onSurfaceTextureReady(Surface surface) {
-        resumeMediaPlayer(surface);
-    }
+    public void onSurfaceTextureReady(Surface surface) { resumeMediaPlayer(surface); }
 
     @Override
     public void prepare() {
@@ -82,11 +82,9 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     // TODO. Refactor.
     private static List<VerificationScriptResource> createOmidVerificationScriptResourceList(
-            Map<String, Verification> omidVerificationMap
+        @NonNull Map<String, Verification> omidVerificationMap
     ) {
         List<VerificationScriptResource> vsrList = new ArrayList<>();
-        if (omidVerificationMap == null)
-            return vsrList;
         for (Verification v : omidVerificationMap.values()) {
             if (v == null)
                 continue;
@@ -95,18 +93,18 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
                 URL url = new URL(v.getJavaScriptResourceUrl());
                 String vp = v.getVerificationParameters();
                 VerificationScriptResource vsr = TextUtils.isEmpty(vp) ?
-                        VerificationScriptResource.createVerificationScriptResourceWithoutParameters(
-                                vendor, url
-                        ) :
-                        VerificationScriptResource.createVerificationScriptResourceWithParameters(
-                                vendor, url, vp
-                        );
+                    VerificationScriptResource.createVerificationScriptResourceWithoutParameters(
+                        vendor, url
+                    ) :
+                    VerificationScriptResource.createVerificationScriptResourceWithParameters(
+                        vendor, url, vp
+                    );
                 vsrList.add(vsr);
             } catch (Exception e) {
                 Logging.out(LOG_TAG, e.toString());
                 // TODO. Refactor. This piece of code isn't about creating data.
                 postVerificationNotExecutedEvent(
-                        v.getVerificationNotExecutedUrlList(), VAST_MACROS_REASON_LOAD_ERROR
+                    v.getVerificationNotExecutedUrlList(), VAST_MACROS_REASON_LOAD_ERROR
                 );
             }
         }
@@ -176,11 +174,10 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     @Override
     public void onPlay(int position) {
         mIsAdSkipped = false;
-        int DELAY_UNTIL_EXECUTE = 100;
         postDelayed(() -> {
             destroyMediaPlayer();
             mLoopMePlayer = new LoopMeMediaPlayer(mVideoUri, this);
-        }, DELAY_UNTIL_EXECUTE);
+        }, 100);
         onAdResumedEvent();
     }
 

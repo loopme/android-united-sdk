@@ -123,23 +123,20 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
 
         registerDestroyReceiver();
 
-        if (mLoopMeAd.isMraidAd()) {
-            mMraidCloseButton = new CloseButton(this);
-            mMraidCloseButton.registerReceiver();
-            DisplayControllerLoopMe dc = (DisplayControllerLoopMe) mDisplayController;
-            if (mLoopMeAd.isInterstitial()) {
-                mMraidCloseButton.setOnClickListener(v -> dc.closeMraidAd());
-            } else {
-                mMraidCloseButton.setOnClickListener(v -> dc.collapseMraidBanner());
-            }
-            dc.tryAddOmidFriendlyObstructionCloseButton(mMraidCloseButton);
-
-            new Handler().postDelayed(() -> {
-                mLoopMeContainerView.addView(mMraidCloseButton, new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.END
-                ));
-            }, SKIP_DELAY_INTERSTITIAL);
+        if (!mLoopMeAd.isMraidAd()) {
+            return;
         }
+        mMraidCloseButton = new CloseButton(this);
+        mMraidCloseButton.registerReceiver();
+        DisplayControllerLoopMe dc = (DisplayControllerLoopMe) mDisplayController;
+        mMraidCloseButton.setOnClickListener(mLoopMeAd.isInterstitial() ? v -> dc.closeMraidAd() : v -> dc.collapseMraidBanner());
+        dc.tryAddOmidFriendlyObstructionCloseButton(mMraidCloseButton);
+
+        new Handler().postDelayed(() -> {
+            mLoopMeContainerView.addView(mMraidCloseButton, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.END
+            ));
+        }, SKIP_DELAY_INTERSTITIAL);
     }
 
     private void setContentView() {
@@ -148,7 +145,9 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
         boolean isDebugObstructionEnabled = b != null && b.getBoolean(Constants.EXTRAS_DEBUG_OBSTRUCTION_ENABLED);
         findViewById(R.id.debug_obstruction).setVisibility(isDebugObstructionEnabled ? View.VISIBLE : View.GONE);
         mLoopMeContainerView = findViewById(R.id.loopme_container_view);
-        mLoopMeAd.onNewContainer(mLoopMeContainerView);
+        if (mLoopMeContainerView != null) {
+            mLoopMeAd.onNewContainer(mLoopMeContainerView);
+        }
     }
 
     // TODO. Ugly. For permission dialogs.

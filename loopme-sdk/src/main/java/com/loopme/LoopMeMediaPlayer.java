@@ -6,143 +6,82 @@ import android.media.MediaPlayer;
 import android.os.Handler;
 import android.view.Surface;
 
+import androidx.annotation.NonNull;
+
 import com.loopme.utils.Utils;
 
 import java.io.IOException;
 
 public class LoopMeMediaPlayer {
     private static final String LOG_TAG = LoopMeMediaPlayer.class.getSimpleName();
-    private static final int START_POSITION = 0;
-    private static final int START_POSITION_10 = 10;
-    private static final float DEFAULT_RIGHT_VOLUME = 0f;
-    private static final float DEFAULT_LEFT_VOLUME = 0f;
     private final MediaPlayer mMediaPlayer;
-    private LoopMeMediaPlayerListener mListener;
-    private Handler handler = new Handler();
-    private int interval = 1000;
-
-    public LoopMeMediaPlayer(String source, LoopMeMediaPlayerListener listener) {
-        mMediaPlayer = new MediaPlayer();
-        setDataSource(source);
-        configurePlayer();
-        setListener(listener);
-        prepareAsync();
-    }
-
+    private final LoopMeMediaPlayerListener mListener;
+    private final Handler handler = new Handler();
     private final Runnable onTimeChange = new Runnable() {
         @Override
         public void run() {
             if (mMediaPlayer.isPlaying()) {
                 mListener.onTimeUpdate(mMediaPlayer.getCurrentPosition(), mMediaPlayer.getDuration());
-                // Schedule the next update
-                handler.postDelayed(this, interval);
+                handler.postDelayed(this, 1000);
             }
         }
     };
 
-    private void configurePlayer() {
-        if (mMediaPlayer != null) {
-            mMediaPlayer.setLooping(false);
-            mMediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
-                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
-                    .build());
-        }
-    }
-
-    private void setListener(LoopMeMediaPlayerListener listener) {
-        if (mMediaPlayer != null && listener != null) {
-            mListener = listener;
-            mMediaPlayer.setOnPreparedListener(listener);
-            mMediaPlayer.setOnErrorListener(listener);
-            mMediaPlayer.setOnCompletionListener(listener);
+    public LoopMeMediaPlayer(@NonNull String source, @NonNull LoopMeMediaPlayerListener listener) {
+        mMediaPlayer = new MediaPlayer();
+        mListener = listener;
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+            .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+            .setUsage(AudioAttributes.USAGE_MEDIA)
+            .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
+            .build();
+        mMediaPlayer.setLooping(false);
+        mMediaPlayer.setAudioAttributes(audioAttributes);
+        mMediaPlayer.setOnPreparedListener(mListener);
+        mMediaPlayer.setOnErrorListener(mListener);
+        mMediaPlayer.setOnCompletionListener(mListener);
+        try {
+            mMediaPlayer.setDataSource(source);
+            mMediaPlayer.prepareAsync();
+        } catch (IllegalStateException | IOException e) {
+            mListener.onErrorOccurred(e);
         }
     }
 
     public void muteVideo(boolean muted) {
-        if (muted) {
-            setMuteVolume();
-        } else {
-            setSystemVolume();
-        }
-    }
-
-    private void setMuteVolume() {
-        setVolume(DEFAULT_LEFT_VOLUME, DEFAULT_RIGHT_VOLUME);
-        onVolumeChanged(DEFAULT_LEFT_VOLUME, getCurrentPosition());
-    }
-
-    private void setVolume(float leftVolume, float rightVolume) {
-        if (mMediaPlayer != null) {
-            mMediaPlayer.setVolume(leftVolume, rightVolume);
-        }
-    }
-
-    public void setSystemVolume() {
-        float systemVolume = Utils.getSystemVolume();
-        setVolume(systemVolume, systemVolume);
-        onVolumeChanged(systemVolume, getCurrentPosition());
-    }
-
-    public int getCurrentPosition() {
-        return mMediaPlayer == null ? 0 : mMediaPlayer.getCurrentPosition();
+        float leftVolume = muted ? 0f : Utils.getSystemVolume();
+        float rightVolume = muted ? 0f : Utils.getSystemVolume();
+        mMediaPlayer.setVolume(leftVolume, rightVolume);
+        mListener.onVolumeChanged(leftVolume, mMediaPlayer.getCurrentPosition());
     }
 
     public void releasePlayer() {
-        if (mMediaPlayer != null) {
-            handler.removeCallbacks(onTimeChange);
-            mMediaPlayer.reset();
-            mMediaPlayer.release();
-        }
+        handler.removeCallbacks(onTimeChange);
+        mMediaPlayer.reset();
+        mMediaPlayer.release();
     }
 
     public void setSurface(Surface surface) {
         try {
-            if (mMediaPlayer != null) {
-                mMediaPlayer.setSurface(surface);
-            }
+            mMediaPlayer.setSurface(surface);
         } catch (IllegalStateException e) {
-            onErrorOccurred(e);
-        }
-    }
-
-    private void setDataSource(String filePath) {
-        try {
-            if (mMediaPlayer != null) {
-                mMediaPlayer.setDataSource(filePath);
-            }
-        } catch (IllegalStateException | IOException e) {
-            onErrorOccurred(e);
-        }
-    }
-
-
-    private void prepareAsync() {
-        try {
-            if (mMediaPlayer != null) {
-                mMediaPlayer.prepareAsync();
-            }
-        } catch (IllegalStateException e) {
-            onErrorOccurred(e);
+            mListener.onErrorOccurred(e);
         }
     }
 
     public boolean isPlaying() {
         try {
-            return mMediaPlayer != null && mMediaPlayer.isPlaying();
+            return mMediaPlayer.isPlaying();
         } catch (IllegalStateException e) {
-            onErrorOccurred(e);
+            mListener.onErrorOccurred(e);
         }
         return false;
     }
 
     public void destroyListeners() {
-        if (mMediaPlayer != null) {
-            mMediaPlayer.setOnErrorListener(null);
-            mMediaPlayer.setOnPreparedListener(null);
-            mMediaPlayer.setOnCompletionListener(null);
-        }
+        mMediaPlayer.setOnErrorListener(null);
+        mMediaPlayer.setOnPreparedListener(null);
+        mMediaPlayer.setOnCompletionListener(null);
     }
 
     public void pauseMediaPlayer() {
@@ -152,7 +91,7 @@ public class LoopMeMediaPlayer {
                 mMediaPlayer.pause();
             }
         } catch (IllegalStateException e) {
-            onErrorOccurred(e);
+            mListener.onErrorOccurred(e);
         }
     }
 
@@ -161,44 +100,14 @@ public class LoopMeMediaPlayer {
             if (!isPlaying()) {
                 mMediaPlayer.start();
                 handler.removeCallbacks(onTimeChange);
-                handler.postDelayed(onTimeChange, interval);
+                handler.postDelayed(onTimeChange, 1000);
             }
         } catch (IllegalStateException e) {
-            onErrorOccurred(e);
-        }
-    }
-
-    public void seekTo(int position) {
-        try {
-            if (mMediaPlayer != null) {
-                if (position == START_POSITION_10) {
-                    mMediaPlayer.seekTo(START_POSITION);
-                } else {
-                    mMediaPlayer.seekTo(position);
-                }
-            }
-        } catch (IllegalStateException e) {
-            onErrorOccurred(e);
-        }
-    }
-
-    public int getVideoDuration() {
-        return mMediaPlayer == null ? 0 : mMediaPlayer.getDuration();
-    }
-
-    private void onErrorOccurred(Exception e) {
-        e.printStackTrace();
-        Logging.out(LOG_TAG, e.getMessage());
-        if (mListener != null) {
             mListener.onErrorOccurred(e);
         }
     }
 
-    private void onVolumeChanged(float volume, int currentPosition) {
-        if (mListener != null) {
-            mListener.onVolumeChanged(volume, currentPosition);
-        }
-    }
+    public int getVideoDuration() { return mMediaPlayer.getDuration(); }
 
     public interface LoopMeMediaPlayerListener extends
             MediaPlayer.OnPreparedListener,

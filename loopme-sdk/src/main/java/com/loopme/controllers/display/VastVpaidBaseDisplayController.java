@@ -56,7 +56,7 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
     private final VastVpaidEventTracker mEventTracker;
     private WebView webView;
 
-    public VastVpaidBaseDisplayController(LoopMeAd loopMeAd) {
+    public VastVpaidBaseDisplayController(@NonNull LoopMeAd loopMeAd) {
         super(loopMeAd);
         mLoopMeAd = loopMeAd;
         mAdParams = loopMeAd.getAdParams();

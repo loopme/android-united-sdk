@@ -31,16 +31,10 @@ public class MraidView extends WebView {
 
     private static final String LOG_TAG = MraidView.class.getSimpleName();
 
-    public MraidView(
-        Context context,
-        final MraidController mraidController,
-        AdReadyListener adReadyListener
-    ) {
+    public MraidView(Context context) {
         super(context);
         configureWebSettings();
         getSettings().setAllowUniversalAccessFromFileURLs(true);
-        mraidController.setMraidView(this);
-        setWebViewClient(new MraidBridge(mraidController, adReadyListener));
         setDefaultWebChromeClient();
     }
 
@@ -55,37 +49,21 @@ public class MraidView extends WebView {
     }
 
     public void setIsViewable(boolean isViewable) {
-        loadCommand(BridgeCommandBuilder.mraidSetIsViewable(isViewable));
+        loadUrl(BridgeCommandBuilder.mraidSetIsViewable(isViewable));
     }
-
-    public void notifyReady() {
-        loadCommand(BridgeCommandBuilder.mraidNotifyReady());
-    }
-
-    public void notifyError() {
-        loadCommand(BridgeCommandBuilder.mraidNotifyError());
-    }
-
-    public void notifyStateChange() {
-        loadCommand(BridgeCommandBuilder.mraidNotifyStateChange());
-    }
-
     public void notifySizeChangeEvent(int width, int height) {
-        loadCommand(BridgeCommandBuilder.mraidNotifySizeChangeEvent(width, height));
+        loadUrl(BridgeCommandBuilder.mraidNotifySizeChangeEvent(width, height));
     }
-
-    public void onMraidCallComplete() {
-        loadCommand(BridgeCommandBuilder.mraidNativeCallComplete());
-    }
-
-    public void onLoopMeCallComplete() {
-        loadCommand(BridgeCommandBuilder.isNativeCallFinished(true));
-    }
+    public void notifyReady() { loadUrl(BridgeCommandBuilder.mraidNotifyReady()); }
+    public void notifyError() { loadUrl(BridgeCommandBuilder.mraidNotifyError()); }
+    public void notifyStateChange() { loadUrl(BridgeCommandBuilder.mraidNotifyStateChange()); }
+    public void onMraidCallComplete() { loadUrl(BridgeCommandBuilder.mraidNativeCallComplete()); }
+    public void onLoopMeCallComplete() { loadUrl(BridgeCommandBuilder.isNativeCallFinished(true)); }
 
     public void setState(String state) {
         if (!TextUtils.equals(mCurrentMraidState, state)) {
             mCurrentMraidState = state;
-            loadCommand(BridgeCommandBuilder.mraidSetState(state));
+            loadUrl(BridgeCommandBuilder.mraidSetState(state));
         }
     }
 
@@ -121,25 +99,19 @@ public class MraidView extends WebView {
         cookieManager.setAcceptThirdPartyCookies(this, true);
     }
 
-    public void setDefaultWebChromeClient() {
-        setWebChromeClient(new AdViewChromeClient());
-    }
-
-    private void tryRemoveFromParent() {
-        ViewParent parent = getParent();
-        if (parent != null)
-            ((ViewGroup) parent).removeView(this);
-    }
+    public void setDefaultWebChromeClient() { setWebChromeClient(new AdViewChromeClient()); }
 
     @Override
     public void destroy() {
-        tryRemoveFromParent();
+        ViewParent parent = getParent();
+        if (parent != null)
+            ((ViewGroup) parent).removeView(this);
         stopLoading();
         clearCache(true);
         clearHistory();
         setWebViewClient(null);
         setWebChromeClient(null);
-        loadCommand("about:blank");
+        loadUrl("about:blank");
         // This helps Omid to send sessionFinish js event when ad is about to be destroyed.
         new Handler(Looper.getMainLooper())
                 .postDelayed(super::destroy, com.loopme.om.OmidHelper.FINISH_AD_SESSION_DELAY_MILLIS);
@@ -150,11 +122,7 @@ public class MraidView extends WebView {
             return;
         }
         mViewState = webviewState;
-        loadCommand(BridgeCommandBuilder.webviewState(mViewState));
-    }
-
-    protected void loadCommand(String command) {
-        loadUrl(command);
+        loadUrl(BridgeCommandBuilder.webviewState(mViewState));
     }
 
     @Override
