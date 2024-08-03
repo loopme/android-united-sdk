@@ -15,7 +15,7 @@
             android:scaleType="centerCrop"
             android:src="@drawable/ad" />
 
-        <com.loopme.LoopMeBannerView
+        <FrameLayout
             android:id="@+id/video_ad_spot"
             android:layout_width="300dp"
             android:layout_height="250dp"

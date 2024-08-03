@@ -3,7 +3,7 @@
     android:layout_height="wrap_content"
     android:background="#ffffff">
 
-    <com.loopme.LoopMeBannerView
+    <FrameLayout
         android:id="@+id/loop_me_banner_view"
         android:layout_width="@dimen/banner_width"
         android:layout_height="@dimen/banner_height"

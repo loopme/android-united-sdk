@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -11,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.loopme.LoopMeBanner;
-import com.loopme.LoopMeBannerView;
 import com.loopme.banner_sample.R;
 import com.loopme.common.LoopMeError;
 
@@ -29,7 +29,7 @@ public class SimpleBannerFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        LoopMeBannerView containerView = view.findViewById(R.id.video_ad_spot);
+        FrameLayout containerView = view.findViewById(R.id.video_ad_spot);
         mBanner = LoopMeBanner.getInstance("3ae8c26803", getActivity());
         mBanner.bindView(containerView);
         mBanner.setListener(new LoopMeBanner.Listener() {
