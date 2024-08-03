@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -14,12 +15,10 @@ import com.loopme.LoopMeBannerView;
 import com.loopme.banner_sample.R;
 import com.loopme.common.LoopMeError;
 
-public class SimpleBannerFragment extends Fragment implements LoopMeBanner.Listener {
+public class SimpleBannerFragment extends Fragment {
     private LoopMeBanner mBanner;
 
-    public static SimpleBannerFragment newInstance() {
-        return new SimpleBannerFragment();
-    }
+    public static SimpleBannerFragment newInstance() { return new SimpleBannerFragment(); }
 
     @Nullable
     @Override
@@ -28,94 +27,49 @@ public class SimpleBannerFragment extends Fragment implements LoopMeBanner.Liste
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         LoopMeBannerView containerView = view.findViewById(R.id.video_ad_spot);
-        initBanner(containerView);
+        mBanner = LoopMeBanner.getInstance("3ae8c26803", getActivity());
+        mBanner.bindView(containerView);
+        mBanner.setListener(new LoopMeBanner.Listener() {
+            @Override
+            public void onLoopMeBannerLoadFail(LoopMeBanner loopMeBanner, LoopMeError loopMeError) {
+                Toast.makeText(getActivity(), "LoadFail: " + loopMeError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onLoopMeBannerLoadSuccess(LoopMeBanner loopMeBanner) { mBanner.show(); }
+            @Override
+            public void onLoopMeBannerShow(LoopMeBanner loopMeBanner) { }
+            @Override
+            public void onLoopMeBannerClicked(LoopMeBanner loopMeBanner) { }
+            @Override
+            public void onLoopMeBannerExpired(LoopMeBanner loopMeBanner) { }
+            @Override
+            public void onLoopMeBannerHide(LoopMeBanner loopMeBanner) { }
+            @Override
+            public void onLoopMeBannerLeaveApp(LoopMeBanner loopMeBanner) { }
+            @Override
+            public void onLoopMeBannerVideoDidReachEnd(LoopMeBanner loopMeBanner) { }
+        });
+        mBanner.setAutoLoading(false);
+        mBanner.load();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        resumeBanner();
+        mBanner.resume();
     }
-
     @Override
     public void onPause() {
         super.onPause();
-        pauseBanner();
+        mBanner.pause();
     }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        destroyBanner();
-    }
-
-    private void initBanner(LoopMeBannerView containerView) {
-        mBanner = LoopMeBanner.getInstance("3ae8c26803", getActivity());
-        mBanner.bindView(containerView);
-        mBanner.setListener(this);
-        mBanner.setAutoLoading(false);
-        mBanner.load();
-    }
-
-    private void destroyBanner() {
-        if (mBanner != null) {
-            mBanner.dismiss();
-            mBanner.destroy();
-        }
-    }
-
-    private void pauseBanner() {
-        if (mBanner != null) {
-            mBanner.pause();
-        }
-    }
-
-    private void resumeBanner() {
-        if (mBanner != null) {
-            mBanner.resume();
-        }
-    }
-
-    private void showBanner() {
-        if (mBanner != null) {
-            mBanner.show();
-        }
-    }
-
-    @Override
-    public void onLoopMeBannerLoadFail(LoopMeBanner loopMeBanner, LoopMeError loopMeError) {
-        Toast.makeText(getActivity(), "LoadFail: " + loopMeError.getMessage(), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onLoopMeBannerLoadSuccess(LoopMeBanner loopMeBanner) {
-        showBanner();
-    }
-
-    @Override
-    public void onLoopMeBannerShow(LoopMeBanner loopMeBanner) {
-    }
-
-    @Override
-    public void onLoopMeBannerClicked(LoopMeBanner loopMeBanner) {
-    }
-
-    @Override
-    public void onLoopMeBannerExpired(LoopMeBanner loopMeBanner) {
-    }
-
-    @Override
-    public void onLoopMeBannerHide(LoopMeBanner loopMeBanner) {
-    }
-
-    @Override
-    public void onLoopMeBannerLeaveApp(LoopMeBanner loopMeBanner) {
-    }
-
-    @Override
-    public void onLoopMeBannerVideoDidReachEnd(LoopMeBanner loopMeBanner) {
+        mBanner.dismiss();
+        mBanner.destroy();
     }
 }

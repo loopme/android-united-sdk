@@ -26,8 +26,6 @@ import java.util.List;
 class NativeVideoController {
 
     private static final String LOG_TAG = NativeVideoController.class.getSimpleName();
-
-    private static final int FIRST_POSITION = 0;
     private int mItemCount;
     private final Activity mActivity;
     private MinimizedMode mMinimizedMode;
@@ -39,7 +37,7 @@ class NativeVideoController {
     private DataChangeListener mDataChangeListener;
     private final AdChecker mAdChecker;
 
-    public NativeVideoController(@NonNull Activity activity, AdChecker checker) {
+    public NativeVideoController(@NonNull Activity activity, @NonNull AdChecker checker) {
         mActivity = activity;
         mAdChecker = checker;
         Utils.init(mActivity);
@@ -48,18 +46,17 @@ class NativeVideoController {
     public void refreshAdPlacement(int itemCount) {
         if (itemCount == 0) {
             destroyBannerMap();
-        } else if (itemCount < mItemCount) {
-            cleanAdMapBecauseOfNewListLength(itemCount);
+            return;
         }
-    }
-
-    private void cleanAdMapBecauseOfNewListLength(int newListLength) {
+        if (itemCount >= mItemCount) {
+            return;
+        }
         SparseArray<LoopMeBanner> cloneMap = mAdsMap.clone();
         mAdsMap.clear();
         for (int i = 0; i < cloneMap.size(); i++) {
             int key = cloneMap.keyAt(i);
             LoopMeBanner banner = cloneMap.get(key);
-            if (key <= newListLength) {
+            if (key <= itemCount) {
                 mAdsMap.put(key, banner);
             } else {
                 banner.destroy();
@@ -67,12 +64,13 @@ class NativeVideoController {
         }
     }
 
-    public void onResume(RecyclerView recyclerView) {
-        onScroll(recyclerView);
-    }
+    public void onResume(RecyclerView recyclerView) { onScroll(recyclerView); }
 
     public void onPause() {
-        pauseBanners();
+        for (int i = 0; i < mAdsMap.size(); i++) {
+            LoopMeBanner banner = mAdsMap.valueAt(i);
+            if (banner != null) banner.pause();
+        }
     }
 
     public void destroy() {
@@ -88,21 +86,13 @@ class NativeVideoController {
         mAppKeysMap.put(position, appKey);
     }
 
-    public void setViewBinder(NativeVideoBinder binder) {
-        mNativeBinder = binder;
-    }
+    public void setViewBinder(NativeVideoBinder binder) { mNativeBinder = binder; }
 
-    public void setListener(LoopMeBanner.Listener listener) {
-        mAdListener = listener;
-    }
+    public void setListener(LoopMeBanner.Listener listener) { mAdListener = listener; }
 
-    public LoopMeBanner getNativeVideoAd(int position) {
-        return mAdsMap.get(position);
-    }
+    public LoopMeBanner getNativeVideoAd(int position) { return mAdsMap.get(position); }
 
-    protected int getAdsCount() {
-        return mAdsMap.size();
-    }
+    protected int getAdsCount() { return mAdsMap.size(); }
 
     protected View getAdView(LayoutInflater inflater, int position) {
         Logging.out(LOG_TAG, "getAdView");
@@ -114,7 +104,12 @@ class NativeVideoController {
 
         if (mNativeBinder != null) {
             view = inflater.inflate(mNativeBinder.getLayout(), null, false);
-            bindDataToView(view, mNativeBinder, position);
+            Logging.out(LOG_TAG, "bindDataToView");
+            LoopMeBannerView video = view.findViewById(mNativeBinder.getBannerViewId());
+            int index = mAdsMap.indexOfKey(position);
+            LoopMeBanner banner = mAdsMap.valueAt(index);
+            banner.bindView(video);
+            banner.showNativeVideo();
         } else {
             Logging.out(LOG_TAG, "Error: NativeVideoBinder is null. Init and bind it");
             view = null;
@@ -124,46 +119,37 @@ class NativeVideoController {
         return view;
     }
 
-    private void bindDataToView(View row, NativeVideoBinder binder, final int position) {
-        Logging.out(LOG_TAG, "bindDataToView");
-        LoopMeBannerView video = row.findViewById(binder.getBannerViewId());
-        int index = mAdsMap.indexOfKey(position);
-        LoopMeBanner banner = mAdsMap.valueAt(index);
-        banner.bindView(video);
-        banner.showNativeVideo();
-    }
-
     public void loadAds(final int itemsCount, DataChangeListener listener) {
         mDataChangeListener = listener;
         mItemCount = itemsCount;
-
         if (mAppKeysMap.size() == 0) {
             HashMap<String, String> errorInfo = new HashMap<>();
             errorInfo.put(ERROR_MSG, "No ads added for loading");
             LoopMeTracker.post(errorInfo);
-        } else {
-            initBanners();
+            return;
+        }
+        LoopMeBanner.Listener bannerListener = initBannerListener();
+        for (int i = 0; i < mAppKeysMap.size(); i++) {
+            String appKey = mAppKeysMap.valueAt(i);
+            LoopMeBanner banner = LoopMeBanner.getInstance(appKey, mActivity);
+            banner.setListener(bannerListener);
+            banner.setAutoLoading(false);
+            banner.load();
         }
     }
 
     private void addItem(LoopMeBanner banner, int itemsCount) {
         int indexOfValue = mAppKeysMap.indexOfValue(banner.getAppKey());
-        if (isValidIndex(indexOfValue)) {
-            int key = mAppKeysMap.keyAt(indexOfValue);
-            if (key < itemsCount + getAdsCount()) {
-                mAdsMap.put(key, banner);
-                onDataSetChanged();
-            }
+        boolean isValidIndex = indexOfValue >= 0 && indexOfValue < mAppKeysMap.size();
+        if (!isValidIndex) {
+            return;
         }
-    }
-
-    private boolean isValidIndex(int indexOfValue) {
-        return indexOfValue >= 0 && indexOfValue < mAppKeysMap.size();
-    }
-
-    private void onDataSetChanged() {
-        if (mDataChangeListener != null) {
-            mDataChangeListener.onDataSetChanged();
+        int key = mAppKeysMap.keyAt(indexOfValue);
+        if (key < itemsCount + getAdsCount()) {
+            mAdsMap.put(key, banner);
+            if (mDataChangeListener != null) {
+                mDataChangeListener.onDataSetChanged();
+            }
         }
     }
 
@@ -217,129 +203,67 @@ class NativeVideoController {
     }
 
     public void onScroll(RecyclerView recyclerView) {
-        if (recyclerView != null && mAdsMap.size() >= 0) {
-            int[] positions = getPositionsOnScreen(recyclerView);
-            if (isPositionsArrayValid(positions)) {
-                checkAdMapVisibility(positions, recyclerView);
-            }
+        if (recyclerView == null || mAdsMap.size() <= 0) {
+            return;
         }
-    }
-
-    private void checkAdMapVisibility(int[] positions, RecyclerView recyclerView) {
+        int[] positions = getPositionsOnScreen(recyclerView);
+        boolean isPositionsArrayValid = positions[0] != -1 && positions[1] != -1;
+        if (!isPositionsArrayValid) {
+            return;
+        }
         for (int i = 0; i < mAdsMap.size(); i++) {
             int adIndex = mAdsMap.keyAt(i);
-            if (isAd(adIndex) && !isInFullScreen(adIndex)) {
-                checkAdVisibility(adIndex, positions, recyclerView);
+            if (mAdChecker.isAd(adIndex) && !mAdsMap.get(adIndex).isFullScreenMode()) {
+                boolean isAdOnTheScreen = positions[0] <= adIndex && adIndex <= positions[1];
+                if (isAdOnTheScreen) {
+                    handleAdOnScreen(adIndex, recyclerView);
+                } else {
+                    handleAdOutOfScreen(mAdsMap.get(adIndex));
+                }
             }
         }
-    }
-
-    private boolean isAd(int adIndex) {
-        return mAdChecker != null && mAdChecker.isAd(adIndex);
-    }
-
-    private void checkAdVisibility(int adIndex, int[] positions, RecyclerView recyclerView) {
-        int first = positions[0];
-        int last = positions[1];
-
-        LoopMeBanner banner = mAdsMap.get(adIndex);
-
-        if (isAdOnTheScreen(adIndex, first, last)) {
-            handleAdOnScreen(adIndex, recyclerView);
-        } else {
-            handleAdOutOfScreen(banner);
-        }
-    }
-
-    private boolean isAdOnTheScreen(int adIndex, int first, int last) {
-        return first <= adIndex && adIndex <= last;
-    }
-
-    private boolean isInFullScreen(int adIndex) {
-        return mAdsMap.get(adIndex).isFullScreenMode();
     }
 
     private void handleAdOnScreen(final int adIndex, RecyclerView recyclerView) {
         NativeVideoRecyclerAdapter.NativeVideoViewHolder viewHolder =
                 (NativeVideoRecyclerAdapter.NativeVideoViewHolder)
                         recyclerView.findViewHolderForAdapterPosition(adIndex);
-
-        checkFiftyPercentVisibility(viewHolder.getView(), adIndex);
-    }
-
-    private void checkFiftyPercentVisibility(final View view, final int adIndex) {
-        ViewAbilityUtils.calculateViewAbilitySyncDelayed(view, info -> onVisibilityResult(info, adIndex));
-    }
-
-    private void onVisibilityResult(ViewAbilityUtils.ViewAbilityInfo info, int adIndex) {
-        LoopMeBanner banner = mAdsMap.get(adIndex);
-        if (info.isVisibleMore50Percents()) {
-            Logging.out(LOG_TAG, "visible more than 50%");
-            banner.switchToNormalMode();
-            resumeBanner(banner);
-        } else {
-            Logging.out(LOG_TAG, "visible less than 50%");
-            handleAdOutOfScreen(banner);
-        }
+        View view = viewHolder.getView();
+        ViewAbilityUtils.calculateViewAbilitySyncDelayed(view, info -> {
+            LoopMeBanner banner = mAdsMap.get(adIndex);
+            if (info.isVisibleMore50Percents()) {
+                Logging.out(LOG_TAG, "visible more than 50%");
+                banner.switchToNormalMode();
+                banner.resume();
+            } else {
+                Logging.out(LOG_TAG, "visible less than 50%");
+                handleAdOutOfScreen(banner);
+            }
+        });
     }
 
     private void handleAdOutOfScreen(LoopMeBanner banner) {
+        if (banner == null) {
+            return;
+        }
         if (mAdsMap.size() == 1) {
-            switchToMinimizedMode(banner);
+            banner.switchToMinimizedMode();
         } else {
-            pauseBanner(banner);
+            banner.pause();
         }
     }
 
     private void destroyBannerMap() {
         for (int i = 0; i < mAdsMap.size(); i++) {
             LoopMeBanner banner = mAdsMap.valueAt(i);
-            if (banner != null) {
-                banner.destroy();
-            }
+            if (banner != null) banner.destroy();
         }
         mAdsMap.clear();
     }
 
-    private void pauseBanners() {
-        for (int i = 0; i < mAdsMap.size(); i++) {
-            LoopMeBanner banner = mAdsMap.valueAt(i);
-            pauseBanner(banner);
-        }
-    }
-
-    private void initBanners() {
-        LoopMeBanner.Listener bannerListener = initBannerListener();
-        for (int i = 0; i < mAppKeysMap.size(); i++) {
-            String appKey = mAppKeysMap.valueAt(i);
-            LoopMeBanner banner = LoopMeBanner.getInstance(appKey, mActivity);
-            banner.setListener(bannerListener);
-            banner.setAutoLoading(false);
-            banner.load();
-        }
-    }
-
-    private void switchToMinimizedMode(LoopMeBanner banner) {
-        if (banner != null) {
-            banner.switchToMinimizedMode();
-        }
-    }
-
-    private void pauseBanner(LoopMeBanner banner) {
-        if (banner != null) {
-            banner.pause();
-        }
-    }
-
-    private void resumeBanner(LoopMeBanner banner) {
-        if (banner != null) {
-            banner.resume();
-        }
-    }
-
     public void setMinimizedMode(MinimizedMode mode) {
         mMinimizedMode = mode;
-        mMinimizedMode.setPosition(mAppKeysMap.keyAt(FIRST_POSITION));
+        mMinimizedMode.setPosition(mAppKeysMap.keyAt(0));
     }
 
     private LoopMeBanner.Listener initBannerListener() {
@@ -352,39 +276,21 @@ class NativeVideoController {
                     mAdListener.onLoopMeBannerLoadSuccess(banner);
                 }
             }
-
             @Override
-            public void onLoopMeBannerLoadFail(LoopMeBanner banner, LoopMeError error) {
-            }
-
+            public void onLoopMeBannerLoadFail(LoopMeBanner banner, LoopMeError error) { }
             @Override
-            public void onLoopMeBannerShow(LoopMeBanner banner) {
-            }
-
+            public void onLoopMeBannerShow(LoopMeBanner banner) { }
             @Override
-            public void onLoopMeBannerHide(LoopMeBanner banner) {
-            }
-
+            public void onLoopMeBannerHide(LoopMeBanner banner) { }
             @Override
-            public void onLoopMeBannerClicked(LoopMeBanner banner) {
-            }
-
+            public void onLoopMeBannerClicked(LoopMeBanner banner) { }
             @Override
-            public void onLoopMeBannerLeaveApp(LoopMeBanner banner) {
-            }
-
+            public void onLoopMeBannerLeaveApp(LoopMeBanner banner) { }
             @Override
-            public void onLoopMeBannerVideoDidReachEnd(LoopMeBanner banner) {
-            }
-
+            public void onLoopMeBannerVideoDidReachEnd(LoopMeBanner banner) { }
             @Override
-            public void onLoopMeBannerExpired(LoopMeBanner banner) {
-            }
+            public void onLoopMeBannerExpired(LoopMeBanner banner) { }
         };
-    }
-
-    private boolean isPositionsArrayValid(int[] positions) {
-        return positions[0] != -1 && positions[1] != -1;
     }
 
     public interface DataChangeListener {
