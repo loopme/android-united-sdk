@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -105,7 +106,7 @@ class NativeVideoController {
         if (mNativeBinder != null) {
             view = inflater.inflate(mNativeBinder.getLayout(), null, false);
             Logging.out(LOG_TAG, "bindDataToView");
-            LoopMeBannerView video = view.findViewById(mNativeBinder.getBannerViewId());
+            FrameLayout video = view.findViewById(mNativeBinder.getBannerViewId());
             int index = mAdsMap.indexOfKey(position);
             LoopMeBanner banner = mAdsMap.valueAt(index);
             banner.bindView(video);
