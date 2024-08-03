@@ -3,6 +3,7 @@ package com.loopme;
 import android.app.Activity;
 import android.content.Context;
 import android.os.CountDownTimer;
+import android.util.Log;
 
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
@@ -24,8 +25,8 @@ public abstract class AdWrapper extends AdConfig {
     private int mShowCounter;
 
     public AdWrapper(Activity activity, String appKey) {
-        this.mActivity = activity;
-        this.mAppKey = appKey;
+        mActivity = activity;
+        mAppKey = appKey;
     }
 
     public abstract Constants.AdFormat getAdFormat();
@@ -33,9 +34,8 @@ public abstract class AdWrapper extends AdConfig {
     public abstract void onAutoLoadPaused();
 
     public void load(IntegrationType integrationType) {
-        if (mFirstLoopMeAd != null && mSecondLoopMeAd != null) {
+        if (mFirstLoopMeAd != null) {
             mFirstLoopMeAd.setIntegrationType(integrationType);
-            mSecondLoopMeAd.setIntegrationType(integrationType);
         }
         load();
     }
@@ -53,21 +53,21 @@ public abstract class AdWrapper extends AdConfig {
         }
         if (isReady(mFirstLoopMeAd)) {
             show(mFirstLoopMeAd);
-        } else if (isReady(mSecondLoopMeAd)) {
-            show(mSecondLoopMeAd);
         } else {
             postShowMissedEvent();
         }
     }
 
     public void pause() {
-        pause(mFirstLoopMeAd);
-        pause(mSecondLoopMeAd);
+        if (mFirstLoopMeAd != null) {
+            mFirstLoopMeAd.pause();
+        }
     }
 
     public void resume() {
-        resume(mFirstLoopMeAd);
-        resume(mSecondLoopMeAd);
+        if (mFirstLoopMeAd != null) {
+            mFirstLoopMeAd.resume();
+        }
     }
 
     /**
@@ -78,7 +78,7 @@ public abstract class AdWrapper extends AdConfig {
      * in this case it requires next `load` method triggering
      */
     public boolean isReady() {
-        return isReady(mFirstLoopMeAd) || isReady(mSecondLoopMeAd);
+        return isReady(mFirstLoopMeAd);
     }
 
     /**
@@ -89,7 +89,7 @@ public abstract class AdWrapper extends AdConfig {
      * false - if ad absent on scrren
      */
     public boolean isShowing() {
-        return isShowing(mFirstLoopMeAd) || isShowing(mSecondLoopMeAd);
+        return isShowing(mFirstLoopMeAd);
     }
 
     /**
@@ -100,7 +100,7 @@ public abstract class AdWrapper extends AdConfig {
      * false - if ad is not loading now
      */
     public boolean isLoading() {
-        return isLoading(mFirstLoopMeAd) || isLoading(mSecondLoopMeAd);
+        return mFirstLoopMeAd != null && mFirstLoopMeAd.isLoading();
     }
 
     /**
@@ -113,44 +113,37 @@ public abstract class AdWrapper extends AdConfig {
      */
     public void dismiss() {
         dismiss(mFirstLoopMeAd);
-        dismiss(mSecondLoopMeAd);
     }
 
     /**
      * NOTE: should be in UI thread
      */
     public void destroy() {
-        destroy(mFirstLoopMeAd);
-        destroy(mSecondLoopMeAd);
+        if (mFirstLoopMeAd != null) {
+            mFirstLoopMeAd.removeListener();
+            mFirstLoopMeAd.destroy();
+        }
         stopSleepLoadTimer();
     }
 
     public void removeListener() {
-        removeListener(mFirstLoopMeAd);
-        removeListener(mSecondLoopMeAd);
-    }
-
-
-    private void removeListener(LoopMeAd loopMeAd) {
-        if (loopMeAd != null) {
-            loopMeAd.removeListener();
+        if (mFirstLoopMeAd != null) {
+            mFirstLoopMeAd.removeListener();
         }
     }
 
     protected void reload(LoopMeAd loopMeAd) {
         if (isAutoLoadingEnabled()) {
-            if (!isReady(mFirstLoopMeAd) && !isLoading(mFirstLoopMeAd)) {
+            boolean isLoading = mFirstLoopMeAd != null && mFirstLoopMeAd.isLoading();
+            if (!isReady(mFirstLoopMeAd) && !isLoading) {
                 load(mFirstLoopMeAd);
-            }
-            if (!isReady(mSecondLoopMeAd) && !isLoading(mSecondLoopMeAd)) {
-                load(mSecondLoopMeAd);
             }
         }
     }
 
     protected void stopSleepLoadTimer() {
         if (mSleepLoadTimer != null) {
-            Logging.out(LOG_TAG, "Stop sleep timer");
+            Log.d(LOG_TAG, "Stop sleep timer");
             mSleepLoadTimer.cancel();
             mSleepLoadTimer = null;
         }
@@ -162,7 +155,17 @@ public abstract class AdWrapper extends AdConfig {
         if (mSleepLoadTimer != null) {
             return;
         }
-        mSleepLoadTimer = initSleepLoadTimer();
+        mSleepLoadTimer = new CountDownTimer(Constants.SLEEP_TIME, Constants.ONE_MINUTE_IN_MILLIS) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Logging.out(LOG_TAG, "Till next attempt: " + millisUntilFinished / Constants.ONE_MINUTE_IN_MILLIS + " min.");
+            }
+            @Override
+            public void onFinish() {
+                stopSleepLoadTimer();
+                load();
+            }
+        };
         float sleepTimeout = (float) Constants.SLEEP_TIME / Constants.ONE_MINUTE_IN_MILLIS;
         Logging.out(LOG_TAG, "Sleep timeout: " + sleepTimeout + " minutes");
         mSleepLoadTimer.start();
@@ -182,63 +185,32 @@ public abstract class AdWrapper extends AdConfig {
         }
     }
 
-    private CountDownTimer initSleepLoadTimer() {
-        return new CountDownTimer(Constants.SLEEP_TIME, Constants.ONE_MINUTE_IN_MILLIS) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                Logging.out(LOG_TAG, "Till next attempt: " + millisUntilFinished / Constants.ONE_MINUTE_IN_MILLIS + " min.");
-            }
-
-            @Override
-            public void onFinish() {
-                stopSleepLoadTimer();
-                load();
-            }
-        };
-    }
-
-    private void pause(LoopMeAd loopMeAd) {
-        if (loopMeAd != null) {
-            loopMeAd.pause();
-        }
-    }
-
-    private void resume(LoopMeAd loopMeAd) {
-        if (loopMeAd != null) {
-            loopMeAd.resume();
-        }
-    }
-
-    private void destroy(LoopMeAd loopMeAd) {
-        if (loopMeAd != null) {
-            loopMeAd.removeListener();
-            loopMeAd.destroy();
-        }
-    }
-
     public void load() {
-        if (isAutoLoadingPaused()) {
+        if (isAutoLoadingEnabled() && mIsAutoLoadingPaused) {
             onAutoLoadPaused();
             return;
         }
         stopSleepLoadTimer();
         load(mFirstLoopMeAd);
-        if (isAutoLoadingEnabled()) {
-            load(mSecondLoopMeAd);
-        }
     }
 
     protected void load(LoopMeAd loopMeAd) {
-        if (loopMeAd != null) {
-            loopMeAd.load();
-            onLoad();
+        if (loopMeAd == null) {
+            return;
         }
+        loopMeAd.load();
+        mStartLoadingTime = System.currentTimeMillis();
+        mLoadingCounter++;
     }
 
     protected void show(LoopMeAd loopMeAd) {
-        if (loopMeAd != null) {
-            loopMeAd.show();
-            onShow();
+        if (loopMeAd == null) {
+            return;
+        }
+        loopMeAd.show();
+        if (mLoadingCounter != mShowCounter) {
+            LoopMeTracker.postDebugEvent(Params.SDK_SHOW, getPassedTime());
+            mShowCounter++;
         }
     }
 
@@ -256,78 +228,38 @@ public abstract class AdWrapper extends AdConfig {
         return loopMeAd != null && loopMeAd.isShowing();
     }
 
-    private boolean isLoading(LoopMeAd loopMeAd) {
-        return loopMeAd != null && loopMeAd.isLoading();
-    }
-
     /**
      * The appKey uniquely identifies your app to the LoopMe ad network.
      * To get an appKey visit the LoopMe Dashboard.
      */
-    public String getAppKey() {
-        return mAppKey;
-    }
+    public String getAppKey() { return mAppKey; }
 
-    public Context getContext() {
-        return mActivity;
-    }
+    public Context getContext() { return mActivity; }
 
-    private boolean isAutoLoadingPaused() {
-        return isAutoLoadingEnabled() && mIsAutoLoadingPaused;
-    }
-
-    public void resetFailCounter() {
-        mFailCounter = 0;
-    }
+    public void resetFailCounter() { mFailCounter = 0; }
 
     public LoopMeError getAutoLoadingPausedError() {
         return new LoopMeError("Paused by auto loading");
     }
 
     protected void postShowMissedEvent() {
-        if (isNeedSendMissedEvent()) {
+        boolean isNeedSendMissedEvent = mLoadingCounter != mShowMissedCounter;
+        if (isNeedSendMissedEvent) {
             LoopMeTracker.postDebugEvent(Params.SDK_MISSED, getPassedTime());
             mShowMissedCounter++;
         }
     }
 
-    private void onShow() {
-        if (isNeedSendShowEvent()) {
-            LoopMeTracker.postDebugEvent(Params.SDK_SHOW, getPassedTime());
-            mShowCounter++;
-        }
-    }
-
-    protected void onLoadedSuccess() {
-        LoopMeTracker.postDebugEvent(Params.SDK_READY, getPassedTime());
-    }
+    protected void onLoadedSuccess() { LoopMeTracker.postDebugEvent(Params.SDK_READY, getPassedTime()); }
 
     protected void onLoadFail() {
-        resetCounters();
-    }
-
-    private void resetCounters() {
         mLoadingCounter = 0;
         mShowCounter = 0;
         mShowMissedCounter = 0;
     }
 
-
-    private void onLoad() {
-        mStartLoadingTime = System.currentTimeMillis();
-        mLoadingCounter++;
-    }
-
     protected String getPassedTime() {
-        double time = (double) (System.currentTimeMillis() - mStartLoadingTime) / 1000;
-        return new DecimalFormat("0.00").format(time);
-    }
-
-    private boolean isNeedSendMissedEvent() {
-        return mLoadingCounter != mShowMissedCounter;
-    }
-
-    private boolean isNeedSendShowEvent() {
-        return mLoadingCounter != mShowCounter;
+        return new DecimalFormat("0.00")
+            .format((double) (System.currentTimeMillis() - mStartLoadingTime) / 1000);
     }
 }

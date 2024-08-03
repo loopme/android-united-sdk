@@ -3,6 +3,7 @@ package com.loopme;
 import static com.loopme.debugging.Params.ERROR_MSG;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -43,21 +44,13 @@ public class LoopMeBannerGeneral extends LoopMeAd {
     }
 
     public interface Listener {
-
         void onLoopMeBannerLoadSuccess(LoopMeBannerGeneral banner);
-
         void onLoopMeBannerLoadFail(LoopMeBannerGeneral banner, LoopMeError error);
-
         void onLoopMeBannerShow(LoopMeBannerGeneral banner);
-
         void onLoopMeBannerHide(LoopMeBannerGeneral banner);
-
         void onLoopMeBannerClicked(LoopMeBannerGeneral banner);
-
         void onLoopMeBannerLeaveApp(LoopMeBannerGeneral banner);
-
         void onLoopMeBannerVideoDidReachEnd(LoopMeBannerGeneral banner);
-
         void onLoopMeBannerExpired(LoopMeBannerGeneral banner);
     }
 
@@ -131,7 +124,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
     }
 
     void showNativeVideo() {
-        if (isPrepared()) {
+        if (isReady() && isViewBinded() && !isShowing()) {
             showInternal();
             Logging.out(LOG_TAG, "Banner did start showing ad (native)");
         } else {
@@ -143,7 +136,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
 
     @Override
     public void show() {
-        if (isPrepared()) {
+        if (isReady() && isViewBinded() && !isShowing()) {
             showInternal();
             getDisplayController().postImpression();
             if (isLoopMeAd() || isMraidAd()) {
@@ -157,17 +150,17 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         }
     }
 
-    private boolean isPrepared() {
-        return isReady() && isViewBinded() && !isShowing();
-    }
-
     private void showInternal() {
         setAdState(Constants.AdState.SHOWING);
         stopTimer(TimersType.EXPIRATION_TIMER);
         mContainerView = mBannerView;
         buildAdView();
         mBannerView.setVisibility(View.VISIBLE);
-        onLoopMeBannerShow();
+        mIsVideoFinished = false;
+        if (mAdListener != null) {
+            mAdListener.onLoopMeBannerShow(this);
+        }
+        Logging.out(LOG_TAG, "Ad appeared on screen");
     }
 
     @Override
@@ -180,7 +173,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
     }
 
     public void switchToMinimizedMode() {
-        if (isLoopMeBannerShowing() && isVideoNotFinished()) {
+        if (isLoopMeController() && isShowing() && !mIsVideoFinished) {
             DisplayControllerLoopMe displayControllerLoopMe = (DisplayControllerLoopMe) getDisplayController();
             if (displayControllerLoopMe.isMinimizedModeEnable()) {
                 displayControllerLoopMe.switchToMinimizedMode();
@@ -190,20 +183,8 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         }
     }
 
-    private boolean isLoopMeBannerShowing() {
-        return isLoopMeController() && isShowing();
-    }
-
-    private boolean isVideoNotFinished() {
-        return !mIsVideoFinished;
-    }
-
     private boolean isLoopMeController() {
         return getDisplayController() instanceof DisplayControllerLoopMe;
-    }
-
-    public void playbackFinishedWithError() {
-        mIsVideoFinished = true;
     }
 
     public void switchToNormalMode() {
@@ -225,31 +206,30 @@ public class LoopMeBannerGeneral extends LoopMeAd {
             return new AdSpotDimensions(width, height);
         }
         return new AdSpotDimensions(0, 0);
-
     }
 
     /**
-     * Triggered when banner ad failed to load ad content
-     *
-     * @param error - error of unsuccesful ad loading attempt
+     * Triggered when the banner's loaded ad content is expired.
+     * Expiration happens when loaded ad content wasn't displayed during some period of time, approximately one hour.
+     * Once the banner is presented on the screen, the expiration is no longer tracked and banner won't
+     * receive this message
      */
-    private void onLoopMeBannerLoadFail(final LoopMeError error) {
-        stopTimer(TimersType.FETCHER_TIMER);
+    @Override
+    public void onAdExpired() {
         setReady(false);
         setAdState(Constants.AdState.NONE);
         destroyDisplayController();
         if (mAdListener != null) {
-            mAdListener.onLoopMeBannerLoadFail(this, error);
-        } else {
-            Logging.out(LOG_TAG, "Warning: empty listener");
+            mAdListener.onLoopMeBannerExpired(this);
         }
-        Logging.out(LOG_TAG, "Ad fails to load: " + error.getMessage());
+        Logging.out(LOG_TAG, "Ad content is expired");
     }
 
     /**
      * Triggered when the banner has successfully loaded the ad content
      */
-    private void onLoopMeBannerSuccessLoad() {
+    @Override
+    public void onAdLoadSuccess() {
         stopTimer(TimersType.FETCHER_TIMER);
         long currentTime = System.currentTimeMillis();
         long loadingTime = currentTime - mStartLoadingTime;
@@ -264,92 +244,6 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         Logging.out(LOG_TAG, "Ad successfully loaded (" + loadingTime + "ms)");
     }
 
-    /**
-     * Triggered when the banner ad appears on the screen
-     */
-    private void onLoopMeBannerShow() {
-        mIsVideoFinished = false;
-        if (mAdListener != null) {
-            mAdListener.onLoopMeBannerShow(this);
-        }
-        Logging.out(LOG_TAG, "Ad appeared on screen");
-    }
-
-    /**
-     * Triggered when the banner ad disappears on the screen
-     */
-    private void onLoopMeBannerHide() {
-        setReady(false);
-        setAdState(Constants.AdState.NONE);
-        destroyDisplayController();
-        if (mAdListener != null) {
-            mAdListener.onLoopMeBannerHide(this);
-        }
-        Logging.out(LOG_TAG, "Ad disappeared from screen");
-    }
-
-    /**
-     * Triggered when the user taps the banner ad and the banner is about to perform extra actions
-     * Those actions may lead to displaying a modal browser or leaving your application.
-     */
-    void onLoopMeBannerClicked() {
-        if (mAdListener != null) {
-            mAdListener.onLoopMeBannerClicked(this);
-        }
-        Logging.out(LOG_TAG, "Ad received click event");
-    }
-
-    /**
-     * Triggered when your application is about to go to the background, initiated by the SDK.
-     * This may happen in various ways, f.e if user wants open the SDK's browser web page in native browser or clicks
-     * on `mailto:` links...
-     */
-    void onLoopMeBannerLeaveApp() {
-        if (mAdListener != null) {
-            mAdListener.onLoopMeBannerLeaveApp(LoopMeBannerGeneral.this);
-        }
-        Logging.out(LOG_TAG, "Leaving application");
-    }
-
-    /**
-     * Triggered only when banner's video was played until the end.
-     * It won't be sent if the video was skipped or the banner was dissmissed during the displaying process
-     */
-    private void onLoopMeBannerVideoDidReachEnd() {
-        mIsVideoFinished = true;
-        switchToNormalMode();
-        if (mAdListener != null) {
-            mAdListener.onLoopMeBannerVideoDidReachEnd(this);
-        }
-        Logging.out(LOG_TAG, "Video did reach end");
-    }
-
-    /**
-     * Triggered when the banner's loaded ad content is expired.
-     * Expiration happens when loaded ad content wasn't displayed during some period of time, approximately one hour.
-     * Once the banner is presented on the screen, the expiration is no longer tracked and banner won't
-     * receive this message
-     */
-    private void onLoopMeBannerExpired() {
-        setReady(false);
-        setAdState(Constants.AdState.NONE);
-        destroyDisplayController();
-        if (mAdListener != null) {
-            mAdListener.onLoopMeBannerExpired(this);
-        }
-        Logging.out(LOG_TAG, "Ad content is expired");
-    }
-
-    @Override
-    public void onAdExpired() {
-        onLoopMeBannerExpired();
-    }
-
-    @Override
-    public void onAdLoadSuccess() {
-        onLoopMeBannerSuccessLoad();
-    }
-
     @Override
     public void onAdAlreadyLoaded() {
         if (mAdListener != null) {
@@ -359,48 +253,86 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         }
     }
 
+    /**
+     * Triggered when banner ad failed to load ad content
+     *
+     * @param error - error of unsuccesful ad loading attempt
+     */
     @Override
     public void onAdLoadFail(final LoopMeError error) {
-        mHandler.post(() -> onLoopMeBannerLoadFail(error));
+        mHandler.post(() -> {
+            stopTimer(TimersType.FETCHER_TIMER);
+            setReady(false);
+            setAdState(Constants.AdState.NONE);
+            destroyDisplayController();
+            if (mAdListener != null) {
+                mAdListener.onLoopMeBannerLoadFail(this, error);
+            } else {
+                Logging.out(LOG_TAG, "Warning: empty listener");
+            }
+            Logging.out(LOG_TAG, "Ad fails to load: " + error.getMessage());
+        });
     }
 
+    /**
+     * Triggered when your application is about to go to the background, initiated by the SDK.
+     * This may happen in various ways, f.e if user wants open the SDK's browser web page in native browser or clicks
+     * on `mailto:` links...
+     */
     @Override
     public void onAdLeaveApp() {
-        onLoopMeBannerLeaveApp();
+        if (mAdListener != null) {
+            mAdListener.onLoopMeBannerLeaveApp(LoopMeBannerGeneral.this);
+        }
+        Logging.out(LOG_TAG, "Leaving application");
     }
 
+    /**
+     * Triggered when the user taps the banner ad and the banner is about to perform extra actions
+     * Those actions may lead to displaying a modal browser or leaving your application.
+     */
     @Override
     public void onAdClicked() {
-        onLoopMeBannerClicked();
+        if (mAdListener != null) {
+            mAdListener.onLoopMeBannerClicked(this);
+        }
+        Logging.out(LOG_TAG, "Ad received click event");
     }
 
+    /**
+     * Triggered only when banner's video was played until the end.
+     * It won't be sent if the video was skipped or the banner was dissmissed during the displaying process
+     */
     @Override
     public void onAdVideoDidReachEnd() {
-        onLoopMeBannerVideoDidReachEnd();
+        mIsVideoFinished = true;
+        switchToNormalMode();
+        if (mAdListener != null) {
+            mAdListener.onLoopMeBannerVideoDidReachEnd(this);
+        }
+        Logging.out(LOG_TAG, "Video did reach end");
     }
 
     @Override
     public void dismiss() {
         Logging.out(LOG_TAG, "Banner will be dismissed");
         if (isShowing() || isNoneState()) {
-            dismissController();
-            destroyBannerView();
-            onLoopMeBannerHide();
+            if (mDisplayController instanceof DisplayControllerLoopMe) {
+                ((DisplayControllerLoopMe) mDisplayController).dismiss();
+            }
+            if (mBannerView != null) {
+                mBannerView.setVisibility(View.GONE);
+                mBannerView.removeAllViews();
+            }
+            setReady(false);
+            setAdState(Constants.AdState.NONE);
+            destroyDisplayController();
+            if (mAdListener != null) {
+                mAdListener.onLoopMeBannerHide(this);
+            }
+            Log.d(LOG_TAG, "Ad disappeared from screen");
         } else {
-            Logging.out(LOG_TAG, "Can't dismiss ad, it's not displaying");
-        }
-    }
-
-    private void dismissController() {
-        if (mDisplayController instanceof DisplayControllerLoopMe) {
-            ((DisplayControllerLoopMe) mDisplayController).dismiss();
-        }
-    }
-
-    private void destroyBannerView() {
-        if (mBannerView != null) {
-            mBannerView.setVisibility(View.GONE);
-            mBannerView.removeAllViews();
+            Log.d(LOG_TAG, "Can't dismiss ad, it's not displaying");
         }
     }
 }
