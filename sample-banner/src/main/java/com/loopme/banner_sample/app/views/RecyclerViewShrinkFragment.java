@@ -45,7 +45,7 @@ public class RecyclerViewShrinkFragment extends Fragment implements LoopMeBanner
         CustomRecyclerViewAdapter adapter = new CustomRecyclerViewAdapter(getContext(), DataProvider.getCustomListItem());
 
         mNativeVideoRecyclerAdapter = new NativeVideoRecyclerAdapter(adapter, getActivity(), recyclerView);
-        mNativeVideoRecyclerAdapter.putAdWithAppKeyToPosition(LoopMeBanner.TEST_MPU_BANNER, POSITION_IN_LIST);
+        mNativeVideoRecyclerAdapter.putAdWithAppKeyToPosition("f5826542ae", POSITION_IN_LIST);
         NativeVideoBinder binder = new NativeVideoBinder.Builder(R.layout.ad_banner_view)
                 .setLoopMeBannerViewId(R.id.loop_me_banner_view)
                 .build();

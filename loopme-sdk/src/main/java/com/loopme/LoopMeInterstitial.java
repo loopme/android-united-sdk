@@ -21,10 +21,6 @@ public final class LoopMeInterstitial extends AdWrapper {
     private static final String LOG_TAG = LoopMeInterstitial.class.getSimpleName();
     private Listener mMainAdListener;
 
-    private LoopMeInterstitial() {
-        super(null, null);
-    }
-
     /**
      * Creates new `LoopMeInterstitial` object with the given appKey
      *
@@ -35,9 +31,6 @@ public final class LoopMeInterstitial extends AdWrapper {
     private LoopMeInterstitial(Activity activity, String appKey) {
         super(activity, appKey);
         mFirstLoopMeAd = LoopMeInterstitialGeneral.getInstance(appKey, activity);
-        if (isAutoLoadingEnabled()) {
-            mSecondLoopMeAd = LoopMeInterstitialGeneral.getInstance(appKey, activity);
-        }
     }
 
     /**
@@ -51,10 +44,6 @@ public final class LoopMeInterstitial extends AdWrapper {
         super(activity, appKey);
         mFirstLoopMeAd = LoopMeInterstitialGeneral.getInstance(appKey, activity);
         ((LoopMeInterstitialGeneral) mFirstLoopMeAd).setRewarded(isRewarded);
-        if (isAutoLoadingEnabled()) {
-            mSecondLoopMeAd = LoopMeInterstitialGeneral.getInstance(appKey, activity);
-            ((LoopMeInterstitialGeneral) mSecondLoopMeAd).setRewarded(isRewarded);
-        }
     }
 
     /**
@@ -67,9 +56,7 @@ public final class LoopMeInterstitial extends AdWrapper {
      */
     @Nullable
     public static LoopMeInterstitial getInstance(String appKey, Activity activity) {
-        return LoopMeSdk.isInitialized()
-                ? new LoopMeInterstitial(activity, appKey)
-                : null;
+        return LoopMeSdk.isInitialized() ? new LoopMeInterstitial(activity, appKey) : null;
     }
 
     /**
@@ -82,9 +69,7 @@ public final class LoopMeInterstitial extends AdWrapper {
      */
     @Nullable
     public static LoopMeInterstitial getInstance(String appKey, Activity activity, boolean isRewarded) {
-        return LoopMeSdk.isInitialized()
-                ? new LoopMeInterstitial(activity, appKey, isRewarded)
-                : null;
+        return LoopMeSdk.isInitialized() ? new LoopMeInterstitial(activity, appKey, isRewarded) : null;
     }
 
 
@@ -108,7 +93,6 @@ public final class LoopMeInterstitial extends AdWrapper {
     public void setListener(Listener listener) {
         mMainAdListener = listener;
         setListener(initInternalListener(), mFirstLoopMeAd);
-        setListener(initInternalListener(), mSecondLoopMeAd);
     }
 
     private void setListener(LoopMeInterstitialGeneral.Listener listener, LoopMeAd interstitial) {
@@ -117,9 +101,7 @@ public final class LoopMeInterstitial extends AdWrapper {
         }
     }
 
-    public Listener getListener() {
-        return mMainAdListener;
-    }
+    public Listener getListener() { return mMainAdListener; }
 
     public void removeListener() {
         super.removeListener();
@@ -198,21 +180,13 @@ public final class LoopMeInterstitial extends AdWrapper {
     }
 
     public interface Listener {
-
         void onLoopMeInterstitialLoadSuccess(LoopMeInterstitial interstitial);
-
         void onLoopMeInterstitialLoadFail(LoopMeInterstitial interstitial, LoopMeError error);
-
         void onLoopMeInterstitialShow(LoopMeInterstitial interstitial);
-
         void onLoopMeInterstitialHide(LoopMeInterstitial interstitial);
-
         void onLoopMeInterstitialClicked(LoopMeInterstitial interstitial);
-
         void onLoopMeInterstitialLeaveApp(LoopMeInterstitial interstitial);
-
         void onLoopMeInterstitialExpired(LoopMeInterstitial interstitial);
-
         void onLoopMeInterstitialVideoDidReachEnd(LoopMeInterstitial interstitial);
     }
 }
