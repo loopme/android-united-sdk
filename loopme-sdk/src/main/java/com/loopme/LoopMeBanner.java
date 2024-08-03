@@ -78,7 +78,6 @@ public final class LoopMeBanner extends AdWrapper {
     /**
      * Links (@link LoopMeBannerView) view to banner.
      * If ad doesn't linked to @link LoopMeBannerView, it can't be display.
-     *
      * @param viewGroup - @link LoopMeBannerView (container for ad) where ad will be displayed.
      */
     public void bindView(FrameLayout viewGroup) {

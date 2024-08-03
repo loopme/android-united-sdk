@@ -12,45 +12,29 @@ import com.loopme.banner_sample.R;
 import com.loopme.banner_sample.app.model.Constants;
 import com.loopme.banner_sample.app.views.MainFeaturesFragment;
 import com.loopme.banner_sample.app.views.RecyclerViewFragment;
-import com.loopme.banner_sample.app.views.RecyclerViewShrinkFragment;
 import com.loopme.banner_sample.app.views.SimpleBannerFragment;
 
 public class MainActivity
-        extends AppCompatActivity
-        implements
-        MainFeaturesFragment.OnItemClickedListener,
-        LoopMeSdk.LoopMeSdkListener {
+    extends AppCompatActivity
+    implements MainFeaturesFragment.OnItemClickedListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity_layout);
         setAsMainView(MainFeaturesFragment.newInstance(), false);
-
         tryInitLoopMeSdk();
     }
 
     @Override
     public void onItemClicked(String item) {
-        switch (item) {
-            case Constants.SIMPLE: {
-                setAsMainView(SimpleBannerFragment.newInstance(), true);
-                setTitle("Simple banner");
-                break;
-            }
-            case Constants.RECYCLERVIEW: {
-                setAsMainView(RecyclerViewFragment.newInstance(), true);
-                setTitle("Recycler view");
-
-                break;
-            }
-            case Constants.RECYCLERVIEW_SHRINK: {
-
-                setAsMainView(RecyclerViewShrinkFragment.newInstance(), true);
-                setTitle("Recycler view with shrink mode");
-                break;
-            }
+        if (item.equalsIgnoreCase(Constants.SIMPLE)) {
+            setAsMainView(SimpleBannerFragment.newInstance(), true);
         }
+        if (item.equalsIgnoreCase(Constants.RECYCLERVIEW)) {
+            setAsMainView(RecyclerViewFragment.newInstance(), true);
+        }
+        setTitle("View: " + item);
     }
 
     @Override
@@ -74,24 +58,23 @@ public class MainActivity
         fragmentTransaction.commit();
     }
 
-    @Override
-    public void onSdkInitializationSuccess() {
-        Toast.makeText(this, "LoopMe SDK initialized. Good to go…", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onSdkInitializationFail(int errorCode, String message) {
-        Toast.makeText(this, "LoopMe SDK failed to initialize. Trying again…", Toast.LENGTH_SHORT).show();
-        tryInitLoopMeSdk();
+    private void alert(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     private void tryInitLoopMeSdk() {
-        if (LoopMeSdk.isInitialized())
-            return;
-
-        Toast.makeText(this, "Wait for LoopMe SDK initialization…", Toast.LENGTH_SHORT).show();
-
-        LoopMeSdk.Configuration conf = new LoopMeSdk.Configuration();
-        LoopMeSdk.initialize(this, conf, this);
+        if (LoopMeSdk.isInitialized()) return;
+        alert("LoopMe SDK: initialization…");
+        LoopMeSdk.initialize(this, new LoopMeSdk.Configuration(), new LoopMeSdk.LoopMeSdkListener() {
+            @Override
+            public void onSdkInitializationSuccess() {
+                alert("LoopMe SDK: initialized");
+            }
+            @Override
+            public void onSdkInitializationFail(int errorCode, String message) {
+                alert("LoopMe SDK: failed to initialize. Trying again…");
+                tryInitLoopMeSdk();
+            }
+        });
     }
 }

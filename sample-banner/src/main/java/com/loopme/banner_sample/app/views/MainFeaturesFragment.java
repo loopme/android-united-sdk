@@ -6,25 +6,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.loopme.banner_sample.R;
-import com.loopme.banner_sample.app.model.DataProvider;
+import com.loopme.banner_sample.app.model.Constants;
 import com.loopme.banner_sample.app.model.MainAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainFeaturesFragment extends Fragment {
     private OnItemClickedListener mListener;
 
-
-    public static MainFeaturesFragment newInstance() {
-        return new MainFeaturesFragment();
-    }
+    public static MainFeaturesFragment newInstance() { return new MainFeaturesFragment(); }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof OnItemClickedListener) {
             mListener = (OnItemClickedListener) context;
@@ -38,22 +39,14 @@ public class MainFeaturesFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        List<String> dataList = new ArrayList<>();
+        dataList.add(Constants.SIMPLE);
+        dataList.add(Constants.RECYCLERVIEW);
         RecyclerView recyclerView = view.findViewById(R.id.main_list_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        MainAdapter adapter = new MainAdapter(DataProvider.getSimpleStringsList());
-        adapter.setListener(initOnItemClickListener());
-        recyclerView.setAdapter(adapter);
-    }
-
-    private OnItemClickedListener initOnItemClickListener() {
-        return item -> {
-            if (mListener != null) {
-                mListener.onItemClicked(item);
-            }
-        };
+        recyclerView.setAdapter(new MainAdapter(dataList, item -> mListener.onItemClicked(item)));
     }
 
     public interface OnItemClickedListener {
