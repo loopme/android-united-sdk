@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Wrapper {
-    @Attribute
-    private final boolean followAdditionalWrappers = true;
 
     @Attribute
     private boolean allowMultipleAds;
@@ -50,9 +48,7 @@ public class Wrapper {
     @Tag
     private Creatives creatives;
 
-    public boolean isFollowAdditionalWrappers() {
-        return followAdditionalWrappers;
-    }
+    public boolean isFollowAdditionalWrappers() { return true; }
 
     public boolean isAllowMultipleAds() {
         return allowMultipleAds;
@@ -99,31 +95,20 @@ public class Wrapper {
     }
 
     public String getVastTagUrl() {
-        if (vastAdTagUri != null && !TextUtils.isEmpty(vastAdTagUri.getText())) {
-            return vastAdTagUri.getText();
-        } else {
-            return "";
-        }
+        return (vastAdTagUri != null && !TextUtils.isEmpty(vastAdTagUri.getText())) ?
+            vastAdTagUri.getText() : "";
     }
 
     public List<Tracking> getCreativeTrackingList() {
-        if (creatives != null) {
-            return creatives.getTrackingList();
-        }
-        return null;
+        return creatives != null ? creatives.getTrackingList() : new ArrayList<>();
     }
 
     public List<Verification> getVerificationList() {
-        return adVerifications == null
-                ? new ArrayList<Verification>()
-                : adVerifications.getVerificationList();
+        return adVerifications == null ? new ArrayList<>() : adVerifications.getVerificationList();
     }
 
     public List<String> getVideoClicksList() {
-        if (creatives != null) {
-            return creatives.getVideoClicksList();
-        }
-        return new ArrayList<>();
+        return creatives != null ? creatives.getVideoClicksList() : new ArrayList<>();
     }
 
     public List<String> getCompanionTrackingEvents() {

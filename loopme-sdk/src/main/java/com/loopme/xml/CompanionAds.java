@@ -12,15 +12,9 @@ public class CompanionAds {
     @Tag("Companion")
     private List<Companion> companionList;
 
-    public List<Companion> getCompanionList() {
-        return companionList;
-    }
+    public List<Companion> getCompanionList() { return companionList; }
 
-    public String getRequired() {
-        return required;
-    }
+    public String getRequired() { return required; }
 
-    public boolean hasCompanionList() {
-        return companionList != null && !companionList.isEmpty();
-    }
+    public boolean hasCompanionList() { return companionList != null && !companionList.isEmpty(); }
 }

@@ -2,8 +2,9 @@ package com.loopme.parser;
 
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+
 import com.loopme.Constants;
-import com.loopme.Logging;
 import com.loopme.ad.AdParams;
 import com.loopme.models.Errors;
 import com.loopme.models.response.Bid;
@@ -27,7 +28,6 @@ import com.loopme.xml.vast4.AdVerifications;
 import com.loopme.xml.vast4.VastInfo;
 import com.loopme.xml.vast4.Verification;
 import com.loopme.xml.vast4.ViewableImpression;
-import com.loopme.xml.vast4.Wrapper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,41 +47,26 @@ public class XmlParseService {
             return null;
         }
         sAdParams = adParams;
-        String xml = bidObject.getAdm();
-        Logging.out(LOG_TAG, xml);
-        return parseResponse(xml);
+        return parseResponse(bidObject.getAdm());
     }
 
     public static AdParams parse(String vastString) {
         sAdParams = new AdParams();
-        Logging.out(LOG_TAG, vastString);
         return parseResponse(vastString);
-    }
-
-    private static void setExpiredDate() {
-        sAdParams.setExpiredDate(Constants.DEFAULT_EXPIRED_TIME);
     }
 
     public static String parseOrientation(ResponseJsonModel responseModel) {
         Bid bidObject = retrieveBidObject(responseModel);
-        if (bidObject == null || bidObject.getExt() == null) {
-            return "";
-        }
-        return bidObject.getExt().getOrientation();
+        return (bidObject == null || bidObject.getExt() == null) ?
+            "" : bidObject.getExt().getOrientation();
     }
 
     private static Bid retrieveBidObject(ResponseJsonModel responseModel) {
         try {
             return responseModel.getSeatbid().get(FIRST_ELEMENT).getBid().get(FIRST_ELEMENT);
         } catch (IllegalArgumentException | NullPointerException ex) {
-            ex.printStackTrace();
+            return null;
         }
-        return null;
-    }
-
-    private static String retrieveXml(ResponseJsonModel responseModel) {
-        Bid bid = retrieveBidObject(responseModel);
-        return bid == null ? "" : bid.getAdm();
     }
 
     private static AdParams parseResponse(String response) {
@@ -89,69 +74,110 @@ public class XmlParseService {
         return vast == null ? null : createAdParams(vast);
     }
 
-    private static AdParams createAdParams(Vast vast) {
-        if (vast == null || vast.getAd() == null) {
+    private static List<String> getImpressionsList(InLine inLine) {
+        List<String> impressions = new ArrayList<>();
+        for (Impression impression : inLine.getImpressionList()) {
+            if (!TextUtils.isEmpty(impression.getText())) {
+                impressions.add(impression.getText());
+            }
+        }
+        return impressions;
+    }
+
+    private static String getErrorUrl(InLine inLine) {
+        Error error = inLine.getError();
+        return (error != null && !TextUtils.isEmpty(error.getText())) ? error.getText() : "";
+    }
+
+    private static AdParams createAdParams(@NonNull Vast vast) {
+        if (vast.getAd() == null) {
             throw new IllegalArgumentException("Vast or vast.getAd() shouldn't be null");
         }
         InLine inLine = vast.getAd().getInLine();
         Linear linear = getParamLinear(inLine);
-
         if (linear == null) {
             throw new IllegalArgumentException("NonLinear AD is not supported");
         }
-        setExpiredDate();
-        setParamId(vast);
-        setParamImpressions(inLine);
-        setErrorUrl(inLine.getError());
-        setViewableImpression(inLine.getViewableImpression());
+        sAdParams.setExpiredDate(Constants.DEFAULT_EXPIRED_TIME);
+        sAdParams.setId(vast.getAd().getId());
+        sAdParams.setImpressionsList(getImpressionsList(inLine));
+        sAdParams.addErrorUrl(getErrorUrl(inLine));
+        ViewableImpression viewableImpression = inLine.getViewableImpression();
+        if (viewableImpression != null) {
+            sAdParams.setViewableImpressionMap(viewableImpression.getViewableImpressionMap());
+        }
         setAdVerificationJavaScriptUrl(inLine.getAdVerifications());
-        setParamSkipTime(linear);
-        setParamTrackingEvents(linear);
-        setParamDuration(linear);
-        setAdParameters(linear);
-        setParamVideoRedirectUrl(linear);
-        setParamVideoClicks(linear);
-        setVastVpaid(linear);
-        setOrientation(linear);
-
+        sAdParams.setSkipTime(linear.getSkipoffset());
+        if (linear.getTrackingEvents() != null) {
+            sAdParams.setTrackingEventsList(linear.getTrackingEvents().getTrackingList());
+        }
+        sAdParams.setDuration(Utils.parseDuration(linear.getDuration().getText()));
+        sAdParams.setAdParams(parseAdParameters(linear));
+        if (linear.getVideoClicks() != null) {
+            ClickThrough clickThrough = linear.getVideoClicks().getClickThrough();
+            if (clickThrough != null) {
+                sAdParams.setVideoRedirectUrl(clickThrough.getText());
+            }
+        }
+        if (linear.getVideoClicks() != null) {
+            List<ClickTracking> trackingList = linear.getVideoClicks().getClickTrackingList();
+            List<String> clickEvents = new ArrayList<>();
+            if (trackingList != null) {
+                for (ClickTracking tracking : trackingList) {
+                    clickEvents.add(tracking.getText());
+                }
+            }
+            sAdParams.setVideoClicks(clickEvents);
+        }
+        if (linear.getMediaFiles() != null) {
+            List<MediaFile> mediaFileList = linear.getMediaFiles().getMediaFileList();
+            String vpaidJsUrl = getVpaidJsUrl(mediaFileList);
+            if (!TextUtils.isEmpty(vpaidJsUrl)) {
+                sAdParams.setVpaid();
+                sAdParams.setVpaidJsUrl(vpaidJsUrl);
+            } else {
+                if (mediaFileList != null) {
+                    List<String> videoFileUrlsList = new ArrayList<>();
+                    for (MediaFile mediaFile : filterAndSortSupportedMediaFiles(mediaFileList))
+                        videoFileUrlsList.add(mediaFile.getText().trim());
+                    sAdParams.setVideoFileUrlsList(videoFileUrlsList);
+                }
+            }
+        }
+        sAdParams.setOrientation(linear.getOrientation());
         List<Companion> companionList = getCompanionList(getCreativeList(inLine));
-
         if (companionList == null || companionList.isEmpty()) {
             return sAdParams;
         }
-        setParamEndCardUrlList(inLine, companionList);
+        List<String> endCardUrlList = new ArrayList<>();
+        for (Companion companion : companionList) {
+            endCardUrlList.add(companion.getStaticResource().getText().trim());
+        }
+        sAdParams.setEndCardUrlList(endCardUrlList);
         Companion companion = companionList.get(0);
         if (companion == null) {
             return sAdParams;
         }
-        setParamEndCardRedirectUrl(companion);
-        setParamEndCardClicks(companion);
-        setParamCompanionCreativeViewEvents(companion);
+        CompanionClickThrough clickThrough = companion.getCompanionClickThrough();
+        if (clickThrough != null && clickThrough.getText() != null) {
+            String redirectUrl = clickThrough.getText().trim();
+            sAdParams.setEndCardRedirectUrl(redirectUrl);
+        }
+        if (companion.getCompanionClickTracking() != null) {
+            List<String> clickEvents = new ArrayList<>();
+            for (CompanionClickTracking tracking : companion.getCompanionClickTracking()) {
+                clickEvents.add(tracking.getText());
+            }
+            sAdParams.setEndCardClicks(clickEvents);
+        }
+        if (companion.getTrackingEvents() != null) {
+            List<String> events = new ArrayList<>();
+            for (Tracking tracking : companion.getTrackingEvents().getTrackingList()) {
+                events.add(tracking.getText());
+            }
+            sAdParams.setCompanionCreativeViewEvents(events);
+        }
         return sAdParams;
-    }
-
-    private static void setOrientation(Linear linear) {
-        if (linear.getOrientation() != null) {
-            sAdParams.setOrientation(linear.getOrientation());
-        }
-    }
-
-    private static void setErrorUrl(Error error) {
-        if (error == null) {
-            return;
-        }
-        String errorUrl = error.getText();
-        if (!TextUtils.isEmpty(errorUrl)) {
-            sAdParams.addErrorUrl(errorUrl);
-        }
-    }
-
-    private static void setViewableImpression(ViewableImpression viewableImpression) {
-        if (viewableImpression == null) {
-            return;
-        }
-        Map<String, List<String>> viewableImpressionMap = viewableImpression.getViewableImpressionMap();
-        sAdParams.setViewableImpressionMap(viewableImpressionMap);
     }
 
     private static void setAdVerificationJavaScriptUrl(AdVerifications adVerifications) {
@@ -163,119 +189,6 @@ public class XmlParseService {
             return;
 
         sAdParams.setVerificationList(verifications);
-    }
-
-    private static void setParamCompanionCreativeViewEvents(Companion companion) {
-        if (companion.getTrackingEvents() == null) {
-            return;
-        }
-        List<String> events = new ArrayList<>();
-        for (Tracking tracking : companion.getTrackingEvents().getTrackingList()) {
-            events.add(tracking.getText());
-        }
-        sAdParams.setCompanionCreativeViewEvents(events);
-    }
-
-    private static void setParamEndCardClicks(Companion companion) {
-        if (companion.getCompanionClickTracking() == null) {
-            return;
-        }
-        List<String> clickEvents = new ArrayList<>();
-        for (CompanionClickTracking tracking : companion.getCompanionClickTracking()) {
-            clickEvents.add(tracking.getText());
-        }
-        sAdParams.setEndCardClicks(clickEvents);
-    }
-
-    private static void setParamEndCardRedirectUrl(Companion companion) {
-        CompanionClickThrough clickThrough = companion.getCompanionClickThrough();
-        if (clickThrough == null || clickThrough.getText() == null) {
-            return;
-        }
-        String redirectUrl = clickThrough.getText().trim();
-        sAdParams.setEndCardRedirectUrl(redirectUrl);
-    }
-
-    private static void setParamEndCardUrlList(InLine inLine, List<Companion> companionList) {
-        if (inLine == null || companionList == null) {
-            return;
-        }
-        List<String> endCardUrlList = new ArrayList<>();
-        for (Companion companion : companionList) {
-            endCardUrlList.add(companion.getStaticResource().getText().trim());
-        }
-        sAdParams.setEndCardUrlList(endCardUrlList);
-    }
-
-    private static void setVastVpaid(Linear linear) {
-        if (linear.getMediaFiles() == null) {
-            return;
-        }
-        List<MediaFile> mediaFileList = linear.getMediaFiles().getMediaFileList();
-        String vpaidJsUrl = getVpaidJsUrl(mediaFileList);
-        if (!TextUtils.isEmpty(vpaidJsUrl)) {
-            setVpaidJsUrl(vpaidJsUrl);
-        } else {
-            setParamVastVideoFileUrlList(mediaFileList);
-        }
-    }
-
-    private static void setVpaidJsUrl(String vpaidJsUrl) {
-        sAdParams.setVpaid();
-        sAdParams.setVpaidJsUrl(vpaidJsUrl);
-    }
-
-    private static void setParamVastVideoFileUrlList(List<MediaFile> mediaFileList) {
-        if (mediaFileList == null)
-            return;
-
-        List<String> videoFileUrlsList = new ArrayList<>();
-        for (MediaFile mediaFile : filterAndSortSupportedMediaFiles(mediaFileList))
-            videoFileUrlsList.add(mediaFile.getText().trim());
-        sAdParams.setVideoFileUrlsList(videoFileUrlsList);
-    }
-
-    private static void setParamVideoClicks(Linear linear) {
-        if (linear.getVideoClicks() == null) {
-            return;
-        }
-        List<ClickTracking> trackingList = linear.getVideoClicks().getClickTrackingList();
-        List<String> clickEvents = new ArrayList<>();
-        if (trackingList != null) {
-            for (ClickTracking tracking : trackingList) {
-                clickEvents.add(tracking.getText());
-            }
-        }
-        sAdParams.setVideoClicks(clickEvents);
-    }
-
-    private static void setParamVideoRedirectUrl(Linear linear) {
-        if (linear.getVideoClicks() == null) {
-            return;
-        }
-        ClickThrough clickThrough = linear.getVideoClicks().getClickThrough();
-        if (clickThrough != null) {
-            sAdParams.setVideoRedirectUrl(clickThrough.getText());
-        }
-    }
-
-    private static void setAdParameters(Linear linear) {
-        sAdParams.setAdParams(parseAdParameters(linear));
-    }
-
-    private static void setParamDuration(Linear linear) {
-        int duration = Utils.parseDuration(linear.getDuration().getText());
-        sAdParams.setDuration(duration);
-    }
-
-    private static void setParamTrackingEvents(Linear linear) {
-        if (linear.getTrackingEvents() != null) {
-            sAdParams.setTrackingEventsList(linear.getTrackingEvents().getTrackingList());
-        }
-    }
-
-    private static void setParamSkipTime(Linear linear) {
-        sAdParams.setSkipTime(linear.getSkipoffset());
     }
 
     private static Linear getParamLinear(InLine inLine) {
@@ -295,61 +208,38 @@ public class XmlParseService {
         return inLine == null ? new ArrayList<>() : inLine.getCreatives().getCreativeList();
     }
 
-    private static void setParamImpressions(InLine inLine) {
-        if (inLine == null || inLine.getImpressionList() == null) {
-            return;
-        }
-        List<String> impressions = new ArrayList<>();
-        for (Impression impression : inLine.getImpressionList()) {
-            if (!TextUtils.isEmpty(impression.getText())) {
-                impressions.add(impression.getText());
-            }
-        }
-        sAdParams.setImpressionsList(impressions);
-    }
-
-
-    private static void setParamId(Vast vast) {
-        if (vast != null) {
-            sAdParams.setId(vast.getAd().getId());
-        }
-    }
-
     private static String getVpaidJsUrl(List<MediaFile> mediaFileList) {
         if (mediaFileList == null) {
             return "";
         }
         for (MediaFile mediaFile : mediaFileList) {
-            if (isMediaFileValid(mediaFile)) {
+            boolean isMediaFileValid = mediaFile != null &&
+                mediaFile.getApiFramework() != null &&
+                (mediaFile.getApiFramework().equalsIgnoreCase(Constants.TYPE_VPAID) ||
+                mediaFile.getApiFramework().equalsIgnoreCase(Constants.TYPE_VAST)) &&
+                mediaFile.getType().equalsIgnoreCase(Constants.TYPE_APPLICATION_JAVASCRIPT);
+            if (isMediaFileValid) {
                 return mediaFile.getText().trim();
             }
         }
         return "";
     }
 
-    private static boolean isMediaFileValid(MediaFile mediaFile) {
-        return mediaFile != null
-                && mediaFile.getApiFramework() != null
-                && (mediaFile.getApiFramework().equalsIgnoreCase(Constants.TYPE_VPAID) ||
-                mediaFile.getApiFramework().equalsIgnoreCase(Constants.TYPE_VAST))
-                && mediaFile.getType().equalsIgnoreCase(Constants.TYPE_APPLICATION_JAVASCRIPT);
-    }
-
     private static String parseAdParameters(Linear linear) {
         try {
-            if (linear.getAdParameters() != null) {
-                return linear.getAdParameters().getText().trim();
-            }
+            return linear.getAdParameters() != null ? linear.getAdParameters().getText().trim() : "";
         } catch (Exception e) {
-            e.printStackTrace();
+            return "";
         }
-        return "";
     }
 
     private static List<Companion> getCompanionList(List<Creative> creativeList) {
         if (creativeList != null) {
             for (Creative creative : creativeList) {
-                if (!isCompanionAdsNull(creative)) {
+                boolean isCompanionAdsNull = creative == null ||
+                    creative.getCompanionAds() == null ||
+                    creative.getCompanionAds().getCompanionList() == null;
+                if (!isCompanionAdsNull) {
                     return creative.getCompanionAds().getCompanionList();
                 }
             }
@@ -357,35 +247,21 @@ public class XmlParseService {
         return new ArrayList<>();
     }
 
-    private static boolean isCompanionAdsNull(Creative creative) {
-        return creative == null ||
-            creative.getCompanionAds() == null ||
-            creative.getCompanionAds().getCompanionList() == null;
-    }
-
     private static List<MediaFile> filterAndSortSupportedMediaFiles(List<MediaFile> mediaFileList) {
         if (mediaFileList == null) {
             return new ArrayList<>();
         }
-
         List<MediaFile> supportedMediaFilesList = new ArrayList<>();
         for (MediaFile mediaFile : mediaFileList) {
-            if (isSupportedFormat(mediaFile)) {
-                supportedMediaFilesList.add(mediaFile);
-            }
+            String text = mediaFile == null ? "" : mediaFile.getText();
+            boolean isSupportedFormat =
+                text.contains(Constants.MP4_FORMAT_EXT) || text.contains(Constants.WEBM_FORMAT_EXT);
+            if (isSupportedFormat) supportedMediaFilesList.add(mediaFile);
         }
-
         Comparator<MediaFile> mediaSizeComparator =
             createMediaSizeComparator(Utils.getScreenWidth() * Utils.getScreenHeight());
-
         Collections.sort(supportedMediaFilesList, mediaSizeComparator);
         return supportedMediaFilesList;
-    }
-
-    private static boolean isSupportedFormat(MediaFile mediaFile) {
-        String text = mediaFile == null ? "" : mediaFile.getText();
-        return text.contains(Constants.MP4_FORMAT_EXT) ||
-            text.contains(Constants.WEBM_FORMAT_EXT);
     }
 
     private static Comparator<MediaFile> createMediaSizeComparator(final int screenSquare) {
@@ -433,13 +309,8 @@ public class XmlParseService {
         try {
             return XmlParser.parse(xml, Vast.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
-    }
-
-    public static VastInfo getVastInfo(String vastString) {
-        return new VastInfoParser(vastString).getVastInfo();
     }
 
     public static String getVastString(ResponseJsonModel mResponseModel) {
@@ -448,7 +319,8 @@ public class XmlParseService {
     }
 
     public static boolean isValidXml(ResponseJsonModel body) {
-        String xml = retrieveXml(body);
+        Bid bid = retrieveBidObject(body);
+        String xml = bid == null ? "" : bid.getAdm();
         if (TextUtils.isEmpty(xml)) {
             return false;
         }
@@ -456,62 +328,15 @@ public class XmlParseService {
         return vast != null && vast.getAd() != null;
     }
 
-    private static class VastInfoParser {
-        private boolean mHasWrapper;
-        private Vast mVast;
-        private String mVastTagUrl;
-        private final String mVastString;
-        private Wrapper mWrapper;
-        private VastInfo mVastInfo;
-
-        VastInfoParser(String vastString) {
-            mVastString = vastString;
-            if (isValidXml()) {
-                setWrapper();
-                detectWrapper();
-                setVastTagUri();
-                createVastInfo();
-            }
-        }
-
-        private boolean isValidXml() {
-            try {
-                mVast = XmlParser.parse(mVastString, Vast.class);
-                return true;
-            } catch (Exception e) {
-                mVastInfo = new VastInfo();
-                mVastInfo.setError(Errors.SYNTAX_ERROR_IN_XML);
-                return false;
-            }
-        }
-
-        private void setWrapper() {
-            if (mVast != null && mVast.getAd() != null) {
-                mWrapper = mVast.getAd().getWrapper();
-            }
-        }
-
-        private void detectWrapper() {
-            mHasWrapper = mWrapper != null;
-        }
-
-        private void setVastTagUri() {
-            if (mHasWrapper) {
-                mVastTagUrl = mWrapper.getVastTagUrl();
-            }
-        }
-
-        private void createVastInfo() {
-            if (mVast == null) {
-                return;
-            }
-            mVastInfo = new VastInfo();
-            mVastInfo.setVastTagUrl(mVastTagUrl);
-            mVastInfo.setHasWrapper(mHasWrapper);
-            mVastInfo.setWrapper(mWrapper);
-        }
-
-        private VastInfo getVastInfo() {
+    public static VastInfo getVastInfo(String vastString) {
+        try {
+            Vast mVast = XmlParser.parse(vastString, Vast.class);
+            VastInfo mVastInfo = new VastInfo();
+            mVastInfo.setWrapper(mVast.getAd() == null ? null : mVast.getAd().getWrapper());
+            return mVastInfo;
+        } catch (Exception e) {
+            VastInfo mVastInfo = new VastInfo();
+            mVastInfo.setError(Errors.SYNTAX_ERROR_IN_XML);
             return mVastInfo;
         }
     }

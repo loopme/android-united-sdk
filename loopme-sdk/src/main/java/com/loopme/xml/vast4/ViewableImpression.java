@@ -27,7 +27,6 @@ public class ViewableImpression {
     private ViewUndetermined viewUndetermined;
     private final Map<String, List<String>> mViewableImpressionMap = new HashMap<>();
 
-
     public String getId() {
         return id;
     }
@@ -45,24 +44,15 @@ public class ViewableImpression {
     }
 
     public String getViewableImpressionUrl() {
-        if (viewable != null && !TextUtils.isEmpty(viewable.getText())) {
-            return viewable.getText();
-        }
-        return "";
+        return viewable != null ? viewable.getText() : "";
     }
 
     public String getNotViewableImpressionUrl() {
-        if (notViewable != null && !TextUtils.isEmpty(notViewable.getText())) {
-            return notViewable.getText();
-        }
-        return "";
+        return notViewable != null ? notViewable.getText() : "";
     }
 
     public String getViewUndeterminedUrl() {
-        if (viewUndetermined != null && !TextUtils.isEmpty(viewUndetermined.getText())) {
-            return viewUndetermined.getText();
-        }
-        return "";
+        return viewUndetermined != null ? viewUndetermined.getText() : "";
     }
 
     public Map<String, List<String>> getViewableImpressionMap() {
@@ -73,10 +63,11 @@ public class ViewableImpression {
     }
 
     private void putToViewableImpressionMap(String impressionType, String impressionUrl) {
-        if (!TextUtils.isEmpty(impressionType) && !TextUtils.isEmpty(impressionUrl)) {
-            ArrayList<String> list = new ArrayList<>();
-            list.add(impressionUrl);
-            mViewableImpressionMap.put(impressionType, list);
+        if (TextUtils.isEmpty(impressionType) || TextUtils.isEmpty(impressionUrl)) {
+            return;
         }
+        ArrayList<String> list = new ArrayList<>();
+        list.add(impressionUrl);
+        mViewableImpressionMap.put(impressionType, list);
     }
 }

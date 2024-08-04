@@ -7,14 +7,13 @@ import android.text.TextUtils;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.ad.AdParams;
+import com.loopme.ad.AdParamsBuilder;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.AdType;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.models.Errors;
 import com.loopme.models.response.Bid;
-import com.loopme.models.response.Ext;
 import com.loopme.models.response.ResponseJsonModel;
-import com.loopme.tracker.AdIds;
 import com.loopme.tracker.partners.LoopMeTracker;
 
 import java.util.ArrayList;
@@ -75,24 +74,21 @@ public class ParseService {
         if (bidObject == null) {
             return null;
         }
-
-        return new AdParams.AdParamsBuilder(retrieveAdFormat(loopMeAd))
-            .html(safelyRetrieve(() -> bidObject.getAdm(), ""))
+        AdParamsBuilder adParamsBuilder = new AdParamsBuilder(retrieveAdFormat(loopMeAd))
+            .html(safelyRetrieve(bidObject::getAdm, ""))
             .orientation(safelyRetrieve(() -> {
                 String orientation = bidObject.getExt().getOrientation();
                 return orientation.equalsIgnoreCase(DEFAULT) ? PORTRAIT : orientation;
             }, PORTRAIT))
-            .token(safelyRetrieve(() -> bidObject.getId(), ""))
+            .token(safelyRetrieve(bidObject::getId, ""))
             .debug(safelyRetrieve(() -> bidObject.getExt().getDebug() == 1, false))
             .trackersList(safelyRetrieve(() -> bidObject.getExt().getMeasurePartners(), new ArrayList<>()))
             .packageIds(safelyRetrieve(() -> new ArrayList<>(bidObject.getExt().getPackageIds()), new ArrayList<>()))
             .mraid(false)
-            .adIds(bidObject.getExt() == null ?
-                new AdIds() : parseAdIds(bidObject, loopMeAd.getContext().getPackageName())
-            )
             .autoLoading(retrieveAutoLoadingWithDefaultTrue(bidObject))
-            .adSpotDimensions(retrieveAdDimensionsForNoneVastOrDefault(bidObject))
-            .build();
+            .adSpotDimensions(retrieveAdDimensionsForNoneVastOrDefault(bidObject)
+        );
+        return adParamsBuilder.isValidFormatValue() ? new AdParams(adParamsBuilder) : new AdParams();
     }
 
     private static AdSpotDimensions retrieveAdDimensionsForNoneVastOrDefault(Bid bidObject) {
@@ -125,23 +121,6 @@ public class ParseService {
         }
 
         return autoLoadingValue == 1;
-    }
-
-    private static AdIds parseAdIds(Bid bid, String packageName) {
-        Ext ext = bid.getExt();
-        AdIds adIds = new AdIds();
-        adIds.setAdvertiserId(ext.getAdvertiser());
-        adIds.setCampaignId(ext.getCampaign());
-        adIds.setLineItemId(ext.getLineitem());
-        adIds.setAppId(ext.getAppname());
-        adIds.setCreativeId(bid.getCrid());
-        adIds.setPlacementId(bid.getAdid());
-        adIds.setCompany(ext.getCompany());
-        adIds.setDeveloper(ext.getDeveloper());
-        adIds.setAppName(ext.getAppname());
-        adIds.setAppBundle(packageName);
-
-        return adIds;
     }
 
     private static String retrieveAdFormat(LoopMeAd loopMeAd) {

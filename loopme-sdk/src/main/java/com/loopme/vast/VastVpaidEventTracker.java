@@ -29,14 +29,10 @@ public class VastVpaidEventTracker {
         if (URLUtil.isNetworkUrl(eventsUrlOrType)) {
             postEventByUrl(eventsUrlOrType, addMessage);
         } else {
-            postEventByType(eventsUrlOrType, addMessage);
-        }
-    }
-
-    private void postEventByType(String eventType, String addMessage) {
-        for (Tracking event : mEventsList) {
-            if (event != null && eventType != null && event.isTypeOf(eventType)) {
-                postEventByUrl(event.getText(), addMessage);
+            for (Tracking event : mEventsList) {
+                if (event != null && eventsUrlOrType != null && event.isTypeOf(eventsUrlOrType)) {
+                    postEventByUrl(event.getText(), addMessage);
+                }
             }
         }
     }
@@ -48,9 +44,7 @@ public class VastVpaidEventTracker {
         }
     }
 
-
     public static synchronized void trackVastEvent(final String eventUrl, final String addMessage) {
-
         ExecutorHelper.getExecutor().submit(() -> {
             String completeUrl = StringUtils.setMessage(eventUrl, addMessage);
             HttpUtils.doRequest(completeUrl, HttpUtils.Method.GET, null);
