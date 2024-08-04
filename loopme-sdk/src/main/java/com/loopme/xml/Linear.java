@@ -1,5 +1,7 @@
 package com.loopme.xml;
 
+import androidx.annotation.NonNull;
+
 import com.loopme.parser.xml.Attribute;
 import com.loopme.parser.xml.Tag;
 import com.loopme.xml.vast4.Icons;
@@ -68,6 +70,7 @@ public class Linear {
         return new ArrayList<>();
     }
 
+    @NonNull
     public String getOrientation() {
         MediaFile mediafile = getMediaFiles().getMediaFileList().get(0);
         return mediafile.getHeight() > mediafile.getWidth() ? "portrait" : "landscape";

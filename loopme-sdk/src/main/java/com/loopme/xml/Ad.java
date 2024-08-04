@@ -8,32 +8,18 @@ public class Ad {
 
     @Attribute
     private String id;
-
     @Attribute
     private int sequence;
-
     @Attribute
     private boolean conditionalAd;
 
     @Tag
     private InLine inLine;
-
     @Tag
     private Wrapper wrapper;
 
-    public Wrapper getWrapper() {
-        return wrapper;
-    }
-
-    public boolean isConditionalAd() {
-        return conditionalAd;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public InLine getInLine() {
-        return inLine;
-    }
+    public Wrapper getWrapper() { return wrapper; }
+    public boolean isConditionalAd() { return conditionalAd; }
+    public String getId() { return id; }
+    public InLine getInLine() { return inLine; }
 }
