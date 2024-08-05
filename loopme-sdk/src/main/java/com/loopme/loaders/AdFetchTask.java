@@ -45,7 +45,6 @@ public class AdFetchTask implements Runnable, Observer {
     private static final String UNEXPECTED = "Unexpected";
     private boolean mIsVastVpaidAd;
     private final Timers mTimers;
-    private volatile boolean mFirstRequest = true;
 
     public AdFetchTask(LoopMeAd loopMeAd, AdFetcherListener adFetcherListener) {
         mLoopMeAd = loopMeAd;
@@ -54,18 +53,13 @@ public class AdFetchTask implements Runnable, Observer {
         mExecutorService = ExecutorHelper.getExecutor();
     }
 
-    private void startRequestTimer() {
+    public void fetch() {
         mHandler.post(() -> {
             if (mTimers != null) {
                 mTimers.startTimer(TimersType.REQUEST_TIMER);
             }
         });
-    }
-
-    private void runFetchTask() { mFetchTask = mExecutorService.submit(this); }
-    public void fetch() {
-        startRequestTimer();
-        runFetchTask();
+        mFetchTask = mExecutorService.submit(this);
     }
 
     public void stopFetch() {
@@ -108,17 +102,6 @@ public class AdFetchTask implements Runnable, Observer {
         onErrorResult(Errors.SYNTAX_ERROR_IN_RESPONSE);
     }
 
-    private void handleNonWrapper(ResponseJsonModel body) {
-        if (mIsVastVpaidAd && !XmlParseService.isValidXml(body)) {
-            onErrorResult(Errors.SYNTAX_ERROR_IN_XML);
-            return;
-        }
-        LoopMeAd loopMeAd = ParseService.getLoopMeAdFromResponse(mLoopMeAd, body);
-        if (loopMeAd != null) {
-            onSuccessResult(loopMeAd.getAdParams());
-        }
-    }
-
     private boolean isVastWrapperCase(ResponseJsonModel body) {
         if (!ParseService.isAdOfType(ResponseJsonModel.getCreativeType(body), AdType.VAST)) {
             return false;
@@ -129,74 +112,56 @@ public class AdFetchTask implements Runnable, Observer {
             ParseService.isAdOfType(creativeType, AdType.VPAID);
         String vastString = XmlParseService.getVastString(body);
         VastInfo vastInfo = XmlParseService.getVastInfo(vastString);
-        return mIsVastVpaidAd && vastInfo != null && vastInfo.hasWrapper();
-    }
-
-    private void handleSuccess(AdParams adParams) {
-        if (adParams == null) {
-            onErrorResult(Errors.PARSING_ERROR);
-            return;
-        }
-        adParams.setAdType(mAdType);
-        adParams.setOrientation(mOrientation);
-        onSuccessResult(adParams);
-    }
-
-    private void launchVastFetcher(ResponseJsonModel body) {
-        VastWrapperFetcher.Listener listener = new VastWrapperFetcher.Listener() {
-            @Override
-            public void onCompleted(AdParams adParams) { handleSuccess(adParams); }
-            @Override
-            public void onFailed(LoopMeError error) { onErrorResult(error); }
-        };
-        mVastWrapperFetcher = new VastWrapperFetcher(
-            XmlParseService.getVastString(body), listener
-        );
-        mVastWrapperFetcher.start();
+        return mIsVastVpaidAd && vastInfo.hasWrapper();
     }
 
     private void handleResponse(ResponseJsonModel body) {
         if (!isVastWrapperCase(body)) {
-            handleNonWrapper(body);
+            if (mIsVastVpaidAd && !XmlParseService.isValidXml(body)) {
+                onErrorResult(Errors.SYNTAX_ERROR_IN_XML);
+                return;
+            }
+            LoopMeAd loopMeAd = ParseService.getLoopMeAdFromResponse(mLoopMeAd, body);
+            if (loopMeAd != null) {
+                onSuccessResult(loopMeAd.getAdParams());
+            }
             return;
         }
         mOrientation = XmlParseService.parseOrientation(body);
         mAdType = AdType.fromString(ResponseJsonModel.getCreativeType(body));
-        launchVastFetcher(body);
+        VastWrapperFetcher.Listener listener = new VastWrapperFetcher.Listener() {
+            @Override
+            public void onCompleted(AdParams adParams) {
+                if (adParams == null) {
+                    onErrorResult(Errors.PARSING_ERROR);
+                    return;
+                }
+                adParams.setAdType(mAdType);
+                adParams.setOrientation(mOrientation);
+                onSuccessResult(adParams);
+            }
+            @Override
+            public void onFailed(LoopMeError error) { onErrorResult(error); }
+        };
+        mVastWrapperFetcher = new VastWrapperFetcher(
+                XmlParseService.getVastString(body), listener
+        );
+        mVastWrapperFetcher.start();
     }
 
     protected void parseResponse(GetResponse<ResponseJsonModel> response) {
         if (response.isSuccessful()) {
             handleResponse(response.getBody());
         } else {
-            handleError(response);
+            if (response.getCode() == RESPONSE_NO_ADS) {
+                onErrorResult(Errors.NO_ADS_FOUND);
+                return;
+            }
+            onErrorResult(response.getCode() != 0 ?
+                new LoopMeError(Constants.BAD_SERVERS_CODE + response.getCode()) :
+                new LoopMeError(response.getMessage())
+            );
         }
-    }
-
-    private void handleNoAds() {
-        boolean isInterstitial = mLoopMeAd != null && mLoopMeAd.isInterstitial();
-        if (!mFirstRequest || !isInterstitial) {
-            onErrorResult(Errors.NO_ADS_FOUND);
-            return;
-        }
-        mFirstRequest = false;
-        mLoopMeAd.setReversOrientationRequest();
-        runFetchTask();
-    }
-
-    private void handleError(GetResponse<ResponseJsonModel> response) {
-        if (response == null) {
-            onErrorResult(Errors.NO_CONTENT);
-            return;
-        }
-        if (response.getCode() == RESPONSE_NO_ADS) {
-            handleNoAds();
-            return;
-        }
-        LoopMeError error = response.getCode() != 0 ?
-            new LoopMeError(Constants.BAD_SERVERS_CODE + response.getCode()) :
-            new LoopMeError(response.getMessage());
-        onErrorResult(error);
     }
 
     @Override
