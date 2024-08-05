@@ -228,14 +228,8 @@ public class RequestUtils {
 
     private void setAdSize(Context context) {
         int[] adSize = RequestParamsUtils.getAdSize(context, mLoopMeAd);
-        boolean isReverseOrientation = mLoopMeAd != null && mLoopMeAd.isReverseOrientationRequest();
-        if (isReverseOrientation) {
-            mWidth = adSize[1];
-            mHeight = adSize[0];
-        } else {
-            mWidth = adSize[0];
-            mHeight = adSize[1];
-        }
+        mWidth = adSize[0];
+        mHeight = adSize[1];
     }
 
     private static void setAdvertisingIdInfo(final Context context) {

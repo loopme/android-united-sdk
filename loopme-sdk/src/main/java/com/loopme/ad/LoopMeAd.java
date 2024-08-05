@@ -60,7 +60,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     private final String mAppKey;
     protected boolean mIsReady;
     private final int mAdId;
-    private volatile boolean mIsReverseOrientationRequest;
 
     public final AdFetcherListener adFetchListener = new AdFetcherListener() {
         @Override
@@ -71,7 +70,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
             } else {
                 onInternalLoadFail(Errors.DOWNLOAD_ERROR);
             }
-            mIsReverseOrientationRequest = false;
         }
         @Override
         public void onAdFetchFailed(LoopMeError error) {
@@ -79,7 +77,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
                 error.setErrorMessage(String.valueOf(error.getErrorCode()));
             }
             onInternalLoadFail(error);
-            mIsReverseOrientationRequest = false;
             if (mAdFetchTask != null) {
                 mAdFetchTask.stopFetch();
             }
@@ -342,9 +339,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     public String getAppKey() { return mAppKey; }
     public FrameLayout getContainerView() { return mContainerView; }
     public int getAdId() { return mAdId; }
-    public boolean isReverseOrientationRequest() { return mIsReverseOrientationRequest; }
     public void setAdParams(AdParams mAdParams) { this.mAdParams = mAdParams; }
-    public void setReversOrientationRequest() { mIsReverseOrientationRequest = true; }
     public void setAdState(Constants.AdState adState) { mAdState = adState; }
     public void setReady(boolean ready) { mIsReady = ready; }
     @Override
