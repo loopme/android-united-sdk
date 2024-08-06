@@ -13,7 +13,7 @@ android {
 dependencies {
     api(project(":loopme-sdk"))
 //    api("com.github.loopme.android-united-sdk:loopme-sdk:9.0.5")
-    api("com.applovin:applovin-sdk:12.5.0")
+    api("com.applovin:applovin-sdk:12.6.0")
 
     // appcompat and material > 1.6.0 does not supported by Unity 2021
     implementation("androidx.appcompat:appcompat:1.6.0")
