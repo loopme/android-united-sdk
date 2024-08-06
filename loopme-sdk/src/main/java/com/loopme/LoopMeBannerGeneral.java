@@ -193,6 +193,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         }
     }
 
+    @NonNull
     @Override
     public Constants.AdFormat getAdFormat() {
         return Constants.AdFormat.BANNER;

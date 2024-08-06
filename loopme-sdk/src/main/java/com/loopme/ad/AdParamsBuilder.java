@@ -5,7 +5,10 @@ import static com.loopme.debugging.Params.ERROR_TYPE;
 
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+
 import com.loopme.Constants;
+import com.loopme.Constants.AdFormat;
 import com.loopme.tracker.partners.LoopMeTracker;
 
 import java.util.ArrayList;
@@ -18,7 +21,7 @@ import java.util.List;
 
 public class AdParamsBuilder {
     private static final String LOG_TAG = AdParamsBuilder.class.getSimpleName();
-    final String mBuilderFormat;
+    String mBuilderFormat;
 
     String mBuilderHtml;
     String mBuilderOrientation;
@@ -35,8 +38,11 @@ public class AdParamsBuilder {
     boolean mAutoLoading;
     AdSpotDimensions mAdSpotDimensions;
 
-    public AdParamsBuilder(String format) {
+    public AdParamsBuilder() {}
+
+    public AdParamsBuilder format(String format) {
         mBuilderFormat = format;
+        return this;
     }
 
     public AdParamsBuilder packageIds(List<String> installPacakage) {
@@ -76,14 +82,14 @@ public class AdParamsBuilder {
     }
 
     public AdParamsBuilder orientation(String orientation) {
-        boolean isValidOrientationValue = orientation != null &&
-            (orientation.equalsIgnoreCase(Constants.ORIENTATION_PORT) ||
-            orientation.equalsIgnoreCase(Constants.ORIENTATION_LAND));
-        if (isValidOrientationValue) {
+        if (
+            Constants.ORIENTATION_PORT.equalsIgnoreCase(orientation) ||
+            Constants.ORIENTATION_LAND.equalsIgnoreCase(orientation)
+        ) {
             mBuilderOrientation = orientation;
             return this;
         }
-        if (!TextUtils.isEmpty(mBuilderFormat) && mBuilderFormat.equalsIgnoreCase(Constants.INTERSTITIAL_TAG)) {
+        if (Constants.INTERSTITIAL_TAG.equalsIgnoreCase(mBuilderFormat)) {
             HashMap<String, String> errorInfo = new HashMap<>();
             errorInfo.put(ERROR_MSG, "Broken response [invalid orientation: " + orientation + "]");
             errorInfo.put(ERROR_TYPE, Constants.ErrorType.SERVER);
@@ -92,10 +98,10 @@ public class AdParamsBuilder {
         return this;
     }
 
-    public boolean isValidFormatValue() {
-        return mBuilderFormat != null &&
-            (mBuilderFormat.equalsIgnoreCase(Constants.BANNER_TAG) ||
-            mBuilderFormat.equalsIgnoreCase(Constants.INTERSTITIAL_TAG));
+    @NonNull
+    public static String getAdFormat(@NonNull AdFormat adFormat) {
+        if (adFormat == AdFormat.INTERSTITIAL) return Constants.INTERSTITIAL_TAG;
+        return adFormat == AdFormat.BANNER ? Constants.BANNER_TAG : Constants.INTERSTITIAL_TAG;
     }
 
     public AdParamsBuilder debug(boolean debug) {

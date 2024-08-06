@@ -1,23 +1,20 @@
 package com.loopme.parser;
 
-import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.utils.Utils.safelyRetrieve;
 
-import android.text.TextUtils;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.loopme.Constants;
+import com.loopme.Constants.AdFormat;
 import com.loopme.Logging;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.AdParamsBuilder;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.AdType;
-import com.loopme.ad.LoopMeAd;
-import com.loopme.models.Errors;
 import com.loopme.models.response.Bid;
-import com.loopme.models.response.ResponseJsonModel;
-import com.loopme.tracker.partners.LoopMeTracker;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class ParseService {
 
@@ -25,113 +22,55 @@ public class ParseService {
     private static final String DEFAULT = "default";
     private static final String PORTRAIT = "portrait";
 
-    public interface RetrieveOperation<T> {
-        T execute() throws Exception;
-    }
-    private static <T> T safelyRetrieve(RetrieveOperation<T> operation, T defaultValue) {
-        try {
-            return operation.execute();
-        } catch (Exception ex) {
-            Logging.out(LOG_TAG, ex.getMessage());
-            return defaultValue;
+    @NonNull
+    public static AdParams getAdParamsFromResponse(
+        @NonNull AdFormat adFormat, @NonNull AdType creativeType, @Nullable Bid bid
+    ) {
+        AdParams adParams = bid == null ? new AdParams() : parse(bid, adFormat, creativeType);
+        if (creativeType == AdType.VAST || creativeType == AdType.VPAID) {
+            adParams = bid == null ? adParams : XmlParseService.parse(adParams, bid);
         }
-    }
-
-    public static LoopMeAd getLoopMeAdFromResponse(LoopMeAd loopMeAd, ResponseJsonModel responseModel) {
-        String creativeType = ResponseJsonModel.getCreativeType(responseModel);
-        if (creativeType == null) {
-            return null;
-        }
-        AdParams adParams = parse(responseModel, loopMeAd);
-        if (isAdOfType(creativeType, AdType.HTML)) {
-            setAdType(adParams, AdType.HTML);
-        } else if (isAdOfType(creativeType, AdType.VAST)) {
-            adParams = XmlParseService.parse(adParams, responseModel);
-            setAdType(adParams, AdType.VAST);
-        } else if (isAdOfType(creativeType, AdType.VPAID)) {
-            adParams = XmlParseService.parse(adParams, responseModel);
-            setAdType(adParams, AdType.VPAID);
-        } else if (isAdOfType(creativeType, AdType.MRAID)) {
-            setAdType(adParams, AdType.MRAID);
-        }
-        if (adParams == null) {
-            HashMap<String, String> errorInfo = new HashMap<>();
-            errorInfo.put(ERROR_MSG, Errors.PARSING_ERROR.getMessage());
-            LoopMeTracker.post(errorInfo);
-        }
-        loopMeAd.setAdParams(adParams);
-        return loopMeAd;
+        adParams.setAdType(creativeType);
+        return adParams;
     }
 
-    private static void setAdType(AdParams adParams, AdType adType) {
-        if (adParams != null) {
-            adParams.setAdType(adType);
-        }
-    }
-
-    public static AdParams parse(ResponseJsonModel responseModel, LoopMeAd loopMeAd) {
-        Bid bidObject = safelyRetrieve(() -> responseModel.getSeatbid().get(0).getBid().get(0), null);
-        if (bidObject == null) {
-            return null;
-        }
-        AdParamsBuilder adParamsBuilder = new AdParamsBuilder(retrieveAdFormat(loopMeAd))
-            .html(safelyRetrieve(bidObject::getAdm, ""))
+    @NonNull
+    private static AdParams parse(@NonNull Bid bid, @NonNull AdFormat adFormat, AdType type) {
+        return new AdParams(new AdParamsBuilder()
+            .format(AdParamsBuilder.getAdFormat(adFormat))
+            .html(safelyRetrieve(bid::getAdm, ""))
             .orientation(safelyRetrieve(() -> {
-                String orientation = bidObject.getExt().getOrientation();
-                return orientation.equalsIgnoreCase(DEFAULT) ? PORTRAIT : orientation;
+                String orientation = bid.getExt().getOrientation();
+                return DEFAULT.equalsIgnoreCase(orientation) ? PORTRAIT : orientation;
             }, PORTRAIT))
-            .token(safelyRetrieve(bidObject::getId, ""))
-            .debug(safelyRetrieve(() -> bidObject.getExt().getDebug() == 1, false))
-            .trackersList(safelyRetrieve(() -> bidObject.getExt().getMeasurePartners(), new ArrayList<>()))
-            .packageIds(safelyRetrieve(() -> new ArrayList<>(bidObject.getExt().getPackageIds()), new ArrayList<>()))
+            .token(safelyRetrieve(bid::getId, ""))
+            .debug(safelyRetrieve(() -> bid.getExt().getDebug() == 1, false))
+            .trackersList(safelyRetrieve(() -> bid.getExt().getMeasurePartners(), new ArrayList<>()))
+            .packageIds(safelyRetrieve(() -> new ArrayList<>(bid.getExt().getPackageIds()), new ArrayList<>()))
             .mraid(false)
-            .autoLoading(retrieveAutoLoadingWithDefaultTrue(bidObject))
-            .adSpotDimensions(retrieveAdDimensionsForNoneVastOrDefault(bidObject)
+            .autoLoading(retrieveAutoLoadingWithDefaultTrue(bid))
+            .adSpotDimensions(retrieveAdDimension(bid, type))
         );
-        return adParamsBuilder.isValidFormatValue() ? new AdParams(adParamsBuilder) : new AdParams();
     }
 
-    private static AdSpotDimensions retrieveAdDimensionsForNoneVastOrDefault(Bid bidObject) {
-        String creativeType = AdType.HTML.name();
-        try {
-            creativeType = bidObject.getExt().getCrtype();
-        } catch (IllegalArgumentException | NullPointerException ex) {
-            Logging.out(LOG_TAG, ex.getMessage());
-        }
-        if (!isAdOfType(creativeType, AdType.HTML) && !isAdOfType(creativeType, AdType.MRAID)) {
-            return AdSpotDimensions.getDefaultBanner();
-        }
-        if (bidObject.getWidth() == 0 || bidObject.getHeight() == 0) {
-            return AdSpotDimensions.getDefaultBanner();
-        }
-        return new AdSpotDimensions(bidObject.getWidth(), bidObject.getHeight());
+    private static AdSpotDimensions retrieveAdDimension(@NonNull Bid bid, @NonNull AdType type) {
+        if (type != AdType.HTML && type != AdType.MRAID) return AdSpotDimensions.getDefaultBanner();
+        if (bid.getWidth() == 0 || bid.getHeight() == 0) return AdSpotDimensions.getDefaultBanner();
+        return new AdSpotDimensions(bid.getWidth(), bid.getHeight());
     }
 
-    private static boolean retrieveAutoLoadingWithDefaultTrue(Bid bidObject) {
+    private static boolean retrieveAutoLoadingWithDefaultTrue(Bid bid) {
         int autoLoadingValue = 1;
-
         try {
-            autoLoadingValue = bidObject.getExt().getAutoLoading();
+            autoLoadingValue = bid.getExt().getAutoLoading();
         } catch (IllegalStateException | NullPointerException ex) {
             Logging.out(LOG_TAG, ex.getMessage());
         }
         if (autoLoadingValue == Constants.AUTO_LOADING_ABSENCE) {
-            Logging.out(ParseService.class.getSimpleName(), "autoLoadingValue is absence");
+            Logging.out(LOG_TAG, "autoLoadingValue is absence");
             return true;
         }
 
         return autoLoadingValue == 1;
-    }
-
-    private static String retrieveAdFormat(LoopMeAd loopMeAd) {
-        if (loopMeAd.getAdFormat() == Constants.AdFormat.INTERSTITIAL) {
-            return Constants.INTERSTITIAL_TAG;
-        }
-        return loopMeAd.getAdFormat() == Constants.AdFormat.BANNER ?
-            Constants.BANNER_TAG : Constants.INTERSTITIAL_TAG;
-    }
-
-    public static boolean isAdOfType(String creativeType, AdType adType) {
-        return !TextUtils.isEmpty(creativeType) && creativeType.equalsIgnoreCase(adType.name());
     }
 }

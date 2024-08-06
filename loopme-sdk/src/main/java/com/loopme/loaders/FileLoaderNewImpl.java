@@ -15,7 +15,6 @@ import com.loopme.common.LoopMeError;
 import com.loopme.models.Errors;
 import com.loopme.utils.ConnectionUtils;
 import com.loopme.utils.FileUtils;
-import com.loopme.utils.IOUtils;
 import com.loopme.utils.InternetUtils;
 import com.loopme.utils.ExecutorHelper;
 import com.loopme.tracker.partners.LoopMeTracker;
@@ -123,8 +122,10 @@ public class FileLoaderNewImpl implements Loader {
             error.addToMessage(fileUrl);
             onErrorTracking(error, e);
         } finally {
-            IOUtils.closeQuietly(outputStream);
-            IOUtils.closeQuietly(inputStream);
+            try (FileOutputStream os = outputStream) {
+                assert os != null;
+                os.flush();
+            } catch (IOException ignored) { }
             connection.disconnect();
         }
     }

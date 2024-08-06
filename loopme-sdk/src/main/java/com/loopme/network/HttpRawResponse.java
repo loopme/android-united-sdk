@@ -1,6 +1,9 @@
 package com.loopme.network;
 
+import android.util.Log;
+
 public class HttpRawResponse {
+    private static final String LOG_TAG = HttpRawResponse.class.getSimpleName();
     private int mCode;
     private String mMessage = "";
     private byte[] mBody;
@@ -11,7 +14,8 @@ public class HttpRawResponse {
         return mCode;
     }
     public void setMessage(String message) {
-        this.mMessage = message;
+        mMessage = message;
+        Log.d(LOG_TAG, "HttpRawResponse message: " + mMessage);
     }
     public String getMessage() {
         return mMessage;
