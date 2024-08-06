@@ -3,6 +3,8 @@ package com.loopme;
 import android.app.Activity;
 import android.widget.FrameLayout;
 
+import androidx.annotation.NonNull;
+
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
@@ -88,6 +90,7 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
         }
     }
 
+    @NonNull
     @Override
     public Constants.AdFormat getAdFormat() {
         return Constants.AdFormat.INTERSTITIAL;

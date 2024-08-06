@@ -61,7 +61,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     protected boolean mIsReady;
     private final int mAdId;
 
-    public final AdFetcherListener adFetchListener = new AdFetcherListener() {
+    private final AdFetcherListener adFetchListener = new AdFetcherListener() {
         @Override
         public void onAdFetchCompleted(AdParams adParams) {
             if (adParams != null) {
@@ -77,9 +77,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
                 error.setErrorMessage(String.valueOf(error.getErrorCode()));
             }
             onInternalLoadFail(error);
-            if (mAdFetchTask != null) {
-                mAdFetchTask.stopFetch();
-            }
+            if (mAdFetchTask != null) mAdFetchTask.stopFetch();
         }
     };
 
@@ -89,9 +87,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         }
         mContext = context;
         mAppKey = appKey;
-        context.runOnUiThread(() -> {
-            mTimers = new Timers(this);
-        });
+        context.runOnUiThread(() -> mTimers = new Timers(this));
         mAdId = IdGenerator.generateId();
         LiveDebug.init(context);
         Utils.init(getContext());
@@ -131,6 +127,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     public boolean isMraidAd() { return mAdParams != null && mAdParams.isMraidAd(); }
     public boolean isFullScreen() { return mDisplayController != null && mDisplayController.isFullScreen(); }
 
+    @NonNull
     public abstract Constants.AdFormat getAdFormat();
     public abstract AdSpotDimensions getAdSpotDimensions();
     public abstract void onAdExpired();
@@ -339,7 +336,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     public String getAppKey() { return mAppKey; }
     public FrameLayout getContainerView() { return mContainerView; }
     public int getAdId() { return mAdId; }
-    public void setAdParams(AdParams mAdParams) { this.mAdParams = mAdParams; }
+    public void setAdParams(@NonNull AdParams adParams) { mAdParams = adParams; }
     public void setAdState(Constants.AdState adState) { mAdState = adState; }
     public void setReady(boolean ready) { mIsReady = ready; }
     @Override
@@ -360,27 +357,15 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     @Override
     public void update(Observable observable, Object arg) {
-        if (!(observable instanceof Timers) || !(arg instanceof TimersType)) {
-            return;
-        }
-        if (arg == TimersType.FETCHER_TIMER) {
-            onInternalLoadFail(Errors.AD_PROCESSING_TIMEOUT);
-        }
-        if (arg == TimersType.EXPIRATION_TIMER) {
-            onAdExpired();
-        }
+        if (!(observable instanceof Timers) || !(arg instanceof TimersType)) return;
+        if (arg == TimersType.FETCHER_TIMER) onInternalLoadFail(Errors.AD_PROCESSING_TIMEOUT);
+        if (arg == TimersType.EXPIRATION_TIMER) onAdExpired();
     }
 
-    public void runOnUiThread(Runnable runnable) {
-        if (mHandler != null) {
-            mHandler.post(runnable);
-        }
-    }
+    public void runOnUiThread(Runnable runnable) { if (mHandler != null) mHandler.post(runnable); }
 
     public void runOnUiThreadDelayed(Runnable runnable, long time) {
-        if (mHandler != null) {
-            mHandler.postDelayed(runnable, time);
-        }
+        if (mHandler != null) mHandler.postDelayed(runnable, time);
     }
 
     public void onNewContainer(@NonNull FrameLayout containerView) {

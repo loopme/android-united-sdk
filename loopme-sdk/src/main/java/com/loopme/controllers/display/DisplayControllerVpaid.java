@@ -20,13 +20,11 @@ import com.loopme.common.LoopMeError;
 import com.loopme.controllers.MraidController;
 import com.loopme.controllers.interfaces.VastVpaidDisplayController;
 import com.loopme.controllers.view.ViewControllerVpaid;
-import com.loopme.listener.AdReadyListener;
 import com.loopme.models.BridgeMethods;
 import com.loopme.models.Errors;
 import com.loopme.models.Message;
 import com.loopme.time.SimpleTimer;
 import com.loopme.tracker.constants.EventConstants;
-import com.loopme.utils.IOUtils;
 import com.loopme.utils.UiUtils;
 import com.loopme.utils.Utils;
 import com.loopme.views.MraidView;
@@ -73,29 +71,24 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     //region DisplayController methods
 
-    private StringBuilder readAssets(AssetManager assetManager, String filename) {
-        InputStream inputStream = null;
-        try {
-            inputStream = assetManager.open(filename);
+    private StringBuilder readAssets(AssetManager assetManager) {
+        try (InputStream inputStream = assetManager.open(HTML_SOURCE_FILE)) {
             StringBuilder out = new StringBuilder();
-            byte[] bytes = new byte[4096];
-            int numberBytesRead;
-            while ((numberBytesRead = inputStream.read(bytes)) != -1) {
-                out.append(new String(bytes, 0, numberBytesRead));
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                out.append(new String(buffer, 0, bytesRead));
             }
             return out;
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            IOUtils.closeQuietly(inputStream);
+        } catch (IOException ignored) {
+            return new StringBuilder();
         }
-        return new StringBuilder();
     }
 
     @Override
     public void prepare() {
         super.prepare();
-        StringBuilder htmlBuilder = readAssets(getAssetsManager(), HTML_SOURCE_FILE);
+        StringBuilder htmlBuilder = readAssets(getAssetsManager());
         onAdInjectJsVpaid(htmlBuilder);
         String html = htmlBuilder.toString().replace(VPAID_CREATIVE_URL_STRING, mAdParams.getVpaidJsUrl());
         mIsWaitingForWebView = true;

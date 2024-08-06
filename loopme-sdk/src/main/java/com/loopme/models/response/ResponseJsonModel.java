@@ -4,6 +4,8 @@ package com.loopme.models.response;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 import com.loopme.Logging;
 import com.loopme.ad.AdType;
 
@@ -56,12 +58,13 @@ public class ResponseJsonModel implements Serializable, Parcelable {
         return 0;
     }
 
-    public static String getCreativeType(ResponseJsonModel responseModel) {
+    @NonNull
+    public static AdType getCreativeType(ResponseJsonModel responseModel) {
         try {
-            return responseModel.getSeatbid().get(0).getBid().get(0).getExt().getCrtype();
+            return AdType.fromString(responseModel.getSeatbid().get(0).getBid().get(0).getExt().getCrtype());
         } catch (IllegalArgumentException | NullPointerException ex) {
             Logging.out(LOG_TAG, ex.getMessage());
-            return AdType.HTML.name();
+            return AdType.HTML;
         }
     }
 }

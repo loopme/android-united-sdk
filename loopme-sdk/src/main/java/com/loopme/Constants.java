@@ -91,12 +91,8 @@ public class Constants {
         BANNER, INTERSTITIAL, EXPANDABLE_BANNER;
 
         public static AdFormat fromInt(int format) {
-            if (format == BANNER.ordinal()) {
-                return BANNER;
-            }
-            if (format == INTERSTITIAL.ordinal()) {
-                return INTERSTITIAL;
-            }
+            if (format == BANNER.ordinal()) return BANNER;
+            if (format == INTERSTITIAL.ordinal()) return INTERSTITIAL;
             return EXPANDABLE_BANNER;
         }
     }

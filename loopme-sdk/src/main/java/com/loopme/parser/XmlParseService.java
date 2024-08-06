@@ -3,6 +3,7 @@ package com.loopme.parser;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.loopme.Constants;
 import com.loopme.ad.AdParams;
@@ -33,21 +34,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 public class XmlParseService {
 
     private static final String LOG_TAG = XmlParseService.class.getSimpleName();
-    private static final int FIRST_ELEMENT = 0;
     private static AdParams sAdParams = new AdParams();
 
-    public static AdParams parse(AdParams adParams, ResponseJsonModel responseModel) {
-        Bid bidObject = retrieveBidObject(responseModel);
-        if (bidObject == null) {
-            return null;
-        }
+    @NonNull
+    public static AdParams parse(@NonNull AdParams adParams, @NonNull Bid bidObject) {
         sAdParams = adParams;
-        return parseResponse(bidObject.getAdm());
+        AdParams newAdParams = parseResponse(bidObject.getAdm());
+        return newAdParams == null ? sAdParams : newAdParams;
     }
 
     public static AdParams parse(String vastString) {
@@ -61,14 +58,16 @@ public class XmlParseService {
             "" : bidObject.getExt().getOrientation();
     }
 
+    @Nullable
     private static Bid retrieveBidObject(ResponseJsonModel responseModel) {
         try {
-            return responseModel.getSeatbid().get(FIRST_ELEMENT).getBid().get(FIRST_ELEMENT);
+            return responseModel.getSeatbid().get(0).getBid().get(0);
         } catch (IllegalArgumentException | NullPointerException ex) {
             return null;
         }
     }
 
+    @Nullable
     private static AdParams parseResponse(String response) {
         Vast vast = parseVast(response);
         return vast == null ? null : createAdParams(vast);
@@ -305,6 +304,7 @@ public class XmlParseService {
         };
     }
 
+    @Nullable
     private static Vast parseVast(String xml) {
         try {
             return XmlParser.parse(xml, Vast.class);

@@ -18,6 +18,7 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 
 import com.loopme.Constants;
+import com.loopme.Logging;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.request.AES;
@@ -297,4 +298,17 @@ public class Utils {
     }
 
     public static String getUserAgent() { return sUserAgent; }
+
+    public interface RetrieveOperation<T> {
+        T execute() throws Exception;
+    }
+
+    public static <T> T safelyRetrieve(RetrieveOperation<T> operation, T defaultValue) {
+        try {
+            return operation.execute();
+        } catch (Exception ex) {
+            Logging.out(LOG_TAG, ex.getMessage());
+            return defaultValue;
+        }
+    }
 }
