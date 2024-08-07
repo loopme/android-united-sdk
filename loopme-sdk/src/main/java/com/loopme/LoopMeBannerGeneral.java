@@ -1,6 +1,7 @@
 package com.loopme;
 
 import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.debugging.Params.PLACEMENT_TYPE;
 
 import android.app.Activity;
 import android.util.Log;
@@ -94,6 +95,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         } else {
             HashMap<String, String> errorInfo = new HashMap<>();
             errorInfo.put(ERROR_MSG, "Bind view is null");
+            errorInfo.put(PLACEMENT_TYPE, getPlacementType().name().toLowerCase());
             LoopMeTracker.post(errorInfo);
         }
     }
@@ -130,6 +132,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         } else {
             HashMap<String, String> errorInfo = new HashMap<>();
             errorInfo.put(ERROR_MSG, "Banner is not ready");
+            errorInfo.put(PLACEMENT_TYPE, getPlacementType().name().toLowerCase());
             LoopMeTracker.post(errorInfo);
         }
     }
@@ -197,6 +200,11 @@ public class LoopMeBannerGeneral extends LoopMeAd {
     @Override
     public Constants.AdFormat getAdFormat() {
         return Constants.AdFormat.BANNER;
+    }
+
+    @Override
+    public Constants.PlacementType getPlacementType() {
+        return Constants.PlacementType.BANNER;
     }
 
     @Override

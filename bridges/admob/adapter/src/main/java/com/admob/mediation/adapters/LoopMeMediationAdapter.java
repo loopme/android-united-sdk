@@ -8,6 +8,7 @@ import android.util.Log;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.VersionInfo;
 import com.google.android.gms.ads.mediation.Adapter;
 import com.google.android.gms.ads.mediation.InitializationCompleteCallback;
@@ -22,8 +23,8 @@ import com.google.android.gms.ads.mediation.MediationInterstitialAdConfiguration
 import com.google.android.gms.ads.mediation.MediationRewardedAd;
 import com.google.android.gms.ads.mediation.MediationRewardedAdCallback;
 import com.google.android.gms.ads.mediation.MediationRewardedAdConfiguration;
+import com.loopme.BuildConfig;
 import com.loopme.LoopMeSdk;
-import com.admob.mediation.adapters.loopme.BuildConfig;
 
 import java.util.List;
 
@@ -80,6 +81,9 @@ public class LoopMeMediationAdapter extends Adapter {
 
         new Handler(Looper.getMainLooper()).post(() -> {
             LoopMeSdk.Configuration loopMeConf = new LoopMeSdk.Configuration();
+            loopMeConf.setMediation("admob");
+            loopMeConf.setMediationSdkVersion(getMediationSdkVersion());
+            loopMeConf.setAdapterVersion(BuildConfig.VERSION_NAME);
             LoopMeSdk.initialize(context, loopMeConf, new LoopMeSdk.LoopMeSdkListener() {
                 @Override
                 public void onSdkInitializationSuccess() {
@@ -92,6 +96,10 @@ public class LoopMeMediationAdapter extends Adapter {
                 }
             });
         });
+    }
+
+    public String getMediationSdkVersion() {
+        return MobileAds.getVersion().toString();
     }
 
     @Override

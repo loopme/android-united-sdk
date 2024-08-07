@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.ironsource.mediationsdk.adunit.adapter.BaseAdapter;
 import com.ironsource.mediationsdk.adunit.adapter.listener.NetworkInitializationListener;
 import com.ironsource.mediationsdk.adunit.adapter.utility.AdData;
+import com.ironsource.mediationsdk.utils.IronSourceUtils;
 import com.loopme.LoopMeSdk;
 
 import java.util.Map;
@@ -55,6 +56,10 @@ public class LoopmeCustomAdapter extends BaseAdapter {
         return BuildConfig.VERSION_NAME;
     }
 
+    public static String getMediationSdkVersion() {
+        return IronSourceUtils.getSDKVersion();
+    }
+
     private static void tryInitializeLoopMeSdk(
         NetworkInitializationListener networkInitializationListener,
         CountDownLatch latch,
@@ -63,6 +68,9 @@ public class LoopmeCustomAdapter extends BaseAdapter {
         new Handler(Looper.getMainLooper()).post(() -> {
             try {
                 LoopMeSdk.Configuration loopMeConf = new LoopMeSdk.Configuration();
+                loopMeConf.setMediation("ironsource");
+                loopMeConf.setAdapterVersion(BuildConfig.VERSION_NAME);
+                loopMeConf.setMediationSdkVersion(getMediationSdkVersion());
 
                 LoopMeSdk.initialize(
                     context,

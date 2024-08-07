@@ -97,6 +97,11 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
     }
 
     @Override
+    public Constants.PlacementType getPlacementType() {
+        return isRewarded ? Constants.PlacementType.REWARDED : Constants.PlacementType.INTERSTITIAL;
+    }
+
+    @Override
     public AdSpotDimensions getAdSpotDimensions() {
         return new AdSpotDimensions(Utils.getScreenWidth(), Utils.getScreenHeight());
     }

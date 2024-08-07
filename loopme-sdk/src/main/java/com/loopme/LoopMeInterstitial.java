@@ -79,6 +79,15 @@ public final class LoopMeInterstitial extends AdWrapper {
     }
 
     @Override
+    public Constants.PlacementType getPlacementType() {
+        if (mFirstLoopMeAd != null && mFirstLoopMeAd instanceof LoopMeInterstitialGeneral) {
+            return ((LoopMeInterstitialGeneral) mFirstLoopMeAd).isRewarded() ?
+                    Constants.PlacementType.REWARDED : Constants.PlacementType.INTERSTITIAL;
+        }
+        return Constants.PlacementType.INTERSTITIAL;
+    }
+
+    @Override
     public void onAutoLoadPaused() {
         if (mMainAdListener != null) {
             mMainAdListener.onLoopMeInterstitialLoadFail(this, getAutoLoadingPausedError());
