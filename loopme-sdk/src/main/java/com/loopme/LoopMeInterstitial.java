@@ -80,10 +80,8 @@ public final class LoopMeInterstitial extends AdWrapper {
 
     @Override
     public Constants.PlacementType getPlacementType() {
-        if (mFirstLoopMeAd instanceof LoopMeInterstitialGeneral) {
-            return mFirstLoopMeAd.getPlacementType();
-        }
-        return Constants.PlacementType.INTERSTITIAL;
+        return mFirstLoopMeAd instanceof LoopMeInterstitialGeneral ?
+                mFirstLoopMeAd.getPlacementType() : Constants.PlacementType.INTERSTITIAL;
     }
 
     @Override
