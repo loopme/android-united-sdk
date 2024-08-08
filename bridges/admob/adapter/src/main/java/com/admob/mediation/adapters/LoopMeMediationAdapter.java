@@ -83,7 +83,7 @@ public class LoopMeMediationAdapter extends Adapter {
             LoopMeSdk.Configuration loopMeConf = new LoopMeSdk.Configuration();
             loopMeConf.setMediation("admob");
             loopMeConf.setMediationSdkVersion(getMediationSdkVersion());
-            loopMeConf.setAdapterVersion(BuildConfig.VERSION_NAME);
+            loopMeConf.setAdapterVersion(getAdapterVersion());
             LoopMeSdk.initialize(context, loopMeConf, new LoopMeSdk.LoopMeSdkListener() {
                 @Override
                 public void onSdkInitializationSuccess() {
@@ -101,6 +101,7 @@ public class LoopMeMediationAdapter extends Adapter {
     public String getMediationSdkVersion() {
         return MobileAds.getVersion().toString();
     }
+    public String getAdapterVersion() { return BuildConfig.VERSION_NAME; }
 
     @Override
     public void loadInterstitialAd(

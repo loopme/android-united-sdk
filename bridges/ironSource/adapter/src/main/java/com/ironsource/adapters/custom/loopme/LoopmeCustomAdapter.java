@@ -69,7 +69,10 @@ public class LoopmeCustomAdapter extends BaseAdapter {
             try {
                 LoopMeSdk.Configuration loopMeConf = new LoopMeSdk.Configuration();
                 loopMeConf.setMediation("ironsource");
-                loopMeConf.setAdapterVersion(BuildConfig.VERSION_NAME);
+
+                LoopmeCustomAdapter adapterInstance = new LoopmeCustomAdapter();
+                loopMeConf.setAdapterVersion(adapterInstance.getAdapterVersion());
+
                 loopMeConf.setMediationSdkVersion(getMediationSdkVersion());
 
                 LoopMeSdk.initialize(

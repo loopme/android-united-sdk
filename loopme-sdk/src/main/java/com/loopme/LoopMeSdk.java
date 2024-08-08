@@ -151,7 +151,7 @@ public final class LoopMeSdk {
     }
 
     public static String getMediation() {
-        return configuration != null ? configuration.getMediation() : null;
+        return configuration != null ? configuration.getMediation() : "unknown";
     }
 
     public static String getMediationSdkVersion() {
