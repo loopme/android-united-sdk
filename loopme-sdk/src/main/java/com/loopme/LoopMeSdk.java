@@ -155,10 +155,10 @@ public final class LoopMeSdk {
     }
 
     public static String getMediationSdkVersion() {
-        return configuration != null ? configuration.getMediationSdkVersion() : null;
+        return configuration != null ? configuration.getMediationSdkVersion() : "unknown";
     }
 
     public static String getAdapterVersion() {
-        return configuration != null ? configuration.getAdapterVersion() : null;
+        return configuration != null ? configuration.getAdapterVersion() : "unknown";
     }
 }
