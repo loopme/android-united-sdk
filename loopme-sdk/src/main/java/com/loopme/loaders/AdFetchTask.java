@@ -19,19 +19,15 @@ import com.loopme.network.GetResponse;
 import com.loopme.parser.ParseService;
 import com.loopme.parser.XmlParseService;
 import com.loopme.request.RequestBuilder;
-import com.loopme.time.Timers;
-import com.loopme.time.TimersType;
 import com.loopme.utils.ExecutorHelper;
-import com.loopme.webservice.LoopMeAdServiceImpl;
+import com.loopme.network.LoopMeAdService;
 
 import org.json.JSONObject;
 
-import java.util.Observable;
-import java.util.Observer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-public class AdFetchTask implements Runnable, Observer {
+public class AdFetchTask implements Runnable {
 
     protected static final String LOG_TAG = AdFetchTask.class.getSimpleName();
     private static final int RESPONSE_NO_ADS = 204;
@@ -46,19 +42,14 @@ public class AdFetchTask implements Runnable, Observer {
     private final Handler mHandler = new Handler((Looper.getMainLooper()));
     private static final String UNEXPECTED = "Unexpected";
     private boolean mIsVastVpaidAd;
-    private final Timers mTimers;
 
     public AdFetchTask(LoopMeAd loopMeAd, AdFetcherListener adFetcherListener) {
         mLoopMeAd = loopMeAd;
         mAdFetcherListener = adFetcherListener;
-        mTimers = new Timers(this);
         mExecutorService = ExecutorHelper.getExecutor();
     }
 
     public void fetch() {
-        mHandler.post(() -> {
-            if (mTimers != null) mTimers.startTimer(TimersType.REQUEST_TIMER);
-        });
         mFetchTask = mExecutorService.submit(this);
     }
 
@@ -80,16 +71,13 @@ public class AdFetchTask implements Runnable, Observer {
             JSONObject data = RequestBuilder.buildRequestJson(mLoopMeAd.getContext(), mLoopMeAd);
             if (Thread.interrupted()) {
                 Logging.out(LOG_TAG, "Thread interrupted.");
-                stopRequestTimer();
                 return;
             }
-            GetResponse<ResponseJsonModel> response = LoopMeAdServiceImpl.getInstance().fetchAd(Constants.BASE_URL, data);
+            GetResponse<ResponseJsonModel> response = LoopMeAdService.getInstance().fetchAd(Constants.BASE_URL, data);
             Logging.out(LOG_TAG, "response received");
-            stopRequestTimer();
             parseResponse(response);
         } catch (Exception e) {
             Logging.out(LOG_TAG, e.toString());
-            stopRequestTimer();
             handleBadResponse(e.getMessage());
         }
     }
@@ -157,19 +145,6 @@ public class AdFetchTask implements Runnable, Observer {
             Constants.BAD_SERVERS_CODE + response.getCode() :
             response.getMessage();
         onErrorResult(new LoopMeError(message));
-    }
-
-    @Override
-    public void update(Observable observable, Object arg) {
-        if (observable instanceof Timers && arg instanceof TimersType) {
-            if ((arg == TimersType.REQUEST_TIMER)) onErrorResult(Errors.REQUEST_TIMEOUT);
-        }
-    }
-
-    protected void stopRequestTimer() {
-        mHandler.post(() -> {
-            if (mTimers != null) mTimers.stopTimer(TimersType.REQUEST_TIMER);
-        });
     }
 
     private void onSuccessResult(final AdParams adParams) {

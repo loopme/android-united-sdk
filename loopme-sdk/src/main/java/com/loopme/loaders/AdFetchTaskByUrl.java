@@ -4,7 +4,7 @@ import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.models.response.ResponseJsonModel;
 import com.loopme.network.GetResponse;
-import com.loopme.webservice.LoopMeAdServiceImpl;
+import com.loopme.network.LoopMeAdService;
 
 public class AdFetchTaskByUrl extends AdFetchTask {
     private final String mUrl;
@@ -17,12 +17,10 @@ public class AdFetchTaskByUrl extends AdFetchTask {
     @Override
     public void run() {
         try {
-            GetResponse<ResponseJsonModel> response = LoopMeAdServiceImpl.getInstance().fetchAdByUrl(mUrl);
+            GetResponse<ResponseJsonModel> response = LoopMeAdService.getInstance().fetchAdByUrl(mUrl);
             Logging.out(LOG_TAG, "response received");
-            stopRequestTimer();
             parseResponse(response);
         } catch (Exception e) {
-            stopRequestTimer();
             handleBadResponse(e.getMessage());
         }
     }

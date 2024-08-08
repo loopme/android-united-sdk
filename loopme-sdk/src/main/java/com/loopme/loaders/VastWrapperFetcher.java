@@ -5,8 +5,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 
-import androidx.annotation.NonNull;
-
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.ad.AdParams;
@@ -16,7 +14,7 @@ import com.loopme.network.GetResponse;
 import com.loopme.parser.XmlParseService;
 import com.loopme.vast.VastVpaidEventTracker;
 import com.loopme.vast.WrapperParser;
-import com.loopme.webservice.LoopMeAdServiceImpl;
+import com.loopme.network.LoopMeAdService;
 import com.loopme.xml.vast4.VastInfo;
 import com.loopme.xml.vast4.Wrapper;
 
@@ -109,7 +107,7 @@ public class VastWrapperFetcher {
 
     private void doRequest(String vastTagUrl) {
         try {
-            GetResponse<String> response = LoopMeAdServiceImpl.getInstance().downloadResource(vastTagUrl);
+            GetResponse<String> response = LoopMeAdService.getInstance().downloadResource(vastTagUrl);
             stopTimer();
             parseVastResponse(response);
         } catch (Exception e) {
@@ -118,7 +116,6 @@ public class VastWrapperFetcher {
         }
     }
 
-    @NonNull
     private void parseVastResponse(GetResponse<String> response) {
         if (response.isSuccessful() && !mIsStopped) {
             handleVastWrapperCase(response.getBody());

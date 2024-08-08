@@ -19,11 +19,8 @@ public class Timers extends Observable {
 
     public Timers(Observer observer) {
         addObserver(observer);
-        initTimer(TimersType.REQUEST_TIMER, Constants.REQUEST_TIMEOUT);
-        initTimer(TimersType.FETCHER_TIMER, Constants.FETCH_TIMEOUT);
         initTimer(TimersType.PREPARE_ASSETS_TIMER, Constants.PREPARE_VAST_ASSET_TIMEOUT);
         initTimer(TimersType.PREPARE_VPAID_JS_TIMER, Constants.PREPARE_VPAID_JS_TIMEOUT);
-        initTimer(TimersType.GDPR_PAGE_LOADED_TIMER, Constants.GDPR_PAGE_READY_TIMEOUT);
     }
 
     private void initTimer(TimersType type, long duration) {

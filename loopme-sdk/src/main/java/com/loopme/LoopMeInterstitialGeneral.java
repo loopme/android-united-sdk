@@ -110,7 +110,6 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
      * Triggered when the interstitial has successfully loaded the ad content
      */
     private void onLoopMeInterstitialLoadSuccess() {
-        stopTimer(TimersType.FETCHER_TIMER);
         long currentTime = System.currentTimeMillis();
         long loadingTime = currentTime - mStartLoadingTime;
 
@@ -132,7 +131,6 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
     private void onLoopMeInterstitialLoadFail(final LoopMeError error) {
         setReady(false);
         setAdState(Constants.AdState.NONE);
-        stopTimer(TimersType.FETCHER_TIMER);
         destroyDisplayController();
         UiUtils.broadcastIntent(getContext(), Constants.DESTROY_INTENT, getAdId());
         if (mAdListener != null) {

@@ -239,7 +239,6 @@ public class LoopMeBannerGeneral extends LoopMeAd {
      */
     @Override
     public void onAdLoadSuccess() {
-        stopTimer(TimersType.FETCHER_TIMER);
         long currentTime = System.currentTimeMillis();
         long loadingTime = currentTime - mStartLoadingTime;
 
@@ -270,7 +269,6 @@ public class LoopMeBannerGeneral extends LoopMeAd {
     @Override
     public void onAdLoadFail(final LoopMeError error) {
         mHandler.post(() -> {
-            stopTimer(TimersType.FETCHER_TIMER);
             setReady(false);
             setAdState(Constants.AdState.NONE);
             destroyDisplayController();
