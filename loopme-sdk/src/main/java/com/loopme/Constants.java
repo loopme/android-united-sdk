@@ -70,14 +70,11 @@ public class Constants {
     public static final int START_POSITION = 0;
     public static final int SECONDS_IN_MINUTE = 60;
     public static final int MILLIS_IN_SECOND = 1000;
-    public static final int REQUEST_TIMEOUT = 1000 * 15; //15 seconds
     public static final int PREPARE_VAST_ASSET_TIMEOUT = 1000 * 10; //10 seconds
     public static final int PREPARE_VPAID_JS_TIMEOUT = 1000 * 10; //10 seconds
     public static final int SHRINK_MODE_KEEP_AFTER_FINISH_TIME = 1000;
     public static final int DEFAULT_EXPIRED_TIME = 1000 * 60 * 10;//10 minutes
-    public static final long FETCH_TIMEOUT = 1000 * 60;//1 minute
     public static long CACHED_VIDEO_LIFE_TIME = 1000 * 60 * 60 * 32;//32 hours
-    public static final long GDPR_PAGE_READY_TIMEOUT = 1000;
     public static boolean USE_MOBILE_NETWORK_FOR_CACHING = true;
     public static String sCacheDirectory = "";
     public static final String EXTRAS_ALLOW_ORIENTATION_CHANGE = "allowOrientationChange";

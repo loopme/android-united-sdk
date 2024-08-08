@@ -249,7 +249,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     public AdFetchTask load(String url) {
         setAdState(Constants.AdState.LOADING);
-        startTimer(TimersType.FETCHER_TIMER, null);
         AdFetchTask adFetchTask = new AdFetchTaskByUrl(this, adFetchListener, url);
         adFetchTask.fetch();
         return adFetchTask;
@@ -307,7 +306,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
             onAdAlreadyLoaded();
         } else {
             setAdState(Constants.AdState.LOADING);
-            startTimer(TimersType.FETCHER_TIMER, null);
             mAdFetchTask = new AdFetchTask(this, adFetchListener);
             mAdFetchTask.fetch();
         }
@@ -361,7 +359,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     @Override
     public void update(Observable observable, Object arg) {
         if (!(observable instanceof Timers) || !(arg instanceof TimersType)) return;
-        if (arg == TimersType.FETCHER_TIMER) onInternalLoadFail(Errors.AD_PROCESSING_TIMEOUT);
         if (arg == TimersType.EXPIRATION_TIMER) onAdExpired();
     }
 

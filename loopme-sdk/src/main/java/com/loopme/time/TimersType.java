@@ -5,20 +5,11 @@ package com.loopme.time;
  */
 
 public enum TimersType {
-    FETCHER_TIMER(1),
     PREPARE_VPAID_JS_TIMER(2),
     EXPIRATION_TIMER(3),
-    REQUEST_TIMER(4),
-    PREPARE_ASSETS_TIMER(5),
-    GDPR_PAGE_LOADED_TIMER(6);
+    PREPARE_ASSETS_TIMER(5);
 
     private final int mId;
-
-    TimersType(int id) {
-        mId = id;
-    }
-
-    public int getId() {
-        return mId;
-    }
+    TimersType(int id) { mId = id; }
+    public int getId() { return mId; }
 }
