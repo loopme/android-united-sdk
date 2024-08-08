@@ -1,6 +1,7 @@
 package com.loopme.ad;
 
 import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.debugging.Params.PLACEMENT_TYPE;
 
 import android.app.Activity;
 import android.os.Handler;
@@ -129,6 +130,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     @NonNull
     public abstract Constants.AdFormat getAdFormat();
+    public abstract Constants.PlacementType getPlacementType();
     public abstract AdSpotDimensions getAdSpotDimensions();
     public abstract void onAdExpired();
     public abstract void onAdLoadSuccess();
@@ -153,6 +155,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         } else {
             HashMap<String, String> errorInfo = new HashMap<>();
             errorInfo.put(ERROR_MSG, "Bind view is null");
+            errorInfo.put(PLACEMENT_TYPE, getPlacementType().name().toLowerCase());
             LoopMeTracker.post(errorInfo);
         }
     }

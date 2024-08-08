@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import com.loopme.BuildConfig;
 import com.loopme.Constants;
 import com.loopme.Logging;
+import com.loopme.LoopMeSdk;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.debugging.LiveDebug;
@@ -103,6 +104,9 @@ public class LoopMeTracker {
         params.put(Params.DEVICE_ID, RequestUtils.getIfa());
         params.put(Params.APP_KEY, sAppKey);
         params.put(Params.PACKAGE_ID, sPackageId);
+        params.put(Params.MEDIATION, LoopMeSdk.getMediation());
+        params.put(Params.MEDIATION_SDK_VERSION, LoopMeSdk.getMediationSdkVersion());
+        params.put(Params.ADAPTER_VERSION, LoopMeSdk.getAdapterVersion());
         params.put(Params.MSG, Constants.SDK_ERROR_MSG);
         return params;
     }

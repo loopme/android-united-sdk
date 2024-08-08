@@ -97,6 +97,10 @@ public class Constants {
         }
     }
 
+    public enum PlacementType {
+        BANNER, INTERSTITIAL, REWARDED;
+    }
+
     public enum AdState {
         /**
          * Initial state of ad right after creation.

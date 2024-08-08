@@ -70,6 +70,9 @@ public class LoopmeMediationAdapter
 
         new Handler(Looper.getMainLooper()).post(() -> {
             LoopMeSdk.Configuration loopMeConf = new LoopMeSdk.Configuration();
+            loopMeConf.setMediation("applovin");
+            loopMeConf.setAdapterVersion(getAdapterVersion());
+            loopMeConf.setMediationSdkVersion(getMediationSdkVersion());
             LoopMeSdk.initialize(activity.getBaseContext(), loopMeConf, new LoopMeSdk.LoopMeSdkListener() {
                 @Override
                 public void onSdkInitializationSuccess() {
@@ -94,6 +97,10 @@ public class LoopmeMediationAdapter
     @Override
     public String getAdapterVersion() {
         return BuildConfig.VERSION_NAME;
+    }
+
+    public String getMediationSdkVersion() {
+        return AppLovinSdk.VERSION;
     }
 
     @Override

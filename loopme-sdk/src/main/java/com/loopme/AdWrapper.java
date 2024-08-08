@@ -30,6 +30,7 @@ public abstract class AdWrapper extends AdConfig {
     }
 
     public abstract Constants.AdFormat getAdFormat();
+    public abstract Constants.PlacementType getPlacementType();
 
     public abstract void onAutoLoadPaused();
 

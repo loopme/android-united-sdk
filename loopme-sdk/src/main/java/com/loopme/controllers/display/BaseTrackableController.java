@@ -1,6 +1,7 @@
 package com.loopme.controllers.display;
 
 import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.debugging.Params.PLACEMENT_TYPE;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
@@ -34,11 +35,13 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
     private final LoopMeAd mLoopMeAd;
     private boolean mIsImpressionTracked;
     private final String mOrientation;
+    private final String mPlacementType;
 
     public BaseTrackableController(@NonNull LoopMeAd loopMeAd) {
         mLoopMeAd = loopMeAd;
         mOrientation = mLoopMeAd.getAdParams().getAdOrientation();
         mEventManager = new EventManager(mLoopMeAd);
+        mPlacementType = mLoopMeAd.getAdFormat().name();
     }
 
     protected void initTrackers() {
@@ -70,6 +73,7 @@ public abstract class BaseTrackableController implements DisplayController, AdEv
         }
         HashMap<String, String> errorInfo = new HashMap<>();
         errorInfo.put(ERROR_MSG, message);
+        errorInfo.put(PLACEMENT_TYPE, mPlacementType.toLowerCase());
         LoopMeTracker.post(errorInfo);
         onAdErrorEvent(message);
     }
