@@ -60,7 +60,7 @@ public class LoopMeTracker {
     }
 
     private static void sendDataToServer(final String errorUrl, final String request) {
-        ExecutorHelper.getExecutor().submit(() -> HttpUtils.simpleRequest(errorUrl, request));
+        ExecutorHelper.getExecutor().submit(() -> HttpUtils.track(errorUrl, request));
     }
 
     private static synchronized void postVastError(String vastErrorCode) {

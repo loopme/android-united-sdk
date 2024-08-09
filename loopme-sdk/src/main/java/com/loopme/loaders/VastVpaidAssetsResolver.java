@@ -28,16 +28,11 @@ public class VastVpaidAssetsResolver {
         mContext = context;
         mAdParams = adParams;
         mListener = assetsLoadListener;
-
         videoFileIndex = 0;
         endCardFileIndex = 0;
         mVideoFilePath = null;
-
-        if (mAdParams.isVpaidAd()) {
-            loadEndCard();
-        } else {
-            loadVideoAndEndCard();
-        }
+        if (mAdParams.isVpaidAd()) loadEndCard();
+        else loadVideoAndEndCard();
     }
 
     public void stop() {
@@ -48,20 +43,34 @@ public class VastVpaidAssetsResolver {
     }
 
     private void loadVideoAndEndCard() {
-        if (isEmptyList()) {
+        if (mAdParams.getVideoFileUrlsList() == null ||mAdParams.getVideoFileUrlsList().isEmpty()) {
             onErrorOccurred(Errors.VAST_COULD_NOT_FIND_SUPPORTED_FORMAT);
             return;
         }
         mVideoLoader = new FileLoaderNewImpl(
             mAdParams.getVideoFileUrlsList().get(videoFileIndex),
             mContext,
-            initVastFileLoaderCallback()
+            new FileLoaderNewImpl.Callback() {
+                @Override
+                public void onError(LoopMeError error) {
+                    Logging.out(LOG_TAG, "Load video fail:" + error.getMessage());
+                    videoFileIndex++;
+                    if (videoFileIndex < mAdParams.getVideoFileUrlsList().size()) {
+                        onPostWarning(error);
+                        loadVideoAndEndCard();
+                    } else {
+                        onErrorOccurred(error);
+                    }
+                }
+                @Override
+                public void onFileFullLoaded(String filePath) {
+                    Logging.out(LOG_TAG, "onFileFullLoaded");
+                    mVideoFilePath = filePath;
+                    loadEndCard();
+                }
+            }
         );
         mVideoLoader.start();
-    }
-
-    private boolean isEmptyList() {
-        return mAdParams.getVideoFileUrlsList() == null || mAdParams.getVideoFileUrlsList().isEmpty();
     }
 
     private void loadEndCard() {
@@ -70,36 +79,7 @@ public class VastVpaidAssetsResolver {
             return;
         }
         String endCardUrl = mAdParams.getEndCardUrlList().get(endCardFileIndex);
-        mFileLoader = new FileLoaderNewImpl(endCardUrl, mContext, initVpaidFileLoaderCallback());
-        startCompanionTimer();
-        mFileLoader.start();
-    }
-
-    private void startCompanionTimer() {
-        mCompanionTimer = new CountDownTimer(COMPANION_TIMEOUT, Constants.ONE_SECOND_IN_MILLIS) {
-            @Override
-            public void onTick(long millisUntilFinished) { }
-            @Override
-            public void onFinish() {
-                onCompanionTimeout();
-            }
-        };
-        mCompanionTimer.start();
-    }
-
-    private void onCompanionTimeout() {
-        stopLoader(mFileLoader);
-        handleVpaidError(Errors.COMPANION_ERROR);
-    }
-
-    private void stopLoader(Loader loader) {
-        if (loader != null) {
-            loader.stop();
-        }
-    }
-
-    private FileLoaderNewImpl.Callback initVpaidFileLoaderCallback() {
-        return new FileLoaderNewImpl.Callback() {
+        mFileLoader = new FileLoaderNewImpl(endCardUrl, mContext, new FileLoaderNewImpl.Callback() {
             @Override
             public void onError(LoopMeError error) {
                 cancelCompanionTimer();
@@ -110,69 +90,45 @@ public class VastVpaidAssetsResolver {
                 cancelCompanionTimer();
                 onAssetsLoaded(mVideoFilePath, filePath);
             }
+        });
+        mCompanionTimer = new CountDownTimer(COMPANION_TIMEOUT, Constants.ONE_SECOND_IN_MILLIS) {
+            @Override
+            public void onTick(long millisUntilFinished) { }
+            @Override
+            public void onFinish() {
+                stopLoader(mFileLoader);
+                handleVpaidError(Errors.COMPANION_ERROR);
+            }
         };
+        mCompanionTimer.start();
+        mFileLoader.start();
     }
+
+    private void stopLoader(Loader loader) { if (loader != null) loader.stop(); }
 
     private void cancelCompanionTimer() {
-        if (mCompanionTimer == null) {
-            return;
-        }
+        if (mCompanionTimer == null) return;
         mCompanionTimer.cancel();
         mCompanionTimer = null;
-    }
-
-    private FileLoaderNewImpl.Callback initVastFileLoaderCallback() {
-        return new FileLoaderNewImpl.Callback() {
-            @Override
-            public void onError(LoopMeError error) {
-                handleVastError(error);
-            }
-            @Override
-            public void onFileFullLoaded(String filePath) {
-                Logging.out(LOG_TAG, "onFileFullLoaded");
-                mVideoFilePath = filePath;
-                loadEndCard();
-            }
-        };
     }
 
     private void handleVpaidError(LoopMeError error) {
         onPostWarning(error);
         endCardFileIndex++;
-        if (endCardFileIndex < mAdParams.getEndCardUrlList().size()) {
-            loadEndCard();
-        } else {
-            onAssetsLoaded(mVideoFilePath, null);
-        }
-    }
-
-    private void handleVastError(LoopMeError error) {
-        Logging.out(LOG_TAG, "Load video fail:" + error.getMessage());
-        videoFileIndex++;
-        if (videoFileIndex < mAdParams.getVideoFileUrlsList().size()) {
-            onPostWarning(error);
-            loadVideoAndEndCard();
-        } else {
-            onErrorOccurred(error);
-        }
+        if (endCardFileIndex < mAdParams.getEndCardUrlList().size()) loadEndCard();
+        else onAssetsLoaded(mVideoFilePath, null);
     }
 
     private void onPostWarning(LoopMeError error) {
-        if (mListener != null) {
-            mListener.onPostWarning(error);
-        }
+        if (mListener != null) mListener.onPostWarning(error);
     }
 
     private void onAssetsLoaded(String videoFilePath, String filePath) {
-        if (mListener != null && !mIsStopped) {
-            mListener.onAssetsLoaded(videoFilePath, filePath);
-        }
+        if (mListener != null && !mIsStopped) mListener.onAssetsLoaded(videoFilePath, filePath);
     }
 
     private void onErrorOccurred(LoopMeError error) {
-        if (mListener != null) {
-            mListener.onError(error);
-        }
+        if (mListener != null) mListener.onError(error);
     }
 
     public interface OnAssetsLoaded {

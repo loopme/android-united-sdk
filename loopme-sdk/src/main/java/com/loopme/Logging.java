@@ -9,37 +9,17 @@ public class Logging {
 
     private static final String PREFIX = "Debug.LoopMe.";
 
-    private Logging() {
-    }
-
-    private static String createDebugTag(final String tag) {
-        return PREFIX + tag;
-    }
-
-    private static void log(final String tag, final String text) {
-        if (BuildConfig.DEBUG || Constants.sDebugMode)
-            Log.i(tag, text);
-    }
+    private Logging() { }
 
     /**
-     * @param forceSave TODO. Refactor. For handling cases when sIsDebugOn isn't set yet.
+     * @param forceSave - if true, the log will be saved to the database
      */
     public static void out(final String tag, final String text, boolean forceSave) {
-        if (TextUtils.isEmpty(text))
-            return;
-
-        final String logTag = createDebugTag(tag);
-        log(logTag, text);
-
-        LiveDebug.handle(logTag, text, forceSave);
+        Log.d(PREFIX + tag, text);
+        if (!TextUtils.isEmpty(text)) LiveDebug.handle(PREFIX + tag, text, forceSave);
     }
 
-    public static void out(final String tag, final String text) {
-        out(tag, text, false);
-    }
-
-    public static void out(final String text) {
-        out("", text);
-    }
+    public static void out(final String tag, final String text) { out(tag, text, false); }
+    public static void out(final String text) { out("", text); }
 
 }

@@ -13,9 +13,7 @@ import com.loopme.request.RequestUtils;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.Utils;
 
-import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,106 +29,63 @@ public class LiveDebug {
     private static final ExecutorService sExecutor = Executors.newSingleThreadExecutor();
 
     private static CountDownTimer sDebugTimer;
+
     private static boolean sIsDebugOn;
+    public static boolean isDebugOn() { return sIsDebugOn; }
 
-    public static void init(Context context) {
-        sLogDbHelper = new LogDbHelper(context);
-    }
+    public static void init(Context context) { sLogDbHelper = new LogDbHelper(context); }
 
-    public static void setLiveDebug(final Context context, final boolean debug, final String appKey) {
+    public static void setLiveDebug(String packageId, final boolean debug, final String appKey) {
         Logging.out(LOG_TAG, "setLiveDebug " + debug);
-        if (sIsDebugOn == debug) {
-            return;
-        }
-        sIsDebugOn = debug;
-        if (debug) {
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(() -> startTimer(context, appKey));
-        }
+        if (sIsDebugOn == debug || !debug) return;
+        sIsDebugOn = true;
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (sDebugTimer != null) return;
+            sDebugTimer = new CountDownTimer(DEBUG_TIME, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) { }
+                @Override
+                public void onFinish() {
+                    sIsDebugOn = false;
+                    sDebugTimer = null;
+                    if (sLogDbHelper == null) return;
+                    String logs = String.join("\n", sLogDbHelper.getLogs());
+                    Executors.newCachedThreadPool().submit(() ->
+                        HttpUtils.track(
+                            Constants.ERROR_URL,
+                            LoopMeTracker.obtainRequestString(getParams(packageId, appKey, logs))
+                        )
+                    );
+                    sLogDbHelper.clear();
+                }
+            };
+            Logging.out(LOG_TAG, "start debug timer");
+            sDebugTimer.start();
+        });
     }
 
     /**
      * @param forceSave TODO. Refactor. For handling cases when sIsDebugOn isn't set yet.
      */
     public static void handle(String logTag, String text, boolean forceSave) {
-        if (sIsDebugOn || forceSave)
-            saveLog(logTag, text);
-    }
-
-    private static void startTimer(final Context context, final String appKey) {
-        if (sDebugTimer != null) {
-            return;
-        }
-        sDebugTimer = new CountDownTimer(DEBUG_TIME, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) { }
-            @Override
-            public void onFinish() {
-                sendToServer(context, appKey);
-                sIsDebugOn = false;
-                sDebugTimer = null;
-            }
-        };
-        Logging.out(LOG_TAG, "start debug timer");
-        sDebugTimer.start();
-    }
-
-    private static void sendToServer(final Context context, final String appKey) {
-        ExecutorService executor = Executors.newCachedThreadPool();
-        executor.submit(() -> {
-            if (sLogDbHelper == null) {
-                return;
-            }
-            Logging.out(LOG_TAG, "send to server");
-            Map<String, String> params = initPostDataParams(context, appKey);
-            HttpUtils.simpleRequest(Constants.ERROR_URL, LoopMeTracker.obtainRequestString(params));
-        });
-    }
-
-    private static Map<String, String> initPostDataParams(Context context, String appKey) {
-        String debugLogs = initLogsString();
-
-        Map<String, String> params = new HashMap<>();
-        params.put(Params.DEVICE_OS, Constants.ADNROID_DEVICE_OS);
-        params.put(Params.SDK_TYPE, Constants.LOOPME_SDK_TYPE);
-        params.put(Params.SDK_VERSION, BuildConfig.VERSION_NAME);
-        params.put(Params.DEVICE_ID, RequestUtils.getIfa());
-        params.put(Params.PACKAGE_ID, context.getPackageName());
-        params.put(Params.APP_KEY, appKey);
-        params.put(Params.MSG, Constants.SDK_DEBUG_MSG);
-        params.put(Params.DEBUG_LOGS, debugLogs);
-        params.put(Params.APP_IDS, Utils.getPackageInstalledEncrypted());
-
-        return params;
-    }
-
-    private static String initLogsString() {
-        if (sLogDbHelper == null) {
-            return null;
-        }
-        List<String> logList = sLogDbHelper.getLogs();
-        sLogDbHelper.clear();
-        StringBuilder sb = new StringBuilder();
-        for (String s : logList) {
-            sb.append(s);
-            sb.append("\n");
-        }
-        return sb.toString();
-    }
-
-    private static void saveLog(String logTag, String text) {
-        final String logString = formatLogMessage(logTag, text);
-        if (sLogDbHelper != null) {
-            sExecutor.submit(() -> sLogDbHelper.putLog(logString));
+        if (sLogDbHelper != null && (sIsDebugOn || forceSave)) {
+            boolean isUiThread = Looper.getMainLooper() == Looper.myLooper();
+            String log = (isUiThread ? "ui" : "bg") + ": " + logTag + ": " + text;
+            sExecutor.submit(() -> sLogDbHelper.putLog(log));
         }
     }
 
-    private static String formatLogMessage(String logTag, String text) {
-        String thread = (Looper.getMainLooper() == Looper.myLooper()) ? "ui" : "bg";
-        return MessageFormat.format("{0}: {1}: {2}", thread, logTag, text);
-    }
-
-    public static boolean isDebugOn() {
-        return sIsDebugOn;
+    private static Map<String, String> getParams(String packageId, String appKey, String debugLogs) {
+         return new HashMap<String, String>() {{
+            put(Params.DEVICE_OS, Constants.ADNROID_DEVICE_OS);
+            put(Params.SDK_TYPE, Constants.LOOPME_SDK_TYPE);
+            put(Params.SDK_VERSION, BuildConfig.VERSION_NAME);
+            put(Params.DEVICE_ID, RequestUtils.getIfa());
+            put(Params.PACKAGE_ID, packageId);
+            put(Params.APP_KEY, appKey);
+            put(Params.MSG, Constants.SDK_DEBUG_MSG);
+            put(Params.DEBUG_LOGS, debugLogs);
+            put(Params.APP_IDS, Utils.getPackageInstalledEncrypted());
+        }};
     }
 }
