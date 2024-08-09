@@ -27,11 +27,11 @@ import com.loopme.loaders.AdFetchTask;
 import com.loopme.loaders.AdFetchTaskByUrl;
 import com.loopme.loaders.AdFetcherListener;
 import com.loopme.models.Errors;
+import com.loopme.network.HttpUtils;
 import com.loopme.request.RequestParamsUtils;
 import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
 import com.loopme.tracker.partners.LoopMeTracker;
-import com.loopme.utils.InternetUtils;
 import com.loopme.utils.Utils;
 
 import java.util.Arrays;
@@ -272,7 +272,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
             onAdLoadFail(new LoopMeError(error));
             return false;
         }
-        if (!InternetUtils.isOnline(getContext())) {
+        if (!HttpUtils.isOnline(getContext())) {
             error = "No connection";
             Logging.out(LOG_TAG, error);
             onAdLoadFail(new LoopMeError(error));
@@ -325,7 +325,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         if (mDisplayController != null) {
             mDisplayController.onStartLoad();
         }
-        LiveDebug.setLiveDebug(this.getContext(), adParams.isDebug(), this.getAppKey());
+        LiveDebug.setLiveDebug(this.getContext().getPackageName(), adParams.isDebug(), this.getAppKey());
     }
 
     public AdTargetingData getAdTargetingData() { return mAdTargetingData; }

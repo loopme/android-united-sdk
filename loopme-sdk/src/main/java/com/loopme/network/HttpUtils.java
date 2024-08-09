@@ -1,5 +1,9 @@
 package com.loopme.network;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -53,7 +57,7 @@ public class HttpUtils {
         return response;
     }
 
-    public static void simpleRequest(@NonNull String url, @Nullable String body) {
+    public static void track(@NonNull String url, @Nullable String body) {
         Log.d(LOG_TAG, "Making request by: " + url);
         try {
             HttpURLConnection connection = createConnection(url);
@@ -92,5 +96,66 @@ public class HttpUtils {
             }
         } catch (IOException ignored) { }
         return os.toByteArray();
+    }
+
+    public static boolean isOnline(@NonNull Context context) {
+        final ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) return false;
+        final NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnected() && activeNetwork.isAvailable();
+    }
+
+    public static boolean isWifiConnection(Context context) {
+        return getConnectionType(context) == Constants.ConnectionType.WIFI;
+    }
+
+    public static int getConnectionType(@NonNull Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        return (cm == null || cm.getActiveNetworkInfo() == null || telephonyManager == null) ?
+            Constants.ConnectionType.UNKNOWN :
+            getConnectionType(cm.getActiveNetworkInfo().getType(), telephonyManager);
+    }
+
+    private static int getConnectionType(int type, @NonNull TelephonyManager telephonyManager) {
+        if (type == ConnectivityManager.TYPE_WIFI) return Constants.ConnectionType.WIFI;
+        if (type == ConnectivityManager.TYPE_ETHERNET) return Constants.ConnectionType.ETHERNET;
+        if (type != ConnectivityManager.TYPE_MOBILE) return Constants.ConnectionType.UNKNOWN;
+
+        int networkType = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            try {
+                // Because it is static method we can't use permission check here
+                networkType = telephonyManager.getDataNetworkType();
+            } catch (SecurityException e) {
+                return Constants.ConnectionType.UNKNOWN;
+            }
+        }
+        return getConnectionType(networkType);
+    }
+
+    private static int getConnectionType(int networkType) {
+        switch (networkType) {
+            case TelephonyManager.NETWORK_TYPE_GPRS:
+            case TelephonyManager.NETWORK_TYPE_EDGE:
+            case TelephonyManager.NETWORK_TYPE_CDMA:
+            case TelephonyManager.NETWORK_TYPE_1xRTT:
+            case TelephonyManager.NETWORK_TYPE_IDEN:
+                return Constants.ConnectionType.MOBILE_2G;
+            case TelephonyManager.NETWORK_TYPE_UMTS:
+            case TelephonyManager.NETWORK_TYPE_EVDO_0:
+            case TelephonyManager.NETWORK_TYPE_EVDO_A:
+            case TelephonyManager.NETWORK_TYPE_HSDPA:
+            case TelephonyManager.NETWORK_TYPE_HSUPA:
+            case TelephonyManager.NETWORK_TYPE_HSPA:
+            case TelephonyManager.NETWORK_TYPE_EVDO_B:
+            case TelephonyManager.NETWORK_TYPE_EHRPD:
+            case TelephonyManager.NETWORK_TYPE_HSPAP:
+                return Constants.ConnectionType.MOBILE_3G;
+            case TelephonyManager.NETWORK_TYPE_LTE:
+                return Constants.ConnectionType.MOBILE_4G;
+            default:
+                return Constants.ConnectionType.MOBILE_UNKNOWN_GENERATION;
+        }
     }
 }

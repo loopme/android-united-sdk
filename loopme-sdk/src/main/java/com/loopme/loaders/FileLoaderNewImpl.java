@@ -13,9 +13,8 @@ import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.common.LoopMeError;
 import com.loopme.models.Errors;
-import com.loopme.utils.ConnectionUtils;
+import com.loopme.network.HttpUtils;
 import com.loopme.utils.FileUtils;
-import com.loopme.utils.InternetUtils;
 import com.loopme.utils.ExecutorHelper;
 import com.loopme.tracker.partners.LoopMeTracker;
 
@@ -144,10 +143,10 @@ public class FileLoaderNewImpl implements Loader {
     }
 
     private void handleFileDoesNotExist() {
-        if (!InternetUtils.isOnline(context)) {
+        if (!HttpUtils.isOnline(context)) {
             return;
         }
-        if (ConnectionUtils.isWifiConnection(context))
+        if (HttpUtils.isWifiConnection(context))
             preloadFile();
         else
             loadViaMobileNetwork();
