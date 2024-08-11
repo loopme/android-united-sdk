@@ -96,11 +96,11 @@ public final class LoopMeSdk {
             return;
         }
 
+        configuration = config;
         if (configuration.getUsPrivacy() != null)
             IABPreferences.getInstance(context).setUSPrivacy(configuration.getUsPrivacy());
         IABPreferences.getInstance(context).setCoppa(configuration.getCoppa());
 
-        configuration = config;
         loopMeSdkInitListener = sdkInitListener;
 
         OmidHelper.SDKInitListener omidListener = new OmidHelper.SDKInitListener() {

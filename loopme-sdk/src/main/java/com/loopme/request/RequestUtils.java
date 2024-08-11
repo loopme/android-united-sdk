@@ -20,7 +20,7 @@ import com.loopme.R;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.gdpr.ConsentType;
 import com.loopme.location.GoogleLocationService;
-import com.loopme.utils.ConnectionUtils;
+import com.loopme.network.HttpUtils;
 
 import org.json.JSONArray;
 
@@ -64,7 +64,7 @@ public class RequestUtils {
         mAppBundle = context.getPackageName();
         mDeviceWidthPx = RequestParamsUtils.getDeviceSize(context).x;
         mDeviceHeightPx = RequestParamsUtils.getDeviceSize(context).y;
-        mConnectionType = ConnectionUtils.getConnectionType(context);
+        mConnectionType = HttpUtils.getConnectionType(context);
         location = GoogleLocationService.getLocation(context);
         mUa = WebSettings.getDefaultUserAgent(context);
         mInstl = mLoopMeAd instanceof LoopMeInterstitialGeneral ? 1 : 0;
