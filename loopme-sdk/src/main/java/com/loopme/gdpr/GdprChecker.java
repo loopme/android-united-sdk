@@ -9,73 +9,40 @@ import com.loopme.IABPreferences;
  */
 
 // TODO. WeakReference for listener field if used somewhere except LoopMeSdk.
-public class GdprChecker implements DntFetcher.OnDntFetcherListener {
+public class GdprChecker {
     private static final String LOG_TAG = GdprChecker.class.getSimpleName();
     private static GdprChecker instance;
     private static boolean checkedAtLeastOnce;
     private Context appContext;
     private PublisherConsent publisherConsent;
-    private String advId;
-    private Listener listener;
     private boolean destroyed;
 
-    private GdprChecker(Context context, PublisherConsent publisherConsent, Listener listener) {
-        this.appContext = context.getApplicationContext();
-        this.publisherConsent = publisherConsent;
-        this.listener = listener;
+    private GdprChecker(Context context, PublisherConsent consent) {
+        appContext = context;
+        publisherConsent = consent;
     }
 
     public static class PublisherConsent {
         private String consent;
-        public PublisherConsent(String consent) {
-            this.consent = consent;
-        }
-        public PublisherConsent(Boolean consent){
-            setConsent(consent);
-        }
-
-        public String getConsent() {
-            return consent;
-        }
-        /**
-         * if you want to send TCF consent
-         */
-        public void setConsent(String consent) {
-            this.consent = consent;
-        }
-        public void setConsent(boolean consent) {
-            this.consent = consent ? "1" : "0";
-        }
+        public PublisherConsent(String pConsent) { consent = pConsent; }
+        public PublisherConsent(Boolean pConsent){ setConsent(pConsent); }
+        public void setConsent(String pConsent) { consent = pConsent; }
+        public void setConsent(boolean pConsent) { consent = pConsent ? "1" : "0"; }
+        public String getConsent() { return consent; }
     }
 
-    public interface Listener { void onGdprChecked(); }
-    public static boolean checkedAtLeastOnce() {
-        return checkedAtLeastOnce;
-    }
-
-    public static void start (Context context, PublisherConsent publisherConsent, Listener listener) {
-        if (checkedAtLeastOnce()) {
-            listener.onGdprChecked();
-            return;
-        }
-        if (instance != null)
-            instance.destroy();
-        instance = new GdprChecker(context, publisherConsent, listener);
+    public static void start (Context context, PublisherConsent publisherConsent) {
+        if (checkedAtLeastOnce) return;
+        if (instance != null) instance.destroy();
+        instance = new GdprChecker(context.getApplicationContext(), publisherConsent);
         instance.check();
     }
 
     private void setGdprState(String isAccepted, ConsentType consentType) {
-        if (destroyed)
-            return;
-        IABPreferences
-            .getInstance(appContext)
-            .setGdprState(isAccepted, consentType);
+        if (destroyed) return;
+        IABPreferences.getInstance(appContext).setGdprState(isAccepted, consentType);
         checkedAtLeastOnce = true;
-        // TODO. Ugly.
-        Listener listener = this.listener;
         destroy();
-        if (listener != null)
-            listener.onGdprChecked();
     }
 
     private void setGdprState(boolean isAccepted, ConsentType consentType) {
@@ -86,35 +53,18 @@ public class GdprChecker implements DntFetcher.OnDntFetcherListener {
         destroyed = true;
         instance = null;
         appContext = null;
-        listener = null;
         publisherConsent = null;
     }
 
     private void check() {
-        if (destroyed)
-            return;
-
-        if (IABPreferences.getInstance(appContext).isIabTcfCmpSdkPresent()) {
+        if (destroyed) return;
+        if (IABPreferences.getInstance(appContext).isIabTcfCmpSdkPresent())
             setGdprState(true, ConsentType.PUBLISHER);
-            return;
-        }
-
-        if (publisherConsent != null) {
+        else if (publisherConsent != null)
             setGdprState(publisherConsent.getConsent(), ConsentType.PUBLISHER);
-            return;
-        }
-        new DntFetcher(appContext, this).start();
-    }
 
-    @Override
-    public void onDntFetched(boolean isLimited, String advId) {
-        if (destroyed)
-            return;
-
-        this.advId = advId;
-
-        if (isLimited) {
-            setGdprState(false, ConsentType.USER_RESTRICTED);
-        }
+        DntFetcher.start(appContext, (isLimited, advId) -> {
+            if (isLimited) setGdprState(false, ConsentType.USER_RESTRICTED);
+        });
     }
 }

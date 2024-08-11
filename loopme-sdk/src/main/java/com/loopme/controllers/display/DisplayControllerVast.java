@@ -116,20 +116,16 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         if (omidVerificationMap == null || omidVerificationMap.isEmpty())
             return;
         needWaitOmidAdSessionStart = true;
-        OmidHelper.createNativeVideoAdSessionAsync(
-            mLoopMeAd.getContext().getApplicationContext(),
-            createOmidVerificationScriptResourceList(omidVerificationMap),
-            new OmidHelper.AdSessionListener() {
-                @Override
-                public void onReady(AdSession adSession) {
-                    onOmidNativeVideoAdSessionCreated(adSession, null);
-                }
-                @Override
-                public void onError(String error) {
-                    onOmidNativeVideoAdSessionCreated(null, error);
-                }
-            }
-        );
+        try {
+            if (OmidHelper.isInitialized()) onOmidNativeVideoAdSessionCreated(
+                OmidHelper.createAdSession(
+                    createOmidVerificationScriptResourceList(omidVerificationMap)
+                ), null
+            );
+            else onOmidNativeVideoAdSessionCreated(null, "Can't create Video AdSession: OMSDK not initialized");
+        } catch (Exception e) {
+            onOmidNativeVideoAdSessionCreated(null, "Can't create Video AdSession: " + e);
+        }
     }
 
     private void onOmidNativeVideoAdSessionCreated(AdSession adSession, String error) {
@@ -176,7 +172,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         mIsAdSkipped = false;
         postDelayed(() -> {
             destroyMediaPlayer();
-            mLoopMePlayer = new LoopMeMediaPlayer(mVideoUri, this);
+            mLoopMePlayer = new LoopMeMediaPlayer(mVideoUri, DisplayControllerVast.this);
         }, 100);
         onAdResumedEvent();
     }
