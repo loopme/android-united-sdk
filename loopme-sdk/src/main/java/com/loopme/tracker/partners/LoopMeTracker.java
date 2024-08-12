@@ -104,9 +104,9 @@ public class LoopMeTracker {
         params.put(Params.DEVICE_ID, RequestUtils.getIfa());
         params.put(Params.APP_KEY, sAppKey);
         params.put(Params.PACKAGE_ID, sPackageId);
-        params.put(Params.MEDIATION, LoopMeSdk.getMediation());
-        params.put(Params.MEDIATION_SDK_VERSION, LoopMeSdk.getMediationSdkVersion());
-        params.put(Params.ADAPTER_VERSION, LoopMeSdk.getAdapterVersion());
+        params.put(Params.MEDIATION, LoopMeSdk.getConfiguration().getMediation());
+        params.put(Params.MEDIATION_SDK_VERSION, LoopMeSdk.getConfiguration().getMediationSdkVersion());
+        params.put(Params.ADAPTER_VERSION, LoopMeSdk.getConfiguration().getAdapterVersion());
         params.put(Params.MSG, Constants.SDK_ERROR_MSG);
         return params;
     }

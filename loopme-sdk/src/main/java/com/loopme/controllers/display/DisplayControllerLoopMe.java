@@ -11,6 +11,7 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.iab.omid.library.loopme.ScriptInjector;
 import com.iab.omid.library.loopme.adsession.AdEvents;
 import com.iab.omid.library.loopme.adsession.AdSession;
 import com.iab.omid.library.loopme.adsession.FriendlyObstructionPurpose;
@@ -54,8 +55,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
 
     // TODO. Ugly.
     public void tryAddOmidFriendlyObstructionCloseButton(@NonNull View view) {
-        if (omidAdSession == null)
-            return;
+        if (omidAdSession == null) return;
         try {
             omidAdSession.addFriendlyObstruction(view, FriendlyObstructionPurpose.CLOSE_AD, null);
         } catch (RuntimeException ex) {
@@ -65,9 +65,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
 
     // TODO. Ugly.
     public void tryRemoveOmidFriendlyObstruction(@NonNull View view) {
-        if (omidAdSession != null) {
-            omidAdSession.removeFriendlyObstruction(view);
-        }
+        if (omidAdSession != null) omidAdSession.removeFriendlyObstruction(view);
     }
 
     public void collapseMraidBanner() {
@@ -94,20 +92,25 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
         String mraid = "<script>" + loadAssetFileAsString(mLoopMeAd.getContext(), "mraid.js") + "</script>";
         final String preInjectOmidHtml = isMraid ? mraid + mAdParams.getHtml() : mAdParams.getHtml();
 
-        OmidHelper.injectScriptContentIntoHtmlAsync(
-            mLoopMeAd.getContext().getApplicationContext(),
-            preInjectOmidHtml,
-            new OmidHelper.ScriptInjectListener() {
-                @Override
-                public void onReady(String injectedOmidHtml) {
-                    onOmidScriptInjectResult(injectedOmidHtml, null);
-                }
-                @Override
-                public void onError(String injectOmidError) {
-                    onOmidScriptInjectResult(preInjectOmidHtml, injectOmidError);
-                }
+        try {
+            if (OmidHelper.isInitialized()) {
+                onOmidScriptInjectResult(
+                    ScriptInjector.injectScriptContentIntoHtml(
+                        OmidHelper.getOmSDKJavaScript(), preInjectOmidHtml
+                    ), null
+                );
+            } else {
+                onOmidScriptInjectResult(
+                    preInjectOmidHtml,
+                    "Can't inject script content into HTML: OMSDK not initialized"
+                );
             }
-        );
+        } catch (Exception e) {
+            onOmidScriptInjectResult(
+                preInjectOmidHtml,
+                "Can't inject script content into HTML: " + e
+            );
+        }
     }
 
     private void onOmidScriptInjectResult(String html, String injectOmidError) {
@@ -122,15 +125,15 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
 
     // TODO. Refactor.
     private void tryCreateOmidAdSession() {
-        if (!needWaitOmidJsLoad)
-            return;
+        if (!needWaitOmidJsLoad) return;
         needWaitOmidJsLoad = false;
-        if (omidAdSession != null)
+        if (omidAdSession != null) return;
+        try {
+            omidAdSession = OmidHelper.createAdSessionHtml(mMraidView);
+        } catch (Exception e) {
+            Logging.out(LOG_TAG, e.toString());
             return;
-        omidAdSession = OmidHelper.createWebDisplayAdSession(mMraidView);
-        // Something went wrong with omid. See logs.
-        if (omidAdSession == null)
-            return;
+        }
         omidEventTrackerWrapper =
             new OmidEventTrackerWrapper(AdEvents.createAdEvents(omidAdSession), null);
         omidAdSession.registerAdView(mMraidView);
@@ -146,7 +149,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
         if (mLoopMeAd.isBanner()) {
             if (isFullScreen()) {
                 setWebViewState(Constants.WebviewState.VISIBLE);
-                return ;
+                return;
             }
             ViewAbilityUtils.calculateViewAbilitySyncDelayed(mLoopMeAd.getContainerView(), info -> {
                 if (!info.isVisibleMore50Percents()) {
@@ -179,8 +182,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (omidAdSession != null)
-            omidAdSession.finish();
+        if (omidAdSession != null) omidAdSession.finish();
         omidAdSession = null;
         omidEventTrackerWrapper = null;
         needWaitOmidJsLoad = false;

@@ -16,11 +16,15 @@ public final class LoopMeSdk {
     private LoopMeSdk() { }
 
     private static final String LOG_TAG = LoopMeSdk.class.getSimpleName();
-    public static final int ERROR_NONE = -1;
-    public static final int ERROR_OMID_FAILED_TO_INITIALIZE = 1;
+
     private static final String LOOPME_SDK_VERSION = BuildConfig.VERSION_NAME;
-    private static LoopMeSdkListener loopMeSdkInitListener;
+    public static String getVersion() { return LOOPME_SDK_VERSION; }
+
     private static Configuration configuration;
+    public static Configuration getConfiguration() { return configuration; }
+
+    private static boolean isInitialized = false;
+    public static boolean isInitialized() { return isInitialized; }
 
     public interface LoopMeSdkListener {
         void onSdkInitializationSuccess();
@@ -28,137 +32,59 @@ public final class LoopMeSdk {
     }
 
     public static class Configuration {
-        private GdprChecker.PublisherConsent publisherConsent;
-        private String californiaConsumerPrivacy;
-        private boolean coppa;
-        private String mediation;
-        private String mediationSdkVersion;
-        private String adapterVersion;
-
-        public GdprChecker.PublisherConsent getPublisherConsent() {
-            return publisherConsent;
-        }
-
         /**
          * Use this method in case if you Publisher is willing to ask GDPR consent with your own dialog,
          * pass GDPR consent to this method.
          */
-        public void setPublisherConsent(GdprChecker.PublisherConsent publisherConsent) {
-            this.publisherConsent = publisherConsent;
-        }
+        public void setPublisherConsent(GdprChecker.PublisherConsent consent) { publisherConsent = consent; }
+        public GdprChecker.PublisherConsent getPublisherConsent() { return publisherConsent; }
+        private GdprChecker.PublisherConsent publisherConsent;
 
-        public String getUsPrivacy() {
-            return californiaConsumerPrivacy;
-        }
-        public void setUsPrivacy(String californiaConsumerPrivacy) {
-            this.californiaConsumerPrivacy = californiaConsumerPrivacy;
-        }
+        private String usPrivacy;
+        public String getUsPrivacy() { return usPrivacy; }
+        public void setUsPrivacy(String value) { usPrivacy = value; }
 
-        public boolean getCoppa() {
-            return coppa;
-        }
-        public void setCoppa(boolean coppa) {
-            this.coppa = coppa;
-        }
+        private boolean coppa;
+        public boolean getCoppa() { return coppa; }
+        public void setCoppa(boolean value) { coppa = value; }
 
-        public String getMediation() {
-            return mediation;
-        }
-        public void setMediation(String mediation) {
-            this.mediation = mediation;
-        }
+        private String mediation;
+        public String getMediation() { return mediation != null ? mediation : "unknown"; }
+        public void setMediation(String mediationName) { mediation = mediationName; }
 
-        public String getMediationSdkVersion() {
-            return mediationSdkVersion;
-        }
-        public void setMediationSdkVersion(String mediationSdkVersion) {
-            this.mediationSdkVersion = mediationSdkVersion;
-        }
+        private String mediationSdkVersion;
+        public String getMediationSdkVersion() { return mediationSdkVersion != null ? mediationSdkVersion : "unknown"; }
+        public void setMediationSdkVersion(String version) { mediationSdkVersion = version; }
 
-        public String getAdapterVersion() {
-            return adapterVersion;
-        }
-        public void setAdapterVersion(String adapterVersion) {
-            this.adapterVersion = adapterVersion;
-        }
+        private String adapterVersion;
+        public String getAdapterVersion() { return adapterVersion != null ? adapterVersion : "unknown"; }
+        public void setAdapterVersion(String version) { adapterVersion = version; }
     }
 
     @MainThread
-    public static void initialize(@NonNull Context context,
-                                  @NonNull Configuration config,
-                                  @NonNull LoopMeSdkListener sdkInitListener) {
-
+    public static void initialize(
+        @NonNull Context context, @NonNull Configuration config, @NonNull LoopMeSdkListener sdkInitListener
+    ) {
         if (Looper.getMainLooper() != Looper.myLooper())
             throw new IllegalStateException("Must be called on the main thread");
 
-        if (isInitialized()) {
+        if (isInitialized) {
             sdkInitListener.onSdkInitializationSuccess();
             return;
         }
+        isInitialized = true;
 
         configuration = config;
         if (configuration.getUsPrivacy() != null)
             IABPreferences.getInstance(context).setUSPrivacy(configuration.getUsPrivacy());
         IABPreferences.getInstance(context).setCoppa(configuration.getCoppa());
 
-        loopMeSdkInitListener = sdkInitListener;
-
-        OmidHelper.SDKInitListener omidListener = new OmidHelper.SDKInitListener() {
-            @Override
-            public void onReady() {
-                checkInitStatus(ERROR_NONE, "");
-            }
-
-            @Override
-            public void onError(String error) {
-                checkInitStatus(ERROR_OMID_FAILED_TO_INITIALIZE, error);
-            }
-        };
         // Omid init.
-        OmidHelper.tryInitOmidAsync(context.getApplicationContext(), omidListener);
+        OmidHelper.init(context.getApplicationContext());
 
         // Gdpr.
-        GdprChecker.Listener gdprCheckerListener = () -> checkInitStatus(ERROR_NONE, "");
-        GdprChecker.start(context, config.getPublisherConsent(), gdprCheckerListener);
+        GdprChecker.start(context, configuration.getPublisherConsent());
+        sdkInitListener.onSdkInitializationSuccess();
     }
 
-    public static boolean isInitialized() {
-        return OmidHelper.sdkInitialized();
-    }
-
-    private static void checkInitStatus(int errorCode, String errorMessage) {
-        if (loopMeSdkInitListener == null)
-            return;
-
-        boolean hasError = errorCode != ERROR_NONE;
-
-        if (!hasError && !isInitialized())
-            return;
-
-        LoopMeSdkListener listener = loopMeSdkInitListener;
-        loopMeSdkInitListener = null;
-
-        if (hasError) {
-            Logging.out(LOG_TAG, errorMessage, true);
-            listener.onSdkInitializationFail(errorCode, errorMessage);
-        } else {
-            listener.onSdkInitializationSuccess();
-        }
-    }
-
-    public static String getVersion(){
-        return LOOPME_SDK_VERSION;
-    }
-
-    public static String getMediation() {
-        return configuration != null ? configuration.getMediation() : "unknown";
-    }
-
-    public static String getMediationSdkVersion() {
-        return configuration != null ? configuration.getMediationSdkVersion() : "unknown";
-    }
-
-    public static String getAdapterVersion() {
-        return configuration != null ? configuration.getAdapterVersion() : "unknown";
-    }
 }
