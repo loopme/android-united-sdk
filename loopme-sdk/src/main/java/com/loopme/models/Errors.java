@@ -61,6 +61,9 @@ public class Errors {
     public static final LoopMeError MOBILE_NETWORK_CACHE_ERROR = new LoopMeError(
             "Mobile network. Video will not be cached");
 
+    public static final LoopMeError CACHE_ERROR = new LoopMeError(
+            "File not cached");
+
     public static final LoopMeError SPECIFIC_WEBVIEW_ERROR = new LoopMeError(
             117, "Ad received specific URL loopme://webview/fail");
 
@@ -214,6 +217,7 @@ public class Errors {
 
     public static final LoopMeError VAST_UNDEFINED_ERROR = new LoopMeError(
             900, "Undefined error", Constants.ErrorType.VAST);
+
 
     // endregion
 }

@@ -18,8 +18,8 @@ public class VastVpaidAssetsResolver {
     private Context mContext;
     private AdParams mAdParams;
     private String mVideoFilePath;
-    private Loader mFileLoader;
-    private Loader mVideoLoader;
+    private FileLoaderNewImpl mFileLoader;
+    private FileLoaderNewImpl mVideoLoader;
     private OnAssetsLoaded mListener;
     private volatile boolean mIsStopped;
     private CountDownTimer mCompanionTimer;
@@ -104,7 +104,7 @@ public class VastVpaidAssetsResolver {
         mFileLoader.start();
     }
 
-    private void stopLoader(Loader loader) { if (loader != null) loader.stop(); }
+    private void stopLoader(FileLoaderNewImpl loader) { if (loader != null) loader.stop(); }
 
     private void cancelCompanionTimer() {
         if (mCompanionTimer == null) return;
