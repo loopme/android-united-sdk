@@ -3,6 +3,8 @@ package com.loopme.utils;
 import android.content.Context;
 import android.text.TextUtils;
 
+import androidx.annotation.Nullable;
+
 import com.loopme.Constants;
 import com.loopme.Logging;
 
@@ -11,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 /**
@@ -45,17 +48,18 @@ public class FileUtils {
         return new String(hexChars);
     }
 
-    public static String calculateChecksum(String url) {
+    public static String getCachedFileName(String fileUrl) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update(url.getBytes());
+            md.update(fileUrl.getBytes(StandardCharsets.UTF_8));
             return bytesToHex(md.digest());
         } catch (Exception e) {
-            Logging.out(LOG_TAG, e.toString());
-            return null;
+            Logging.out(LOG_TAG, e.getMessage());
+            return fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
         }
     }
 
+    @Nullable
     public static File getExternalFilesDir(Context context) {
         return context == null ? null : context.getExternalFilesDir(Constants.VIDEO_FOLDER);
     }
@@ -107,33 +111,20 @@ public class FileUtils {
 
     public static File checkIfFileExists(String filename, Context context) {
         File parentDir = getExternalFilesDir(context);
-        if (parentDir == null)
-            return null;
-
+        if (parentDir == null) return null;
         Logging.out(LOG_TAG, "Cache dir: " + parentDir.getAbsolutePath());
 
         File[] files = parentDir.listFiles();
-        if (files == null)
-            return null;
+        if (files == null) return null;
 
         for (File file : files) {
-            if (isValidFile(file) && file.getName().equalsIgnoreCase(filename))
-                return file;
+            if (isValidFile(file) && file.getName().equalsIgnoreCase(filename)) return file;
         }
-
         return null;
     }
 
     private static boolean isValidFile(File file) {
         return file != null && !file.isDirectory();
-    }
-
-    public static String getFileName(String fileUrl) {
-        if (TextUtils.isEmpty(fileUrl)) {
-            return "";
-        }
-        String[] components = fileUrl.split("/");
-        return components[components.length - 1];
     }
 
     public static String loadAssetFileAsString(Context context, String fileName) {

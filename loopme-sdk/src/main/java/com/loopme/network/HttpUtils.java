@@ -12,7 +12,10 @@ import androidx.annotation.Nullable;
 import com.loopme.Constants;
 import com.loopme.utils.Utils;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,6 +26,7 @@ public class HttpUtils {
     private static final String LOG_TAG = HttpUtils.class.getSimpleName();
     private static final int CONNECT_TIMEOUT = 15000;
     private static final int READ_TIMEOUT = 15000;
+    private static final String HTTP_METHOD_GET = "GET";
     private static final String APPLICATION_X_WWW_FORM = "application/x-www-form-urlencoded";
     private static final String APPLICATION_JSON_CHARSET_UTF_8 = "application/json; charset=utf-8";
     private static final String HEADER_USER_AGENT = "User-Agent";
@@ -157,5 +161,38 @@ public class HttpUtils {
             default:
                 return Constants.ConnectionType.MOBILE_UNKNOWN_GENERATION;
         }
+    }
+
+    public static void cache(String source, String destination, CacheListener listener) {
+        File file = new File(destination + "_download");
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(source).openConnection();
+            connection.setRequestMethod(HTTP_METHOD_GET);
+            connection.setReadTimeout(READ_TIMEOUT);
+            connection.setConnectTimeout(CONNECT_TIMEOUT);
+
+            try (InputStream inputStream = new BufferedInputStream(connection.getInputStream());
+                 FileOutputStream outputStream = new FileOutputStream(file, false)) {
+                byte[] buffer = new byte[4096];
+                int length;
+                while ((length = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, length);
+                }
+                if (file.renameTo(new File(destination))) {
+                    listener.onSuccess();
+                }
+            } catch (IOException e) {
+                listener.onError(e);
+            } finally {
+                connection.disconnect();
+            }
+        } catch (IOException e) {
+            listener.onError(e);
+        }
+    }
+
+    public interface CacheListener {
+        void onError(Exception e);
+        void onSuccess();
     }
 }
