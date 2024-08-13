@@ -38,7 +38,27 @@ public class AdParamsBuilder {
     boolean mAutoLoading;
     AdSpotDimensions mAdSpotDimensions;
 
+    String requestId;
+    String cid;
+    String crid;
+
     public AdParamsBuilder() {}
+
+    public AdParamsBuilder requestId(String requestId) {
+        this.requestId = requestId;
+        return this;
+    }
+
+    public AdParamsBuilder cid(String cid) {
+        this.cid = cid;
+        return this;
+    }
+
+    public AdParamsBuilder crid(String crid) {
+        this.crid = crid;
+        return this;
+    }
+
 
     public AdParamsBuilder format(String format) {
         mBuilderFormat = format;

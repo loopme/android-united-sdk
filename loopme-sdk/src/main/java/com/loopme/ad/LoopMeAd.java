@@ -1,5 +1,6 @@
 package com.loopme.ad;
 
+import static com.loopme.Constants.UNKNOWN_MSG;
 import static com.loopme.debugging.Params.ERROR_MSG;
 import static com.loopme.debugging.Params.PLACEMENT_TYPE;
 
@@ -23,6 +24,7 @@ import com.loopme.controllers.display.DisplayControllerLoopMe;
 import com.loopme.controllers.display.DisplayControllerVast;
 import com.loopme.controllers.display.DisplayControllerVpaid;
 import com.loopme.debugging.LiveDebug;
+import com.loopme.debugging.Params;
 import com.loopme.loaders.AdFetchTask;
 import com.loopme.loaders.AdFetchTaskByUrl;
 import com.loopme.loaders.AdFetcherListener;
@@ -144,6 +146,22 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     public abstract void removeListener();
 
     /**
+     * Packs error information into a `HashMap`.
+     *
+     * @param errorMessage the error message to include
+     * @return a `HashMap` containing error information
+     */
+    public HashMap<String, String> packErrorInfo(String errorMessage) {
+        HashMap<String, String> errorInfo = new HashMap<>();
+        errorInfo.put(ERROR_MSG, errorMessage != null ? errorMessage : UNKNOWN_MSG);
+        errorInfo.put(PLACEMENT_TYPE, getPlacementType().name().toLowerCase());
+        errorInfo.put(Params.CID, getCurrentCid());
+        errorInfo.put(Params.CRID, getCurrentCrid());
+        errorInfo.put(Params.REQUEST_ID, getRequestId());
+        return errorInfo;
+    }
+
+    /**
      * Links (@link LoopMeContainerView) view to banner.
      * If ad doesn't linked to @link LoopMeContainerView, it can't be display.
      * @param containerView - @link FrameLayout (container for ad) where ad will be displayed.
@@ -153,9 +171,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         if (containerView != null) {
             mContainerView = containerView;
         } else {
-            HashMap<String, String> errorInfo = new HashMap<>();
-            errorInfo.put(ERROR_MSG, "Bind view is null");
-            errorInfo.put(PLACEMENT_TYPE, getPlacementType().name().toLowerCase());
+            HashMap<String, String> errorInfo = packErrorInfo("Bind view is null");
             LoopMeTracker.post(errorInfo);
         }
     }
@@ -208,7 +224,10 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         onSendPostWarning(error);
     }
 
-    public void onSendPostWarning(LoopMeError error) { LoopMeTracker.post(error); }
+    public void onSendPostWarning(LoopMeError error) {
+        HashMap<String, String> errorInfo = packErrorInfo(error.getMessage());
+        LoopMeTracker.post(errorInfo);
+    }
 
     private void startTimer(TimersType fetcherTimer, AdParams adParam) {
         if (mTimers == null) {
@@ -326,6 +345,18 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
             mDisplayController.onStartLoad();
         }
         LiveDebug.setLiveDebug(this.getContext().getPackageName(), adParams.isDebug(), this.getAppKey());
+    }
+
+    public String getRequestId() {
+        return mAdParams != null ? mAdParams.getRequestId() : UNKNOWN_MSG;
+    }
+
+    public String getCurrentCid() {
+        return mAdParams != null ? mAdParams.getCid() : UNKNOWN_MSG;
+    }
+
+    public String getCurrentCrid() {
+        return mAdParams != null ? mAdParams.getCrid() : UNKNOWN_MSG;
     }
 
     public AdTargetingData getAdTargetingData() { return mAdTargetingData; }

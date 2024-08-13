@@ -41,6 +41,10 @@ public class AdParams implements Serializable {
     private String mVideoRedirectUrl;
     private AdType mAdType = AdType.HTML;
 
+    private String requestId;
+    private String cid;
+    private String crid;
+
     private final List<String> mCompanionCreativeViewEventsList = new ArrayList<>();
     private List<String> mVideoFileUrlsList = new ArrayList<>();
     private List<String> mEndCardUrlList = new ArrayList<>();
@@ -77,10 +81,16 @@ public class AdParams implements Serializable {
         Logging.out(LOG_TAG, "Server response indicates  ad params: "
             + "format: " + mFormat + ", isAutoloading: " + mAutoLoading
             + ", mraid: " + mIsMraid + ", expire in: " + mExpiredDate);
+        this.requestId = builder.requestId;
+        this.cid = builder.cid;
+        this.crid = builder.crid;
     }
 
     public AdSpotDimensions getAdSpotDimensions() { return mAdSpotDimensions; }
 
+    public String getRequestId() {return requestId;}
+    public String getCid() {return cid;}
+    public String getCrid() {return crid;}
     public boolean getPartPreload() { return mPartPreload; }
     public String getAdFormat() { return mFormat; }
     public List<String> getTrackers() { return mTrackersList; }
