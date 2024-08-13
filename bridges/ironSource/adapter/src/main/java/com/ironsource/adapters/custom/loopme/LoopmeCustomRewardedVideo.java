@@ -73,6 +73,7 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
 
                 @Override
                 public void onLoopMeInterstitialShow(LoopMeInterstitial arg0) {
+                    rewardedVideoAdListener.onAdOpened();
                     rewardedVideoAdListener.onAdShowSuccess();
                     rewardedVideoAdListener.onAdVisible();
                 }
