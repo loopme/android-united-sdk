@@ -151,9 +151,9 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
      * @param errorMessage the error message to include
      * @return a `HashMap` containing error information
      */
-    public HashMap<String, String> packErrorInfo(String errorMessage) {
+    public HashMap<String, String> packErrorInfo(@NonNull String errorMessage) {
         HashMap<String, String> errorInfo = new HashMap<>();
-        errorInfo.put(ERROR_MSG, errorMessage != null ? errorMessage : UNKNOWN_MSG);
+        errorInfo.put(ERROR_MSG, errorMessage);
         errorInfo.put(PLACEMENT_TYPE, getPlacementType().name().toLowerCase());
         errorInfo.put(Params.CID, getCurrentCid());
         errorInfo.put(Params.CRID, getCurrentCrid());
@@ -171,8 +171,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         if (containerView != null) {
             mContainerView = containerView;
         } else {
-            HashMap<String, String> errorInfo = packErrorInfo("Bind view is null");
-            LoopMeTracker.post(errorInfo);
+            LoopMeTracker.post(packErrorInfo("Bind view is null"));
         }
     }
 

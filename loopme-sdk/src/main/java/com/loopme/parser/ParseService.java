@@ -37,6 +37,9 @@ public class ParseService {
     @NonNull
     private static AdParams parse(@NonNull Bid bid, @NonNull AdFormat adFormat, AdType type) {
         return new AdParams(new AdParamsBuilder()
+            .cid(bid.getCid())
+            .requestId(bid.getId())
+            .crid(bid.getCrid())
             .format(AdParamsBuilder.getAdFormat(adFormat))
             .html(safelyRetrieve(bid::getAdm, ""))
             .orientation(safelyRetrieve(() -> {

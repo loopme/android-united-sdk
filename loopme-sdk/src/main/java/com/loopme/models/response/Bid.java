@@ -82,9 +82,9 @@ public class Bid implements Serializable, Parcelable {
         return adm;
     }
 
-    public String getCrid() {
-        return crid;
-    }
+    public String getCrid() { return crid; }
+
+    public String getCid() { return cid; }
 
     public int getWidth() {
         return width;

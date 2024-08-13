@@ -90,8 +90,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
             mBannerView = frameLayout;
             mContainerView = frameLayout;
         } else {
-            HashMap<String, String> errorInfo = packErrorInfo("Bind view is null");
-            LoopMeTracker.post(errorInfo);
+            LoopMeTracker.post(packErrorInfo("Bind view is null"));
         }
     }
 

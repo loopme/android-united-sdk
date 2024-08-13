@@ -38,24 +38,24 @@ public class AdParamsBuilder {
     boolean mAutoLoading;
     AdSpotDimensions mAdSpotDimensions;
 
-    String requestId;
-    String cid;
-    String crid;
+    String mRequestId;
+    String mCid;
+    String mCrid;
 
     public AdParamsBuilder() {}
 
-    public AdParamsBuilder requestId(String requestId) {
-        this.requestId = requestId;
+    public AdParamsBuilder requestId(String value) {
+        mRequestId = value;
         return this;
     }
 
-    public AdParamsBuilder cid(String cid) {
-        this.cid = cid;
+    public AdParamsBuilder cid(String value) {
+        mCid = value;
         return this;
     }
 
-    public AdParamsBuilder crid(String crid) {
-        this.crid = crid;
+    public AdParamsBuilder crid(String value) {
+        mCrid = value;
         return this;
     }
 
