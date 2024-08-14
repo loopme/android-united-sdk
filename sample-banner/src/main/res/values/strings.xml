@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">LoopMe Banner Sample</string>
+    <string name="app_name">LoopMe SDK Sample</string>
     <string name="sample_text">sample text</string>
     <string name="title_simple">Simple</string>
     <string name="title_recycler_view">RecyclerView</string>
     <string name="example_text">example text</string>
+    <string name="interstitial">Interstitial</string>
+    <string name="banner">Banner</string>
+    <string name="load_interstitial">Load Interstitial</string>
+    <string name="show_interstitial">Show Interstitial</string>
 
 </resources>
