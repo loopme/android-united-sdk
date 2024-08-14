@@ -1,8 +1,5 @@
 package com.loopme;
 
-import static com.loopme.debugging.Params.ERROR_MSG;
-import static com.loopme.debugging.Params.PLACEMENT_TYPE;
-
 import android.app.Activity;
 import android.util.Log;
 import android.view.View;
@@ -93,10 +90,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
             mBannerView = frameLayout;
             mContainerView = frameLayout;
         } else {
-            HashMap<String, String> errorInfo = new HashMap<>();
-            errorInfo.put(ERROR_MSG, "Bind view is null");
-            errorInfo.put(PLACEMENT_TYPE, getPlacementType().name().toLowerCase());
-            LoopMeTracker.post(errorInfo);
+            LoopMeTracker.post(packErrorInfo("Bind view is null"));
         }
     }
 
@@ -130,9 +124,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
             showInternal();
             Logging.out(LOG_TAG, "Banner did start showing ad (native)");
         } else {
-            HashMap<String, String> errorInfo = new HashMap<>();
-            errorInfo.put(ERROR_MSG, "Banner is not ready");
-            errorInfo.put(PLACEMENT_TYPE, getPlacementType().name().toLowerCase());
+            HashMap<String, String> errorInfo = packErrorInfo("Banner is not ready");
             LoopMeTracker.post(errorInfo);
         }
     }

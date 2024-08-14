@@ -77,7 +77,7 @@ public class LiveDebug {
 
     private static Map<String, String> getParams(String packageId, String appKey, String debugLogs) {
          return new HashMap<String, String>() {{
-            put(Params.DEVICE_OS, Constants.ADNROID_DEVICE_OS);
+            put(Params.DEVICE_OS, Constants.ANDROID_DEVICE_OS);
             put(Params.SDK_TYPE, Constants.LOOPME_SDK_TYPE);
             put(Params.SDK_VERSION, BuildConfig.VERSION_NAME);
             put(Params.DEVICE_ID, RequestUtils.getIfa());

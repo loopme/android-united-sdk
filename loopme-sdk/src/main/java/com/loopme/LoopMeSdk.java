@@ -1,5 +1,7 @@
 package com.loopme;
 
+import static com.loopme.Constants.UNKNOWN_MSG;
+
 import android.content.Context;
 import android.os.Looper;
 
@@ -49,15 +51,15 @@ public final class LoopMeSdk {
         public void setCoppa(boolean value) { coppa = value; }
 
         private String mediation;
-        public String getMediation() { return mediation != null ? mediation : "unknown"; }
+        public String getMediation() { return mediation != null ? mediation : UNKNOWN_MSG; }
         public void setMediation(String mediationName) { mediation = mediationName; }
 
         private String mediationSdkVersion;
-        public String getMediationSdkVersion() { return mediationSdkVersion != null ? mediationSdkVersion : "unknown"; }
+        public String getMediationSdkVersion() { return mediationSdkVersion != null ? mediationSdkVersion : UNKNOWN_MSG; }
         public void setMediationSdkVersion(String version) { mediationSdkVersion = version; }
 
         private String adapterVersion;
-        public String getAdapterVersion() { return adapterVersion != null ? adapterVersion : "unknown"; }
+        public String getAdapterVersion() { return adapterVersion != null ? adapterVersion : UNKNOWN_MSG; }
         public void setAdapterVersion(String version) { adapterVersion = version; }
     }
 

@@ -1,8 +1,5 @@
 package com.loopme;
 
-import static com.loopme.debugging.Params.ERROR_MSG;
-import static com.loopme.debugging.Params.PLACEMENT_TYPE;
-
 import android.app.Activity;
 import android.widget.FrameLayout;
 
@@ -70,9 +67,7 @@ public final class LoopMeBanner extends AdWrapper {
                 postShowMissedEvent();
             }
         } else {
-            HashMap<String, String> errorInfo = new HashMap<>();
-            errorInfo.put(ERROR_MSG, "Banner is already showing");
-            errorInfo.put(PLACEMENT_TYPE, getPlacementType().name().toLowerCase());
+            HashMap<String, String> errorInfo = mFirstLoopMeAd.packErrorInfo("Banner is already showing");
             LoopMeTracker.post(errorInfo);
         }
     }
@@ -190,6 +185,7 @@ public final class LoopMeBanner extends AdWrapper {
     public Constants.AdFormat getAdFormat() {
         return Constants.AdFormat.BANNER;
     }
+
     @Override
     public Constants.PlacementType getPlacementType() {
         return Constants.PlacementType.BANNER;
