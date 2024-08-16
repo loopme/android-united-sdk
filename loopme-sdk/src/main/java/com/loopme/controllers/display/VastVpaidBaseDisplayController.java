@@ -1,22 +1,15 @@
 package com.loopme.controllers.display;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 
-import com.loopme.Logging;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.LoopMeAd;
-import com.loopme.common.LoopMeError;
 import com.loopme.controllers.interfaces.VastVpaidDisplayController;
-import com.loopme.loaders.VastVpaidAssetsResolver;
-import com.loopme.models.Errors;
-import com.loopme.time.Timers;
-import com.loopme.time.TimersType;
 import com.loopme.tracker.constants.EventConstants;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.vast.VastVpaidEventTracker;
@@ -29,11 +22,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
 
 public abstract class VastVpaidBaseDisplayController extends BaseTrackableController
-        implements VastVpaidDisplayController, Observer {
+        implements VastVpaidDisplayController {
 
     private static final String LOG_TAG = VastVpaidBaseDisplayController.class.getSimpleName();
     // TODO. Move?
@@ -42,16 +33,12 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
     protected static final int VAST_MACROS_REASON_NOT_SUPPORTED = 2;
     protected static final int VAST_MACROS_REASON_LOAD_ERROR = 3;
 
-    protected String mVideoUri;
-    protected String mImageUri;
     protected AdParams mAdParams;
     protected LoopMeAd mLoopMeAd;
 
-    private final VastVpaidAssetsResolver mVastVpaidAssetsResolver;
-
     private boolean mIsVpaidEventTracked;
-    private Timers mTimer;
-    private final Context mContext;
+
+    protected final Context mContext;
     private ViewableImpressionTracker viewableImpressionTracker;
     private final VastVpaidEventTracker mEventTracker;
     private WebView webView;
@@ -61,16 +48,12 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
         mLoopMeAd = loopMeAd;
         mAdParams = loopMeAd.getAdParams();
         mContext = loopMeAd.getContext();
-        mVastVpaidAssetsResolver = new VastVpaidAssetsResolver();
-        mTimer = new Timers(this);
         LoopMeTracker.initVastErrorUrl(mAdParams.getErrorUrlList());
         mEventTracker = new VastVpaidEventTracker(mLoopMeAd.getAdParams().getTrackingEventsList());
     }
 
     public void postVideoEvent(String event, String addMessage) {
-        if (mEventTracker != null) {
-            mEventTracker.postEvent(event, addMessage);
-        }
+        if (mEventTracker != null) mEventTracker.postEvent(event, addMessage);
     }
 
     public void postVideoEvent(String eventsUrlOrType) {
@@ -84,88 +67,33 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
         }
     }
 
-    protected void postVideoClicks(String currentPosition) {
-        for (String trackUrl : mAdParams.getVideoClicks()) {
-            postVideoEvent(trackUrl, currentPosition);
-        }
-    }
-
-    protected void postEndCardClicks() {
-        for (String trackUrl : mAdParams.getEndCardClicks()) {
-            postVideoEvent(trackUrl);
-        }
-    }
-
-    protected void onEndCardAppears() {
-        for (String trackUrl : mAdParams.getCompanionCreativeViewEvents()) {
-            postVideoEvent(trackUrl);
-        }
-    }
-
     @Override
     public void onStartLoad() {
         super.onStartLoad();
         // Start initializing OMID part.
         onTryCreateOmidTracker(getSupportedOmidVerificationData(mAdParams));
-        startTimer(TimersType.PREPARE_ASSETS_TIMER);
-        mVastVpaidAssetsResolver.resolve(mAdParams, mContext, createAssetsLoadListener());
+        // Init trackers
         initTrackers();
+        onUiThread(this::prepare);
     }
 
     protected void onTryCreateOmidTracker(Map<String, Verification> omidVerificationMap) { }
 
     protected void setVerificationView(View view) {
-        if (viewableImpressionTracker != null) {
-            viewableImpressionTracker.setAdView(view);
-        }
+        if (viewableImpressionTracker != null) viewableImpressionTracker.setAdView(view);
     }
 
     protected void postViewableEvents(int doneMillis) {
-        if (viewableImpressionTracker != null) {
-            viewableImpressionTracker.postViewableEvents(doneMillis);
-        }
-    }
-
-    protected boolean hasViewableImpression() {
-        return mAdParams != null && mAdParams.hasVast4ViewableImpressions();
-    }
-
-    private VastVpaidAssetsResolver.OnAssetsLoaded createAssetsLoadListener() {
-        return new VastVpaidAssetsResolver.OnAssetsLoaded() {
-            @Override
-            public void onAssetsLoaded(String videoFilePath, String endCardFilePath) {
-                mVideoUri = videoFilePath;
-                mImageUri = endCardFilePath;
-                stopTimer(TimersType.PREPARE_ASSETS_TIMER);
-                onUiThread(() -> {
-                    startTimer(TimersType.PREPARE_VPAID_JS_TIMER);
-                    prepare();
-                });
-            }
-            @Override
-            public void onError(LoopMeError info) {
-                onInternalLoadFail(info);
-                stopTimer(TimersType.PREPARE_ASSETS_TIMER);
-            }
-            @Override
-            public void onPostWarning(LoopMeError error) {
-                if (mLoopMeAd != null) {
-                    mLoopMeAd.onSendPostWarning(error);
-                }
-            }
-        };
+        if (viewableImpressionTracker != null) viewableImpressionTracker.postViewableEvents(doneMillis);
     }
 
     // TODO. Refactor.
     private static Map<String, Verification> getSupportedOmidVerificationData(AdParams adParams) {
         Map<String, Verification> omidVerificationMap = new HashMap<>();
-
-        if (adParams == null)
-            return omidVerificationMap;
+        if (adParams == null) return omidVerificationMap;
 
         List<com.loopme.xml.vast4.Verification> verificationList = adParams.getVerificationList();
-        if (verificationList == null)
-            return omidVerificationMap;
+        if (verificationList == null) return omidVerificationMap;
 
         for (com.loopme.xml.vast4.Verification v : verificationList) {
             if (v == null) continue;
@@ -197,8 +125,7 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
     protected static void postVerificationNotExecutedEvent(
         List<String> verificationNotExecutedUrlList, int reason
     ) {
-        if (verificationNotExecutedUrlList == null)
-            return;
+        if (verificationNotExecutedUrlList == null) return;
         for (String url : verificationNotExecutedUrlList)
             VastVpaidEventTracker.trackVastEvent(url, String.valueOf(reason));
     }
@@ -245,8 +172,7 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
     protected abstract WebView createWebView();
 
     protected void destroyWebView() {
-        if (webView != null)
-            webView.destroy();
+        if (webView != null) webView.destroy();
         webView = null;
     }
 
@@ -254,85 +180,34 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
     public void prepare() {
         webView = createWebView();
         onAdRegisterView(mLoopMeAd.getContext(), webView);
-        if (viewableImpressionTracker == null && hasViewableImpression())
+        boolean hasViewableImpression = mAdParams != null && mAdParams.hasVast4ViewableImpressions();
+        if (viewableImpressionTracker == null && hasViewableImpression)
             viewableImpressionTracker = new ViewableImpressionTracker(mLoopMeAd.getAdParams());
     }
 
     @Override
-    public void closeSelf() {
-        onAdUserCloseEvent();
-    }
+    public void closeSelf() { onAdUserCloseEvent(); }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-        if (mTimer != null) {
-            mTimer.destroy();
-            mTimer = null;
-        }
-        breakAssetsLoading();
         LoopMeTracker.clear();
     }
 
-    protected void onAdLoadSuccess() {
-        if (mLoopMeAd != null) {
-            mLoopMeAd.runOnUiThread(() -> mLoopMeAd.onAdLoadSuccess());
-        }
-    }
-
     protected void dismissAd() {
-        if (mLoopMeAd != null) {
-            mLoopMeAd.runOnUiThread(() -> mLoopMeAd.dismiss());
-        }
+        if (mLoopMeAd != null) mLoopMeAd.runOnUiThread(() -> mLoopMeAd.dismiss());
     }
 
     protected void onAdClicked() {
-        if (mLoopMeAd != null) {
-            mLoopMeAd.runOnUiThread(() -> mLoopMeAd.onAdClicked());
-        }
+        if (mLoopMeAd != null) mLoopMeAd.runOnUiThread(() -> mLoopMeAd.onAdClicked());
     }
 
     protected void onAdVideoDidReachEnd() {
-        if (mLoopMeAd != null) {
-            mLoopMeAd.runOnUiThread(() -> mLoopMeAd.onAdVideoDidReachEnd());
-        }
-    }
-
-    protected AssetManager getAssetsManager() { return mContext.getAssets(); }
-
-    @Override
-    public void update(Observable observable, Object arg) {
-        if (!(observable instanceof Timers) || !(arg instanceof TimersType)) {
-            return;
-        }
-        switch ((TimersType) arg) {
-            case PREPARE_VPAID_JS_TIMER: {
-                stopTimer(TimersType.PREPARE_VPAID_JS_TIMER);
-                Logging.out(LOG_TAG, "Js loading timeout");
-                if (this instanceof DisplayControllerVpaid) {
-                    onInternalLoadFail(Errors.JS_LOADING_TIMEOUT);
-                }
-                break;
-            }
-            case PREPARE_ASSETS_TIMER: {
-                stopTimer(TimersType.PREPARE_ASSETS_TIMER);
-                breakAssetsLoading();
-                onInternalLoadFail(Errors.TIMEOUT_ON_MEDIA_FILE_URI);
-                break;
-            }
-        }
+        if (mLoopMeAd != null) mLoopMeAd.runOnUiThread(() -> mLoopMeAd.onAdVideoDidReachEnd());
     }
 
     protected void onAdReady() {
-        stopTimer(TimersType.PREPARE_VPAID_JS_TIMER);
-        onAdLoadSuccess();
-    }
-
-    private void breakAssetsLoading() {
-        if (mVastVpaidAssetsResolver != null) {
-            mVastVpaidAssetsResolver.stop();
-        }
+        if (mLoopMeAd != null) mLoopMeAd.runOnUiThread(() -> mLoopMeAd.onAdLoadSuccess());
     }
 
     @Override
@@ -340,18 +215,6 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
 
     @Override
     public WebView getWebView() { return webView; }
-
-    private void startTimer(TimersType timersType) {
-        if (mTimer != null) {
-            mTimer.startTimer(timersType);
-        }
-    }
-
-    private void stopTimer(TimersType timersType) {
-        if (mTimer != null) {
-            mTimer.stopTimer(timersType);
-        }
-    }
 
     protected static class Verification {
         private final String vendor;

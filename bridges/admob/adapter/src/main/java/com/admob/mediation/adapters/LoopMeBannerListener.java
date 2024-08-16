@@ -27,13 +27,13 @@ public class LoopMeBannerListener implements LoopMeBanner.Listener, MediationBan
     /** Configuration for requesting the banner ad from the third-party network. */
     private final MediationBannerAdConfiguration mediationBannerAdConfiguration;
 
-    /** Callback that fires on loading success or failure. */
+    /** Listener that fires on loading success or failure. */
     private final MediationAdLoadCallback<
         MediationBannerAd,
         MediationBannerAdCallback
     > mediationAdLoadCallback;
 
-    /** Callback for banner ad events. */
+    /** Listener for banner ad events. */
     private MediationBannerAdCallback bannerAdCallback;
     public LoopMeBannerListener(
             MediationBannerAdConfiguration adConfiguration,

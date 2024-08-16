@@ -61,7 +61,8 @@ public class ResponseJsonModel implements Serializable, Parcelable {
     @NonNull
     public static AdType getCreativeType(ResponseJsonModel responseModel) {
         try {
-            return AdType.fromString(responseModel.getSeatbid().get(0).getBid().get(0).getExt().getCrtype());
+            String adm = responseModel.getSeatbid().get(0).getBid().get(0).getAdm();
+            return adm.contains("<VAST") ? AdType.VAST : AdType.MRAID;
         } catch (IllegalArgumentException | NullPointerException ex) {
             Logging.out(LOG_TAG, ex.getMessage());
             return AdType.HTML;
