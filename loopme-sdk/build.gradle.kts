@@ -15,7 +15,7 @@ android {
 dependencies {
     implementation(files("libs/omsdk-android-1.3.3-loopme.jar"))
 
-    // appcompat and material > 1.6.0 does not supported by Unity 2021
+    //noinspection GradleDependency - appcompat and material > 1.6.0 does not supported by Unity 2021
     api("androidx.appcompat:appcompat:1.6.0")
 
     api("androidx.recyclerview:recyclerview:1.3.2")
@@ -26,5 +26,4 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
     implementation("com.google.androidbrowserhelper:androidbrowserhelper:2.5.0")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
 }
