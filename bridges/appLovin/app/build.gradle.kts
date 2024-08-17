@@ -34,11 +34,8 @@ dependencies {
     implementation(project(":bridges:appLovin:adapter"))
 //    implementation("com.github.loopme.android-united-sdk:appLovin-adapter:AL_0.0.1")
 
-    // appcompat and material > 1.6.0 does not supported by Unity 2021
+    //noinspection GradleDependency - appcompat and material > 1.6.0 does not supported by Unity 2021
     implementation("androidx.appcompat:appcompat:1.6.0")
+    //noinspection GradleDependency - appcompat and material > 1.6.0 does not supported by Unity 2021
     implementation("com.google.android.material:material:1.6.0")
-
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
