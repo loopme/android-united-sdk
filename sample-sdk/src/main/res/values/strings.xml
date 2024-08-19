@@ -15,6 +15,6 @@
     <string name="second_mpu_app_key">3ae8c26803</string>
     <string name="load_mpu">load MPU (300x200)</string>
     <string name="load_longitudinal">load 320x50)</string>
-    <string name="destroy_add">destroy add</string>
+    <string name="destroy_ad">destroy ad</string>
 
 </resources>

@@ -30,6 +30,7 @@ public class InterstitialActivity extends AppCompatActivity {
         binding.showButton.setOnClickListener(view -> {
             if (mInterstitial.isReady()) {
                 mInterstitial.show();
+                binding.loadButton.setEnabled(true);
             } else {
                 alert("Interstitial is not ready");
             }
@@ -45,6 +46,7 @@ public class InterstitialActivity extends AppCompatActivity {
     }
 
     private void onLoadClicked() {
+        binding.loadButton.setEnabled(false);
         if (mInterstitial != null) {
             mInterstitial.destroy();
             mInterstitial = null;
@@ -67,6 +69,7 @@ public class InterstitialActivity extends AppCompatActivity {
             @Override
             public void onLoopMeInterstitialLoadFail(LoopMeInterstitial interstitial, LoopMeError error) {
                 alert(error.getMessage());
+                binding.loadButton.setEnabled(true);
             }
 
             @Override

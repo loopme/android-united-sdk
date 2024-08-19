@@ -32,8 +32,7 @@ class BannerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mBanner?.dismiss()
-        mBanner?.destroy()
+        dismissAndDestroyBanner()
     }
 
     private fun setupViews() {
@@ -46,14 +45,15 @@ class BannerActivity : AppCompatActivity() {
         }
 
         binding.destroyAdBtn.setOnClickListener {
-            mBanner?.destroy()
+            dismissAndDestroyBanner()
+            enableLoadingButtons()
         }
     }
 
     private fun loadBanner() {
+        disableLoadingButtons()
         if (mBanner != null) {
-            mBanner?.destroy()
-            mBanner = null
+            dismissAndDestroyBanner()
         }
 
         var appKey = binding.appKeyEt.text.toString()
@@ -75,6 +75,7 @@ class BannerActivity : AppCompatActivity() {
                         "LoadFail: " + loopMeError.message,
                         Toast.LENGTH_SHORT
                     ).show()
+                    enableLoadingButtons()
                 }
 
                 override fun onLoopMeBannerLoadSuccess(loopMeBanner: LoopMeBanner) {
@@ -86,10 +87,28 @@ class BannerActivity : AppCompatActivity() {
                 override fun onLoopMeBannerExpired(loopMeBanner: LoopMeBanner) {}
                 override fun onLoopMeBannerHide(loopMeBanner: LoopMeBanner) {}
                 override fun onLoopMeBannerLeaveApp(loopMeBanner: LoopMeBanner) {}
-                override fun onLoopMeBannerVideoDidReachEnd(loopMeBanner: LoopMeBanner) {}
+                override fun onLoopMeBannerVideoDidReachEnd(loopMeBanner: LoopMeBanner) {
+                    enableLoadingButtons()
+                    dismissAndDestroyBanner()
+                }
             })
             banner.setAutoLoading(false)
             banner.load()
         }
+    }
+
+    private fun dismissAndDestroyBanner() {
+        mBanner?.dismiss()
+        mBanner?.destroy()
+    }
+
+    private fun disableLoadingButtons() {
+        binding.loadMpuBtn.isEnabled = false
+        binding.loadLongitudinalBtn.isEnabled = false
+    }
+
+    private fun enableLoadingButtons() {
+        binding.loadMpuBtn.isEnabled = true
+        binding.loadLongitudinalBtn.isEnabled = true
     }
 }
