@@ -1,4 +1,4 @@
-package com.loopme.banner_sample.app;
+package com.loopme.sdk_sample.app;
 
 import android.os.Bundle;
 
@@ -6,11 +6,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.loopme.banner_sample.R;
-import com.loopme.banner_sample.app.model.Constants;
-import com.loopme.banner_sample.app.views.MainFeaturesFragment;
-import com.loopme.banner_sample.app.views.RecyclerViewFragment;
-import com.loopme.banner_sample.app.views.SimpleBannerFragment;
+import com.loopme.sdk_sample.R;
+import com.loopme.sdk_sample.app.model.Constants;
+import com.loopme.sdk_sample.app.views.MainFeaturesFragment;
+import com.loopme.sdk_sample.app.views.RecyclerViewFragment;
+import com.loopme.sdk_sample.app.views.SimpleBannerFragment;
 
 public class BannerActivity
     extends AppCompatActivity

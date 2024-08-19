@@ -1,4 +1,4 @@
-package com.loopme.banner_sample.app.views;
+package com.loopme.sdk_sample.app.views;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -12,9 +12,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.loopme.banner_sample.R;
-import com.loopme.banner_sample.app.model.Constants;
-import com.loopme.banner_sample.app.model.MainAdapter;
+import com.loopme.sdk_sample.R;
+import com.loopme.sdk_sample.app.model.Constants;
+import com.loopme.sdk_sample.app.model.MainAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

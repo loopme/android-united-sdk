@@ -1,4 +1,4 @@
-package com.loopme.banner_sample.app;
+package com.loopme.sdk_sample.app;
 
 import android.os.Bundle;
 import android.widget.Toast;
@@ -6,7 +6,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.loopme.LoopMeInterstitial;
-import com.loopme.banner_sample.databinding.ActivityInterstitialBinding;
+import com.loopme.sdk_sample.databinding.ActivityInterstitialBinding;
 import com.loopme.common.LoopMeError;
 
 public class InterstitialActivity extends AppCompatActivity {

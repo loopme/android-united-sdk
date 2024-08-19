@@ -1,4 +1,4 @@
-package com.loopme.banner_sample.app.model;
+package com.loopme.sdk_sample.app.model;
 
 import android.view.View;
 import android.widget.ImageView;
@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.loopme.banner_sample.R;
+import com.loopme.sdk_sample.R;
 
 public class CustomViewHolder extends RecyclerView.ViewHolder {
     final TextView textView;

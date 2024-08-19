@@ -1,4 +1,4 @@
-package com.loopme.banner_sample.app.model;
+package com.loopme.sdk_sample.app.model;
 
 public class CustomListItem {
     private final String mTitle;

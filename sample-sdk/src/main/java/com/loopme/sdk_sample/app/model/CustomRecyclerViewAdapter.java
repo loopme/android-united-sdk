@@ -1,4 +1,4 @@
-package com.loopme.banner_sample.app.model;
+package com.loopme.sdk_sample.app.model;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,7 +7,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.loopme.banner_sample.R;
+import com.loopme.sdk_sample.R;
 
 import java.util.ArrayList;
 import java.util.List;

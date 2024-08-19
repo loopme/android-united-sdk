@@ -1,4 +1,4 @@
-package com.loopme.banner_sample.app.views;
+package com.loopme.sdk_sample.app.views;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.loopme.LoopMeBanner;
 import com.loopme.NativeVideoBinder;
 import com.loopme.NativeVideoRecyclerAdapter;
-import com.loopme.banner_sample.R;
-import com.loopme.banner_sample.app.model.CustomListItem;
-import com.loopme.banner_sample.app.model.CustomRecyclerViewAdapter;
+import com.loopme.sdk_sample.R;
+import com.loopme.sdk_sample.app.model.CustomListItem;
+import com.loopme.sdk_sample.app.model.CustomRecyclerViewAdapter;
 import com.loopme.common.LoopMeError;
 
 import java.util.ArrayList;

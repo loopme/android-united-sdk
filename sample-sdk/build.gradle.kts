@@ -4,10 +4,10 @@ plugins {
 }
 
 android {
-    namespace = "com.loopme.banner_sample"
+    namespace = "com.loopme.sdk_sample"
 
     defaultConfig {
-        applicationId = "com.loopme.banner_sample.app"
+        applicationId = "com.loopme.sdk_sample.app"
         versionCode = 1
         versionName ="1.0"
     }

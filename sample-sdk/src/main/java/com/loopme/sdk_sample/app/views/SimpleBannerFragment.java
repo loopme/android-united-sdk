@@ -1,4 +1,4 @@
-package com.loopme.banner_sample.app.views;
+package com.loopme.sdk_sample.app.views;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.loopme.LoopMeBanner;
-import com.loopme.banner_sample.R;
+import com.loopme.sdk_sample.R;
 import com.loopme.common.LoopMeError;
 
 public class SimpleBannerFragment extends Fragment {

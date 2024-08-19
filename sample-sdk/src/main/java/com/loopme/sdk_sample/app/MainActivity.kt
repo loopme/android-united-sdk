@@ -1,4 +1,4 @@
-package com.loopme.banner_sample.app
+package com.loopme.sdk_sample.app
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,7 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.loopme.LoopMeSdk
 import com.loopme.LoopMeSdk.LoopMeSdkListener
-import com.loopme.banner_sample.databinding.ActivityMainBinding
+import com.loopme.sdk_sample.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
