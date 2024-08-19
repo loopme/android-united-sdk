@@ -10,6 +10,7 @@ import android.location.Location;
 import android.media.AudioManager;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.os.PowerManager;
 import android.text.TextUtils;
 import android.webkit.WebSettings;
 
@@ -178,6 +179,11 @@ public class RequestUtils {
         return String.valueOf(
             bm != null ? bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) : 1
         );
+    }
+
+    String getBatterySaverState(Context context) {
+        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        return (powerManager != null && powerManager.isPowerSaveMode()) ? "1" : "0";
     }
 
     boolean isAnyAudioOutput(Context context) {
