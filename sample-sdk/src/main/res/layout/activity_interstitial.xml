@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/activity_horizontal_margin"
         android:gravity="center"
-        android:hint="@string/default_appkey" />
+        android:hint="@string/default_interstitial_app_key" />
 
     <Button
         android:id="@+id/load_button"

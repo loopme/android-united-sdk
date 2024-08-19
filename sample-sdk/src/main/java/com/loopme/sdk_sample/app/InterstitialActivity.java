@@ -51,7 +51,7 @@ public class InterstitialActivity extends AppCompatActivity {
         }
         String appkey = binding.appKeyEt.getText().toString();
         if (appkey.isEmpty()) {
-            appkey = getString(R.string.default_appkey);
+            appkey = getString(R.string.default_interstitial_app_key);
         }
         mInterstitial = LoopMeInterstitial.getInstance(appkey, this);
         mInterstitial.setAutoLoading(false);
