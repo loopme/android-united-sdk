@@ -6,6 +6,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.loopme.LoopMeInterstitial;
+import com.loopme.sdk_sample.R;
 import com.loopme.sdk_sample.databinding.ActivityInterstitialBinding;
 import com.loopme.common.LoopMeError;
 
@@ -48,7 +49,11 @@ public class InterstitialActivity extends AppCompatActivity {
             mInterstitial.destroy();
             mInterstitial = null;
         }
-        mInterstitial = LoopMeInterstitial.getInstance("b5df00223e", this);
+        String appkey = binding.appKeyEt.getText().toString();
+        if (appkey.isEmpty()) {
+            appkey = getString(R.string.default_appkey);
+        }
+        mInterstitial = LoopMeInterstitial.getInstance(appkey, this);
         mInterstitial.setAutoLoading(false);
 
         // Adding listener to receive SDK notifications during the

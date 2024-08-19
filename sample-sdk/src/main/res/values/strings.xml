@@ -10,5 +10,6 @@
     <string name="banner">Banner</string>
     <string name="load_interstitial">Load Interstitial</string>
     <string name="show_interstitial">Show Interstitial</string>
+    <string name="default_appkey">b5df00223e</string>
 
 </resources>
