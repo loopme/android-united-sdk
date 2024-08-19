@@ -1,5 +1,6 @@
 plugins {
     id("com.android.library")
+    kotlin("android")
 }
 
 android {
@@ -9,6 +10,14 @@ android {
         buildConfigField("String", "OM_SDK_JS_URL", project.findProperty("OM_SDK_JS_URL") as? String ?: "")
         buildConfigField("String", "OM_SDK_PARTNER", project.findProperty("OM_SDK_PARTNER") as? String ?: "")
         buildConfigField("String", "VERSION_NAME", project.findProperty("VERSION_NAME") as? String ?: "")
+    }
+
+    viewBinding {
+        enable = true
+    }
+
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
     }
 }
 
@@ -26,4 +35,12 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
     implementation("com.google.androidbrowserhelper:androidbrowserhelper:2.5.0")
+
+    implementation("androidx.test.ext:junit:1.2.1")
+
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("junit:junit:4.13.2")
+
+    testImplementation("org.robolectric:robolectric:4.13")
+    androidTestImplementation("org.robolectric:robolectric:4.13")
 }
