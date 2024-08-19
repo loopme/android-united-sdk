@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.loopme.Constants;
+import com.loopme.Logging;
 import com.loopme.utils.Utils;
 
 import java.io.BufferedInputStream;
@@ -163,9 +164,17 @@ public class HttpUtils {
         }
     }
 
-    public static void cache(String source, String destination, CacheListener listener) {
+    public static void cache(@NonNull Context context, @NonNull String source, @NonNull String destination, @NonNull CacheListener listener) {
         File file = new File(destination + "_download");
         try {
+            Logging.out(LOG_TAG, "Use mobile network for caching: " + Constants.USE_MOBILE_NETWORK_FOR_CACHING);
+            if (!HttpUtils.isOnline(context)) {
+                throw new IllegalStateException("No internet connection");
+            }
+            if (!HttpUtils.isWifiConnection(context) && !Constants.USE_MOBILE_NETWORK_FOR_CACHING) {
+                throw new IllegalStateException("No wifi connection");
+            }
+
             HttpURLConnection connection = (HttpURLConnection) new URL(source).openConnection();
             connection.setRequestMethod(HTTP_METHOD_GET);
             connection.setReadTimeout(READ_TIMEOUT);

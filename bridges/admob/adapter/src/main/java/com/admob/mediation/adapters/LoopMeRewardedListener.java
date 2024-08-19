@@ -26,9 +26,9 @@ public class LoopMeRewardedListener implements LoopMeInterstitial.Listener, Medi
 
     private boolean isAlreadyRewarded = false;
 
-    /** Callback for interstitial ad events. */
+    /** Listener for interstitial ad events. */
     private MediationRewardedAdCallback rewardedAdCallback;
-    /** Callback that fires on loading success or failure. */
+    /** Listener that fires on loading success or failure. */
     private final MediationAdLoadCallback<
         MediationRewardedAd,
         MediationRewardedAdCallback

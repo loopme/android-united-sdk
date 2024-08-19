@@ -23,9 +23,9 @@ public class LoopMeInterstitialListener implements LoopMeInterstitial.Listener, 
     /** Configuration for requesting the interstitial ad from the third-party network. */
     private final MediationInterstitialAdConfiguration mediationInterstitialAdConfiguration;
 
-    /** Callback for interstitial ad events. */
+    /** Listener for interstitial ad events. */
     private MediationInterstitialAdCallback interstitialAdCallback;
-    /** Callback that fires on loading success or failure. */
+    /** Listener that fires on loading success or failure. */
     private final MediationAdLoadCallback<
         MediationInterstitialAd,
         MediationInterstitialAdCallback

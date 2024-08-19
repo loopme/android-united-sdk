@@ -1,5 +1,7 @@
 package com.loopme.ad;
 
+import androidx.annotation.Nullable;
+
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.vast.WrapperParser;
@@ -46,8 +48,8 @@ public class AdParams implements Serializable {
     private String mCrid;
 
     private final List<String> mCompanionCreativeViewEventsList = new ArrayList<>();
-    private List<String> mVideoFileUrlsList = new ArrayList<>();
-    private List<String> mEndCardUrlList = new ArrayList<>();
+    private List<String> mVideoFileUrls = new ArrayList<>();
+    private List<String> mEndCardUrls = new ArrayList<>();
     private List<String> mImpressionsList = new ArrayList<>();
     private List<String> mVideoClicksList = new ArrayList<>();
     private List<String> mEndCardClicksList = new ArrayList<>();
@@ -161,13 +163,15 @@ public class AdParams implements Serializable {
     public String getVideoRedirectUrl() { return mVideoRedirectUrl; }
     public void setVideoRedirectUrl(String videoRedirectUrl) { mVideoRedirectUrl = videoRedirectUrl; }
 
-    public List<String> getVideoFileUrlsList() { return mVideoFileUrlsList; }
-    public void setVideoFileUrlsList(List<String> videoFileUrlsList) {
-        mVideoFileUrlsList = videoFileUrlsList;
-    }
+    @Nullable
+    public String getVideoFileUrl() { return mVideoFileUrls.isEmpty() ? null : mVideoFileUrls.get(0); }
+    public List<String> getVideoFiles() { return mVideoFileUrls; }
+    public void setVideoFileUrlsList(List<String> urls) { mVideoFileUrls = urls; }
 
-    public List<String> getEndCardUrlList() { return mEndCardUrlList; }
-    public void setEndCardUrlList(List<String> endCardUrlList) { mEndCardUrlList = endCardUrlList; }
+    @Nullable
+    public String getEndCardUrl () { return mEndCardUrls.isEmpty() ? null : mEndCardUrls.get(0); }
+    public List<String> getEndCards() { return mEndCardUrls; }
+    public void setEndCardUrlList(List<String> urls) { mEndCardUrls = urls; }
 
     public String getSkipTime() { return mSkipTime; }
     public void setSkipTime(String skipTime) { mSkipTime = skipTime; }

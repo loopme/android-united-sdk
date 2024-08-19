@@ -2,6 +2,10 @@ package com.loopme.controllers.display;
 
 import static com.loopme.Constants.SKIP_DELAY_INTERSTITIAL;
 import static com.loopme.Constants.SKIP_DELAY_REWARDED;
+import static com.loopme.debugging.Params.ERROR_EXCEPTION;
+import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.debugging.Params.ERROR_TYPE;
+import static com.loopme.debugging.Params.ERROR_URL;
 
 import android.media.MediaPlayer;
 import android.os.Handler;
@@ -21,17 +25,21 @@ import com.loopme.Logging;
 import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.LoopMeMediaPlayer;
 import com.loopme.ad.LoopMeAd;
+import com.loopme.common.LoopMeError;
 import com.loopme.controllers.view.ViewControllerVast;
+import com.loopme.loaders.AssetsCache;
 import com.loopme.models.Errors;
 import com.loopme.om.OmidEventTrackerWrapper;
 import com.loopme.om.OmidHelper;
 import com.loopme.tracker.constants.EventConstants;
+import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.ApiLevel;
 import com.loopme.utils.Utils;
 import com.loopme.vast.TrackingEvent;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +52,9 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     private List<TrackingEvent> mTrackingEventsList = new ArrayList<>();
     private LoopMeMediaPlayer mLoopMePlayer;
     private int mSkipTimeMillis;
+
+    private String mVideoUrl;
+    private String mEndCardUrl;
 
     private boolean mIsAdSkipped;
     // TODO. Refactor.
@@ -59,6 +70,34 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         mViewControllerVast = new ViewControllerVast(this, this);
         mLogTag = DisplayControllerVast.class.getSimpleName();
         Logging.out(mLogTag);
+    }
+
+    @Override
+    public void onStartLoad() {
+        super.onStartLoad();
+        // Cache video and endcard assets.
+        AssetsCache.Listener listener = new AssetsCache.Listener() {
+            @Override
+            public void onAssetsLoaded(String videoUrl, String endCardUrl) {
+                mVideoUrl = videoUrl;
+                mEndCardUrl = endCardUrl;
+            }
+            @Override
+            public void onError(LoopMeError info) { onInternalLoadFail(info); }
+            @Override
+            public void onPostWarning(LoopMeError error) {
+                if (mLoopMeAd != null) mLoopMeAd.onSendPostWarning(error);
+            }
+        };
+        mEndCardUrl = mAdParams.getEndCardUrl();
+        mVideoUrl = mAdParams.getVideoFileUrl();
+        if (mVideoUrl == null) {
+            listener.onError(Errors.VAST_COULD_NOT_FIND_SUPPORTED_FORMAT);
+        } else if (mEndCardUrl == null) {
+            AssetsCache.loadVideo(mVideoUrl, mContext, listener);
+        } else {
+            AssetsCache.loadVideoWithEndcard(mVideoUrl, mEndCardUrl, mContext, listener);
+        }
     }
 
     @Override
@@ -172,7 +211,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         mIsAdSkipped = false;
         postDelayed(() -> {
             destroyMediaPlayer();
-            mLoopMePlayer = new LoopMeMediaPlayer(mVideoUri, DisplayControllerVast.this);
+            mLoopMePlayer = new LoopMeMediaPlayer(mVideoUrl, DisplayControllerVast.this);
         }, 100);
         onAdResumedEvent();
     }
@@ -238,10 +277,15 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     public void onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
         if (mLoopMePlayer != null && mLoopMePlayer.isPlaying()) {
             url = mAdParams.getVideoRedirectUrl();
-            postVideoClicks(getCurrentPositionAsString());
+            String currentPosition = getCurrentPositionAsString();
+            for (String trackUrl : mAdParams.getVideoClicks()) {
+                postVideoEvent(trackUrl, currentPosition);
+            }
         } else {
             url = mAdParams.getEndCardRedirectUrl();
-            postEndCardClicks();
+            for (String trackUrl : mAdParams.getEndCardClicks()) {
+                postVideoEvent(trackUrl);
+            }
         }
         onAdClicked();
         super.onRedirect(url, mLoopMeAd);
@@ -307,11 +351,13 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         if (mLoopMePlayer != null) {
             mLoopMePlayer.pauseMediaPlayer();
         }
-        if (TextUtils.isEmpty(mImageUri)) {
+        if (TextUtils.isEmpty(mEndCardUrl)) {
             closeSelf();
         } else {
-            mViewControllerVast.showEndCard(mImageUri);
-            onEndCardAppears();
+            mViewControllerVast.showEndCard(mEndCardUrl);
+            for (String trackUrl : mAdParams.getCompanionCreativeViewEvents()) {
+                postVideoEvent(trackUrl);
+            }
         }
         if (skipEvent) {
             postVideoEvent(EventConstants.SKIP, getCurrentPositionAsString());
