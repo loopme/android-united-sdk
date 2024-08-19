@@ -174,11 +174,9 @@ public class RequestUtils {
         return audioOutputs;
     }
 
-    String getChargeLevel(Context context) {
+    int getChargeLevel(Context context) {
         BatteryManager bm = (BatteryManager) context.getSystemService(BATTERY_SERVICE);
-        return String.valueOf(
-            bm != null ? bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) : 1
-        );
+        return (bm != null) ? bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) : 1;
     }
 
     String getBatterySaverState(Context context) {
