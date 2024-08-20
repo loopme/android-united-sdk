@@ -174,16 +174,18 @@ public class RequestUtils {
         return audioOutputs;
     }
 
-    String getChargeLevel(Context context) {
+    private int getBatteryPercentage(Context context) {
         BatteryManager bm = (BatteryManager) context.getSystemService(BATTERY_SERVICE);
-        int batteryPercentage = (bm != null) ? bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) : 1;
-        return String.valueOf(batteryPercentage);
+        return (bm != null) ? bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) : -1;
+    }
+
+    String getChargeLevel(Context context) {
+        return String.valueOf(getBatteryPercentage(context));
     }
 
 
     int getBatteryLevel(Context context) {
-        BatteryManager bm = (BatteryManager) context.getSystemService(BATTERY_SERVICE);
-        int batteryPercentage = (bm != null) ? bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) : -1;
+        int batteryPercentage = getBatteryPercentage(context);
 
         if (batteryPercentage >= 85) return 8;
         if (batteryPercentage >= 70) return 7;
