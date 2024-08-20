@@ -1,6 +1,7 @@
 package com.loopme.sdk_sample.app
 
 import android.os.Bundle
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.loopme.LoopMeBanner
@@ -37,11 +38,12 @@ class BannerActivity : AppCompatActivity() {
 
     private fun setupViews() {
         binding.loadMpuBtn.setOnClickListener {
-            loadBanner()
+            loadMPU()
         }
 
         binding.loadLongitudinalBtn.setOnClickListener {
-            loadBanner()
+            loadLongitudinal()
+
         }
 
         binding.destroyAdBtn.setOnClickListener {
@@ -50,7 +52,23 @@ class BannerActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadBanner() {
+    private fun loadLongitudinal() {
+        with(binding) {
+            mpuPlaceholder.makeGone()
+            longitudinalBannerPlaceholder.makeVisible()
+            loadBanner(longitudinalBannerPlaceholder)
+        }
+    }
+
+    private fun loadMPU() {
+        with(binding) {
+            mpuPlaceholder.makeVisible()
+            longitudinalBannerPlaceholder.makeGone()
+            loadBanner(mpuPlaceholder)
+        }
+    }
+
+    private fun loadBanner(bannerPlaceholder: FrameLayout) {
         disableLoadingButtons()
         if (mBanner != null) {
             dismissAndDestroyBanner()
@@ -63,7 +81,7 @@ class BannerActivity : AppCompatActivity() {
 
         mBanner = LoopMeBanner.getInstance(appKey, this)
         mBanner?.let { banner ->
-            banner.bindView(binding.bannerPlaceholder)
+            banner.bindView(bannerPlaceholder)
             banner.setListener(object : LoopMeBanner.Listener {
                 override fun onLoopMeBannerLoadFail(
                     loopMeBanner: LoopMeBanner,
@@ -98,17 +116,19 @@ class BannerActivity : AppCompatActivity() {
     }
 
     private fun dismissAndDestroyBanner() {
+        binding.longitudinalBannerPlaceholder.makeGone()
+        binding.mpuPlaceholder.makeGone()
         mBanner?.dismiss()
         mBanner?.destroy()
     }
 
     private fun disableLoadingButtons() {
-        binding.loadMpuBtn.isEnabled = false
-        binding.loadLongitudinalBtn.isEnabled = false
+        binding.loadMpuBtn.disable()
+        binding.loadLongitudinalBtn.disable()
     }
 
     private fun enableLoadingButtons() {
-        binding.loadMpuBtn.isEnabled = true
-        binding.loadLongitudinalBtn.isEnabled = true
+        binding.loadMpuBtn.enable()
+        binding.loadLongitudinalBtn.enable()
     }
 }

@@ -14,12 +14,22 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <FrameLayout
-        android:id="@+id/banner_placeholder"
+        android:id="@+id/mpu_placeholder"
         android:layout_width="300dp"
         android:layout_height="250dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title_tv" />
+        app:layout_constraintTop_toBottomOf="@id/title_tv"
+        android:visibility="gone"/>
+
+    <FrameLayout
+        android:id="@+id/longitudinal_banner_placeholder"
+        android:layout_width="320dp"
+        android:layout_height="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_tv"
+        android:visibility="gone"/>
 
     <EditText
         android:id="@+id/app_key_et"
