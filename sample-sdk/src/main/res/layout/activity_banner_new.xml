@@ -39,6 +39,8 @@
         android:layout_marginTop="@dimen/mpu_width"
         android:gravity="center"
         android:hint="@string/default_mpu_app_key"
+        android:importantForAutofill="no"
+        android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title_tv" />
