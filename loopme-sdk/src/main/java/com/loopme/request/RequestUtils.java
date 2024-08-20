@@ -10,6 +10,7 @@ import android.location.Location;
 import android.media.AudioManager;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.os.PowerManager;
 import android.text.TextUtils;
 import android.webkit.WebSettings;
 
@@ -173,11 +174,32 @@ public class RequestUtils {
         return audioOutputs;
     }
 
-    String getChargeLevel(Context context) {
+    private int getBatteryPercentage(Context context) {
         BatteryManager bm = (BatteryManager) context.getSystemService(BATTERY_SERVICE);
-        return String.valueOf(
-            bm != null ? bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) : 1
-        );
+        return (bm != null) ? bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) : -1;
+    }
+
+    String getChargeLevel(Context context) {
+        return String.valueOf(getBatteryPercentage(context));
+    }
+
+
+    int getBatteryLevel(Context context) {
+        int batteryPercentage = getBatteryPercentage(context);
+
+        if (batteryPercentage >= 85) return 8;
+        if (batteryPercentage >= 70) return 7;
+        if (batteryPercentage >= 55) return 6;
+        if (batteryPercentage >= 40) return 5;
+        if (batteryPercentage >= 25) return 4;
+        if (batteryPercentage >= 10) return 3;
+        if (batteryPercentage >= 5) return 2;
+        return 1;
+    }
+
+    int getBatterySaverState(Context context) {
+        PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        return (powerManager != null && powerManager.isPowerSaveMode()) ? 1 : 0;
     }
 
     boolean isAnyAudioOutput(Context context) {
