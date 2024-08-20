@@ -46,7 +46,8 @@ public class RequestBuilder implements Serializable {
     private static final String EXT = "ext";
     private static final String TIMEZONE = "timezone";
     private static final String ORIENTATION = "orientation";
-    private static final String CHARGE_LEVEL = "batterylevel";
+    private static final String CHARGE_LEVEL = "chargelevel";
+    private static final String BATTERY_LEVEL = "batterylevel";
     private static final String BATTERY_SAVER = "batterysaver";
     private static final String PLUGIN = "plugin";
     private static final String TMAX = "tmax";
@@ -189,6 +190,7 @@ public class RequestBuilder implements Serializable {
                     .put(TIMEZONE, requestUtils.getTimeZone())
                     .put(ORIENTATION, requestUtils.getOrientation())
                     .put(CHARGE_LEVEL, requestUtils.getChargeLevel(context))
+                    .put(BATTERY_LEVEL, requestUtils.getBatteryLevel(context))
                     .put(BATTERY_SAVER, requestUtils.getBatterySaverState(context))
                     .put(PLUGIN, RequestConstants.PLUGIN)
                     .put(OUTPUT, LiveDebug.isDebugOn() && requestUtils.isAnyAudioOutput(context) ?
