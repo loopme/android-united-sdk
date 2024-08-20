@@ -29,8 +29,7 @@ include(
     // LoopMe SDK
     ":loopme-sdk",
     // LoopMe SDK Sample Apps
-    ":sample-interstitial",
-    ":sample-banner",
+    ":sample-sdk",
     // IronSource Mediation Adapter and Sample App
     ":bridges:ironSource:adapter",
     ":bridges:ironSource:app",
