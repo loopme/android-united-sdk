@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">LoopMe SDK Sample</string>
-    <string name="sample_text">sample text</string>
-    <string name="title_simple">Simple</string>
-    <string name="title_recycler_view">RecyclerView</string>
-    <string name="example_text">example text</string>
     <string name="interstitial">Interstitial</string>
     <string name="banner">Banner</string>
     <string name="load_interstitial">Load Interstitial</string>
     <string name="show_interstitial">Show Interstitial</string>
     <string name="default_interstitial_app_key">b5df00223e</string>
     <string name="default_mpu_app_key">f5826542ae</string>
-    <string name="second_mpu_app_key">3ae8c26803</string>
     <string name="load_mpu">load MPU (300x200)</string>
     <string name="load_longitudinal">load 320x50)</string>
     <string name="destroy_ad">destroy ad</string>
-
 </resources>

@@ -19,11 +19,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".app.OldBannerActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:exported="false"
-            android:theme="@style/Theme.AppCompat.Light" />
-        <activity
             android:name=".app.InterstitialActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/Theme.AppCompat.Light" />
