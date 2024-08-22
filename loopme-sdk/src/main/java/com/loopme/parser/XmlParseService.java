@@ -8,8 +8,8 @@ import androidx.annotation.Nullable;
 import com.loopme.Constants;
 import com.loopme.ad.AdParams;
 import com.loopme.models.Errors;
-import com.loopme.models.response.Bid;
-import com.loopme.models.response.ResponseJsonModel;
+import com.loopme.network.response.Bid;
+import com.loopme.network.response.BidResponse;
 import com.loopme.parser.xml.XmlParser;
 import com.loopme.utils.Utils;
 import com.loopme.xml.ClickThrough;
@@ -52,14 +52,14 @@ public class XmlParseService {
         return parseResponse(vastString);
     }
 
-    public static String parseOrientation(ResponseJsonModel responseModel) {
+    public static String parseOrientation(BidResponse responseModel) {
         Bid bidObject = retrieveBidObject(responseModel);
         return (bidObject == null || bidObject.getExt() == null) ?
             "" : bidObject.getExt().getOrientation();
     }
 
     @Nullable
-    private static Bid retrieveBidObject(ResponseJsonModel responseModel) {
+    private static Bid retrieveBidObject(BidResponse responseModel) {
         try {
             return responseModel.getSeatbid().get(0).getBid().get(0);
         } catch (IllegalArgumentException | NullPointerException ex) {
@@ -313,12 +313,12 @@ public class XmlParseService {
         }
     }
 
-    public static String getVastString(ResponseJsonModel mResponseModel) {
+    public static String getVastString(BidResponse mResponseModel) {
         Bid bidObject = retrieveBidObject(mResponseModel);
         return bidObject == null ? "" : bidObject.getAdm();
     }
 
-    public static boolean isValidXml(ResponseJsonModel body) {
+    public static boolean isValidXml(BidResponse body) {
         Bid bid = retrieveBidObject(body);
         String xml = bid == null ? "" : bid.getAdm();
         if (TextUtils.isEmpty(xml)) {

@@ -2,7 +2,7 @@ package com.loopme.loaders;
 
 import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
-import com.loopme.models.response.ResponseJsonModel;
+import com.loopme.network.response.BidResponse;
 import com.loopme.network.GetResponse;
 import com.loopme.network.LoopMeAdService;
 
@@ -17,7 +17,7 @@ public class AdFetchTaskByUrl extends AdFetchTask {
     @Override
     public void run() {
         try {
-            GetResponse<ResponseJsonModel> response = LoopMeAdService.getInstance().fetchAdByUrl(mUrl);
+            GetResponse<BidResponse> response = LoopMeAdService.getInstance().fetchAdByUrl(mUrl);
             Logging.out(LOG_TAG, "response received");
             parseResponse(response);
         } catch (Exception e) {

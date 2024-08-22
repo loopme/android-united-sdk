@@ -56,8 +56,10 @@ public class HttpUtils {
             }
             response.setCode(responseCode);
             response.setMessage(connection.getResponseMessage());
+            Log.d(LOG_TAG, "HttpRawResponse message: " + connection.getResponseMessage());
         } catch (IOException e) {
             response.setMessage("Exception(" + e.getClass().getSimpleName() +"): " + e.getMessage());
+            Log.d(LOG_TAG, "HttpRawResponse Exception(" + e.getClass().getSimpleName() +"): " + e.getMessage());
         }
         return response;
     }
