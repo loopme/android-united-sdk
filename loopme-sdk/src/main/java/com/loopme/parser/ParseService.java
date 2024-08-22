@@ -12,7 +12,7 @@ import com.loopme.ad.AdParams;
 import com.loopme.ad.AdParamsBuilder;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.AdType;
-import com.loopme.models.response.Bid;
+import com.loopme.network.response.Bid;
 
 import java.util.ArrayList;
 

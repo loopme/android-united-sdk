@@ -13,8 +13,8 @@ import com.loopme.ad.AdType;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.models.Errors;
-import com.loopme.models.response.Bid;
-import com.loopme.models.response.ResponseJsonModel;
+import com.loopme.network.response.Bid;
+import com.loopme.network.response.BidResponse;
 import com.loopme.network.GetResponse;
 import com.loopme.parser.ParseService;
 import com.loopme.parser.XmlParseService;
@@ -73,7 +73,7 @@ public class AdFetchTask implements Runnable {
                 Logging.out(LOG_TAG, "Thread interrupted.");
                 return;
             }
-            GetResponse<ResponseJsonModel> response = LoopMeAdService.getInstance().fetchAd(Constants.BASE_URL, data);
+            GetResponse<BidResponse> response = LoopMeAdService.getInstance().fetchAd(Constants.BASE_URL, data);
             Logging.out(LOG_TAG, "response received");
             parseResponse(response);
         } catch (Exception e) {
@@ -90,21 +90,21 @@ public class AdFetchTask implements Runnable {
         );
     }
 
-    private boolean isVastWrapperCase(ResponseJsonModel body) {
-        AdType creativeType = ResponseJsonModel.getCreativeType(body);
+    private boolean isVastWrapperCase(BidResponse body) {
+        AdType creativeType = BidResponse.getCreativeType(body);
         mIsVastVpaidAd = creativeType == AdType.VAST || creativeType == AdType.VPAID;
         return mIsVastVpaidAd && XmlParseService
             .getVastInfo(XmlParseService.getVastString(body))
             .hasWrapper();
     }
 
-    private void handleResponse(ResponseJsonModel body) {
+    private void handleResponse(BidResponse body) {
         if (!isVastWrapperCase(body)) {
             if (mIsVastVpaidAd && !XmlParseService.isValidXml(body)) {
                 onErrorResult(Errors.SYNTAX_ERROR_IN_XML);
                 return;
             }
-            AdType creativeType = ResponseJsonModel.getCreativeType(body);
+            AdType creativeType = BidResponse.getCreativeType(body);
             Bid bid = safelyRetrieve(() -> body.getSeatbid().get(0).getBid().get(0), null);
             mLoopMeAd.setAdParams(
                 ParseService.getAdParamsFromResponse(mLoopMeAd.getAdFormat(), creativeType, bid)
@@ -113,7 +113,7 @@ public class AdFetchTask implements Runnable {
             return;
         }
         mOrientation = XmlParseService.parseOrientation(body);
-        mAdType = ResponseJsonModel.getCreativeType(body);
+        mAdType = BidResponse.getCreativeType(body);
         mVastWrapperFetcher = new VastWrapperFetcher(
             XmlParseService.getVastString(body), new VastWrapperFetcher.Listener() {
             @Override
@@ -132,7 +132,7 @@ public class AdFetchTask implements Runnable {
         mVastWrapperFetcher.start();
     }
 
-    protected void parseResponse(GetResponse<ResponseJsonModel> response) {
+    protected void parseResponse(GetResponse<BidResponse> response) {
         if (response.isSuccessful()) {
             handleResponse(response.getBody());
             return;
