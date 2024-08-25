@@ -11,11 +11,6 @@ public class Survey {
     @Attribute
     private String type;
 
-    public String getText() {
-        return text;
-    }
-
-    public String getType() {
-        return type;
-    }
+    public String getText() { return text; }
+    public String getType() { return type; }
 }

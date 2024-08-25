@@ -12,24 +12,14 @@ public class VideoClicks {
 
     @Tag()
     private ClickThrough clickThrough;
-
     @Tag()
     private CustomClick customClick;
-
     @Tag("ClickTracking")
     private List<ClickTracking> clickTrackingList;
 
-    public List<ClickTracking> getClickTrackingList() {
-        return clickTrackingList;
-    }
-
-    public ClickThrough getClickThrough() {
-        return clickThrough;
-    }
-
-    public CustomClick getCustomClick() {
-        return customClick;
-    }
+    public List<ClickTracking> getClickTrackingList() { return clickTrackingList; }
+    public ClickThrough getClickThrough() { return clickThrough; }
+    public CustomClick getCustomClick() { return customClick; }
 
     public ArrayList<String> getClicksList() {
         ArrayList<String> clicksList = new ArrayList<>();
@@ -43,15 +33,11 @@ public class VideoClicks {
     }
 
     private ArrayList<String> getClickTrackingUrlList() {
-        if (clickTrackingList != null) {
-            ArrayList<String> clicksList = new ArrayList<>();
-            for (ClickTracking clickTracking : clickTrackingList) {
-                if (!TextUtils.isEmpty(clickTracking.getText())) {
-                    clicksList.add(clickTracking.getText());
-                }
-            }
-            return clicksList;
+        if (clickTrackingList == null) return new ArrayList<>();
+        ArrayList<String> clicksList = new ArrayList<>();
+        for (ClickTracking clickTracking : clickTrackingList) {
+            if (!TextUtils.isEmpty(clickTracking.getText())) clicksList.add(clickTracking.getText());
         }
-        return new ArrayList<>();
+        return clicksList;
     }
 }

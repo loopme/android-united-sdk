@@ -14,11 +14,6 @@ public class IconClickTracking {
     @Text
     private String text;
 
-    public String getText() {
-        return text;
-    }
-
-    public String getId() {
-        return id;
-    }
+    public String getText() { return text; }
+    public String getId() { return id; }
 }

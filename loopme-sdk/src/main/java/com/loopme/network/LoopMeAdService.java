@@ -12,31 +12,25 @@ import org.json.JSONObject;
 import java.net.HttpURLConnection;
 
 public class LoopMeAdService {
-    private static final String LOG_TAG = LoopMeAdService.class.getSimpleName();
-    private static LoopMeAdService sService;
-
     private LoopMeAdService() { }
+    private static final String LOG_TAG = LoopMeAdService.class.getSimpleName();
 
-    public static LoopMeAdService getInstance() {
-        if (sService == null) {
-            synchronized (LoopMeAdService.class) {
-                sService = new LoopMeAdService();
-            }
-        }
-        return sService;
-    }
-
-    public GetResponse<BidResponse> fetchAd(String url, JSONObject body) {
+    public static GetResponse<BidResponse> fetchAd(String url, JSONObject body) {
         HttpRawResponse httpRawResponse = HttpUtils.doRequest(url, HttpUtils.Method.POST, body.toString().getBytes());
         return parse(httpRawResponse);
     }
 
-    public GetResponse<String> downloadResource(String resUrl) {
+    public static void downloadResource(String resUrl, Listener listener) {
         HttpRawResponse httpRawResponse = HttpUtils.doRequest(resUrl, HttpUtils.Method.GET, null);
-        return parseStringBody(httpRawResponse);
+        GetResponse<String> response = parseStringBody(httpRawResponse);
+        if (response.isSuccessful()) {
+            listener.onSuccess(response);
+        } else {
+            listener.onError(new Exception(response.getMessage()));
+        }
     }
 
-    public GetResponse<BidResponse> fetchAdByUrl(String mUrl) {
+    public static GetResponse<BidResponse> fetchAdByUrl(String mUrl) {
         HttpRawResponse httpRawResponse = HttpUtils.doRequest(mUrl, HttpUtils.Method.GET, null);
         return parse(httpRawResponse);
     }
@@ -71,7 +65,7 @@ public class LoopMeAdService {
         }
         try {
             response.setBody(
-                    BidResponse.fromJSON(new JSONObject(new String(rawResponse.getBody())))
+                BidResponse.fromJSON(new JSONObject(new String(rawResponse.getBody())))
             );
             response.setCode(code);
             return response;
@@ -80,5 +74,10 @@ public class LoopMeAdService {
             response.setMessage(Errors.ERROR_MESSAGE_BROKEN_SERVERS_RESPONSE);
             return response;
         }
+    }
+
+    public interface Listener {
+        void onSuccess(GetResponse<String> response);
+        void onError(Exception exception);
     }
 }

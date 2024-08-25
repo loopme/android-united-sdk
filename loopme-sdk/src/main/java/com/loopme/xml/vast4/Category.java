@@ -10,11 +10,6 @@ public class Category {
     @Attribute
     private String authority;
 
-    public String getText() {
-        return text;
-    }
-
-    public String getAuthority() {
-        return authority;
-    }
+    public String getText() { return text; }
+    public String getAuthority() { return authority; }
 }

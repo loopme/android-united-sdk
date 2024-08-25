@@ -24,8 +24,7 @@ import java.util.List;
 public class XmlParser {
 
     public static <T> T parse(String xml, Class<T> classOfT) throws Exception {
-        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-        XmlPullParser parser = factory.newPullParser();
+        XmlPullParser parser = XmlPullParserFactory.newInstance().newPullParser();
         parser.setInput(new StringReader(xml));
         parser.next();
         return parseTag(parser, classOfT);
@@ -43,17 +42,12 @@ public class XmlParser {
     private static <T> void parseAttributes(XmlPullParser parser, T tagInstance) throws IllegalAccessException {
         for (Field field : tagInstance.getClass().getDeclaredFields()) {
             Attribute attribute = getAnnotation(field, Attribute.class);
-            if (attribute == null) {
-                continue;
-            }
-            String attributeValue = attribute.value();
-            if (TextUtils.isEmpty(attributeValue)) {
-                attributeValue = field.getName();
-            }
-            String value = parser.getAttributeValue(null, attributeValue);
-            if (TextUtils.isEmpty(value)) {
-                continue;
-            }
+            if (attribute == null) continue;
+            String value = parser.getAttributeValue(
+                null,
+                TextUtils.isEmpty(attribute.value()) ? field.getName() : attribute.value()
+            );
+            if (TextUtils.isEmpty(value)) continue;
             field.setAccessible(true);
             Class fieldClass = field.getType();
             if (fieldClass.equals(String.class)) {
@@ -69,35 +63,12 @@ public class XmlParser {
             } else if (Float.class.equals(fieldClass) || float.class.equals(fieldClass)) {
                 field.setFloat(tagInstance, Float.parseFloat(value));
             } else if (Boolean.class.equals(fieldClass) || boolean.class.equals(fieldClass)) {
-                setBooleanValue(field, value, tagInstance);
+                try {
+                    field.setBoolean(tagInstance, Boolean.parseBoolean(value) || Integer.parseInt(value) == 1);
+                } catch (NumberFormatException ignored) {
+                    field.setBoolean(tagInstance, false);
+                }
             }
-        }
-    }
-
-    public static boolean isBooleanString(String value) {
-        if (TextUtils.isEmpty(value)) {
-            return false;
-        }
-        return value.equalsIgnoreCase(Boolean.TRUE.toString()) ||
-            value.equalsIgnoreCase(Boolean.FALSE.toString());
-    }
-
-    public static int getInteger(String value) {
-        if (TextUtils.isEmpty(value)) {
-            return 0;
-        }
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-
-    private static <T> void setBooleanValue(Field field, String value, T tagInstance) throws IllegalAccessException {
-        if (isBooleanString(value)) {
-            field.setBoolean(tagInstance, Boolean.parseBoolean(value));
-        } else {
-            field.setBoolean(tagInstance, getInteger(value) == 1);
         }
     }
 
@@ -107,93 +78,63 @@ public class XmlParser {
             parser.getEventType() == XmlPullParser.TEXT
         ) {
             if (parser.getEventType() == XmlPullParser.TEXT) {
-                parseText(parser, tagInstance);
+                for (Field field : tagInstance.getClass().getDeclaredFields()) {
+                    if (getAnnotation(field, Text.class) != null) {
+                        field.setAccessible(true);
+                        field.set(tagInstance, parser.getText().trim());
+                        break;
+                    }
+                }
+                parser.next();
             } else {
                 parseSubTag(parser, tagInstance);
             }
         }
     }
 
-    private static <T> void parseText(XmlPullParser parser, T parent) throws Exception {
-        if (parser.getEventType() != XmlPullParser.TEXT) {
-            return;
-        }
-        Field textField = getFieldForText(parent);
-        if (textField != null) {
-            textField.setAccessible(true);
-            textField.set(parent, parser.getText().trim());
-        }
-        parser.next();
-    }
-
-    @SuppressWarnings("unchecked")
     private static <T> void parseSubTag(XmlPullParser parser, T parent) throws Exception {
         String tagName = parser.getName();
-        int tagDepth = parser.getDepth();
-
-        Field tagField = getFieldForTag(parent, tagName);
+        Field tagField = null;
+        for (Field field : parent.getClass().getDeclaredFields()) {
+            Tag tagAnnotation = getAnnotation(field, Tag.class);
+            if (tagAnnotation != null) {
+                String tagValue = TextUtils.isEmpty(tagAnnotation.value()) ? field.getName() : tagAnnotation.value();
+                if (tagValue.equalsIgnoreCase(tagName)) {
+                    tagField = field;
+                    break;
+                }
+            }
+        }
         if (tagField == null) {
-            skipTag(parser, tagName, tagDepth);
+            int depth = parser.getDepth();
+            while (
+                parser.next() != XmlPullParser.END_TAG ||
+                !parser.getName().equalsIgnoreCase(tagName) ||
+                parser.getDepth() != depth
+            ) { /* Continue parsing */ };
+            parser.next();
             return;
         }
+        tagField.setAccessible(true);
         if (!List.class.isAssignableFrom(tagField.getType())) {
-            Object tag = parseTag(parser, tagField.getType());
-            tagField.setAccessible(true);
-            tagField.set(parent, tag);
+            tagField.set(parent, parseTag(parser, tagField.getType()));
             return;
         }
         ParameterizedType listGenericType = (ParameterizedType) tagField.getGenericType();
-        Class<?> listGenericClass = (Class<?>) listGenericType.getActualTypeArguments()[0];
-        Object tag = parseTag(parser, listGenericClass);
-        tagField.setAccessible(true);
+        Object tag = parseTag(parser, (Class<?>) listGenericType.getActualTypeArguments()[0]);
         List list = (List) tagField.get(parent);
         if (list == null) {
-            list = new ArrayList();
+            list = new ArrayList<>();
             tagField.set(parent, list);
         }
         list.add(tag);
     }
 
-    private static <T> Field getFieldForTag(T parent, String tagName) {
-        for (Field field : parent.getClass().getDeclaredFields()) {
-            Tag tagAnnotation = getAnnotation(field, Tag.class);
-            if (tagAnnotation != null) {
-                String tagValue = tagAnnotation.value();
-                if (TextUtils.isEmpty(tagValue)) {
-                    tagValue = field.getName();
-                }
-                if (tagValue.equalsIgnoreCase(tagName)) {
-                    return field;
-                }
-            }
-        }
-        return null;
-    }
-
-    private static <T> Field getFieldForText(T parent) {
-        for (Field field : parent.getClass().getDeclaredFields()) {
-            if (getAnnotation(field, Text.class) != null) {
-                return field;
-            }
-        }
-        return null;
-    }
-
-    private static void skipTag(XmlPullParser parser, String name, int depth) throws Exception {
-        do {
-            parser.next();
-        } while (parser.getEventType() != XmlPullParser.END_TAG || !parser.getName().equalsIgnoreCase(name) || parser.getDepth() != depth);
-        parser.next();
-    }
-
     @SuppressWarnings("unchecked")
     private static <T extends Annotation> T getAnnotation(AnnotatedElement element, Class<? extends Annotation> annotationType) {
         for (Annotation annotation : element.getDeclaredAnnotations()) {
-            if (annotationType.isInstance(annotation)) {
-                return (T) annotation;
-            }
+            if (annotationType.isInstance(annotation)) return (T) annotation;
         }
         return null;
     }
-
 }

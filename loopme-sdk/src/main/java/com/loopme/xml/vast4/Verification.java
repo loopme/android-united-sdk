@@ -13,26 +13,13 @@ public class Verification {
 
     @Tag("JavaScriptResource")
     private List<JavaScriptResource> javaScriptResourceList;
-
     @Tag
     private TrackingEvents trackingEvents;
-
     @Tag
     private VerificationParameters verificationParameters;
 
-    public String getVendor() {
-        return vendor;
-    }
-
-    public List<JavaScriptResource> getJavaScriptResourceList() {
-        return javaScriptResourceList;
-    }
-
-    public TrackingEvents getTrackingEvents() {
-        return trackingEvents;
-    }
-
-    public VerificationParameters getVerificationParameters() {
-        return verificationParameters;
-    }
+    public String getVendor() { return vendor; }
+    public List<JavaScriptResource> getJavaScriptResourceList() { return javaScriptResourceList; }
+    public TrackingEvents getTrackingEvents() { return trackingEvents; }
+    public VerificationParameters getVerificationParameters() { return verificationParameters; }
 }

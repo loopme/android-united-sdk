@@ -1,5 +1,7 @@
 package com.loopme.xml;
 
+import androidx.annotation.NonNull;
+
 import com.loopme.parser.xml.Attribute;
 import com.loopme.parser.xml.Text;
 
@@ -10,12 +12,8 @@ public class AdParameters {
     @Text
     private String text;
 
-    public String getText() {
-        return text;
-    }
+    @NonNull
+    public String getText() { return text == null ? "" : text; }
 
-    public String getXmlEncoded() {
-        return xmlEncoded;
-    }
-
+    public String getXmlEncoded() { return xmlEncoded; }
 }

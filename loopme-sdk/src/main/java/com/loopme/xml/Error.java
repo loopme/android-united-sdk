@@ -1,5 +1,7 @@
 package com.loopme.xml;
 
+import androidx.annotation.NonNull;
+
 import com.loopme.parser.xml.Text;
 
 public class Error {
@@ -7,7 +9,6 @@ public class Error {
     @Text
     private String text;
 
-    public String getText() {
-        return text;
-    }
+    @NonNull
+    public String getText() { return text == null ? "" : text; }
 }

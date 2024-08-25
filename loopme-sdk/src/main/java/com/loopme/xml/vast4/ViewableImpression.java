@@ -19,41 +19,20 @@ public class ViewableImpression {
 
     @Tag
     private Viewable viewable;
-
     @Tag
     private NotViewable notViewable;
-
     @Tag
     private ViewUndetermined viewUndetermined;
+
     private final Map<String, List<String>> mViewableImpressionMap = new HashMap<>();
 
-    public String getId() {
-        return id;
-    }
-
-    public ViewUndetermined getViewUndetermined() {
-        return viewUndetermined;
-    }
-
-    public NotViewable getNotViewable() {
-        return notViewable;
-    }
-
-    public Viewable getViewable() {
-        return viewable;
-    }
-
-    public String getViewableImpressionUrl() {
-        return viewable != null ? viewable.getText() : "";
-    }
-
-    public String getNotViewableImpressionUrl() {
-        return notViewable != null ? notViewable.getText() : "";
-    }
-
-    public String getViewUndeterminedUrl() {
-        return viewUndetermined != null ? viewUndetermined.getText() : "";
-    }
+    public String getId() { return id; }
+    public String getViewableImpressionUrl() { return viewable == null ? "" : viewable.getText(); }
+    public String getNotViewableImpressionUrl() { return notViewable == null ? "" : notViewable.getText(); }
+    public String getViewUndeterminedUrl() { return viewUndetermined == null ? "" : viewUndetermined.getText(); }
+    public ViewUndetermined getViewUndetermined() { return viewUndetermined; }
+    public NotViewable getNotViewable() { return notViewable; }
+    public Viewable getViewable() { return viewable; }
 
     public Map<String, List<String>> getViewableImpressionMap() {
         putToViewableImpressionMap(Constants.VIEWABLE, getViewableImpressionUrl());
@@ -63,9 +42,7 @@ public class ViewableImpression {
     }
 
     private void putToViewableImpressionMap(String impressionType, String impressionUrl) {
-        if (TextUtils.isEmpty(impressionType) || TextUtils.isEmpty(impressionUrl)) {
-            return;
-        }
+        if (TextUtils.isEmpty(impressionType) || TextUtils.isEmpty(impressionUrl)) return;
         ArrayList<String> list = new ArrayList<>();
         list.add(impressionUrl);
         mViewableImpressionMap.put(impressionType, list);

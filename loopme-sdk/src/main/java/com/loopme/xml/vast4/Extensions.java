@@ -13,7 +13,5 @@ public class Extensions {
     @Tag("Extension")
     private List<Extension> extensionList;
 
-    public List<Extension> getExtensionList() {
-        return extensionList;
-    }
+    public List<Extension> getExtensionList() { return extensionList; }
 }

@@ -6,6 +6,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.loopme.Logging;
 import com.loopme.ad.AdType;
@@ -25,10 +26,10 @@ public class BidResponse implements Serializable, Parcelable {
     }
 
     private String id;
-    private List<SeatBid> seatbid = null;
-
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
+
+    private List<SeatBid> seatbid = null;
     public List<SeatBid> getSeatbid() { return seatbid; }
     public void setSeatbid(List<SeatBid> seatbid) { this.seatbid = seatbid; }
 
@@ -66,11 +67,25 @@ public class BidResponse implements Serializable, Parcelable {
         );
     }
 
-    @NonNull
-    public static AdType getCreativeType(BidResponse responseModel) {
+    @Nullable
+    public Bid getBid() {
         try {
-            String adm = responseModel.getSeatbid().get(0).getBid().get(0).getAdm();
-            return adm.contains("<VAST") ? AdType.VAST : AdType.MRAID;
+            return getSeatbid().get(0).getBid().get(0);
+        } catch (IllegalArgumentException | NullPointerException ex) {
+            return null;
+        }
+    }
+
+    @Nullable
+    public String getOrientation() { return getBid() == null ? null : getBid().getOrientation(); }
+
+    @NonNull
+    public String getAdm() { return getBid() == null ? "" : getBid().getAdm(); }
+
+    @NonNull
+    public AdType getCreativeType() {
+        try {
+            return getAdm().contains("<VAST") ? AdType.VAST : AdType.MRAID;
         } catch (IllegalArgumentException | NullPointerException ex) {
             Logging.out(LOG_TAG, ex.getMessage());
             return AdType.HTML;

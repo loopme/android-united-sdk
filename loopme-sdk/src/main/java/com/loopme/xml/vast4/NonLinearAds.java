@@ -7,7 +7,6 @@ import com.loopme.xml.TrackingEvents;
 public class NonLinearAds {
     @Tag
     private NonLinear nonLinear;
-
     @Tag
     private TrackingEvents trackingEvents;
 }

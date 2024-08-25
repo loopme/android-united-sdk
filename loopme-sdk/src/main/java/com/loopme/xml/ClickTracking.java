@@ -1,5 +1,7 @@
 package com.loopme.xml;
 
+import androidx.annotation.NonNull;
+
 import com.loopme.parser.xml.Attribute;
 import com.loopme.parser.xml.Text;
 
@@ -10,11 +12,7 @@ public class ClickTracking {
     @Text
     private String text;
 
-    public String getText() {
-        return text;
-    }
-
-    public String getId() {
-        return id;
-    }
+    @NonNull
+    public String getText() { return text == null ? "" : text; }
+    public String getId() { return id; }
 }

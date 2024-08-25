@@ -10,7 +10,5 @@ public class CreativeExtension {
     @Attribute
     private String type;
 
-    public String getType() {
-        return type;
-    }
+    public String getType() { return type; }
 }

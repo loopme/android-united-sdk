@@ -15,12 +15,6 @@ public class Extension {
     @Tag("total_available")
     private TotalAvailable totalAvailable;
 
-    public TotalAvailable getTotalAvailable() {
-        return totalAvailable;
-    }
-
-    public String getType() {
-        return type;
-    }
-
+    public TotalAvailable getTotalAvailable() { return totalAvailable; }
+    public String getType() { return type; }
 }

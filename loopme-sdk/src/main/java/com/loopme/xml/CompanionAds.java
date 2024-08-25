@@ -13,8 +13,6 @@ public class CompanionAds {
     private List<Companion> companionList;
 
     public List<Companion> getCompanionList() { return companionList; }
-
-    public String getRequired() { return required; }
-
     public boolean hasCompanionList() { return companionList != null && !companionList.isEmpty(); }
+    public String getRequired() { return required; }
 }

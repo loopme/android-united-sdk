@@ -9,7 +9,5 @@ public class AdVerifications {
     @Tag("Verification")
     private List<Verification> verificationList;
 
-    public List<Verification> getVerificationList() {
-        return verificationList;
-    }
+    public List<Verification> getVerificationList() { return verificationList; }
 }

@@ -10,7 +10,5 @@ public class Impressions {
     @Tag("Impression")
     private List<Impression> impressionList;
 
-    public List<Impression> getImpressionList() {
-        return impressionList;
-    }
+    public List<Impression> getImpressionList() { return impressionList; }
 }
