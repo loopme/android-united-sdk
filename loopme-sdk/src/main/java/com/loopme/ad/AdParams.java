@@ -1,11 +1,23 @@
 package com.loopme.ad;
 
+import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
+import com.loopme.network.response.Bid;
+import com.loopme.network.response.BidResponse;
+import com.loopme.parser.xml.XmlParser;
+import com.loopme.utils.Utils;
 import com.loopme.vast.WrapperParser;
+import com.loopme.xml.Ad;
+import com.loopme.xml.Companion;
+import com.loopme.xml.InLine;
+import com.loopme.xml.Linear;
 import com.loopme.xml.Tracking;
+import com.loopme.xml.Vast;
 import com.loopme.xml.vast4.Verification;
 import com.loopme.xml.vast4.Wrapper;
 
@@ -80,27 +92,27 @@ public class AdParams implements Serializable {
         mIsDebug = builder.mIsDebug;
         mAutoLoading = builder.mAutoLoading;
         mAdSpotDimensions = builder.mAdSpotDimensions;
-        Logging.out(LOG_TAG, "Server response indicates  ad params: "
-            + "format: " + mFormat + ", isAutoloading: " + mAutoLoading
-            + ", mraid: " + mIsMraid + ", expire in: " + mExpiredDate);
         mRequestId = builder.mRequestId;
         mCid = builder.mCid;
         mCrid = builder.mCrid;
+        Logging.out(LOG_TAG, "Server response indicates  ad params: "
+            + "format: " + mFormat + ", isAutoloading: " + mAutoLoading
+            + ", mraid: " + mIsMraid + ", expire in: " + mExpiredDate);
     }
 
     public AdSpotDimensions getAdSpotDimensions() { return mAdSpotDimensions; }
 
-    public String getRequestId() {return mRequestId;}
-    public String getCid() {return mCid;}
-    public String getCrid() {return mCrid;}
-    public boolean getPartPreload() { return mPartPreload; }
+    public String getRequestId() { return mRequestId; }
+    public String getCid() { return mCid; }
+    public String getCrid() { return mCrid; }
     public String getAdFormat() { return mFormat; }
-    public List<String> getTrackers() { return mTrackersList; }
     public String getAdOrientation() { return mOrientation; }
     public List<String> getPackageIds() { return mPackageIds; }
     public String getToken() { return mToken; }
     public boolean getAutoLoading() { return mAutoLoading; }
     public void setOrientation(String orientation) { mOrientation = orientation; }
+    public boolean getPartPreload() { return mPartPreload; }
+    public List<String> getTrackers() { return mTrackersList; }
 
     public boolean isMraidAd() { return getAdType() == AdType.MRAID; }
     public boolean isLoopMeAd() { return getAdType() == AdType.HTML; }
@@ -137,7 +149,12 @@ public class AdParams implements Serializable {
     public void setAdParams(String adParams) { mAdParams = adParams; }
 
     public String getVpaidJsUrl() { return mVpaidJsUrl; }
-    public void setVpaidJsUrl(String vpaidJsUrl) { mVpaidJsUrl = vpaidJsUrl; }
+    public void setVpaidJsUrl(String vpaidJsUrl) {
+        mVpaidJsUrl = vpaidJsUrl;
+        mIsVpaid = (
+            mVpaidJsUrl != null && (mVpaidJsUrl.startsWith("https://") || mVpaidJsUrl.startsWith("http://"))
+        );
+    }
 
     public List<String> getImpressionsList() { return mImpressionsList; }
     public void setImpressionsList(List<String> impressions) { mImpressionsList = impressions; }
@@ -148,10 +165,8 @@ public class AdParams implements Serializable {
     }
 
     public List<Tracking> getTrackingEventsList() { return new ArrayList<>(mTrackingEventsList); }
-    public void setTrackingEventsList(List<Tracking> events) {
-        if (events != null) {
-            mTrackingEventsList.addAll(events);
-        }
+    public void setTrackingEventsList(@NonNull List<Tracking> events) {
+        mTrackingEventsList.addAll(events);
     }
 
     public List<String> getVideoClicks() { return mVideoClicksList; }
@@ -224,4 +239,77 @@ public class AdParams implements Serializable {
         return Collections.emptyList();
     }
 
+    public static AdParams getAdParams(String vastString, List<Wrapper> mWrappersList) {
+        AdParams adParams = parse(vastString, null);
+        adParams.parseWrappers(mWrappersList);
+        return adParams;
+    }
+
+    @NonNull
+    public static AdParams parse(@NonNull String vastString, @Nullable AdParams adParams) {
+        AdParams sAdParams = adParams == null ? new AdParams() : adParams;
+        try {
+            return parseResponse(vastString, sAdParams);
+        } catch (IllegalArgumentException e) {
+            return sAdParams;
+        }
+    }
+
+    @NonNull
+    private static AdParams parseResponse(String response, AdParams sAdParams) throws IllegalArgumentException {
+        Vast vast = parseVast(response);
+        if (vast == null || vast.getAd() == null) {
+            throw new IllegalArgumentException("Vast or vast.getAd() shouldn't be null");
+        }
+        Ad ad = vast.getAd();
+        InLine inLine = ad.getInLine();
+        if (inLine == null) {
+            throw new IllegalArgumentException("NonLinear AD is not supported");
+        }
+        Linear linear = inLine.getLinear();
+        if (linear == null) {
+            throw new IllegalArgumentException("NonLinear AD is not supported");
+        }
+        sAdParams.setExpiredDate(Constants.DEFAULT_EXPIRED_TIME);
+        sAdParams.setId(ad.getId());
+
+        sAdParams.setImpressionsList(inLine.getImpressionList());
+        sAdParams.addErrorUrl(inLine.getError());
+        sAdParams.setViewableImpressionMap(inLine.getViewableImpression());
+        sAdParams.setVerificationList(inLine.getVerifications());
+
+        sAdParams.setSkipTime(linear.getSkipoffset());
+        sAdParams.setTrackingEventsList(linear.getTrackingEvents());
+        sAdParams.setDuration(Utils.parseDuration(linear.getDuration().getText()));
+        sAdParams.setAdParams(linear.getAdParameters());
+        sAdParams.setOrientation(linear.getOrientation());
+        sAdParams.setVideoClicks(linear.getVideoClickEvents());
+        sAdParams.setVideoRedirectUrl(linear.getClickThroughUrl());
+        sAdParams.setVpaidJsUrl(linear.getVpaidUrl());
+        sAdParams.setVideoFileUrlsList(linear.getVideoFiles());
+
+        Companion companion = Companion.getCompanion(inLine.getCreatives());
+        if (companion == null) return sAdParams;
+        sAdParams.setEndCardUrlList(Collections.singletonList(companion.getCompanionUrl()));
+        sAdParams.setEndCardRedirectUrl(companion.getCompanionRedirectUrl());
+        sAdParams.setEndCardClicks(companion.getCompanionClickEvents());
+        sAdParams.setCompanionCreativeViewEvents(companion.getCompanionViewEvents());
+        return sAdParams;
+    }
+
+    @Nullable
+    private static Vast parseVast(String xml) {
+        try {
+            return XmlParser.parse(xml, Vast.class);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static boolean isValidXml(BidResponse response) {
+        String xml = response.getAdm();
+        if (TextUtils.isEmpty(xml)) return false;
+        Vast vast = parseVast(xml);
+        return vast != null && vast.getAd() != null;
+    }
 }

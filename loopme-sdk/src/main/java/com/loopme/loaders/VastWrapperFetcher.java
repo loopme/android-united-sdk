@@ -1,17 +1,12 @@
 package com.loopme.loaders;
 
-import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 
-import com.loopme.Constants;
-import com.loopme.Logging;
-import com.loopme.ad.AdParams;
+import androidx.annotation.NonNull;
+
 import com.loopme.common.LoopMeError;
 import com.loopme.models.Errors;
 import com.loopme.network.GetResponse;
-import com.loopme.parser.XmlParseService;
 import com.loopme.vast.VastVpaidEventTracker;
 import com.loopme.vast.WrapperParser;
 import com.loopme.network.LoopMeAdService;
@@ -25,179 +20,63 @@ public class VastWrapperFetcher {
 
     private static final String LOG_TAG = VastWrapperFetcher.class.getSimpleName();
     private static final int VAST_4_MAX_WRAPPERS_COUNT = 5;
-    private static final long WRAPPER_REQUEST_TIMEOUT = 10000;
-    private boolean mIsFollowAdditionalWrapper = true;
     private int mCurrentWrapper = 1;
     private final String mVastString;
-    private Listener mListener;
+    private final Listener mListener;
     private final List<Wrapper> mWrappersList = new ArrayList<>();
-    private CountDownTimer mWrapperTimer;
-    protected Handler mHandler = new Handler(Looper.getMainLooper());
-    private volatile boolean mIsStopped;
+    private volatile boolean mIsCanceled;
 
-    public VastWrapperFetcher(String vastString, Listener listener) {
+    public VastWrapperFetcher(@NonNull String vastString, @NonNull Listener listener) {
         mVastString = vastString;
         mListener = listener;
+        mIsCanceled = false;
     }
 
-    public void start() {
-        handleVastWrapperCase(mVastString);
-    }
+    public void start() { handleVastWrapperCase(mVastString); }
 
-    public void cancel() {
-        mListener = null;
-        mIsStopped = true;
-        stopTimer();
-    }
-
-    private boolean hasWrapper(VastInfo vastInfo) {
-        return vastInfo != null && vastInfo.hasWrapper();
-    }
+    public void cancel() { mIsCanceled = true; }
 
     private void handleVastWrapperCase(String vastString) {
-        VastInfo vastInfo = XmlParseService.getVastInfo(vastString);
+        if (mIsCanceled) return;
+        VastInfo vastInfo = VastInfo.getVastInfo(vastString);
         if (vastInfo.hasError()) {
             onFailed(Errors.NO_VAST_RESPONSE_AFTER_WRAPPER);
             return;
         }
-        if (hasWrapper(vastInfo)) {
-            handleWrapper(vastInfo);
-            return;
-        }
-        AdParams adParams = XmlParseService.parse(vastString);
-        parseWrappers(adParams);
-        onCompleted(adParams);
-    }
-
-    private void handleWrapper(VastInfo vastInfo) {
-        Logging.out(LOG_TAG, "wrapper in response " + mCurrentWrapper);
-        collectWrappers(vastInfo.getWrapper());
-        doWrapperRequest(vastInfo.getWrapper());
-    }
-
-    private void doWrapperRequest(Wrapper wrapper) {
+        Wrapper wrapper = vastInfo.getWrapper();
         if (wrapper == null) {
+            mListener.onCompleted(vastString, mWrappersList);
             return;
         }
-        if (isWrapperLimitReached()) {
+        mWrappersList.add(wrapper);
+        if (++mCurrentWrapper > VAST_4_MAX_WRAPPERS_COUNT) {
             onFailed(Errors.WRAPPER_LIMIT_REACHED);
-            Logging.out(LOG_TAG, Errors.WRAPPER_LIMIT_REACHED.getMessage());
             return;
         }
-        if (mIsFollowAdditionalWrapper) {
-            mCurrentWrapper++;
-            mIsFollowAdditionalWrapper = wrapper.isFollowAdditionalWrappers();
-            Logging.out(LOG_TAG, "doWrapperRequest()");
-            proceed(wrapper.getVastTagUrl());
+        String vastTagUrl = wrapper.getVastTagUrl();
+        if (TextUtils.isEmpty(vastTagUrl)) {
+            onFailed(Errors.GENERAL_WRAPPER_ERROR);
             return;
         }
-        Logging.out(LOG_TAG, "mIsFollowAdditionalWrapper = false");
-        Logging.out(LOG_TAG, Errors.NO_VAST_RESPONSE_AFTER_WRAPPER.getMessage());
-        onFailed(Errors.NO_VAST_RESPONSE_AFTER_WRAPPER);
-    }
-
-    private void proceed(String vastTagUrl) {
-        if (!isVastTagUriAvailable(vastTagUrl) || mIsStopped) {
-            return;
-        }
-        Logging.out(LOG_TAG, "vast url: " + vastTagUrl);
-        startTimer();
-        doRequest(vastTagUrl);
-    }
-
-    private void doRequest(String vastTagUrl) {
-        try {
-            GetResponse<String> response = LoopMeAdService.getInstance().downloadResource(vastTagUrl);
-            stopTimer();
-            parseVastResponse(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            stopTimer();
-        }
-    }
-
-    private void parseVastResponse(GetResponse<String> response) {
-        if (response.isSuccessful() && !mIsStopped) {
-            handleVastWrapperCase(response.getBody());
-        } else {
-            onFailed(Errors.NO_VAST_RESPONSE_AFTER_WRAPPER);
-        }
-    }
-
-    private boolean isVastTagUriAvailable(String vastTagUrl) {
-        if (!TextUtils.isEmpty(vastTagUrl)) {
-            return true;
-        }
-        Logging.out(LOG_TAG, Errors.TIMEOUT_OF_VAST_URI.getMessage());
-        onFailed(Errors.TIMEOUT_OF_VAST_URI);
-        return false;
-    }
-
-    private boolean isWrapperLimitReached() {
-        return mCurrentWrapper > VAST_4_MAX_WRAPPERS_COUNT;
-    }
-
-    private void parseWrappers(AdParams adParams) {
-        if (adParams != null) {
-            adParams.parseWrappers(mWrappersList);
-        }
-    }
-
-    private void collectWrappers(Wrapper wrapper) {
-        if (wrapper != null) {
-            mWrappersList.add(wrapper);
-        }
-    }
-
-    private void startTimer() {
-        mHandler.post(() -> {
-            mWrapperTimer = new CountDownTimer(WRAPPER_REQUEST_TIMEOUT, Constants.ONE_SECOND_IN_MILLIS) {
-                @Override
-                public void onTick(long millisUntilFinished) { }
-                @Override
-                public void onFinish() {
-                    Logging.out(LOG_TAG, Errors.TIMEOUT_OF_VAST_URI.getMessage());
-                    onFailed(Errors.TIMEOUT_OF_VAST_URI);
-                }
-            };
-            mWrapperTimer.start();
+        LoopMeAdService.downloadResource(vastTagUrl, new LoopMeAdService.Listener() {
+            @Override
+            public void onSuccess(GetResponse<String> response) { handleVastWrapperCase(response.getBody()); }
+            @Override
+            public void onError(Exception e) { onFailed(Errors.NO_VAST_RESPONSE_AFTER_WRAPPER); }
         });
-    }
-
-    private void stopTimer() {
-        mHandler.post(() -> {
-            if (mWrapperTimer == null) {
-                return;
-            }
-            mWrapperTimer.cancel();
-            mWrapperTimer = null;
-        });
-    }
-
-    private void trackByWrapperUrl(LoopMeError error) {
-        WrapperParser parser = new WrapperParser(mWrappersList);
-        for (String errorUrl : parser.getErrorUrlList()) {
-            String code = String.valueOf(error.getErrorCode());
-            VastVpaidEventTracker.trackVastEvent(errorUrl, code);
-        }
     }
 
     private void onFailed(LoopMeError error) {
-        trackByWrapperUrl(error);
-        if (mListener != null) {
-            mListener.onFailed(error);
+        WrapperParser parser = new WrapperParser(mWrappersList);
+        for (String errorUrl : parser.getErrorUrlList()) {
+            VastVpaidEventTracker.trackVastEvent(errorUrl, String.valueOf(error.getErrorCode()));
         }
+        mListener.onFailed(error);
         cancel();
     }
 
-    private void onCompleted(AdParams adParams) {
-        if (mListener != null) {
-            mListener.onCompleted(adParams);
-        }
-    }
-
     public interface Listener {
-        void onCompleted(AdParams adParams);
+        void onCompleted(String vastString, List<Wrapper> wrapperList);
         void onFailed(LoopMeError error);
     }
 }

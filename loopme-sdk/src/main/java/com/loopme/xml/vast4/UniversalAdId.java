@@ -9,15 +9,9 @@ import com.loopme.parser.xml.Attribute;
 public class UniversalAdId {
     @Attribute
     private String idRegistry;
-
     @Attribute
     private String idValue;
 
-    public String getIdValue() {
-        return idValue;
-    }
-
-    public String getIdRegistry() {
-        return idRegistry;
-    }
+    public String getIdValue() { return idValue; }
+    public String getIdRegistry() { return idRegistry; }
 }

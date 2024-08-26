@@ -28,7 +28,7 @@ public class ParseService {
     ) {
         AdParams adParams = bid == null ? new AdParams() : parse(bid, adFormat, creativeType);
         if (creativeType == AdType.VAST || creativeType == AdType.VPAID) {
-            adParams = bid == null ? adParams : XmlParseService.parse(adParams, bid);
+            adParams = bid == null ? adParams : AdParams.parse(bid.getAdm(), adParams);
         }
         adParams.setAdType(creativeType);
         return adParams;

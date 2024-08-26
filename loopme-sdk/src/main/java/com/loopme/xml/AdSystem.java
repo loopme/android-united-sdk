@@ -11,11 +11,6 @@ public class AdSystem {
     @Text
     private String text;
 
-    public String getVersion() {
-        return version;
-    }
-
-    public String getText() {
-        return text;
-    }
+    public String getVersion() { return version; }
+    public String getText() { return text; }
 }

@@ -9,15 +9,13 @@ public class Tracking {
 
     @Attribute
     private String event = "";
-
     @Attribute
     private String offset = "";
 
     @Text
     private String text = "";
 
-    public Tracking() {
-    }
+    public Tracking() { }
 
     public Tracking(String event, String offset, String text) {
         this.event = event;
@@ -25,47 +23,16 @@ public class Tracking {
         this.text = text;
     }
 
-    public String getEvent() {
-        return event;
-    }
+    public String getEvent() { return event; }
+    public String getOffset() { return offset; }
+    public String getText() { return text; }
+    public boolean hasText() { return !TextUtils.isEmpty(text); }
 
-    public String getOffset() {
-        return offset;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public boolean isProgressEvent() {
-        return event != null && event.equalsIgnoreCase(EventConstants.PROGRESS);
-    }
-
-    public boolean isCreativeViewEvent() {
-        return event != null && event.equalsIgnoreCase(EventConstants.CREATIVE_VIEW);
-    }
-
-    public boolean isStartEvent() {
-        return event != null && event.equalsIgnoreCase(EventConstants.START);
-    }
-
-    public boolean isFirstQuartileEvent() {
-        return event != null && event.equalsIgnoreCase(EventConstants.FIRST_QUARTILE);
-    }
-
-    public boolean isMidpointEvent() {
-        return event != null && event.equalsIgnoreCase(EventConstants.MIDPOINT);
-    }
-
-    public boolean isThirdQuartileEvent() {
-        return event != null && event.equalsIgnoreCase(EventConstants.THIRD_QUARTILE);
-    }
-
-    public boolean isTypeOf(String eventType) {
-        return event != null && event.equalsIgnoreCase(eventType);
-    }
-
-    public boolean hasText() {
-        return !TextUtils.isEmpty(text);
-    }
+    public boolean isProgressEvent() { return EventConstants.PROGRESS.equalsIgnoreCase(event); }
+    public boolean isCreativeViewEvent() { return EventConstants.CREATIVE_VIEW.equalsIgnoreCase(event); }
+    public boolean isStartEvent() { return EventConstants.START.equalsIgnoreCase(event); }
+    public boolean isFirstQuartileEvent() { return EventConstants.FIRST_QUARTILE.equalsIgnoreCase(event); }
+    public boolean isMidpointEvent() { return EventConstants.MIDPOINT.equalsIgnoreCase(event); }
+    public boolean isThirdQuartileEvent() { return EventConstants.THIRD_QUARTILE.equalsIgnoreCase(event); }
+    public boolean isTypeOf(String eventType) { return eventType.equalsIgnoreCase(event); }
 }

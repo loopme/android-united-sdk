@@ -1,5 +1,7 @@
 package com.loopme.xml;
 
+import androidx.annotation.NonNull;
+
 import com.loopme.parser.xml.Tag;
 
 import java.util.ArrayList;
@@ -10,19 +12,21 @@ public class Creatives {
     @Tag("Creative")
     private List<Creative> creativeList;
 
+    public boolean hasCreativeList() { return creativeList != null && !creativeList.isEmpty(); }
+
     public List<Creative> getCreativeList() {
-        return creativeList;
+        return creativeList == null ? new ArrayList<>() : creativeList;
     }
 
+    @NonNull
     public List<Tracking> getTrackingList() {
-        if (creativeList != null) {
-            for (Creative creative : creativeList) {
-                if (creative.getLinear() != null) {
-                    return creative.getLinear().getTrackingList();
-                }
+        if (creativeList == null) return new ArrayList<>();
+        for (Creative creative : creativeList) {
+            if (creative.getLinear() != null) {
+                return creative.getLinear().getTrackingList();
             }
         }
-        return null;
+        return new ArrayList<>();
     }
 
     public List<String> getVideoClicksList() {
@@ -34,10 +38,6 @@ public class Creatives {
             return videoClicksList;
         }
         return new ArrayList<>();
-    }
-
-    public boolean hasCreativeList() {
-        return creativeList != null && !creativeList.isEmpty();
     }
 
     public List<String> getCompanionTrackingEvents() {

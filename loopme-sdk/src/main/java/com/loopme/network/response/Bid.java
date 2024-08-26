@@ -45,7 +45,8 @@ public class Bid implements Serializable, Parcelable {
     public Ext getExt() { return ext; }
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
-    public String getAdm() { return adm; }
+    @NonNull
+    public String getAdm() { return adm == null ? "" : adm; }
     public String getCrid() { return crid; }
     public String getCid() { return cid; }
     public int getWidth() { return width; }
@@ -126,5 +127,9 @@ public class Bid implements Serializable, Parcelable {
                 jsonObject.optInt(Param.WIDTH, 0),
                 jsonObject.optInt(Param.HEIGHT, 0)
         );
+    }
+
+    public String getOrientation() {
+        return getExt() == null ? "" : getExt().getOrientation();
     }
 }

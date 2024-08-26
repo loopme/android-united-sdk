@@ -9,8 +9,6 @@ public class Icons {
     @Tag("Icon")
     private List<Icon> iconList;
 
-    public List<Icon> getIconList() {
-        return iconList;
-    }
+    public List<Icon> getIconList() { return iconList; }
 
 }

@@ -15,11 +15,7 @@ public class FlashResource {
     @Text
     private String text;
 
-    public String getApiFramework() {
-        return apiFramework;
-    }
+    public String getApiFramework() { return apiFramework; }
 
-    public String getText() {
-        return text;
-    }
+    public String getText() { return text; }
 }

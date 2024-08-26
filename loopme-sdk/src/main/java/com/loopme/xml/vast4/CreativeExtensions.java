@@ -8,7 +8,5 @@ public class CreativeExtensions {
     @Tag("CreativeExtension")
     private List<CreativeExtension> creativeExtensionList;
 
-    public List<CreativeExtension> getCreativeExtensionList() {
-        return creativeExtensionList;
-    }
+    public List<CreativeExtension> getCreativeExtensionList() { return creativeExtensionList; }
 }

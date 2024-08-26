@@ -17,13 +17,15 @@ import com.loopme.network.response.Bid;
 import com.loopme.network.response.BidResponse;
 import com.loopme.network.GetResponse;
 import com.loopme.parser.ParseService;
-import com.loopme.parser.XmlParseService;
 import com.loopme.request.RequestBuilder;
 import com.loopme.utils.ExecutorHelper;
 import com.loopme.network.LoopMeAdService;
+import com.loopme.xml.vast4.VastInfo;
+import com.loopme.xml.vast4.Wrapper;
 
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -32,16 +34,13 @@ public class AdFetchTask implements Runnable {
     protected static final String LOG_TAG = AdFetchTask.class.getSimpleName();
     private static final int RESPONSE_NO_ADS = 204;
 
-    private AdType mAdType;
     private Future mFetchTask;
     private final LoopMeAd mLoopMeAd;
-    private String mOrientation;
     private VastWrapperFetcher mVastWrapperFetcher;
     private final ExecutorService mExecutorService;
     private volatile AdFetcherListener mAdFetcherListener;
     private final Handler mHandler = new Handler((Looper.getMainLooper()));
     private static final String UNEXPECTED = "Unexpected";
-    private boolean mIsVastVpaidAd;
 
     public AdFetchTask(LoopMeAd loopMeAd, AdFetcherListener adFetcherListener) {
         mLoopMeAd = loopMeAd;
@@ -49,9 +48,7 @@ public class AdFetchTask implements Runnable {
         mExecutorService = ExecutorHelper.getExecutor();
     }
 
-    public void fetch() {
-        mFetchTask = mExecutorService.submit(this);
-    }
+    public void fetch() { mFetchTask = mExecutorService.submit(this); }
 
     public void stopFetch() {
         mAdFetcherListener = null;
@@ -73,7 +70,7 @@ public class AdFetchTask implements Runnable {
                 Logging.out(LOG_TAG, "Thread interrupted.");
                 return;
             }
-            GetResponse<BidResponse> response = LoopMeAdService.getInstance().fetchAd(Constants.BASE_URL, data);
+            GetResponse<BidResponse> response = LoopMeAdService.fetchAd(Constants.BASE_URL, data);
             Logging.out(LOG_TAG, "response received");
             parseResponse(response);
         } catch (Exception e) {
@@ -90,40 +87,31 @@ public class AdFetchTask implements Runnable {
         );
     }
 
-    private boolean isVastWrapperCase(BidResponse body) {
-        AdType creativeType = BidResponse.getCreativeType(body);
-        mIsVastVpaidAd = creativeType == AdType.VAST || creativeType == AdType.VPAID;
-        return mIsVastVpaidAd && XmlParseService
-            .getVastInfo(XmlParseService.getVastString(body))
-            .hasWrapper();
-    }
+    private void handleResponse(BidResponse bidResponse) {
+        AdType adType = bidResponse.getCreativeType();
+        boolean isVastVpaid = adType == AdType.VAST || adType == AdType.VPAID;
+        String vastString = bidResponse.getAdm();
+        boolean isVastWrapperCase =  isVastVpaid && VastInfo.getVastInfo(vastString).hasWrapper();
 
-    private void handleResponse(BidResponse body) {
-        if (!isVastWrapperCase(body)) {
-            if (mIsVastVpaidAd && !XmlParseService.isValidXml(body)) {
+        if (!isVastWrapperCase) {
+            if (isVastVpaid && !AdParams.isValidXml(bidResponse)) {
                 onErrorResult(Errors.SYNTAX_ERROR_IN_XML);
                 return;
             }
-            AdType creativeType = BidResponse.getCreativeType(body);
-            Bid bid = safelyRetrieve(() -> body.getSeatbid().get(0).getBid().get(0), null);
+            Bid bid = safelyRetrieve(bidResponse::getBid, null);
             mLoopMeAd.setAdParams(
-                ParseService.getAdParamsFromResponse(mLoopMeAd.getAdFormat(), creativeType, bid)
+                ParseService.getAdParamsFromResponse(mLoopMeAd.getAdFormat(), adType, bid)
             );
             onSuccessResult(mLoopMeAd.getAdParams());
             return;
         }
-        mOrientation = XmlParseService.parseOrientation(body);
-        mAdType = BidResponse.getCreativeType(body);
         mVastWrapperFetcher = new VastWrapperFetcher(
-            XmlParseService.getVastString(body), new VastWrapperFetcher.Listener() {
+            vastString, new VastWrapperFetcher.Listener() {
             @Override
-            public void onCompleted(AdParams adParams) {
-                if (adParams == null) {
-                    onErrorResult(Errors.PARSING_ERROR);
-                    return;
-                }
-                adParams.setAdType(mAdType);
-                adParams.setOrientation(mOrientation);
+            public void onCompleted(String vastString, List<Wrapper> wrapperList) {
+                AdParams adParams = AdParams.getAdParams(vastString, wrapperList);
+                adParams.setAdType(adType);
+                adParams.setOrientation(bidResponse.getOrientation());
                 onSuccessResult(adParams);
             }
             @Override

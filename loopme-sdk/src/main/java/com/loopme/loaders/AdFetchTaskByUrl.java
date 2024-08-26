@@ -17,7 +17,7 @@ public class AdFetchTaskByUrl extends AdFetchTask {
     @Override
     public void run() {
         try {
-            GetResponse<BidResponse> response = LoopMeAdService.getInstance().fetchAdByUrl(mUrl);
+            GetResponse<BidResponse> response = LoopMeAdService.fetchAdByUrl(mUrl);
             Logging.out(LOG_TAG, "response received");
             parseResponse(response);
         } catch (Exception e) {

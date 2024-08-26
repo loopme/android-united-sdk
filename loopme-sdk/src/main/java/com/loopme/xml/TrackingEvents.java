@@ -1,5 +1,7 @@
 package com.loopme.xml;
 
+import androidx.annotation.NonNull;
+
 import com.loopme.parser.xml.Tag;
 
 import java.util.ArrayList;
@@ -10,18 +12,17 @@ public class TrackingEvents {
     @Tag("Tracking")
     private List<Tracking> trackingList;
 
+    @NonNull
     public List<Tracking> getTrackingList() {
-        return trackingList;
+        return trackingList == null ? new ArrayList<>() : trackingList;
     }
 
+    @NonNull
     public List<String> getCompanionTrackingEvents() {
+        if (trackingList == null) return new ArrayList<>();
         List<String> trackingEventsList = new ArrayList<>();
-        if (trackingList != null) {
-            for (Tracking tracking : trackingList) {
-                if (tracking.hasText()) {
-                    trackingEventsList.add(tracking.getText());
-                }
-            }
+        for (Tracking tracking : trackingList) {
+            if (tracking.hasText()) trackingEventsList.add(tracking.getText());
         }
         return trackingEventsList;
     }

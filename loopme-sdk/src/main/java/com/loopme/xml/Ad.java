@@ -19,7 +19,7 @@ public class Ad {
     private Wrapper wrapper;
 
     public Wrapper getWrapper() { return wrapper; }
-    public boolean isConditionalAd() { return conditionalAd; }
     public String getId() { return id; }
     public InLine getInLine() { return inLine; }
+    public boolean isConditionalAd() { return conditionalAd; }
 }

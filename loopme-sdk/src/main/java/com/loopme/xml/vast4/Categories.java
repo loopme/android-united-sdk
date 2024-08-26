@@ -8,8 +8,6 @@ public class Categories {
     @Tag("Category")
     private List<Category> categoryList;
 
-    public List<Category> getCategoryList() {
-        return categoryList;
-    }
+    public List<Category> getCategoryList() { return categoryList; }
 }
 

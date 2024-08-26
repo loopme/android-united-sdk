@@ -4,6 +4,7 @@ import com.loopme.parser.xml.Tag;
 import com.loopme.xml.vast4.InteractiveCreativeFile;
 import com.loopme.xml.vast4.Mezzanine;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MediaFiles {
@@ -13,19 +14,13 @@ public class MediaFiles {
 
     @Tag
     private Mezzanine mezzanine;
-
     @Tag
     private InteractiveCreativeFile interactiveCreativeFile;
 
     public List<MediaFile> getMediaFileList() {
-        return mediaFileList;
+        return mediaFileList == null ? new ArrayList<>() : mediaFileList;
     }
 
-    public InteractiveCreativeFile getInteractiveCreativeFile() {
-        return interactiveCreativeFile;
-    }
-
-    public Mezzanine getMezzanine() {
-        return mezzanine;
-    }
+    public InteractiveCreativeFile getInteractiveCreativeFile() { return interactiveCreativeFile; }
+    public Mezzanine getMezzanine() { return mezzanine; }
 }

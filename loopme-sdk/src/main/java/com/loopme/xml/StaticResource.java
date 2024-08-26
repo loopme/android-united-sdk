@@ -11,11 +11,7 @@ public class StaticResource {
     @Text
     private String text;
 
-    public String getText() {
-        return text;
-    }
+    public String getText() { return text; }
 
-    public String getCreativeType() {
-        return creativeType;
-    }
+    public String getCreativeType() { return creativeType; }
 }

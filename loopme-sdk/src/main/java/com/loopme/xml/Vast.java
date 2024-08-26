@@ -6,6 +6,7 @@ import com.loopme.parser.xml.Tag;
 public class Vast {
     @Attribute
     private String version;
+
     @Tag
     private Ad ad;
     @Tag

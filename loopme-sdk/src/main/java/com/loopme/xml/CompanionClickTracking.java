@@ -11,15 +11,7 @@ public class CompanionClickTracking {
     @Text
     private String text;
 
-    public String getText() {
-        return text;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public boolean hasText() {
-        return !TextUtils.isEmpty(text);
-    }
+    public String getText() { return text; }
+    public String getId() { return id; }
+    public boolean hasText() { return !TextUtils.isEmpty(text); }
 }

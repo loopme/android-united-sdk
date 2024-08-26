@@ -11,11 +11,6 @@ public class Impression {
     @Text
     private String text;
 
-    public String getId() {
-        return id;
-    }
-
-    public String getText() {
-        return text;
-    }
+    public String getId() { return id; }
+    public String getText() { return text; }
 }

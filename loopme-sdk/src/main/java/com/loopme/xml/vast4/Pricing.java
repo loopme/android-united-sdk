@@ -7,23 +7,13 @@ public class Pricing {
 
     @Attribute
     private String model;
-
     @Attribute
     private String currency;
 
     @Text
     private String amount;
 
-    public String getAmount() {
-        return amount;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
+    public String getAmount() { return amount; }
+    public String getModel() { return model; }
+    public String getCurrency() { return currency; }
 }

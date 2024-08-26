@@ -14,16 +14,7 @@ public class JavaScriptResource {
     @Text
     private String text;
 
-    public String getApiFramework() {
-        return apiFramework;
-    }
-
-    public boolean getBrowserOptional() {
-        return browserOptional;
-    }
-
-    public String getText() {
-        return text;
-    }
-
+    public String getApiFramework() { return apiFramework; }
+    public boolean getBrowserOptional() { return browserOptional; }
+    public String getText() { return text; }
 }

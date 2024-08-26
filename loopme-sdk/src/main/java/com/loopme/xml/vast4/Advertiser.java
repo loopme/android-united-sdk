@@ -7,7 +7,5 @@ public class Advertiser {
     @Text
     private String text;
 
-    public String getText() {
-        return text;
-    }
+    public String getText() { return text; }
 }
