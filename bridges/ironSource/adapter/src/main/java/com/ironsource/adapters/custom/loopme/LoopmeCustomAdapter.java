@@ -25,6 +25,7 @@ public class LoopmeCustomAdapter extends BaseAdapter {
     @Override
     public void init(AdData adData, Context context, NetworkInitializationListener networkInitializationListener) {
         if (LoopMeSdk.isInitialized()) {
+            System.out.println("@@@wjw loopme sdk already initialized");
             onNetworkInitializationFinished(networkInitializationListener, null, true);
             return;
         }

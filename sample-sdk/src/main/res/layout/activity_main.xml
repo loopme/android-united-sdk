@@ -6,6 +6,24 @@
     android:layout_height="match_parent"
     tools:context=".app.MainActivity">
 
+    <Button
+        android:id="@+id/initBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Init sdk"
+        app:layout_constraintBottom_toTopOf="@id/initThredBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/initThredBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Init from different thread"
+        app:layout_constraintBottom_toTopOf="@id/interstitial"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 
     <Button
         android:id="@+id/interstitial"
@@ -24,9 +42,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="@string/banner"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/interstitial" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

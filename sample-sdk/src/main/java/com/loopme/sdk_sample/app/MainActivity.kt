@@ -1,7 +1,7 @@
 package com.loopme.sdk_sample.app
 
 import android.content.Intent
-import android.os.Bundle
+import android.os.Bundle import android.os.Handler
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.loopme.LoopMeSdk
@@ -16,8 +16,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        tryInitLoopMeSdk()
+//        initFromAnotherThread()
+//        tryInitLoopMeSdk()
         setUpButtons()
+    }
+
+    private fun initFromAnotherThread() {
+        Thread {
+            println("@@@wjw operating on thread: ${Thread.currentThread().name}")
+            tryInitLoopMeSdk()
+        }.start()
     }
 
     private fun setUpButtons() {
@@ -37,18 +45,30 @@ class MainActivity : AppCompatActivity() {
                 )
             )
         }
+        binding.initBtn.setOnClickListener {
+            tryInitLoopMeSdk()
+            tryInitLoopMeSdk()
+        }
+
+        binding.initThredBtn.setOnClickListener {
+            initFromAnotherThread()
+            initFromAnotherThread()
+            tryInitLoopMeSdk()
+        }
     }
 
     private fun tryInitLoopMeSdk() {
-        if (LoopMeSdk.isInitialized()) return
-        alert("LoopMe SDK: initialization…")
+//        if (LoopMeSdk.isInitialized()) return
+//        alert("LoopMe SDK: initialization…")
         LoopMeSdk.initialize(this, LoopMeSdk.Configuration(), object : LoopMeSdkListener {
             override fun onSdkInitializationSuccess() {
-                alert("LoopMe SDK: initialized")
+                println("@@@wjw LoopMe SDK: onSdkInitializationSuccess()")
+//                alert("LoopMe SDK: initialized")
             }
 
             override fun onSdkInitializationFail(errorCode: Int, message: String) {
-                alert("LoopMe SDK: failed to initialize. Trying again…")
+//                alert("LoopMe SDK: failed to initialize. Trying again…")
+                println("@@@wjw LoopMe SDK: failed to initialize. Trying again…")
                 tryInitLoopMeSdk()
             }
         })

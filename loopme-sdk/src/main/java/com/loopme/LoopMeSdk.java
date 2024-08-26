@@ -4,6 +4,7 @@ import static com.loopme.Constants.UNKNOWN_MSG;
 
 import android.content.Context;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
@@ -67,13 +68,14 @@ public final class LoopMeSdk {
     public static void initialize(
         @NonNull Context context, @NonNull Configuration config, @NonNull LoopMeSdkListener sdkInitListener
     ) {
-        if (Looper.getMainLooper() != Looper.myLooper())
-            throw new IllegalStateException("Must be called on the main thread");
+        System.out.println(String.format("@@@wjw initializing called on thread %s", Thread.currentThread().getName()));
 
         if (isInitialized) {
+            System.out.println("@@@wjw already initialized");
             sdkInitListener.onSdkInitializationSuccess();
             return;
         }
+        System.out.println("@@@wjw setting isInitialized to true");
         isInitialized = true;
 
         configuration = config;
