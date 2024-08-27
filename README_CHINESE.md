@@ -44,9 +44,6 @@ LoopMe是最大的移动视频DSP和广告网络平台，全球覆盖受众超�
 <uses-permission android:name="android.permission.READ_BASIC_PHONE_STATE" />
 <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
-//可选的许可
-<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 ```
 活动：
 ```xml

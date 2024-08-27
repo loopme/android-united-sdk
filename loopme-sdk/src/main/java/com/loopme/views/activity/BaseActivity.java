@@ -1,8 +1,5 @@
 package com.loopme.views.activity;
 
-import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-
 import static com.loopme.Constants.SKIP_DELAY_INTERSTITIAL;
 
 import android.content.Intent;
@@ -45,7 +42,6 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
     private static final String LOG_TAG = BaseActivity.class.getSimpleName();
     private static final int START_DEFAULT_POSITION = 0;
     private static final int REQUEST_GENERAL_PERMISSIONS = 0;
-    private static final int REQUEST_LOCATION_PERMISSIONS = 1;
 
     private BaseTrackableController mDisplayController;
 
@@ -59,9 +55,6 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
     private CloseButton mMraidCloseButton;
     private boolean mIsDestroyBroadcastReceived;
     private String[] generalPermissionsFromWebViewRequest;
-    private static final String[] LOCATION_PERMISSIONS = new String[]{
-        ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION
-    };
 
     private void registerDestroyReceiver() {
         mAdReceiver = new AdReceiver(new AdReceiver.Listener() {
@@ -255,19 +248,12 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
             );
             generalPermissionsFromWebViewRequest = null;
         }
-
-        if (requestCode == REQUEST_LOCATION_PERMISSIONS)
-            chromeClient.setLocationPermissionGranted(
-                !PermissionUtils
-                    .groupPermissions(this, LOCATION_PERMISSIONS)
-                    .getGrantedPermissions().isEmpty()
-            );
     }
 
     @Override
     public void onRequestGeneralPermissions(String[] androidPermissions) {
         PermissionUtils.GroupedPermissions groupedPermissions =
-                PermissionUtils.groupPermissions(this, androidPermissions);
+            PermissionUtils.groupPermissions(this, androidPermissions);
 
         List<String> deniedPermissions = groupedPermissions.getDeniedPermissions();
 
@@ -291,27 +277,4 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
     public void onCancelGeneralPermissionsRequest() {
         generalPermissionsFromWebViewRequest = null;
     }
-
-    @Override
-    public void onRequestLocationPermission(String origin) {
-        PermissionUtils.GroupedPermissions groupedPermissions =
-                PermissionUtils.groupPermissions(this, LOCATION_PERMISSIONS);
-
-        List<String> deniedPermissions = groupedPermissions.getDeniedPermissions();
-
-        if (deniedPermissions.isEmpty()) {
-            AdViewChromeClient chromeClient = tryGetAdViewChromeClient(mDisplayController.getWebView());
-            if (chromeClient == null) {
-                return;
-            }
-            chromeClient.setLocationPermissionGranted(!groupedPermissions.getGrantedPermissions().isEmpty());
-        }
-
-        ActivityCompat.requestPermissions(
-            this, deniedPermissions.toArray(new String[0]), REQUEST_LOCATION_PERMISSIONS
-        );
-    }
-
-    @Override
-    public void onCancelLocationPermissionRequest() { }
 }
