@@ -8,7 +8,6 @@ import static com.loopme.debugging.Params.ERROR_TYPE;
 
 import android.text.TextUtils;
 import android.webkit.ConsoleMessage;
-import android.webkit.GeolocationPermissions;
 import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
 
@@ -30,9 +29,6 @@ public class AdViewChromeClient extends WebChromeClient {
 
     private PermissionResolver permissionResolveListener;
     private PermissionRequest permissionRequest;
-
-    private String locationPermissionOrigin;
-    private GeolocationPermissions.Callback geolocationPermissionsCallback;
 
     public AdViewChromeClient() { }
 
@@ -74,38 +70,6 @@ public class AdViewChromeClient extends WebChromeClient {
         }
 
         permissionRequest = null;
-    }
-
-    @Override
-    public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
-        if (permissionResolveListener == null) {
-            callback.invoke(origin, false, false);
-            return;
-        }
-
-        locationPermissionOrigin = origin;
-        geolocationPermissionsCallback = callback;
-
-        permissionResolveListener.onRequestLocationPermission(origin);
-    }
-
-    @Override
-    public void onGeolocationPermissionsHidePrompt() {
-        locationPermissionOrigin = null;
-        geolocationPermissionsCallback = null;
-
-        if (permissionResolveListener != null) {
-            permissionResolveListener.onCancelLocationPermissionRequest();
-        }
-    }
-
-    public void setLocationPermissionGranted(boolean granted) {
-        if (locationPermissionOrigin == null || geolocationPermissionsCallback == null) return;
-
-        geolocationPermissionsCallback.invoke(locationPermissionOrigin, granted, false);
-
-        locationPermissionOrigin = null;
-        geolocationPermissionsCallback = null;
     }
 
     private String getSourceUrl(String message) {
@@ -180,7 +144,5 @@ public class AdViewChromeClient extends WebChromeClient {
     public interface PermissionResolver {
         void onRequestGeneralPermissions(String[] permissions);
         void onCancelGeneralPermissionsRequest();
-        void onRequestLocationPermission(String origin);
-        void onCancelLocationPermissionRequest();
     }
 }

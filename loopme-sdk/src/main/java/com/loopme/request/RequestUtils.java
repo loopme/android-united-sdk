@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.location.Location;
 import android.media.AudioManager;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -20,7 +19,6 @@ import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.R;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.gdpr.ConsentType;
-import com.loopme.location.GoogleLocationService;
 import com.loopme.network.HttpUtils;
 
 import org.json.JSONArray;
@@ -39,7 +37,6 @@ public class RequestUtils {
     private String mAppVersion = "0.0";
     private String mUa;
     private String mOr = "p";
-    private Location location;
     private static String mIfa = "";
     private static String mDnt = "0";
     private int mInstl;
@@ -66,7 +63,6 @@ public class RequestUtils {
         mDeviceWidthPx = RequestParamsUtils.getDeviceSize(context).x;
         mDeviceHeightPx = RequestParamsUtils.getDeviceSize(context).y;
         mConnectionType = HttpUtils.getConnectionType(context);
-        location = GoogleLocationService.getLocation(context);
         mUa = WebSettings.getDefaultUserAgent(context);
         mInstl = mLoopMeAd instanceof LoopMeInterstitialGeneral ? 1 : 0;
         setAdvertisingIdInfo(context);
@@ -98,7 +94,6 @@ public class RequestUtils {
         return RequestConstants.API_ALL;
     }
     int getInstl() { return mInstl; }
-    Location getLocation() { return location; }
     int getSkippable() { return mSkippable; }
     String getUuId() { return UUID.randomUUID().toString(); }
     String getLanguage() { return Locale.getDefault().getLanguage(); }
@@ -182,7 +177,6 @@ public class RequestUtils {
     String getChargeLevel(Context context) {
         return String.valueOf(getBatteryPercentage(context));
     }
-
 
     int getBatteryLevel(Context context) {
         int batteryPercentage = getBatteryPercentage(context);

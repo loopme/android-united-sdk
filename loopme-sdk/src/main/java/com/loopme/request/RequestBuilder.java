@@ -1,7 +1,6 @@
 package com.loopme.request;
 
 import android.content.Context;
-import android.location.Location;
 
 import com.loopme.AdTargetingData;
 import com.loopme.JSONBuilder;
@@ -98,14 +97,9 @@ public class RequestBuilder implements Serializable {
     private static final String CONSENT = "consent";
     private static final String OUTPUT = "audio_output";
     private static final String MUSIC = "music";
-    private static final String LAT = "lat";
-    private static final String LON = "lon";
-    private static final String GEO_TYPE = "type";
-    private static final String GEO = "geo";
 
     public static JSONObject buildRequestJson(Context context, LoopMeAd loopMeAd) throws JSONException {
         RequestUtils requestUtils = new RequestUtils(context, loopMeAd);
-        Location location = requestUtils.getLocation();
         AdTargetingData data = loopMeAd.getAdTargetingData();
         LoopMeAd.Type adType = loopMeAd.getPreferredAdType();
         boolean isBanner = LoopMeAd.Type.ALL == adType || LoopMeAd.Type.HTML == adType;
@@ -180,12 +174,6 @@ public class RequestBuilder implements Serializable {
                 .put(UA, requestUtils.getUa())
                 .put(DNT, requestUtils.getDnt())
                 .put(MODEL, requestUtils.getModel())
-                .put(GEO, (location != null) ? new JSONBuilder()
-                    .put(LAT, (float) location.getLatitude())
-                    .put(LON, (float) location.getLongitude())
-                    .put(GEO_TYPE, 1 /*gps/location services*/)
-                    .build() : null
-                )
                 .put(EXT, new JSONBuilder()
                     .put(TIMEZONE, requestUtils.getTimeZone())
                     .put(ORIENTATION, requestUtils.getOrientation())
