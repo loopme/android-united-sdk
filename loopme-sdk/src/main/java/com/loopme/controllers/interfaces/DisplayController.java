@@ -16,7 +16,6 @@ public interface DisplayController {
     void onPause();
     void onResume();
     void onDestroy();
-    void onMessage(Message type, String message);
     boolean isFullScreen();
     WebView getWebView();
     int getOrientation();
