@@ -10,36 +10,21 @@ public abstract class AdConfig implements AdTargeting {
     }
 
     public void setAutoLoading(boolean autoLoadingEnabled) {
-        if (mFirstLoopMeAd != null) {
-            mFirstLoopMeAd.setAutoLoading(autoLoadingEnabled);
-        }
+        if (mFirstLoopMeAd != null) mFirstLoopMeAd.setAutoLoading(autoLoadingEnabled);
     }
 
     @Override
     public void setKeywords(String keywords) {
-        if (mFirstLoopMeAd != null) {
-            mFirstLoopMeAd.setKeywords(keywords);
-        }
+        if (mFirstLoopMeAd != null) mFirstLoopMeAd.setKeywords(keywords);
     }
 
     @Override
     public void setGender(String gender) {
-        if (mFirstLoopMeAd != null) {
-            mFirstLoopMeAd.setGender(gender);
-        }
+        if (mFirstLoopMeAd != null) mFirstLoopMeAd.setGender(gender);
     }
 
     @Override
     public void setYearOfBirth(int year) {
-        if (mFirstLoopMeAd != null) {
-            mFirstLoopMeAd.setYearOfBirth(year);
-        }
-    }
-
-    @Override
-    public void addCustomParameter(String param, String paramValue) {
-        if (mFirstLoopMeAd != null) {
-            mFirstLoopMeAd.addCustomParameter(param, paramValue);
-        }
+        if (mFirstLoopMeAd != null) mFirstLoopMeAd.setYearOfBirth(year);
     }
 }
