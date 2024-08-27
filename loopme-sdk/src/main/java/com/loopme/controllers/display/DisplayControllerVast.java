@@ -83,10 +83,12 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
                 mEndCardUrl = endCardUrl;
             }
             @Override
-            public void onError(LoopMeError info) { onInternalLoadFail(info); }
+            public void onError(LoopMeError info) {
+                mLoopMeAd.onInternalLoadFail(info);
+            }
             @Override
             public void onPostWarning(LoopMeError error) {
-                if (mLoopMeAd != null) mLoopMeAd.onSendPostWarning(error);
+                mLoopMeAd.onSendPostWarning(error);
             }
         };
         mEndCardUrl = mAdParams.getEndCardUrl();
@@ -189,7 +191,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     protected WebView createWebView() {
-        return isTrackerAvailable() ? new VastWebView(mLoopMeAd.getContext()) : null;
+        return new VastWebView(mLoopMeAd.getContext());
     }
 
     @Override
@@ -209,7 +211,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     @Override
     public void onPlay(int position) {
         mIsAdSkipped = false;
-        postDelayed(() -> {
+        mLoopMeAd.runOnUiThreadDelayed(() -> {
             destroyMediaPlayer();
             mLoopMePlayer = new LoopMeMediaPlayer(mVideoUrl, DisplayControllerVast.this);
         }, 100);
@@ -445,7 +447,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
             Logging.out(mLogTag, e.toString());
         // TODO. Destroying beforehand to get rid of unnecessary callbacks like onCompletion.
         destroyMediaPlayer();
-        onInternalLoadFail(Errors.PROBLEM_DISPLAYING_MEDIAFILE);
+        mLoopMeAd.onInternalLoadFail(Errors.PROBLEM_DISPLAYING_MEDIAFILE);
         closeSelf();
     }
 

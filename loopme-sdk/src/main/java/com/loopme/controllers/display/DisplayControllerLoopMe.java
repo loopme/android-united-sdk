@@ -27,6 +27,7 @@ import com.loopme.controllers.MraidController;
 import com.loopme.controllers.interfaces.LoopMeDisplayController;
 import com.loopme.om.OmidEventTrackerWrapper;
 import com.loopme.om.OmidHelper;
+import com.loopme.tracker.constants.AdType;
 import com.loopme.utils.UiUtils;
 import com.loopme.views.MraidView;
 
@@ -78,7 +79,8 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     @Override
     public void onStartLoad() {
         super.onStartLoad();
-        initTrackers();
+        boolean isNativeAd = mLoopMeAd.isVastAd() && !mLoopMeAd.isVpaidAd() && !mLoopMeAd.isMraidAd();
+        onInitTracker(isNativeAd ? AdType.NATIVE : AdType.WEB);
         preloadHtml();
     }
 
@@ -130,15 +132,14 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
         if (omidAdSession != null) return;
         try {
             omidAdSession = OmidHelper.createAdSessionHtml(mMraidView);
+            omidEventTrackerWrapper =
+                new OmidEventTrackerWrapper(AdEvents.createAdEvents(omidAdSession), null);
+            omidAdSession.registerAdView(mMraidView);
+            omidAdSession.start();
+            omidEventTrackerWrapper.sendLoaded();
         } catch (Exception e) {
             Logging.out(LOG_TAG, e.toString());
-            return;
         }
-        omidEventTrackerWrapper =
-            new OmidEventTrackerWrapper(AdEvents.createAdEvents(omidAdSession), null);
-        omidAdSession.registerAdView(mMraidView);
-        omidAdSession.start();
-        omidEventTrackerWrapper.sendLoaded();
     }
 
     @Override
@@ -226,7 +227,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
             return mMraidController.getForceOrientation();
         }
         if (mLoopMeAd.isInterstitial()) {
-            return getOrientationFromAdParams();
+            return super.getOrientation();
         }
         return ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
     }

@@ -219,13 +219,14 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     }
 
     public void onInternalLoadFail(LoopMeError error) {
-        onAdLoadFail(error);
-        onSendPostWarning(error);
+        runOnUiThread(() -> {
+            onAdLoadFail(error);
+            onSendPostWarning(error);
+        });
     }
 
     public void onSendPostWarning(LoopMeError error) {
-        HashMap<String, String> errorInfo = packErrorInfo(error.getMessage());
-        LoopMeTracker.post(errorInfo);
+        runOnUiThread(() -> LoopMeTracker.post(packErrorInfo(error.getMessage())));
     }
 
     private void startTimer(TimersType fetcherTimer, AdParams adParam) {

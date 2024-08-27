@@ -132,7 +132,7 @@ public class MraidController implements MraidBridgeListener {
     @Override
     public void expand(boolean useCustomClose) {
         mLoopMeAd.getAdParams().setOwnCloseButton(useCustomClose);
-        AdUtils.startAdActivity(mLoopMeAd, useCustomClose);
+        AdUtils.startAdActivity(mLoopMeAd);
         mMraidView.setIsViewable(true);
         mMraidView.setState(Constants.MraidState.EXPANDED);
         Logging.out(LOG_TAG, "expand " + useCustomClose);

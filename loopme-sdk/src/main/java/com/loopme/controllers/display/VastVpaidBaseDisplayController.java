@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.controllers.interfaces.VastVpaidDisplayController;
+import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.constants.EventConstants;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.vast.VastVpaidEventTracker;
@@ -73,8 +74,9 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
         // Start initializing OMID part.
         onTryCreateOmidTracker(getSupportedOmidVerificationData(mAdParams));
         // Init trackers
-        initTrackers();
-        onUiThread(this::prepare);
+        boolean isNativeAd = mLoopMeAd.isVastAd() && !mLoopMeAd.isVpaidAd() && !mLoopMeAd.isMraidAd();
+        onInitTracker(isNativeAd ? AdType.NATIVE : AdType.WEB);
+        mLoopMeAd.runOnUiThread(this::prepare);
     }
 
     protected void onTryCreateOmidTracker(Map<String, Verification> omidVerificationMap) { }

@@ -3,6 +3,7 @@ package com.loopme.controllers.display;
 import android.annotation.SuppressLint;
 import android.content.res.AssetManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
@@ -83,7 +84,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         if (arg == TimersType.PREPARE_VPAID_JS_TIMER) {
             if (mTimer != null) mTimer.stopTimer(TimersType.PREPARE_VPAID_JS_TIMER);
             Logging.out(LOG_TAG, "Js loading timeout");
-            onInternalLoadFail(Errors.JS_LOADING_TIMEOUT);
+            mLoopMeAd.onInternalLoadFail(Errors.JS_LOADING_TIMEOUT);
         }
     }
 
@@ -189,12 +190,12 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     //endregion
 
     @Override
-    public void runOnUiThread(Runnable runnable) { onUiThread(runnable); }
+    public void runOnUiThread(Runnable runnable) { mLoopMeAd.runOnUiThread(runnable); }
 
     //region BridgeEventHandler methods
     @Override
     public void callJsMethod(final String url) {
-        onUiThread(() -> {
+        runOnUiThread(() -> {
             WebView wv = getWebView();
             if (wv != null)
                 wv.loadUrl("javascript:" + url);
@@ -245,7 +246,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         if (TextUtils.isEmpty(message)) return;
         UiUtils.broadcastIntent(mLoopMeAd.getContext(), Constants.DESTROY_INTENT, mLoopMeAd.getAdId());
         LoopMeError error = new LoopMeError(901, "Error from vpaid js: trackError(): " + message, Constants.ErrorType.VPAID);
-        onInternalLoadFail(error);
+        mLoopMeAd.onInternalLoadFail(error);
     }
 
     @Override
@@ -286,9 +287,9 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         LoopMeError error = mIsStarted ? new LoopMeError(Errors.GENERAL_VPAID_ERROR) : new LoopMeError(Errors.VPAID_FILE_NOT_FOUND);
         error.addToMessage(message);
         if (mIsStarted) {
-            onPostWarning(error);
+            mLoopMeAd.onSendPostWarning(error);
         } else {
-            onInternalLoadFail(error);
+            mLoopMeAd.onInternalLoadFail(error);
         }
     }
 
@@ -316,7 +317,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         mImpressionTimer.stop();
         for (String url : mAdParams.getImpressionsList()) {
             postVideoEvent(url);
-            onMessage(Message.LOG, "mAdParams.getImpressionsList() " + url);
+            Log.d(mLogTag, "mAdParams.getImpressionsList() " + url);
         }
         setVerificationView(getWebView());
         postViewableEvents(ViewableImpressionTracker.IMPRESSION_TIME_NATIVE_VIDEO);
@@ -347,7 +348,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     }
 
     private void callBridgeMethod(BridgeMethods method) {
-        onUiThread(new CallBridgeRunnable(method));
+        runOnUiThread(new CallBridgeRunnable(method));
     }
 
     private class CallBridgeRunnable implements Runnable {
@@ -407,7 +408,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         mCreativeType = CreativeType.VIDEO_OTHER_TYPE;
         LoopMeError error = new LoopMeError(Errors.UNUSUAL_VIDEO_FORMAT);
         error.addToMessage(source);
-        onPostWarning(error);
+        mLoopMeAd.onSendPostWarning(error);
     }
 
     private void cancelExtraCloseButton() {
