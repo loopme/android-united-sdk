@@ -382,11 +382,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     }
 
     @Override
-    public void addCustomParameter(String param, String paramValue) {
-        mAdTargetingData.setCustomParameters(param, paramValue);
-    }
-
-    @Override
     public void update(Observable observable, Object arg) {
         if (!(observable instanceof Timers) || !(arg instanceof TimersType)) return;
         if (arg == TimersType.EXPIRATION_TIMER) onAdExpired();
