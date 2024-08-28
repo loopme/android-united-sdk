@@ -135,13 +135,17 @@ public class DisplayModeResolver {
                     mDisplayControllerLoopMe.dismissAd();
                 }
             }
+
             @Override
             public void onClick() {
-                if (mMinimizedMode != null) {
-                    mMinimizedMode.onViewClicked();
+                if (mLoopMeAd.hasUserClicked()) {
+                    mLoopMeAd.resetUserClicked();
+                    if (mMinimizedMode != null) {
+                        mMinimizedMode.onViewClicked();
+                    }
                 }
             }
-        });
+        }, mLoopMeAd);
     }
 
     public boolean isFullScreenMode() {

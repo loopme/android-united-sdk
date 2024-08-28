@@ -20,10 +20,9 @@ final class MraidBridgeCommand {
         if (MraidBridgeCommand.USE_CUSTOM_CLOSE.equals(command)) {
             mMraidBridgeListener.onChangeCloseButtonVisibility(useCustomClose);
         }
-        // TODO: temporary disable expandable banners
-//        if (EXPAND.equals(command)) {
-//            mOnMraidBridgeListener.expand(useCustomClose);
-//        }
+        if (EXPAND.equals(command)) {
+            mMraidBridgeListener.expand(useCustomClose);
+        }
         if (MraidBridgeCommand.RESIZE.equals(command)) {
             mMraidBridgeListener.resize(
                     Utils.convertDpToPixel(Integer.parseInt(BridgeQuery.detect(uri, BridgeQuery.WIDTH))),

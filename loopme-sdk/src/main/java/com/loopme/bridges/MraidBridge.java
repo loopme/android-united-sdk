@@ -30,6 +30,8 @@ public class MraidBridge extends WebViewClientCompat {
     private final MraidBridgeListener mMraidBridgeListener;
     private final AdReadyListener adReadyListener;
 
+    public boolean userClicked = false;
+
     public MraidBridge(@NonNull MraidBridgeListener mraidBridgeListener, @NonNull AdReadyListener readyListener) {
         mMraidBridgeListener = mraidBridgeListener;
         adReadyListener = readyListener;
@@ -57,6 +59,21 @@ public class MraidBridge extends WebViewClientCompat {
         }
         if (PROTOCOL.MRAID.equalsIgnoreCase(scheme)) {
             String command = uri.getHost();
+
+            if (MraidBridgeCommand.OPEN.equals(command)) {
+                if (!userClicked) {
+                    Logging.out(LOG_TAG, "Redirect blocked: User has not clicked on the ad.");
+                    return true;
+                }
+            }
+
+            if (MraidBridgeCommand.EXPAND.equals(command)) {
+                if (!userClicked) {
+                    Logging.out(LOG_TAG, "Expand blocked: User has not clicked on the ad.");
+                    return true;
+                }
+            }
+
             MraidBridgeCommand.handleCommand(mMraidBridgeListener, uri, command);
             return true;
         }
@@ -69,6 +86,13 @@ public class MraidBridge extends WebViewClientCompat {
             MraidBridgeWebview.handleCommands(mMraidBridgeListener, adReadyListener, uri, command);
             return true;
         }
+
+        // for other URLs, block if no user click
+        if (!userClicked) {
+            Logging.out(LOG_TAG, "Redirect blocked: User has not clicked on the ad.");
+            return true;
+        }
+
         mMraidBridgeListener.open(url);
         return true;
     }
@@ -78,11 +102,17 @@ public class MraidBridge extends WebViewClientCompat {
         super.onPageFinished(view, url);
         mMraidBridgeListener.onLoadSuccess();
         adReadyListener.onCall();
+        resetUserClickStatus();
     }
 
     @Override
     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
         super.onReceivedError(view, request, error);
         ((MraidView) view).notifyError();
+        resetUserClickStatus();
+    }
+
+    public void resetUserClickStatus() {
+        userClicked = false;
     }
 }

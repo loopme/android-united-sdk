@@ -1,5 +1,6 @@
 package com.loopme.controllers;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.view.ViewGroup;
@@ -15,9 +16,11 @@ import com.loopme.LoopMeBannerGeneral;
 import com.loopme.MraidOrientation;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
+import com.loopme.bridges.MraidBridge;
 import com.loopme.bridges.MraidBridgeListener;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
+import com.loopme.utils.ApiLevel;
 import com.loopme.utils.UiUtils;
 import com.loopme.utils.Utils;
 import com.loopme.views.MraidView;
@@ -94,10 +97,31 @@ public class MraidController implements MraidBridgeListener {
     @Override
     public void open(String url) {
         Logging.out(LOG_TAG, "open " + url);
+
+        MraidBridge bridge = getMraidBridge();
+        assert bridge != null;
+
+        if (!bridge.userClicked) {
+            Logging.out(LOG_TAG, "Redirect blocked: No valid user click.");
+            return;
+        }
+
         mLoopMeAd.onAdClicked();
-        if (AdUtils.tryStartCustomTabs(mMraidView.getContext(), url))
+        bridge.resetUserClickStatus();
+
+        if (AdUtils.tryStartCustomTabs(mMraidView.getContext(), url)) {
             mLoopMeAd.onAdLeaveApp();
+        }
     }
+
+    @SuppressLint("WebViewApiAvailability")
+    private MraidBridge getMraidBridge() {
+        if (ApiLevel.isApi26AndHigher() && mMraidView.getWebViewClient() instanceof MraidBridge) {
+            return (MraidBridge) mMraidView.getWebViewClient();
+        }
+        return null;
+    }
+
 
     @Override
     public void resize(int width, int height) {

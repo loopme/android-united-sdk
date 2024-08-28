@@ -64,6 +64,9 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     protected boolean mIsReady;
     private final int mAdId;
 
+    /** Flag to check if user has clicked */
+    protected boolean userClicked = false;
+
     private final AdFetcherListener adFetchListener = new AdFetcherListener() {
         @Override
         public void onAdFetchCompleted(AdParams adParams) {
@@ -95,6 +98,19 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         LiveDebug.init(context);
         Utils.init(getContext());
         LoopMeTracker.init(this);
+    }
+
+    /** Methods to manage userClicked flag */
+    public void setUserClicked(boolean clicked) {
+        userClicked = clicked;
+    }
+
+    public boolean hasUserClicked() {
+        return userClicked;
+    }
+
+    public void resetUserClicked() {
+        userClicked = false;
     }
 
     /**
@@ -245,7 +261,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     }
 
     protected void buildAdView() {
-        Logging.out(LOG_TAG, " build ad view interstitial " + mContainerView);
+        Logging.out(LOG_TAG, "build ad view interstitial " + mContainerView);
         if (mDisplayController == null) {
             return;
         }

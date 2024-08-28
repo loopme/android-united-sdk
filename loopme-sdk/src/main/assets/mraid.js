@@ -952,3 +952,8 @@ console.log("mraidBridge:" + window.mraidbridge);
 // Some browser don't support window.crypto.randomUUID
 window.crypto = window.crypto || {};
 window.crypto.randomUUID = window.crypto.randomUUID || function () { return Date.now(); };
+
+//Override window.open to use mraid.open
+window.open = function(URL) {
+    mraid.open(URL);
+   };
