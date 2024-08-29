@@ -155,6 +155,7 @@ public class MraidController implements MraidBridgeListener {
 
     @Override
     public void expand(boolean useCustomClose) {
+        if (!mLoopMeAd.isBanner()) return;
         mLoopMeAd.getAdParams().setOwnCloseButton(useCustomClose);
         AdUtils.startAdActivity(mLoopMeAd, useCustomClose);
         mMraidView.setIsViewable(true);
