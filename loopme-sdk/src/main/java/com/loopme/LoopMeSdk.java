@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 
 import com.loopme.gdpr.GdprChecker;
 import com.loopme.om.OmidHelper;
+import com.loopme.utils.Utils;
 
 /**
  * Created by katerina on 4/27/18.
@@ -69,6 +70,8 @@ public final class LoopMeSdk {
     ) {
         if (Looper.getMainLooper() != Looper.myLooper())
             throw new IllegalStateException("Must be called on the main thread");
+
+        Utils.init(context);
 
         if (isInitialized) {
             sdkInitListener.onSdkInitializationSuccess();

@@ -19,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.loopme.Constants;
+import com.loopme.Constants.Layout;
 import com.loopme.R;
 import com.loopme.utils.Utils;
 import com.loopme.utils.ViewUtils;
@@ -48,7 +49,7 @@ public class PlayerLayout extends FrameLayout
         super(context);
         mListener = listener;
 
-        int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI, getContext());
+        int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI);
 
         mSkipButton = new ImageView(getContext());
         mSkipButton.setId(SKIP_BUTTON_ID);
@@ -71,7 +72,7 @@ public class PlayerLayout extends FrameLayout
 
         mPlayerTextureView = new TextureView(getContext());
         mPlayerTextureView.setId(View.generateViewId());
-        mPlayerTextureView.setLayoutParams(Utils.createMatchParentLayoutParams());
+        mPlayerTextureView.setLayoutParams(Layout.MATCH_PARENT_CENTER);
         mPlayerTextureView.setSurfaceTextureListener(this);
 
         mTextView = new TextView(getContext());
@@ -84,7 +85,7 @@ public class PlayerLayout extends FrameLayout
             webView.setId(View.generateViewId());
         }
         buttonViews = new View[]{mMuteButton, mSkipButton};
-        setLayoutParams(Utils.createMatchParentLayoutParams());
+        setLayoutParams(Layout.MATCH_PARENT_CENTER);
         addView(mPlayerTextureView, generateViewPosition());
         if (webView != null) {
             addView(webView, generateViewPosition());
@@ -95,9 +96,44 @@ public class PlayerLayout extends FrameLayout
         addView(mTextView, generateViewPosition());
     }
 
+    private static FrameLayout.LayoutParams calculateNewLayoutParams(
+        @NonNull FrameLayout.LayoutParams layoutParams,
+        int videoWidth, int videoHeight,
+        int resizeWidth, int resizeHeight,
+        Constants.StretchOption stretchOption
+    ) {
+        layoutParams.gravity = Gravity.CENTER;
+        if (stretchOption == Constants.StretchOption.STRETCH) {
+            layoutParams.width = resizeWidth;
+            layoutParams.height = resizeHeight;
+            return layoutParams;
+        }
+        if (stretchOption == Constants.StretchOption.NONE) {
+            float percent = 0;
+            if (videoWidth > videoHeight) {
+                layoutParams.width = resizeWidth;
+                layoutParams.height = (int) ((float) videoHeight / videoWidth * resizeWidth);
+                percent = layoutParams.height != 0 ?
+                        (resizeHeight - layoutParams.height * 100f) / layoutParams.height : 0;
+            } else {
+                layoutParams.height = resizeHeight;
+                layoutParams.width = (int) ((float) videoWidth / videoHeight * resizeHeight);
+                percent = layoutParams.width != 0 ?
+                        (resizeWidth - layoutParams.width * 100f) / layoutParams.width : 0;
+            }
+            int DEFAULT_THRESHOLD = 11;
+            if (percent < DEFAULT_THRESHOLD) {
+                layoutParams.width = resizeWidth;
+                layoutParams.height = resizeHeight;
+            }
+            return layoutParams;
+        }
+        return layoutParams;
+    }
+
     public void adjustLayoutParams(int width, int height, int containerWidth, int containerHeight) {
         FrameLayout.LayoutParams oldParams = (FrameLayout.LayoutParams) mPlayerTextureView.getLayoutParams();
-        ViewGroup.LayoutParams newParams = Utils.calculateNewLayoutParams(
+        ViewGroup.LayoutParams newParams = calculateNewLayoutParams(
             oldParams, width, height, containerWidth, containerHeight, Constants.StretchOption.NONE
         );
         mPlayerTextureView.setLayoutParams(newParams);

@@ -1,5 +1,6 @@
 package com.loopme;
 
+import android.util.DisplayMetrics;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -12,48 +13,30 @@ import com.loopme.utils.Utils;
 public class MinimizedMode {
 
     private static final String LOG_TAG = MinimizedMode.class.getSimpleName();
-    private static final int DEFAULT_HEIGHT = 100;
-    private static final int DEFAULT_WIDTH = 300;
-    private final AdSpotDimensions mMinimizedViewDims = new AdSpotDimensions(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+
+    public static int MARGIN_RIGHT = 10;
+    public static int MARGIN_BOTTOM = 10;
+
+    private final AdSpotDimensions mMinimizedViewDims = new AdSpotDimensions(300, 100);
+    @NonNull
+    public AdSpotDimensions getDimensions() { return mMinimizedViewDims; }
+
     private final ViewGroup mRoot;
     private final RecyclerView mRecyclerView;
+
     private int mPosition;
-
-    public int getWidth() { return mMinimizedViewDims.getWidth(); }
-    public int getHeight() { return mMinimizedViewDims.getHeight(); }
-
-    public int getMarginRight() { return 10; }
-    public int getMarginBottom() { return 10; }
-
-    public ViewGroup getRootView() { return mRoot; }
-    public AdSpotDimensions getDimensions() { return mMinimizedViewDims; }
     public void setPosition(int position) { mPosition = position; }
 
     public MinimizedMode(@NonNull ViewGroup root, @NonNull RecyclerView recyclerView) {
         mRoot = root;
         mRecyclerView = recyclerView;
-        if (mMinimizedViewDims != null) {
-            Utils.setDimensions(mMinimizedViewDims);
-        }
+        DisplayMetrics dm = Utils.getDisplayMetrics();
+        boolean isPortrait = dm.heightPixels > dm.widthPixels;
+        int width = isPortrait ? dm.widthPixels / 2 : dm.widthPixels / 3;
+        int height = width * 2 / 3;
+        mMinimizedViewDims.setDimensions(width, height);
     }
 
-    public void setViewSize(int width, int height) {
-        int widthInPx = Utils.convertDpToPixel(width);
-        int heightInPx = Utils.convertDpToPixel(height);
-        mMinimizedViewDims.setWidth(widthInPx);
-        mMinimizedViewDims.setHeight(heightInPx);
-    }
-
-    public void addView(FrameLayout view) {
-        if (mRoot != null) {
-            mRoot.addView(view);
-        }
-    }
-
-    public void onViewClicked() {
-        if (mRecyclerView != null) {
-            mRecyclerView.smoothScrollToPosition(mPosition);
-        }
-    }
-
+    public void addView(FrameLayout view) { mRoot.addView(view); }
+    public void onViewClicked() { mRecyclerView.smoothScrollToPosition(mPosition); }
 }

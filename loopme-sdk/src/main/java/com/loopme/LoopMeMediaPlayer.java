@@ -49,10 +49,9 @@ public class LoopMeMediaPlayer {
     }
 
     public void muteVideo(boolean muted) {
-        float leftVolume = muted ? 0f : Utils.getSystemVolume();
-        float rightVolume = muted ? 0f : Utils.getSystemVolume();
-        mMediaPlayer.setVolume(leftVolume, rightVolume);
-        mListener.onVolumeChanged(leftVolume, mMediaPlayer.getCurrentPosition());
+        float volume = muted ? 0f : Utils.getSystemVolume();
+        mMediaPlayer.setVolume(volume, volume);
+        mListener.onVolumeChanged(volume, mMediaPlayer.getCurrentPosition());
     }
 
     public void releasePlayer() {

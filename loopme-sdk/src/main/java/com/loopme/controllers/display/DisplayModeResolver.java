@@ -117,7 +117,7 @@ public class DisplayModeResolver {
     }
 
     public boolean isMinimizedModeEnable() {
-        return mMinimizedMode != null && mMinimizedMode.getRootView() != null;
+        return mMinimizedMode != null;
     }
 
     private View.OnTouchListener initGestureListener() {

@@ -35,12 +35,9 @@ public class ViewControllerVpaid implements View.OnClickListener {
     }
 
     public void buildVideoAdView(FrameLayout containerView, WebView webView, Context context) {
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
-        );
         mWebView = webView;
         mWebView.setBackgroundColor(Color.TRANSPARENT);
-        mWebView.setLayoutParams(params);
+        mWebView.setLayoutParams(Constants.Layout.MATCH_PARENT);
         if (mWebView.getParent() != null) {
             ((ViewGroup) mWebView.getParent()).removeAllViews();
         }
@@ -49,7 +46,7 @@ public class ViewControllerVpaid implements View.OnClickListener {
         mEndCardLayout.setVisibility(View.GONE);
         mEndCardLayout.findViewById(R.id.close_imageview).setOnClickListener(this);
         mEndCardLayout.findViewById(R.id.replay_imageview).setOnClickListener(this);
-        mEndCardLayout.setLayoutParams(params);
+        mEndCardLayout.setLayoutParams(Constants.Layout.MATCH_PARENT);
         containerView.setBackgroundColor(Color.TRANSPARENT);
         containerView.addView(mEndCardLayout, 0);
         containerView.addView(mWebView, 1);
@@ -57,7 +54,7 @@ public class ViewControllerVpaid implements View.OnClickListener {
     }
 
     private ImageView getCloseView(Context context) {
-        int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI, context);
+        int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI);
         mCloseImageView = new ImageView(context);
         mCloseImageView.setId(CLOSE_BUTTON_ID);
         mCloseImageView.setScaleType(ImageView.ScaleType.CENTER);

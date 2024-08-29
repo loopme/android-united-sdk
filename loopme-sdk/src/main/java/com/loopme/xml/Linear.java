@@ -109,7 +109,7 @@ public class Linear {
             if (isSupportedFormat) supportedMediaFilesList.add(mediaFile);
         }
         Comparator<MediaFile> mediaSizeComparator =
-                createMediaSizeComparator(Utils.getScreenWidth() * Utils.getScreenHeight());
+                createMediaSizeComparator(Utils.getScreenWidthInPixels() * Utils.getScreenHeightInPixels());
         Collections.sort(supportedMediaFilesList, mediaSizeComparator);
         return supportedMediaFilesList;
     }
