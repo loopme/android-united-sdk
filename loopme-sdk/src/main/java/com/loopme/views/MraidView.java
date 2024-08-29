@@ -5,21 +5,20 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
-import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import com.loopme.BuildConfig;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.bridges.BridgeCommandBuilder;
 import com.loopme.bridges.MraidBridge;
-import com.loopme.controllers.MraidController;
-import com.loopme.listener.AdReadyListener;
 import com.loopme.utils.ApiLevel;
 import com.loopme.views.webclient.AdViewChromeClient;
 
@@ -31,11 +30,28 @@ public class MraidView extends WebView {
 
     private static final String LOG_TAG = MraidView.class.getSimpleName();
 
+    @SuppressLint("ClickableViewAccessibility")
     public MraidView(Context context) {
         super(context);
         configureWebSettings();
         getSettings().setAllowUniversalAccessFromFileURLs(true);
         setDefaultWebChromeClient();
+        setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                handleUserClick();
+            }
+            return false;
+        });
+    }
+
+    @SuppressLint("WebViewApiAvailability")
+    private void handleUserClick() {
+        if (ApiLevel.isApi26AndHigher()) {
+            WebViewClient client = getWebViewClient();
+            if (client instanceof MraidBridge) {
+                ((MraidBridge) client).userClicked = true;
+            }
+        }
     }
 
     public void loadHtml(String html) {
