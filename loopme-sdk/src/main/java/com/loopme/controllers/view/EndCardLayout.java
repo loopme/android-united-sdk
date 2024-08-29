@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 
 import com.loopme.Constants;
+import com.loopme.Constants.Layout;
 import com.loopme.R;
 import com.loopme.utils.ImageUtils;
 import com.loopme.utils.Utils;
@@ -30,11 +31,11 @@ public class EndCardLayout extends FrameLayout implements GestureDetector.OnGest
         super(context);
         mListener = listener;
 
-        int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI, getContext());
+        int btnSizePx = Utils.convertDpToPixel(Constants.BUTTON_SIZE_DPI);
         mEndCardImageView = new ImageView(getContext());
         mEndCardImageView.setId(View.generateViewId());
         mEndCardImageView.setScaleType(ImageView.ScaleType.FIT_XY);
-        mEndCardImageView.setLayoutParams(Utils.createMatchParentLayoutParams());
+        mEndCardImageView.setLayoutParams(Layout.MATCH_PARENT_CENTER);
 
         mCloseImageView = new ImageView(getContext());
         mCloseImageView.setId(CLOSE_BUTTON_ID);
@@ -50,7 +51,7 @@ public class EndCardLayout extends FrameLayout implements GestureDetector.OnGest
 
         buttonViews = new View[]{mReplayImageView, mCloseImageView};
 
-        setLayoutParams(Utils.createMatchParentLayoutParams());
+        setLayoutParams(Layout.MATCH_PARENT_CENTER);
         addView(mEndCardImageView, 0);
         addView(mCloseImageView, 1);
         addView(mReplayImageView, 2);

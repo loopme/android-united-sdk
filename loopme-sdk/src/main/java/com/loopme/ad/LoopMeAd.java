@@ -93,7 +93,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         context.runOnUiThread(() -> mTimers = new Timers(this));
         mAdId = IdGenerator.generateId();
         LiveDebug.init(context);
-        Utils.init(getContext());
         LoopMeTracker.init(this);
     }
 
@@ -201,7 +200,6 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
             mTimers = null;
         }
         destroyDisplayController();
-        Utils.reset();
         LoopMeAdHolder.removeAd(this);
         Logging.out(LOG_TAG, "Ad is destroyed");
     }

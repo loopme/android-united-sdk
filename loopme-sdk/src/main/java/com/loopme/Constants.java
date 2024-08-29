@@ -1,5 +1,9 @@
 package com.loopme;
 
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+
 public class Constants {
     public static final String UTF_8 = "UTF-8";
     public static final String MIME_TYPE_TEXT_HTML = "text/html";
@@ -244,5 +248,23 @@ public class Constants {
 
         public static int[] EXPANDABLE_BANNER_SIZE = {EXPAND_BANNER_WIDTH, EXPAND_BANNER_HEIGHT};
         public static int[] MPU_BANNER_SIZE = {MPU_BANNER_WIDTH, MPU_BANNER_HEIGHT};
+    }
+
+    public static class Layout {
+        public static final ViewGroup.LayoutParams MATCH_PARENT = new ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        );
+
+        public static final ViewGroup.LayoutParams MATCH_PARENT_CENTER = new FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            Gravity.CENTER
+        );
+
+        public static final ViewGroup.LayoutParams WRAP_CONTENT_END = new FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.END
+        );
+
     }
 }

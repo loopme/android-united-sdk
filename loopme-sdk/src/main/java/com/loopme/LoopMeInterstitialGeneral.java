@@ -103,7 +103,7 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
 
     @Override
     public AdSpotDimensions getAdSpotDimensions() {
-        return new AdSpotDimensions(Utils.getScreenWidth(), Utils.getScreenHeight());
+        return new AdSpotDimensions(Utils.getScreenWidthInPixels(), Utils.getScreenHeightInPixels());
     }
 
     /**

@@ -4,12 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 
 import com.loopme.AdUtils;
 import com.loopme.Constants;
+import com.loopme.Constants.Layout;
 import com.loopme.Logging;
 import com.loopme.LoopMeBannerGeneral;
 import com.loopme.MraidOrientation;
@@ -33,16 +33,6 @@ public class MraidController implements MraidBridgeListener {
 
     private int mWidth;
     private int mHeight;
-
-    private final ViewGroup.LayoutParams relativeMatchParent = new RelativeLayout.LayoutParams(
-        RelativeLayout.LayoutParams.MATCH_PARENT,
-        RelativeLayout.LayoutParams.MATCH_PARENT
-    );
-
-    private final ViewGroup.LayoutParams frameMatchParent = new FrameLayout.LayoutParams(
-        FrameLayout.LayoutParams.MATCH_PARENT,
-        FrameLayout.LayoutParams.MATCH_PARENT
-    );
 
     private MraidOrientation mForceOrientation = MraidOrientation.NONE;
 
@@ -181,13 +171,13 @@ public class MraidController implements MraidBridgeListener {
         }
     }
 
-    public void onRebuildView(@NonNull FrameLayout containerView) { buildView(containerView, relativeMatchParent); }
-    public void buildMraidContainer(@NonNull FrameLayout containerView) { buildView(containerView, frameMatchParent); }
+    public void onRebuildView(@NonNull FrameLayout containerView) { buildView(containerView); }
+    public void buildMraidContainer(@NonNull FrameLayout containerView) { buildView(containerView); }
 
-    private void buildView(@NonNull FrameLayout containerView, ViewGroup.LayoutParams layoutParams) {
+    private void buildView(@NonNull FrameLayout containerView) {
         if (mMraidView.getParent() != null) {
             ((ViewGroup) mMraidView.getParent()).removeView(mMraidView);
         }
-        containerView.addView(mMraidView, layoutParams);
+        containerView.addView(mMraidView, Layout.MATCH_PARENT);
     }
 }

@@ -24,6 +24,7 @@ import com.iab.omid.library.loopme.adsession.media.MediaEvents;
 import com.loopme.Logging;
 import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.LoopMeMediaPlayer;
+import com.loopme.ad.AdParams;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.view.ViewControllerVast;
@@ -36,6 +37,7 @@ import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.ApiLevel;
 import com.loopme.utils.Utils;
 import com.loopme.vast.TrackingEvent;
+import com.loopme.xml.Tracking;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -394,6 +396,48 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         return false;
     }
 
+    private static List<TrackingEvent> createProgressPoints(int duration, AdParams adParams) {
+        List<TrackingEvent> trackingEventsList = new ArrayList<>();
+
+        for (String url : adParams.getImpressionsList()) {
+            trackingEventsList.add(new TrackingEvent(url));
+        }
+
+        for (Tracking tracking : adParams.getTrackingEventsList()) {
+            if (tracking == null) {
+                continue;
+            }
+            TrackingEvent event = new TrackingEvent(tracking.getText());
+            if (tracking.isCreativeViewEvent()) {
+                event.timeMillis = 0;
+                trackingEventsList.add(event);
+            }
+            if (tracking.isStartEvent()) {
+                event.timeMillis = 0;
+                trackingEventsList.add(event);
+            }
+            if (tracking.isFirstQuartileEvent()) {
+                event.timeMillis = duration / 4;
+                trackingEventsList.add(event);
+            }
+            if (tracking.isMidpointEvent()) {
+                event.timeMillis = duration / 2;
+                trackingEventsList.add(event);
+            }
+            if (tracking.isThirdQuartileEvent()) {
+                event.timeMillis = duration * 3 / 4;
+                trackingEventsList.add(event);
+            }
+            if (tracking.isProgressEvent() && tracking.getOffset() != null) {
+                event.timeMillis = tracking.getOffset().contains("%") ?
+                        duration * Utils.parsePercent(adParams.getSkipTime()) / 100 :
+                        Utils.parseDuration(tracking.getOffset()) * 1000;
+                trackingEventsList.add(event);
+            }
+        }
+        return trackingEventsList;
+    }
+
     @Override
     public void onPrepared(MediaPlayer mp) {
         playerPrepared = true;
@@ -402,7 +446,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         boolean isRewarded = mLoopMeAd instanceof LoopMeInterstitialGeneral &&
                 ((LoopMeInterstitialGeneral) mLoopMeAd).isRewarded();
         mSkipTimeMillis = isRewarded ? SKIP_DELAY_REWARDED : SKIP_DELAY_INTERSTITIAL;
-        mTrackingEventsList = Utils.createProgressPoints(duration, mAdParams);
+        mTrackingEventsList = createProgressPoints(duration, mAdParams);
         mViewControllerVast.setMaxProgress(duration);
         resumeMediaPlayer(mViewControllerVast.getSurface());
         onAdPreparedEvent(mp, mViewControllerVast.getPlayerView());

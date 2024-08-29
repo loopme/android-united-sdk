@@ -10,8 +10,8 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 
 import com.loopme.Constants;
+import com.loopme.Constants.Layout;
 import com.loopme.controllers.display.DisplayControllerVast;
-import com.loopme.utils.Utils;
 
 public class ViewControllerVast {
 
@@ -35,7 +35,7 @@ public class ViewControllerVast {
         mPlayerLayout = new PlayerLayout(context, webView, initOnPlayerListener());
         mEndCardLayout = new EndCardLayout(context, initOnEndCardListener());
         mAdLayout = new FrameLayout(containerView.getContext());
-        mAdLayout.setLayoutParams(Utils.createMatchParentLayoutParams());
+        mAdLayout.setLayoutParams(Layout.MATCH_PARENT_CENTER);
         mAdLayout.addView(mPlayerLayout);
         mAdLayout.addView(mEndCardLayout);
 

@@ -11,6 +11,8 @@ import android.text.TextUtils;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.NonNull;
+
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.MinimizedMode;
@@ -35,15 +37,12 @@ public class UiUtils {
         RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) bannerView.getLayoutParams();
         lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        lp.bottomMargin = minimizedMode.getMarginBottom();
-        lp.rightMargin = minimizedMode.getMarginRight();
+        lp.bottomMargin = MinimizedMode.MARGIN_BOTTOM;
+        lp.rightMargin = MinimizedMode.MARGIN_RIGHT;
         bannerView.setLayoutParams(lp);
     }
 
-    public static FrameLayout createFrameLayout(Context context, AdSpotDimensions dimensions) {
-        if (context == null || dimensions == null) {
-            return null;
-        }
+    public static FrameLayout createFrameLayout(@NonNull Context context, @NonNull AdSpotDimensions dimensions) {
         FrameLayout frameLayout = new FrameLayout(context);
         frameLayout.setLayoutParams(new FrameLayout.LayoutParams(
             dimensions.getWidth(), dimensions.getHeight()

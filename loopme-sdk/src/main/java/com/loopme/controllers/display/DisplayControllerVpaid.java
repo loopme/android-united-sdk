@@ -22,7 +22,6 @@ import com.loopme.controllers.interfaces.VastVpaidDisplayController;
 import com.loopme.controllers.view.ViewControllerVpaid;
 import com.loopme.models.BridgeMethods;
 import com.loopme.models.Errors;
-import com.loopme.models.Message;
 import com.loopme.time.SimpleTimer;
 import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
@@ -375,7 +374,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
                     break;
                 }
                 case VPAID_RESIZE_AD: {
-                    mVpaidBridge.resizeAd(Utils.getWidth(), Utils.getHeight(), "'fullscreen'");
+                    mVpaidBridge.resizeAd(Utils.getScreenWidthInDp(), Utils.getScreenHeightInDp(), "'fullscreen'");
                     break;
                 }
                 case VPAID_STOP_AD: {

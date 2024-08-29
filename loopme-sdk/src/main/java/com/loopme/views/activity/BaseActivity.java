@@ -8,9 +8,7 @@ import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
@@ -23,6 +21,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.loopme.Constants;
+import com.loopme.Constants.Layout;
 import com.loopme.Logging;
 import com.loopme.R;
 import com.loopme.ad.LoopMeAd;
@@ -126,9 +125,7 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
         dc.tryAddOmidFriendlyObstructionCloseButton(mMraidCloseButton);
 
         new Handler().postDelayed(() -> {
-            mLoopMeContainerView.addView(mMraidCloseButton, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.END
-            ));
+            mLoopMeContainerView.addView(mMraidCloseButton, Layout.WRAP_CONTENT_END);
         }, SKIP_DELAY_INTERSTITIAL);
     }
 

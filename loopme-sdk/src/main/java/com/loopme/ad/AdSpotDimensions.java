@@ -7,6 +7,14 @@ public class AdSpotDimensions {
 
     public static final AdSpotDimensions DEFAULT_DIMENSIONS = new AdSpotDimensions(0, 0);
 
+    private int width;
+    public int getWidth() { return width; }
+    public void setWidth(int width) { this.width = width; }
+
+    private int height;
+    public int getHeight() { return height; }
+    public void setHeight(int height) { this.height = height; }
+
     public AdSpotDimensions(AdSpotDimensions adSpotDimensions) {
         this.width = adSpotDimensions.width;
         this.height = adSpotDimensions.height;
@@ -17,13 +25,15 @@ public class AdSpotDimensions {
         this.height = height;
     }
 
-    private int width;
-    public int getWidth() { return width; }
-    public void setWidth(int width) { this.width = width; }
+    public void setDimensions(AdSpotDimensions dimension) {
+        this.width = dimension.width;
+        this.height = dimension.height;
+    }
 
-    private int height;
-    public int getHeight() { return height; }
-    public void setHeight(int height) { this.height = height; }
+    public void setDimensions(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -60,7 +70,7 @@ public class AdSpotDimensions {
     }
 
     public static AdSpotDimensions getFullscreen() {
-        return new AdSpotDimensions(Utils.getScreenWidth(), Utils.getScreenHeight());
+        return new AdSpotDimensions(Utils.getScreenWidthInPixels(), Utils.getScreenHeightInPixels());
     }
 
 }
