@@ -5,7 +5,6 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
 
-import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.tracker.partners.LoopMeTracker;
 
@@ -84,12 +83,6 @@ public final class LoopMeBanner extends AdWrapper {
         }
     }
 
-    public void setMinimizedMode(MinimizedMode mode) {
-        if (mFirstLoopMeAd instanceof LoopMeBannerGeneral) {
-            ((LoopMeBannerGeneral) mFirstLoopMeAd).setMinimizedMode(mode);
-        }
-    }
-
     public FrameLayout getBannerView() { return mBannerView; }
 
     /**
@@ -161,26 +154,6 @@ public final class LoopMeBanner extends AdWrapper {
         );
     }
 
-    public void showNativeVideo() {
-        if (!isShowing()) {
-            if (isReady(mFirstLoopMeAd)) {
-                if (mFirstLoopMeAd instanceof LoopMeBannerGeneral) {
-                    ((LoopMeBannerGeneral) mFirstLoopMeAd).showNativeVideo();
-                }
-            }
-        }
-    }
-
-    public void switchToMinimizedMode() {
-        switchToMinimizedMode(mFirstLoopMeAd);
-    }
-
-    public void switchToNormalMode() {
-        if (mFirstLoopMeAd instanceof LoopMeBannerGeneral) {
-            ((LoopMeBannerGeneral) mFirstLoopMeAd).switchToNormalMode();
-        }
-    }
-
     @Override
     public Constants.AdFormat getAdFormat() {
         return Constants.AdFormat.BANNER;
@@ -217,16 +190,6 @@ public final class LoopMeBanner extends AdWrapper {
     public void removeListener() {
         super.removeListener();
         mMainAdListener = null;
-    }
-
-    public void switchToMinimizedMode(LoopMeAd banner) {
-        if (banner instanceof LoopMeBannerGeneral) {
-            ((LoopMeBannerGeneral) banner).switchToMinimizedMode();
-        }
-    }
-
-    public boolean isFullScreenMode() {
-        return mFirstLoopMeAd != null && mFirstLoopMeAd.isFullScreen();
     }
 
     public void load(String url) {

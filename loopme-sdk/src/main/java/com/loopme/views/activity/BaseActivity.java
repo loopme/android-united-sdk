@@ -61,8 +61,6 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
             public void onDestroyBroadcast() {
                 Logging.out(LOG_TAG, "onDestroyBroadcast");
                 mIsDestroyBroadcastReceived = true;
-                if (mLoopMeAd.isBanner())
-                    ((DisplayControllerLoopMe) mDisplayController).switchToPreviousMode();
                 unregisterDestroyReceiver();
                 finish();
             }
@@ -222,7 +220,6 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
             return;
         DisplayControllerLoopMe dc = (DisplayControllerLoopMe) mDisplayController;
         dc.collapseMraidBanner();
-        dc.switchToPreviousMode();
         dc.onAdExitedFullScreenEvent();
         super.onBackPressed();
     }
