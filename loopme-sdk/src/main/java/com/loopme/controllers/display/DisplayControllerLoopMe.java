@@ -82,6 +82,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
         boolean isNativeAd = mLoopMeAd.isVastAd() && !mLoopMeAd.isVpaidAd() && !mLoopMeAd.isMraidAd();
         onInitTracker(isNativeAd ? AdType.NATIVE : AdType.WEB);
         preloadHtml();
+        mLoopMeAd.onAdLoadSuccess();
     }
 
     @Override

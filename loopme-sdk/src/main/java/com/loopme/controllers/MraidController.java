@@ -157,7 +157,6 @@ public class MraidController implements MraidBridgeListener {
     public void onLoadSuccess() {
         mMraidView.setState(Constants.MraidState.DEFAULT);
         mMraidView.notifyReady();
-        mLoopMeAd.onAdLoadSuccess();
     }
 
     @Override
