@@ -12,6 +12,7 @@ import com.ironsource.mediationsdk.model.NetworkSettings;
 import com.loopme.IntegrationType;
 import com.loopme.LoopMeInterstitial;
 import com.loopme.common.LoopMeError;
+import com.loopme.tracker.partners.LoopMeTracker;
 
 @Keep
 public class LoopmeCustomInterstitial extends BaseInterstitial<LoopmeCustomAdapter> {
@@ -28,6 +29,7 @@ public class LoopmeCustomInterstitial extends BaseInterstitial<LoopmeCustomAdapt
 
     @Override
     public void loadAd(AdData adData, Activity activity, InterstitialAdListener interstitialAdListener) {
+//        LoopMeTracker.post(new LoopMeError(333, "wjw_test custom message", "wjw_test_type"));
         try {
             this.mInterstitialListener = interstitialAdListener;
             String appkey = adData.getConfiguration().get("instancekey").toString();

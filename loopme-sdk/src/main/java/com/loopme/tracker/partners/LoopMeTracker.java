@@ -45,6 +45,10 @@ public class LoopMeTracker {
         sPackageId = loopMeAd.getContext().getPackageName();
     }
 
+    public static void setPackageName(@NonNull String packageName) {
+        sPackageId = packageName;
+    }
+
     public static void initVastErrorUrl(List<String> errorUrlList) {
         sVastErrorUrlSet.addAll(errorUrlList);
     }
@@ -150,7 +154,7 @@ public class LoopMeTracker {
                 }
                 result.append("=");
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    result.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
+                    result.append(URLEncoder.encode(entry.getValue() == null ? "" : entry.getValue() , StandardCharsets.UTF_8));
                 } else {
                     result.append(URLEncoder.encode(entry.getValue()));
                 }

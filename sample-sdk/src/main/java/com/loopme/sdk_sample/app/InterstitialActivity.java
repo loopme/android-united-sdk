@@ -9,6 +9,7 @@ import com.loopme.LoopMeInterstitial;
 import com.loopme.sdk_sample.R;
 import com.loopme.sdk_sample.databinding.ActivityInterstitialBinding;
 import com.loopme.common.LoopMeError;
+import com.loopme.tracker.partners.LoopMeTracker;
 
 public class InterstitialActivity extends AppCompatActivity {
 
@@ -47,6 +48,7 @@ public class InterstitialActivity extends AppCompatActivity {
 
     private void onLoadClicked() {
         binding.loadButton.setEnabled(false);
+//        LoopMeTracker.post(new LoopMeError(333, "test custom wjw message", "test_type"));
         if (mInterstitial != null) {
             mInterstitial.destroy();
             mInterstitial = null;

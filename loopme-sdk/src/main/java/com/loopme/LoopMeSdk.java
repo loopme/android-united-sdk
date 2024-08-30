@@ -8,9 +8,14 @@ import android.os.Looper;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 
+import com.loopme.debugging.Params;
 import com.loopme.gdpr.GdprChecker;
 import com.loopme.om.OmidHelper;
 import com.loopme.utils.Utils;
+import com.loopme.request.RequestUtils;
+import com.loopme.tracker.partners.LoopMeTracker;
+
+import java.util.HashMap;
 
 /**
  * Created by katerina on 4/27/18.
@@ -68,6 +73,8 @@ public final class LoopMeSdk {
     public static void initialize(
         @NonNull Context context, @NonNull Configuration config, @NonNull LoopMeSdkListener sdkInitListener
     ) {
+        System.out.println("@@@wjw start");
+        long start = System.currentTimeMillis();
         if (Looper.getMainLooper() != Looper.myLooper())
             throw new IllegalStateException("Must be called on the main thread");
 
@@ -85,11 +92,64 @@ public final class LoopMeSdk {
         IABPreferences.getInstance(context).setCoppa(configuration.getCoppa());
 
         // Omid init.
+        long omidStart = System.currentTimeMillis();
         OmidHelper.init(context.getApplicationContext());
+        long omidEnd = System.currentTimeMillis();
 
         // Gdpr.
         GdprChecker.start(context, configuration.getPublisherConsent());
+        long end = System.currentTimeMillis();
+
         sdkInitListener.onSdkInitializationSuccess();
+
+        System.out.printf("@@@wjw omidTime: %d\n", omidEnd - omidStart);
+        System.out.printf("@@@wjw initTime: %d\n", end - start);
+
+
+//this part is for testing puropses
+        // need to change the error_type to custom
+        sendAvailableDataToKibana("sdk_init_time_alert_available", "SDK init time alert > 100ms", end - start);
+        gatherInfoAndSendToKIbana(context, "sdk_init_time_alert_gathered", "SDK init time alert > 100ms", end - start);
+
+// until here
+
+        if (omidEnd - omidStart > 100) {
+            // log to kibana
+            gatherInfoAndSendToKIbana(context, "sdk_init_time_alert", "OMID init time alert > 100ms", omidEnd - omidStart);
+
+        }
+        if (end - start > 100) {
+            //log to kibana
+            gatherInfoAndSendToKIbana(context, "sdk_init_time_alert", "SDK init time alert > 100ms", end - start);
+
+        }
+    }
+
+    private static void sendAvailableDataToKibana(String errorType, String errorMessage, long initTime) {
+        HashMap<String, String> errorInfo = new HashMap<>();
+        errorInfo.put(Params.ERROR_TYPE, errorType);
+        errorInfo.put(Params.ERROR_MSG, errorMessage);
+        errorInfo.put("error_info_timeout", String.valueOf(initTime));
+        LoopMeTracker.post(errorInfo);
+
+    }
+
+    private static void gatherInfoAndSendToKIbana(@NonNull Context context, String errorType, String errorMessage, long initTime) {
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                // get and set deviceId  - this one operation needs to be done on a worker thread
+                RequestUtils.setAdvertisingIdInfo(context);
+                HashMap<String, String> errorInfo = new HashMap<>();
+                errorInfo.put(Params.ERROR_TYPE, errorType);
+                errorInfo.put(Params.ERROR_MSG, errorMessage);
+                errorInfo.put("timeout", String.valueOf(initTime));
+                //add package
+                LoopMeTracker.setPackageName(context.getPackageName());
+                LoopMeTracker.post(errorInfo);
+            }
+        }.start();
     }
 
 }
