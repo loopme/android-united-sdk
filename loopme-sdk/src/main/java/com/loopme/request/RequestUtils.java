@@ -248,7 +248,7 @@ public class RequestUtils {
         mHeight = adSize[1];
     }
 
-    public static void setAdvertisingIdInfo(final Context context) {
+    private static void setAdvertisingIdInfo(final Context context) {
         RequestParamsUtils.AdvAdInfo advAdInfo = RequestParamsUtils.getAdvertisingIdInfo(context);
         mDnt = advAdInfo.getDoNotTrackAsString();
         mIfa = advAdInfo.getAdvId();
