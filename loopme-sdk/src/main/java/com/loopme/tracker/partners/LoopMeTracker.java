@@ -34,7 +34,6 @@ import java.util.Set;
 public class LoopMeTracker {
     private static final String LOG_TAG = LoopMeTracker.class.getSimpleName();
 
-    private static String sPackageId;
     private static String sAppKey;
     private static final Set<String> sVastErrorUrlSet = new HashSet<>();
 
@@ -42,11 +41,6 @@ public class LoopMeTracker {
 
     public static void init(@NonNull LoopMeAd loopMeAd) {
         sAppKey = loopMeAd.getAppKey();
-        sPackageId = loopMeAd.getContext().getPackageName();
-    }
-
-    public static void setPackageName(@NonNull String packageName) {
-        sPackageId = packageName;
     }
 
     public static void initVastErrorUrl(List<String> errorUrlList) {
@@ -110,7 +104,7 @@ public class LoopMeTracker {
         params.put(Params.DEVICE_MANUFACTURER, Build.MANUFACTURER);
         params.put(Params.DEVICE_ID, RequestUtils.getIfa());
         params.put(Params.APP_KEY, sAppKey);
-        params.put(Params.PACKAGE_ID, sPackageId);
+        params.put(Params.PACKAGE_ID, Utils.getsPackageName());
         params.put(Params.MEDIATION, LoopMeSdk.getConfiguration().getMediation());
         params.put(Params.MEDIATION_SDK_VERSION, LoopMeSdk.getConfiguration().getMediationSdkVersion());
         params.put(Params.ADAPTER_VERSION, LoopMeSdk.getConfiguration().getAdapterVersion());

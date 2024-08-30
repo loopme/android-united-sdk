@@ -31,6 +31,7 @@ public class Utils {
     private static AudioManager sAudioManager;
     private static WindowManager sWindowManager;
     private static PackageManager sPackageManager;
+    private static String sPackageName;
 
     public static String sUserAgent;
     public static String getUserAgent() { return sUserAgent; }
@@ -45,6 +46,7 @@ public class Utils {
             sPackageManager = context.getPackageManager();
             sAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
             sWindowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            sPackageName = context.getPackageName();
         }
     }
 
@@ -78,6 +80,10 @@ public class Utils {
     public static int getScreenWidthInDp() {
         float density = sResources != null ? sResources.getDisplayMetrics().density : 1;
         return (int) (getDisplayMetrics().widthPixels / density);
+    }
+
+    public static String getsPackageName() {
+        return sPackageName;
     }
 
     private static List<String> getInstalledPackagesAsStringsList() {
