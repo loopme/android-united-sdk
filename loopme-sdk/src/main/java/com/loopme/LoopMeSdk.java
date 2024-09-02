@@ -112,7 +112,7 @@ public final class LoopMeSdk {
         HashMap<String, String> errorInfo = new HashMap<>();
         errorInfo.put(Params.ERROR_TYPE, Constants.ErrorType.CUSTOM);
         errorInfo.put(Params.ERROR_MSG, errorMessage);
-        errorInfo.put("timeout", String.valueOf(initTime));
+        errorInfo.put(Params.TIMEOUT, String.valueOf(initTime));
         LoopMeTracker.post(errorInfo);
     }
 
