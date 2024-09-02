@@ -14,8 +14,6 @@ import com.loopme.controllers.display.DisplayControllerLoopMe;
 import com.loopme.time.TimersType;
 import com.loopme.tracker.partners.LoopMeTracker;
 
-import java.util.HashMap;
-
 /**
  * The `LoopMeBanner` class provides facilities to display a custom size ads
  * during natural transition points in your application.
@@ -31,15 +29,8 @@ public class LoopMeBannerGeneral extends LoopMeAd {
 
     private volatile FrameLayout mBannerView;
 
-    private boolean mIsVideoFinished;
     private int mWidth = 0;
     private int mHeight = 0;
-
-    public void setMinimizedMode(MinimizedMode mode) {
-        if (isLoopMeController()) {
-            ((DisplayControllerLoopMe) mDisplayController).setMinimizedMode(mode);
-        }
-    }
 
     public interface Listener {
         void onLoopMeBannerLoadSuccess(LoopMeBannerGeneral banner);
@@ -119,16 +110,6 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         mAdListener = null;
     }
 
-    void showNativeVideo() {
-        if (isReady() && isViewBinded() && !isShowing()) {
-            showInternal();
-            Logging.out(LOG_TAG, "Banner did start showing ad (native)");
-        } else {
-            HashMap<String, String> errorInfo = packErrorInfo("Banner is not ready");
-            LoopMeTracker.post(errorInfo);
-        }
-    }
-
     @Override
     public void show() {
         if (isReady() && isViewBinded() && !isShowing()) {
@@ -151,7 +132,6 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         mContainerView = mBannerView;
         buildAdView();
         mBannerView.setVisibility(View.VISIBLE);
-        mIsVideoFinished = false;
         if (mAdListener != null) {
             mAdListener.onLoopMeBannerShow(this);
         }
@@ -167,25 +147,8 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         }
     }
 
-    public void switchToMinimizedMode() {
-        if (isLoopMeController() && isShowing() && !mIsVideoFinished) {
-            DisplayControllerLoopMe displayControllerLoopMe = (DisplayControllerLoopMe) getDisplayController();
-            if (displayControllerLoopMe.isMinimizedModeEnable()) {
-                displayControllerLoopMe.switchToMinimizedMode();
-            } else {
-                pause();
-            }
-        }
-    }
-
     private boolean isLoopMeController() {
         return getDisplayController() instanceof DisplayControllerLoopMe;
-    }
-
-    public void switchToNormalMode() {
-        if (isLoopMeAd() && getDisplayController() != null && isShowing()) {
-            ((DisplayControllerLoopMe) getDisplayController()).switchToNormalMode();
-        }
     }
 
     @NonNull
@@ -304,8 +267,6 @@ public class LoopMeBannerGeneral extends LoopMeAd {
      */
     @Override
     public void onAdVideoDidReachEnd() {
-        mIsVideoFinished = true;
-        switchToNormalMode();
         if (mAdListener != null) {
             mAdListener.onLoopMeBannerVideoDidReachEnd(this);
         }

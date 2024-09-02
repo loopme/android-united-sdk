@@ -18,7 +18,6 @@ import com.iab.omid.library.loopme.adsession.FriendlyObstructionPurpose;
 import com.loopme.Constants;
 import com.loopme.Logging;
 import com.loopme.LoopMeBannerGeneral;
-import com.loopme.MinimizedMode;
 import com.loopme.ViewAbilityUtils;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.LoopMeAd;
@@ -38,7 +37,6 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     private final AdParams mAdParams;
     private final MraidView mMraidView;
     private final MraidController mMraidController;
-    private final DisplayModeResolver mDisplayModeResolver;
 
     private AdSession omidAdSession;
     private OmidEventTrackerWrapper omidEventTrackerWrapper;
@@ -48,7 +46,6 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
         super(loopMeAd);
         mLoopMeAd = loopMeAd;
         mAdParams = mLoopMeAd.getAdParams();
-        mDisplayModeResolver = new DisplayModeResolver(this, loopMeAd);
         mMraidView = new MraidView(mLoopMeAd.getContext());
         mMraidController = new MraidController(mLoopMeAd, mMraidView);
         mMraidView.setWebViewClient(new MraidBridge(mMraidController, this::tryCreateOmidAdSession));
@@ -190,7 +187,6 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
         needWaitOmidJsLoad = false;
         mMraidController.destroyExpandedView();
         mMraidView.destroy();
-        mDisplayModeResolver.destroy();
     }
 
     @Override
@@ -219,7 +215,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
 
     @Override
     public boolean isFullScreen() {
-        return mDisplayModeResolver.isFullScreenMode() || mMraidController.isExpanded();
+        return mMraidController.isExpanded();
     }
 
     @Override
@@ -239,12 +235,6 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
             omidEventTrackerWrapper.sendOneTimeImpression();
     }
 
-    public void switchToPreviousMode() {
-        if (mLoopMeAd.isBanner()) {
-            mDisplayModeResolver.switchToPreviousMode();
-        }
-    }
-
     public void buildView(@NonNull FrameLayout containerView) {
         if (mLoopMeAd.isMraidAd()) {
             onBuildMraidView(containerView);
@@ -255,11 +245,5 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
     public WebView getWebView() { return mMraidView; }
 
     public void closeMraidAd() { mMraidController.close(); }
-    public void setMinimizedMode(MinimizedMode mode) { mDisplayModeResolver.setMinimizedMode(mode); }
-    public boolean isMinimizedModeEnable() { return mDisplayModeResolver.isMinimizedModeEnable(); }
-    public void switchToMinimizedMode() { mDisplayModeResolver.switchToMinimizedMode(); }
-    public void switchToNormalMode() { mDisplayModeResolver.switchToNormalMode(); }
-
-    public void dismissAd() { mLoopMeAd.dismiss(); }
     public void dismiss() { setWebViewState(Constants.WebviewState.CLOSED); }
 }
