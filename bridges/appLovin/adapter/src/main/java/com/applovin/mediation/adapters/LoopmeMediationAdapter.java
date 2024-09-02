@@ -134,8 +134,8 @@ public class LoopmeMediationAdapter
 
             container.setLayoutParams(
                 new FrameLayout.LayoutParams(
-                    maxAdFormat.getAdaptiveSize(activity).getWidth(),
-                    maxAdFormat.getAdaptiveSize(activity).getHeight()
+                    maxAdFormat.getSize().getWidth(),
+                    maxAdFormat.getSize().getHeight()
                 )
             );
             mBanner.bindView(container);
