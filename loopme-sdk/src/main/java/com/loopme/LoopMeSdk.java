@@ -8,9 +8,13 @@ import android.os.Looper;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 
+import com.loopme.debugging.Params;
 import com.loopme.gdpr.GdprChecker;
 import com.loopme.om.OmidHelper;
 import com.loopme.utils.Utils;
+import com.loopme.tracker.partners.LoopMeTracker;
+
+import java.util.HashMap;
 
 /**
  * Created by katerina on 4/27/18.
@@ -68,6 +72,7 @@ public final class LoopMeSdk {
     public static void initialize(
         @NonNull Context context, @NonNull Configuration config, @NonNull LoopMeSdkListener sdkInitListener
     ) {
+        long start = System.currentTimeMillis();
         if (Looper.getMainLooper() != Looper.myLooper())
             throw new IllegalStateException("Must be called on the main thread");
 
@@ -85,11 +90,30 @@ public final class LoopMeSdk {
         IABPreferences.getInstance(context).setCoppa(configuration.getCoppa());
 
         // Omid init.
+        long omidStart = System.currentTimeMillis();
         OmidHelper.init(context.getApplicationContext());
+        long omidEnd = System.currentTimeMillis();
 
         // Gdpr.
         GdprChecker.start(context, configuration.getPublisherConsent());
+        long end = System.currentTimeMillis();
+
         sdkInitListener.onSdkInitializationSuccess();
+
+        if (omidEnd - omidStart > 100) {
+            sendInitTimeAlert("OMID init time alert > 100ms", omidEnd - omidStart);
+        }
+        if (end - start > 100) {
+            sendInitTimeAlert( "SDK init time alert > 100ms", end - start);
+        }
+    }
+
+    private static void sendInitTimeAlert(String errorMessage, long initTime) {
+        HashMap<String, String> errorInfo = new HashMap<>();
+        errorInfo.put(Params.ERROR_TYPE, Constants.ErrorType.CUSTOM);
+        errorInfo.put(Params.ERROR_MSG, errorMessage);
+        errorInfo.put(Params.TIMEOUT, String.valueOf(initTime));
+        LoopMeTracker.post(errorInfo);
     }
 
 }
