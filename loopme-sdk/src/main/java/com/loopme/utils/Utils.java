@@ -9,16 +9,14 @@ import android.media.AudioManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.WebSettings;
-import android.widget.FrameLayout;
+import kotlin.Lazy;
+
 
 import androidx.annotation.NonNull;
 
 import com.loopme.Logging;
-import com.loopme.ad.AdSpotDimensions;
 import com.loopme.request.AES;
 
 import java.util.ArrayList;
@@ -26,70 +24,66 @@ import java.util.List;
 
 // TODO. Refactor.
 public class Utils {
+    private static Context sContext;
     private static final String LOG_TAG = Utils.class.getSimpleName();
-    private static Resources sResources;
-    private static AudioManager sAudioManager;
-    private static WindowManager sWindowManager;
-    private static PackageManager sPackageManager;
-    private static String sPackageName;
-
-    public static String sUserAgent;
-    public static String getUserAgent() { return sUserAgent; }
+    private static final Lazy<Resources> sResources = kotlin.LazyKt.lazy(() -> sContext.getResources());
+    private static final Lazy<AudioManager> sAudioManager = kotlin.LazyKt.lazy(() -> (AudioManager) sContext.getSystemService(Context.AUDIO_SERVICE));
+    private static final Lazy<WindowManager> sWindowManager = kotlin.LazyKt.lazy(() -> (WindowManager) sContext.getSystemService(Context.WINDOW_SERVICE));
+    private static final Lazy<PackageManager> sPackageManager = kotlin.LazyKt.lazy(() -> sContext.getPackageManager());
+    private static final Lazy<String> sPackageName = kotlin.LazyKt.lazy(() -> sContext.getPackageName());
+    private static final Lazy<String> sUserAgent = kotlin.LazyKt.lazy(() -> WebSettings.getDefaultUserAgent(sContext));
 
     private static boolean isInitialized = false;
 
     public static void init(@NonNull Context context) {
         if (!isInitialized) {
             isInitialized = true;
-            sUserAgent = WebSettings.getDefaultUserAgent(context);
-            sResources = context.getResources();
-            sPackageManager = context.getPackageManager();
-            sAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-            sWindowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-            sPackageName = context.getPackageName();
+            sContext = context.getApplicationContext();
         }
     }
 
+    public static String getUserAgent() { return sUserAgent.getValue(); }
+
     public static DisplayMetrics getDisplayMetrics() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
-        if (sWindowManager != null) {
-            sWindowManager.getDefaultDisplay().getMetrics(displayMetrics);
+        if (sWindowManager.getValue() != null) {
+            sWindowManager.getValue().getDefaultDisplay().getMetrics(displayMetrics);
         }
         return displayMetrics;
     }
 
     public static int getScreenWidthInPixels() {
-        if (sWindowManager == null) return 0;
+        if (sWindowManager.getValue() == null) return 0;
         Point size = new Point();
-        sWindowManager.getDefaultDisplay().getSize(size);
+        sWindowManager.getValue().getDefaultDisplay().getSize(size);
         return size.x;
     }
 
     public static int getScreenHeightInPixels() {
-        if (sWindowManager == null) return 0;
+        if (sWindowManager.getValue() == null) return 0;
         Point size = new Point();
-        sWindowManager.getDefaultDisplay().getSize(size);
+        sWindowManager.getValue().getDefaultDisplay().getSize(size);
         return size.y;
     }
 
     public static int getScreenHeightInDp() {
-        float density = sResources != null ? sResources.getDisplayMetrics().density : 1;
+        float density = sResources.getValue() != null ? sResources.getValue().getDisplayMetrics().density : 1;
         return (int) (getDisplayMetrics().heightPixels / density);
     }
 
     public static int getScreenWidthInDp() {
-        float density = sResources != null ? sResources.getDisplayMetrics().density : 1;
+        float density = sResources.getValue() != null ? sResources.getValue().getDisplayMetrics().density : 1;
         return (int) (getDisplayMetrics().widthPixels / density);
     }
 
-    public static String getsPackageName() {
-        return sPackageName;
+    public static String getPackageName() {
+        return sPackageName.getValue();
     }
 
     private static List<String> getInstalledPackagesAsStringsList() {
         // TODO: getInstalledPackages - As of Android 11, this method no longer returns information about all apps;
-        List<PackageInfo> installedPackages = sPackageManager == null ?
-                new ArrayList<>() : sPackageManager.getInstalledPackages(0);
+        List<PackageInfo> installedPackages = sPackageManager.getValue() == null ?
+                new ArrayList<>() : sPackageManager.getValue().getInstalledPackages(0);
         List<String> packageNames = new ArrayList<>();
         for (PackageInfo packageInfo : installedPackages) {
             packageNames.add(packageInfo.packageName);
@@ -148,15 +142,15 @@ public class Utils {
     }
 
     public static float getSystemVolume() {
-        if (sAudioManager == null) return 1.0f;
-        int volumeLevel = sAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        int max = sAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        if (sAudioManager.getValue() == null) return 1.0f;
+        int volumeLevel = sAudioManager.getValue().getStreamVolume(AudioManager.STREAM_MUSIC);
+        int max = sAudioManager.getValue().getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         return (float) Math.round((float) (volumeLevel * 100) / max) / 100;
     }
 
     public static int convertDpToPixel(float dp) {
-        if (sResources == null) return 0;
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, sResources.getDisplayMetrics());
+        if (sResources.getValue() == null) return 0;
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, sResources.getValue().getDisplayMetrics());
     }
 
     public interface RetrieveOperation<T> {
