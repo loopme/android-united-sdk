@@ -37,12 +37,12 @@ public class PlayerLayout extends FrameLayout
     private int mViewPosition;
     private boolean mMuteState;
     private Surface mSurface;
-    private TextView mTextView;
-    private ProgressBar mProgressBar;
-    private ImageView mMuteButton;
-    private ImageView mSkipButton;
-    private TextureView mPlayerTextureView;
-    private View[] buttonViews;
+    private final TextView mTextView;
+    private final ProgressBar mProgressBar;
+    private final ImageView mMuteButton;
+    private final ImageView mSkipButton;
+    private final TextureView mPlayerTextureView;
+    private final View[] buttonViews;
     private final OnPlayerListener mListener;
 
     public PlayerLayout(@NonNull Context context, WebView webView, OnPlayerListener listener) {

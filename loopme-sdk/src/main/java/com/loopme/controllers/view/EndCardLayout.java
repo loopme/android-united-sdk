@@ -20,8 +20,8 @@ import com.loopme.utils.ViewUtils;
 public class EndCardLayout extends FrameLayout implements GestureDetector.OnGestureListener {
     private final int CLOSE_BUTTON_ID = View.generateViewId();
     private final int REPLAY_BUTTON_ID = View.generateViewId();
-    private ImageView mEndCardImageView;
-    private View[] buttonViews;
+    private final ImageView mEndCardImageView;
+    private final View[] buttonViews;
 
     private final OnEndCardListener mListener;
 
