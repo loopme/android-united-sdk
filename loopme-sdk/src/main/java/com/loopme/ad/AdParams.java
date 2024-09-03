@@ -7,7 +7,6 @@ import androidx.annotation.Nullable;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
-import com.loopme.network.response.Bid;
 import com.loopme.network.response.BidResponse;
 import com.loopme.parser.xml.XmlParser;
 import com.loopme.utils.Utils;

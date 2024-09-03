@@ -34,7 +34,6 @@ import com.loopme.request.RequestParamsUtils;
 import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
 import com.loopme.tracker.partners.LoopMeTracker;
-import com.loopme.utils.Utils;
 
 import java.util.Arrays;
 import java.util.HashMap;

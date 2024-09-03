@@ -2,9 +2,6 @@ package com.loopme.vast;
 
 import android.text.TextUtils;
 
-
-import androidx.annotation.NonNull;
-
 import com.loopme.Constants;
 import com.loopme.xml.Impression;
 import com.loopme.xml.Tracking;

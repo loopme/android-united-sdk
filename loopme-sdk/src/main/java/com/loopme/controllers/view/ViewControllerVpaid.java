@@ -15,7 +15,6 @@ import com.loopme.Logging;
 import com.loopme.R;
 import com.loopme.controllers.display.DisplayControllerVpaid;
 import com.loopme.time.TimerWithPause;
-import com.loopme.utils.ImageUtils;
 import com.loopme.utils.Utils;
 
 public class ViewControllerVpaid implements View.OnClickListener {

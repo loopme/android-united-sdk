@@ -1,10 +1,5 @@
 package com.loopme.utils;
 
-import static com.loopme.debugging.Params.ERROR_EXCEPTION;
-import static com.loopme.debugging.Params.ERROR_MSG;
-import static com.loopme.debugging.Params.ERROR_TYPE;
-import static com.loopme.debugging.Params.ERROR_URL;
-
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,10 +9,7 @@ import androidx.annotation.Nullable;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
-import com.loopme.common.LoopMeError;
-import com.loopme.models.Errors;
 import com.loopme.network.HttpUtils;
-import com.loopme.tracker.partners.LoopMeTracker;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,7 +18,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.HashMap;
 
 /**
  * Created by vynnykiakiv on 4/20/17.

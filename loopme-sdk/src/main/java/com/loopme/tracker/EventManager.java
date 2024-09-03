@@ -7,7 +7,6 @@ import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 
-import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.tracker.constants.AdType;
 import com.loopme.tracker.constants.Event;

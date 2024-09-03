@@ -5,7 +5,6 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 
 import com.loopme.ad.LoopMeAd;
-import com.loopme.models.Message;
 
 public interface DisplayController {
     void onStartLoad();
