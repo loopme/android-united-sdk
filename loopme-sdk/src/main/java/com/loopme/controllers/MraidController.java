@@ -97,7 +97,6 @@ public class MraidController implements MraidBridgeListener {
         }
 
         mLoopMeAd.onAdClicked();
-        bridge.resetUserClickStatus();
 
         if (AdUtils.tryStartCustomTabs(mMraidView.getContext(), url)) {
             mLoopMeAd.onAdLeaveApp();
