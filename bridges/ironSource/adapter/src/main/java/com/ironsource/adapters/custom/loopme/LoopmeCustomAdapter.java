@@ -29,11 +29,6 @@ public class LoopmeCustomAdapter extends BaseAdapter {
             return;
         }
 
-        if (context == null) {
-            onNetworkInitializationFinished(networkInitializationListener, null, false);
-            return;
-        }
-
         CountDownLatch latch = new CountDownLatch(1);
 
         tryInitializeLoopMeSdk(networkInitializationListener, latch, context);

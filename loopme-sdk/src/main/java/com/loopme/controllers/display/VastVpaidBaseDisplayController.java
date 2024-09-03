@@ -139,8 +139,6 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
         if (trackingEvents == null)
             return verificationNotExecutedUrlList;
         List<Tracking> trackingList = trackingEvents.getTrackingList();
-        if (trackingList == null)
-            return verificationNotExecutedUrlList;
         for (Tracking t : trackingList) {
             if (t == null) continue;
             String event = t.getEvent();

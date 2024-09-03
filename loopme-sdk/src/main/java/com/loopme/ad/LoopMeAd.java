@@ -400,10 +400,12 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         if (arg == TimersType.EXPIRATION_TIMER) onAdExpired();
     }
 
-    public void runOnUiThread(Runnable runnable) { if (mHandler != null) mHandler.post(runnable); }
+    public void runOnUiThread(Runnable runnable) {
+        mHandler.post(runnable);
+    }
 
     public void runOnUiThreadDelayed(Runnable runnable, long time) {
-        if (mHandler != null) mHandler.postDelayed(runnable, time);
+        mHandler.postDelayed(runnable, time);
     }
 
     public void onNewContainer(@NonNull FrameLayout containerView) {
