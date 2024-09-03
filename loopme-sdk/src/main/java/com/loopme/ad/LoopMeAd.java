@@ -279,11 +279,10 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
      */
     public void load() { load(mIntegrationType); }
 
-    public AdFetchTask load(String url) {
+    public void load(String url) {
         setAdState(Constants.AdState.LOADING);
         AdFetchTask adFetchTask = new AdFetchTaskByUrl(this, adFetchListener, url);
         adFetchTask.fetch();
-        return adFetchTask;
     }
 
     private boolean isCouldLoadAd() {
