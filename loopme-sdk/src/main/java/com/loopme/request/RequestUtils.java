@@ -211,18 +211,18 @@ public class RequestUtils {
     private int getXiaomiBatterySaverState(Context context) {
         try {
             int value = Settings.System.getInt(context.getContentResolver(), "POWER_SAVE_MODE_OPEN");
-            return (value == 1) ? 1 : 0;  // 1 = Power Save Mode ON, 0 = OFF
+            return (value == 1) ? 1 : 0;
         } catch (Settings.SettingNotFoundException e) {
-            return getStandardBatterySaverState(context); // Fall back to standard method
+            return getStandardBatterySaverState(context);
         }
     }
 
     private int getHuaweiBatterySaverState(Context context) {
         try {
             int value = Settings.System.getInt(context.getContentResolver(), "SmartModeStatus");
-            return (value == 4) ? 1 : 0;  // 4 = Power Save Mode ON, other values = OFF
+            return (value == 4) ? 1 : 0;
         } catch (Settings.SettingNotFoundException e) {
-            return getStandardBatterySaverState(context); // Fall back to standard method
+            return getStandardBatterySaverState(context);
         }
     }
 
