@@ -3,6 +3,7 @@ package com.ironsource.adapters.custom.loopme;
 import android.app.Activity;
 
 import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
 
 import com.ironsource.mediationsdk.adunit.adapter.BaseInterstitial;
 import com.ironsource.mediationsdk.adunit.adapter.listener.InterstitialAdListener;
@@ -27,7 +28,7 @@ public class LoopmeCustomInterstitial extends BaseInterstitial<LoopmeCustomAdapt
     }
 
     @Override
-    public void loadAd(AdData adData, Activity activity, InterstitialAdListener interstitialAdListener) {
+    public void loadAd(@NonNull AdData adData, @NonNull Activity activity, @NonNull InterstitialAdListener interstitialAdListener) {
         try {
             this.mInterstitialListener = interstitialAdListener;
             String appkey = adData.getConfiguration().get("instancekey").toString();
@@ -80,7 +81,7 @@ public class LoopmeCustomInterstitial extends BaseInterstitial<LoopmeCustomAdapt
     }
 
     @Override
-    public void showAd(AdData adData, InterstitialAdListener interstitialAdListener) {
+    public void showAd(@NonNull AdData adData, @NonNull InterstitialAdListener interstitialAdListener) {
         if (isAdAvailable(adData)) {
             mInterstitial.show();
         } else {
@@ -89,7 +90,7 @@ public class LoopmeCustomInterstitial extends BaseInterstitial<LoopmeCustomAdapt
     }
 
     @Override
-    public boolean isAdAvailable(AdData adData) {
+    public boolean isAdAvailable(@NonNull AdData adData) {
         return mInterstitial.isReady();
     }
 

@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 
+import androidx.annotation.NonNull;
+
 import com.loopme.Constants;
 
 /**
@@ -24,7 +26,7 @@ public abstract class TimerWithPause {
     @SuppressLint("HandlerLeak")
     private final Handler mHandler = new Handler() {
         @Override
-        public void handleMessage(Message msg) { handleTimerMessage(); }
+        public void handleMessage(@NonNull Message msg) { handleTimerMessage(); }
     };
 
     protected TimerWithPause(long millisOnTimer) {
