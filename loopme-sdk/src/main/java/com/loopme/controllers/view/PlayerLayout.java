@@ -97,18 +97,17 @@ public class PlayerLayout extends FrameLayout
     }
 
     private static FrameLayout.LayoutParams calculateNewLayoutParams(
-        @NonNull FrameLayout.LayoutParams layoutParams,
+        @NonNull LayoutParams layoutParams,
         int videoWidth, int videoHeight,
-        int resizeWidth, int resizeHeight,
-        Constants.StretchOption stretchOption
+        int resizeWidth, int resizeHeight
     ) {
         layoutParams.gravity = Gravity.CENTER;
-        if (stretchOption == Constants.StretchOption.STRETCH) {
+        if (Constants.StretchOption.NONE == Constants.StretchOption.STRETCH) {
             layoutParams.width = resizeWidth;
             layoutParams.height = resizeHeight;
             return layoutParams;
         }
-        if (stretchOption == Constants.StretchOption.NONE) {
+        if (Constants.StretchOption.NONE == Constants.StretchOption.NONE) {
             float percent = 0;
             if (videoWidth > videoHeight) {
                 layoutParams.width = resizeWidth;
@@ -134,7 +133,7 @@ public class PlayerLayout extends FrameLayout
     public void adjustLayoutParams(int width, int height, int containerWidth, int containerHeight) {
         FrameLayout.LayoutParams oldParams = (FrameLayout.LayoutParams) mPlayerTextureView.getLayoutParams();
         ViewGroup.LayoutParams newParams = calculateNewLayoutParams(
-            oldParams, width, height, containerWidth, containerHeight, Constants.StretchOption.NONE
+            oldParams, width, height, containerWidth, containerHeight
         );
         mPlayerTextureView.setLayoutParams(newParams);
     }

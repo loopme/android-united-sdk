@@ -242,19 +242,19 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         runOnUiThread(() -> LoopMeTracker.post(packErrorInfo(error.getMessage())));
     }
 
-    private void startTimer(TimersType fetcherTimer, AdParams adParam) {
+    private void startTimer(AdParams adParam) {
         if (mTimers == null) {
             return;
         }
         if (adParam != null) {
             mTimers.setExpirationValidTime(adParam.getExpiredTime());
         }
-        mTimers.startTimer(fetcherTimer);
+        mTimers.startTimer(TimersType.EXPIRATION_TIMER);
     }
 
-    protected void stopTimer(TimersType timersType) {
+    protected void stopTimer() {
         if (mTimers != null) {
-            mTimers.stopTimer(timersType);
+            mTimers.stopTimer(TimersType.EXPIRATION_TIMER);
         }
     }
 
@@ -344,7 +344,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     private void proceedPrepareAd(AdParams adParams) {
         setBackendAutoLoadingValue(adParams.getAutoLoading());
-        startTimer(TimersType.EXPIRATION_TIMER, adParams);
+        startTimer(adParams);
         setAdParams(adParams);
         if (isVpaidAd()) {
             mDisplayController = new DisplayControllerVpaid(this);

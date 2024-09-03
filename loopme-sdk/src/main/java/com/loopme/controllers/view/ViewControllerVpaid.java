@@ -84,7 +84,7 @@ public class ViewControllerVpaid implements View.OnClickListener {
     public void startCloseButtonTimer(long duration) {
         cancelCloseButtonTimer();
         Logging.out(LOG_TAG, "startCloseButtonTimer");
-        mCloseButtonTimer = new TimerWithPause(duration, Constants.ONE_SECOND_IN_MILLIS, true) {
+        mCloseButtonTimer = new TimerWithPause(duration) {
             @Override
             public void onTick(long millisUntilFinished) {
                 Logging.out(LOG_TAG, "Till extra close button " + millisUntilFinished / 1000);

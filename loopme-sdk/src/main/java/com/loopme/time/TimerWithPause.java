@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 
+import com.loopme.Constants;
+
 /**
  * extends {@link android.os.CountDownTimer}
  */
@@ -25,11 +27,11 @@ public abstract class TimerWithPause {
         public void handleMessage(Message msg) { handleTimerMessage(); }
     };
 
-    protected TimerWithPause(long millisOnTimer, long countDownInterval, boolean runAtStart) {
+    protected TimerWithPause(long millisOnTimer) {
         mMillisInFuture = millisOnTimer;
         mTotalCountdown = mMillisInFuture;
-        mCountdownInterval = countDownInterval;
-        mRunAtStart = runAtStart;
+        mCountdownInterval = Constants.ONE_SECOND_IN_MILLIS;
+        mRunAtStart = true;
     }
 
     public abstract void onTick(long millisUntilFinished);
