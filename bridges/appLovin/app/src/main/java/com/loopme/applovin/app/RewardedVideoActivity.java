@@ -17,7 +17,6 @@ public class RewardedVideoActivity extends Activity implements MaxRewardedAdList
     private static final String LOG_TAG = RewardedVideoActivity.class.getSimpleName();
     private static final String APPLOVIN_UNIT_ID = "53df96fcbd095f70";
     private MaxRewardedAd rewardedAd;
-    private Button mLoadButton;
     private Button mShowButton;
     private void toast(String message) {
         Toast.makeText(RewardedVideoActivity.this, message, Toast.LENGTH_SHORT).show();
@@ -27,7 +26,7 @@ public class RewardedVideoActivity extends Activity implements MaxRewardedAdList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rewarded);
 
-        mLoadButton = findViewById(R.id.load_button);
+        Button mLoadButton = findViewById(R.id.load_button);
         mLoadButton.setOnClickListener((view) -> loadAd());
 
         mShowButton = findViewById(R.id.show_button);

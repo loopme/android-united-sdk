@@ -21,8 +21,6 @@ public class EndCardLayout extends FrameLayout implements GestureDetector.OnGest
     private final int CLOSE_BUTTON_ID = View.generateViewId();
     private final int REPLAY_BUTTON_ID = View.generateViewId();
     private ImageView mEndCardImageView;
-    private ImageView mCloseImageView;
-    private ImageView mReplayImageView;
     private View[] buttonViews;
 
     private final OnEndCardListener mListener;
@@ -37,13 +35,13 @@ public class EndCardLayout extends FrameLayout implements GestureDetector.OnGest
         mEndCardImageView.setScaleType(ImageView.ScaleType.FIT_XY);
         mEndCardImageView.setLayoutParams(Layout.MATCH_PARENT_CENTER);
 
-        mCloseImageView = new ImageView(getContext());
+        ImageView mCloseImageView = new ImageView(getContext());
         mCloseImageView.setId(CLOSE_BUTTON_ID);
         mCloseImageView.setScaleType(ImageView.ScaleType.CENTER);
         mCloseImageView.setImageResource(R.drawable.l_close);
         mCloseImageView.setLayoutParams(new FrameLayout.LayoutParams(btnSizePx, btnSizePx, Gravity.END));
 
-        mReplayImageView = new ImageView(getContext());
+        ImageView mReplayImageView = new ImageView(getContext());
         mReplayImageView.setId(REPLAY_BUTTON_ID);
         mReplayImageView.setScaleType(ImageView.ScaleType.CENTER);
         mReplayImageView.setImageResource(R.drawable.l_replay);
