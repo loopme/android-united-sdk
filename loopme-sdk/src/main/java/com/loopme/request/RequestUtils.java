@@ -10,6 +10,7 @@ import android.media.AudioManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.PowerManager;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.webkit.WebSettings;
 
@@ -49,7 +50,7 @@ public class RequestUtils {
     private LoopMeAd mLoopMeAd;
     private int mSkippable;
 
-    RequestUtils(Context context, LoopMeAd loopMeAd) {
+    public RequestUtils(Context context, LoopMeAd loopMeAd) {
         if (loopMeAd != null) {
             mLoopMeAd = loopMeAd;
             if (context != null) {
@@ -74,18 +75,18 @@ public class RequestUtils {
         setSkippable();
     }
 
-    String getAppBundle() { return mAppBundle; }
-    String getAppName() { return mAppName; }
-    String getAppVersion() { return mAppVersion; }
-    String getUa() { return mUa; }
-    String getDnt() { return mDnt; }
-    int getDeviceType() { return mDeviceType; }
-    int getDeviceWidthPx() { return mDeviceWidthPx; }
-    int getDeviceHeightPx() { return mDeviceHeightPx; }
+    public String getAppBundle() { return mAppBundle; }
+    public String getAppName() { return mAppName; }
+    public String getAppVersion() { return mAppVersion; }
+    public String getUa() { return mUa; }
+    public String getDnt() { return mDnt; }
+    public int getDeviceType() { return mDeviceType; }
+    public int getDeviceWidthPx() { return mDeviceWidthPx; }
+    public int getDeviceHeightPx() { return mDeviceHeightPx; }
     public int getWidth() { return mWidth; }
     public int getHeight() { return mHeight; }
     public static String getIfa() { return mIfa; }
-    int getConnectionType() { return mConnectionType; }
+    public int getConnectionType() { return mConnectionType; }
     public String getOrientation() { return mOr; }
     public int[] getApi() {
         LoopMeAd.Type adType = mLoopMeAd.getPreferredAdType();
@@ -93,53 +94,53 @@ public class RequestUtils {
         if (adType == LoopMeAd.Type.VIDEO) return RequestConstants.API_VIDEO;
         return RequestConstants.API_ALL;
     }
-    int getInstl() { return mInstl; }
-    int getSkippable() { return mSkippable; }
-    String getUuId() { return UUID.randomUUID().toString(); }
-    String getLanguage() { return Locale.getDefault().getLanguage(); }
-    String getOsv() { return String.valueOf(Build.VERSION.RELEASE); }
-    String getMake() { return Build.MANUFACTURER; }
-    String getHwv() { return Build.HARDWARE; }
+    public int getInstl() { return mInstl; }
+    public int getSkippable() { return mSkippable; }
+    public String getUuId() { return UUID.randomUUID().toString(); }
+    public String getLanguage() { return Locale.getDefault().getLanguage(); }
+    public String getOsv() { return String.valueOf(Build.VERSION.RELEASE); }
+    public String getMake() { return Build.MANUFACTURER; }
+    public String getHwv() { return Build.HARDWARE; }
     public String getModel() { return Build.MODEL; }
-    String getTimeZone() { return TimeZone.getDefault().getDisplayName(Locale.ENGLISH); }
-    String getDisplayManagerVersion() {  return BuildConfig.VERSION_NAME; }
-    String getImpId() { return String.valueOf(System.currentTimeMillis()); }
+    public String getTimeZone() { return TimeZone.getDefault().getDisplayName(Locale.ENGLISH); }
+    public String getDisplayManagerVersion() { return BuildConfig.VERSION_NAME; }
+    public String getImpId() { return String.valueOf(System.currentTimeMillis()); }
     public String getIt() { return mLoopMeAd.getIntegrationType().getType(); }
-    JSONArray getTrackersSupported() { return new JSONArray(); }
+    public JSONArray getTrackersSupported() { return new JSONArray(); }
 
-    String getUserConsent(Context context) {
+    public String getUserConsent(Context context) {
         return IABPreferences.getInstance(context).getGdprState();
     }
 
-    int getConsentType(Context context) {
+    public int getConsentType(Context context) {
         return IABPreferences.getInstance(context).getConsentType();
     }
 
-    String getUSPrivacyString(Context context) {
+    public String getUSPrivacyString(Context context) {
         return IABPreferences.getInstance(context).getUSPrivacyString();
     }
 
-    String getIabTcfTcString(Context context) {
+    public String getIabTcfTcString(Context context) {
         return IABPreferences.getInstance(context).getIabTcfTcString();
     }
 
-    boolean isIabTcfCmpSdkPresent(Context context) {
+    public boolean isIabTcfCmpSdkPresent(Context context) {
         return IABPreferences.getInstance(context).isIabTcfCmpSdkPresent();
     }
 
-    int getIabTcfGdprApplies(Context context) {
+    public int getIabTcfGdprApplies(Context context) {
         return IABPreferences.getInstance(context).getIabTcfGdprApplies();
     }
 
-    int getCoppa(Context context) {
+    public int getCoppa(Context context) {
         return IABPreferences.getInstance(context).getCoppa() ? 1 : 0;
     }
 
-    boolean isIabTcfGdprAppliesPresent(Context context) {
+    public boolean isIabTcfGdprAppliesPresent(Context context) {
         return IABPreferences.getInstance(context).isIabTcfGdprAppliesPresent();
     }
 
-    int getMusic(Context context) {
+    public int getMusic(Context context) {
         AudioManager manager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         return manager != null && manager.isMusicActive() ? 1 : 0;
     }
@@ -174,11 +175,11 @@ public class RequestUtils {
         return (bm != null) ? bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) : -1;
     }
 
-    String getChargeLevel(Context context) {
+    public String getChargeLevel(Context context) {
         return String.valueOf(getBatteryPercentage(context));
     }
 
-    int getBatteryLevel(Context context) {
+    public int getBatteryLevel(Context context) {
         int batteryPercentage = getBatteryPercentage(context);
 
         if (batteryPercentage >= 85) return 8;
@@ -191,12 +192,41 @@ public class RequestUtils {
         return 1;
     }
 
-    int getBatterySaverState(Context context) {
+    public int getBatterySaverState(Context context) {
+        String manufacturer = Build.MANUFACTURER.toLowerCase();
+        if (manufacturer.contains("xiaomi")) {
+            return getXiaomiBatterySaverState(context);
+        } else if (manufacturer.contains("huawei")) {
+            return getHuaweiBatterySaverState(context);
+        } else {
+            return getStandardBatterySaverState(context);
+        }
+    }
+
+    private int getStandardBatterySaverState(Context context) {
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         return (powerManager != null && powerManager.isPowerSaveMode()) ? 1 : 0;
     }
 
-    boolean isAnyAudioOutput(Context context) {
+    private int getXiaomiBatterySaverState(Context context) {
+        try {
+            int value = Settings.System.getInt(context.getContentResolver(), "POWER_SAVE_MODE_OPEN");
+            return (value == 1) ? 1 : 0;
+        } catch (Settings.SettingNotFoundException e) {
+            return getStandardBatterySaverState(context);
+        }
+    }
+
+    private int getHuaweiBatterySaverState(Context context) {
+        try {
+            int value = Settings.System.getInt(context.getContentResolver(), "SmartModeStatus");
+            return (value == 4) ? 1 : 0;
+        } catch (Settings.SettingNotFoundException e) {
+            return getStandardBatterySaverState(context);
+        }
+    }
+
+    public boolean isAnyAudioOutput(Context context) {
         return !getAudioOutput(context).isEmpty();
     }
 
@@ -266,7 +296,7 @@ public class RequestUtils {
         }
     }
 
-    boolean isFullscreenSize() {
+    public boolean isFullscreenSize() {
         return mWidth >= 320 && mHeight >= 320;
     }
 }
