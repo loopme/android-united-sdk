@@ -45,7 +45,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     private static final String LOG_TAG = LoopMeAd.class.getSimpleName();
     private static final String WRONG_PARAMETERS = "Context or AppKey is null!";
 
-    protected Handler mHandler = new Handler(Looper.getMainLooper());
+    protected final Handler mHandler = new Handler(Looper.getMainLooper());
     private IntegrationType mIntegrationType = IntegrationType.NORMAL;
     private final AdTargetingData mAdTargetingData = new AdTargetingData();
     protected BaseTrackableController mDisplayController;

@@ -34,8 +34,8 @@ public abstract class VastVpaidBaseDisplayController extends BaseTrackableContro
     protected static final int VAST_MACROS_REASON_NOT_SUPPORTED = 2;
     protected static final int VAST_MACROS_REASON_LOAD_ERROR = 3;
 
-    protected AdParams mAdParams;
-    protected LoopMeAd mLoopMeAd;
+    protected final AdParams mAdParams;
+    protected final LoopMeAd mLoopMeAd;
 
     private boolean mIsVpaidEventTracked;
 

@@ -11,7 +11,7 @@ import com.loopme.Constants;
 
 public class MraidAdCloseButtonReceiver extends BroadcastReceiver {
 
-    public Listener mListener;
+    public final Listener mListener;
 
     public interface Listener {
         void onCloseButtonVisibilityChanged(boolean customCloseButton);
