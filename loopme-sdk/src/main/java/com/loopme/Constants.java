@@ -99,9 +99,7 @@ public class Constants {
         }
     }
 
-    public enum PlacementType {
-        BANNER, INTERSTITIAL, REWARDED;
-    }
+    public enum PlacementType { BANNER, INTERSTITIAL, REWARDED }
 
     public enum AdState {
         /**
