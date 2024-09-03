@@ -105,11 +105,11 @@ public class HttpUtils {
         return os.toByteArray();
     }
 
-    public static boolean isOnline(@NonNull Context context) {
+    public static boolean isOffline(@NonNull Context context) {
         final ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm == null) return false;
+        if (cm == null) return true;
         final NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.isConnected() && activeNetwork.isAvailable();
+        return activeNetwork == null || !activeNetwork.isConnected() || !activeNetwork.isAvailable();
     }
 
     public static boolean isWifiConnection(Context context) {
@@ -170,7 +170,7 @@ public class HttpUtils {
         File file = new File(destination + "_download");
         try {
             Logging.out(LOG_TAG, "Use mobile network for caching: " + Constants.USE_MOBILE_NETWORK_FOR_CACHING);
-            if (!HttpUtils.isOnline(context)) {
+            if (HttpUtils.isOffline(context)) {
                 throw new IllegalStateException("No internet connection");
             }
             if (!HttpUtils.isWifiConnection(context) && !Constants.USE_MOBILE_NETWORK_FOR_CACHING) {

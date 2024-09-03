@@ -303,7 +303,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
             onAdLoadFail(new LoopMeError(error));
             return false;
         }
-        if (!HttpUtils.isOnline(getContext())) {
+        if (HttpUtils.isOffline(getContext())) {
             error = "No connection";
             Logging.out(LOG_TAG, error);
             onAdLoadFail(new LoopMeError(error));
