@@ -3,7 +3,7 @@ package com.loopme.vast;
 import java.util.Objects;
 
 public class TrackingEvent {
-    public String url;
+    public final String url;
     public int timeMillis;
 
     public TrackingEvent(String url) {

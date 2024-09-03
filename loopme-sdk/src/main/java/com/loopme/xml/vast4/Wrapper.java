@@ -3,7 +3,6 @@ package com.loopme.xml.vast4;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.loopme.parser.xml.Attribute;
 import com.loopme.parser.xml.Tag;

@@ -7,7 +7,6 @@ import androidx.annotation.Nullable;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
-import com.loopme.network.response.Bid;
 import com.loopme.network.response.BidResponse;
 import com.loopme.parser.xml.XmlParser;
 import com.loopme.utils.Utils;
@@ -40,7 +39,6 @@ public class AdParams implements Serializable {
     private String mToken;
 
     private boolean mPartPreload;
-    private boolean mIsMraid;
     private boolean mOwnCloseButton;
     private boolean mIsDebug;
 
@@ -88,7 +86,6 @@ public class AdParams implements Serializable {
         mTrackersList = builder.mTrackersList;
         mToken = builder.mToken;
         mPartPreload = builder.mPartPreload;
-        mIsMraid = builder.mIsMraid;
         mIsDebug = builder.mIsDebug;
         mAutoLoading = builder.mAutoLoading;
         mAdSpotDimensions = builder.mAdSpotDimensions;
@@ -97,7 +94,7 @@ public class AdParams implements Serializable {
         mCrid = builder.mCrid;
         Logging.out(LOG_TAG, "Server response indicates  ad params: "
             + "format: " + mFormat + ", isAutoloading: " + mAutoLoading
-            + ", mraid: " + mIsMraid + ", expire in: " + mExpiredDate);
+            + ", mraid: " + builder.mIsMraid + ", expire in: " + mExpiredDate);
     }
 
     public AdSpotDimensions getAdSpotDimensions() { return mAdSpotDimensions; }

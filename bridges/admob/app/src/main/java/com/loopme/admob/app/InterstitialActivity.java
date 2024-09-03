@@ -21,7 +21,6 @@ public class InterstitialActivity extends AppCompatActivity {
     private static final String adUnitId = "ca-app-pub-3222206793588139/8737181390";
     private AdManagerInterstitialAd mAdManagerInterstitialAd;
     AdManagerAdRequest adRequest;
-    private Button mLoadButton;
     private Button mShowButton;
     private void toast(String message) {
         Toast.makeText(InterstitialActivity.this, message, Toast.LENGTH_SHORT).show();
@@ -32,7 +31,7 @@ public class InterstitialActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_interstitial);
 
-        mLoadButton = findViewById(R.id.load_button);
+        Button mLoadButton = findViewById(R.id.load_button);
         mLoadButton.setEnabled(true);
         mLoadButton.setOnClickListener((view) -> loadAd());
 

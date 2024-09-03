@@ -2,7 +2,6 @@ package com.loopme.controllers.display;
 
 import android.view.View;
 
-import com.loopme.Logging;
 import com.loopme.ViewAbilityUtils;
 import com.loopme.ad.AdParams;
 import com.loopme.utils.ExecutorHelper;

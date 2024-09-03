@@ -20,10 +20,8 @@ import com.loopme.utils.ViewUtils;
 public class EndCardLayout extends FrameLayout implements GestureDetector.OnGestureListener {
     private final int CLOSE_BUTTON_ID = View.generateViewId();
     private final int REPLAY_BUTTON_ID = View.generateViewId();
-    private ImageView mEndCardImageView;
-    private ImageView mCloseImageView;
-    private ImageView mReplayImageView;
-    private View[] buttonViews;
+    private final ImageView mEndCardImageView;
+    private final View[] buttonViews;
 
     private final OnEndCardListener mListener;
 
@@ -37,13 +35,13 @@ public class EndCardLayout extends FrameLayout implements GestureDetector.OnGest
         mEndCardImageView.setScaleType(ImageView.ScaleType.FIT_XY);
         mEndCardImageView.setLayoutParams(Layout.MATCH_PARENT_CENTER);
 
-        mCloseImageView = new ImageView(getContext());
+        ImageView mCloseImageView = new ImageView(getContext());
         mCloseImageView.setId(CLOSE_BUTTON_ID);
         mCloseImageView.setScaleType(ImageView.ScaleType.CENTER);
         mCloseImageView.setImageResource(R.drawable.l_close);
         mCloseImageView.setLayoutParams(new FrameLayout.LayoutParams(btnSizePx, btnSizePx, Gravity.END));
 
-        mReplayImageView = new ImageView(getContext());
+        ImageView mReplayImageView = new ImageView(getContext());
         mReplayImageView.setId(REPLAY_BUTTON_ID);
         mReplayImageView.setScaleType(ImageView.ScaleType.CENTER);
         mReplayImageView.setImageResource(R.drawable.l_replay);
@@ -64,13 +62,13 @@ public class EndCardLayout extends FrameLayout implements GestureDetector.OnGest
     public boolean onTouchEvent(MotionEvent event) { return gestureDetector.onTouchEvent(event); }
 
     @Override
-    public boolean onDown(MotionEvent e) { return true; }
+    public boolean onDown(@NonNull MotionEvent e) { return true; }
 
     @Override
-    public void onShowPress(MotionEvent e) { }
+    public void onShowPress(@NonNull MotionEvent e) { }
 
     @Override
-    public boolean onSingleTapUp(MotionEvent e) {
+    public boolean onSingleTapUp(@NonNull MotionEvent e) {
         View v = ViewUtils.findVisibleView(buttonViews, e);
         if (v == null) {
             if (mListener != null) {
@@ -89,15 +87,15 @@ public class EndCardLayout extends FrameLayout implements GestureDetector.OnGest
     }
 
     @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+    public boolean onScroll(MotionEvent e1, @NonNull MotionEvent e2, float distanceX, float distanceY) {
         return false;
     }
 
     @Override
-    public void onLongPress(MotionEvent e) { }
+    public void onLongPress(@NonNull MotionEvent e) { }
 
     @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+    public boolean onFling(MotionEvent e1, @NonNull MotionEvent e2, float velocityX, float velocityY) {
         return false;
     }
 

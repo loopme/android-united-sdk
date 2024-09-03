@@ -20,7 +20,6 @@ public class RewardedVideoActivity extends Activity {
     private static final String adUnitId = "ca-app-pub-3222206793588139/6342952349";
     private RewardedAd rewardedAd;
     AdManagerAdRequest adRequest;
-    private Button mLoadButton;
     private Button mShowButton;
     private void toast(String message) {
         Toast.makeText(RewardedVideoActivity.this, message, Toast.LENGTH_SHORT).show();
@@ -30,7 +29,7 @@ public class RewardedVideoActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rewarded);
 
-        mLoadButton = findViewById(R.id.load_button);
+        Button mLoadButton = findViewById(R.id.load_button);
         mLoadButton.setOnClickListener((view) -> loadAd());
 
         mShowButton = findViewById(R.id.show_button);

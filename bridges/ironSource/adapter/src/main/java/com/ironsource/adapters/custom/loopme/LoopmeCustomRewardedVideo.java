@@ -3,6 +3,7 @@ package com.ironsource.adapters.custom.loopme;
 import android.app.Activity;
 
 import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
 
 import com.ironsource.mediationsdk.adunit.adapter.BaseRewardedVideo;
 import com.ironsource.mediationsdk.adunit.adapter.listener.RewardedVideoAdListener;
@@ -22,8 +23,6 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
 
     private LoopMeInterstitial mRewarded;
 
-    private RewardedVideoAdListener rewardedVideoAdListener;
-
     private boolean isAlreadyRewarded = false;
 
     public LoopmeCustomRewardedVideo(NetworkSettings networkSettings) {
@@ -31,10 +30,9 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
     }
 
     @Override
-    public void loadAd(AdData adData, Activity activity, @NotNull RewardedVideoAdListener rewardedVideoAdListener) {
+    public void loadAd(@NonNull AdData adData, @NonNull Activity activity, @NotNull RewardedVideoAdListener rewardedVideoAdListener) {
         try {
             isAlreadyRewarded = false;
-            this.rewardedVideoAdListener = rewardedVideoAdListener;
             String appkey = adData.getConfiguration().get("instancekey").toString();
             mRewarded = LoopMeInterstitial.getInstance(appkey, activity, true);
             mRewarded.setAutoLoading(false);
@@ -94,7 +92,7 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
     }
 
     @Override
-    public void showAd(AdData adData, RewardedVideoAdListener rewardedVideoAdListener) {
+    public void showAd(@NonNull AdData adData, @NonNull RewardedVideoAdListener rewardedVideoAdListener) {
         if (isAdAvailable(adData)) {
             mRewarded.show();
         } else {
@@ -103,7 +101,7 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
     }
 
     @Override
-    public boolean isAdAvailable(AdData adData) {
+    public boolean isAdAvailable(@NonNull AdData adData) {
         return mRewarded.isReady();
     }
 

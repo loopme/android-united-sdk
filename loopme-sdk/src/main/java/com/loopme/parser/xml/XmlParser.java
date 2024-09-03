@@ -111,7 +111,7 @@ public class XmlParser {
                 parser.next() != XmlPullParser.END_TAG ||
                 !parser.getName().equalsIgnoreCase(tagName) ||
                 parser.getDepth() != depth
-            ) { /* Continue parsing */ };
+            ) { /* Continue parsing */ }
             parser.next();
             return;
         }

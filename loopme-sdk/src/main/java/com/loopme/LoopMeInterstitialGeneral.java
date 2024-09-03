@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
-import com.loopme.time.TimersType;
 import com.loopme.utils.UiUtils;
 import com.loopme.utils.Utils;
 
@@ -80,7 +79,7 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
         if (isReady()) {
             if (!isShowing()) {
                 setAdState(Constants.AdState.SHOWING);
-                stopTimer(TimersType.EXPIRATION_TIMER);
+                stopTimer();
                 AdUtils.startAdActivity(this);
                 onLoopMeInterstitialShow();
                 Logging.out(LOG_TAG, "Interstitial will present fullscreen ad. App key: " + getAppKey());

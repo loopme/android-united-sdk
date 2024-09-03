@@ -37,12 +37,12 @@ public class PlayerLayout extends FrameLayout
     private int mViewPosition;
     private boolean mMuteState;
     private Surface mSurface;
-    private TextView mTextView;
-    private ProgressBar mProgressBar;
-    private ImageView mMuteButton;
-    private ImageView mSkipButton;
-    private TextureView mPlayerTextureView;
-    private View[] buttonViews;
+    private final TextView mTextView;
+    private final ProgressBar mProgressBar;
+    private final ImageView mMuteButton;
+    private final ImageView mSkipButton;
+    private final TextureView mPlayerTextureView;
+    private final View[] buttonViews;
     private final OnPlayerListener mListener;
 
     public PlayerLayout(@NonNull Context context, WebView webView, OnPlayerListener listener) {
@@ -97,18 +97,17 @@ public class PlayerLayout extends FrameLayout
     }
 
     private static FrameLayout.LayoutParams calculateNewLayoutParams(
-        @NonNull FrameLayout.LayoutParams layoutParams,
+        @NonNull LayoutParams layoutParams,
         int videoWidth, int videoHeight,
-        int resizeWidth, int resizeHeight,
-        Constants.StretchOption stretchOption
+        int resizeWidth, int resizeHeight
     ) {
         layoutParams.gravity = Gravity.CENTER;
-        if (stretchOption == Constants.StretchOption.STRETCH) {
+        if (Constants.StretchOption.NONE == Constants.StretchOption.STRETCH) {
             layoutParams.width = resizeWidth;
             layoutParams.height = resizeHeight;
             return layoutParams;
         }
-        if (stretchOption == Constants.StretchOption.NONE) {
+        if (Constants.StretchOption.NONE == Constants.StretchOption.NONE) {
             float percent = 0;
             if (videoWidth > videoHeight) {
                 layoutParams.width = resizeWidth;
@@ -134,7 +133,7 @@ public class PlayerLayout extends FrameLayout
     public void adjustLayoutParams(int width, int height, int containerWidth, int containerHeight) {
         FrameLayout.LayoutParams oldParams = (FrameLayout.LayoutParams) mPlayerTextureView.getLayoutParams();
         ViewGroup.LayoutParams newParams = calculateNewLayoutParams(
-            oldParams, width, height, containerWidth, containerHeight, Constants.StretchOption.NONE
+            oldParams, width, height, containerWidth, containerHeight
         );
         mPlayerTextureView.setLayoutParams(newParams);
     }
@@ -151,15 +150,15 @@ public class PlayerLayout extends FrameLayout
     }
 
     @Override
-    public boolean onDown(MotionEvent e) {
+    public boolean onDown(@NonNull MotionEvent e) {
         return true;
     }
 
     @Override
-    public void onShowPress(MotionEvent e) { }
+    public void onShowPress(@NonNull MotionEvent e) { }
 
     @Override
-    public boolean onSingleTapUp(MotionEvent e) {
+    public boolean onSingleTapUp(@NonNull MotionEvent e) {
         View v = ViewUtils.findVisibleView(buttonViews, e);
         if (mListener != null) {
             if (v == null) {
@@ -176,15 +175,15 @@ public class PlayerLayout extends FrameLayout
     }
 
     @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+    public boolean onScroll(MotionEvent e1, @NonNull MotionEvent e2, float distanceX, float distanceY) {
         return false;
     }
 
     @Override
-    public void onLongPress(MotionEvent e) { }
+    public void onLongPress(@NonNull MotionEvent e) { }
 
     @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+    public boolean onFling(MotionEvent e1, @NonNull MotionEvent e2, float velocityX, float velocityY) {
         return false;
     }
 
@@ -220,7 +219,7 @@ public class PlayerLayout extends FrameLayout
     }
 
     @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
+    public void onSurfaceTextureAvailable(@NonNull SurfaceTexture surfaceTexture, int width, int height) {
         mSurface = new Surface(surfaceTexture);
         if (mListener != null) {
             mListener.onSurfaceTextureReady(mSurface);
@@ -228,15 +227,15 @@ public class PlayerLayout extends FrameLayout
     }
 
     @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) { }
+    public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surface, int width, int height) { }
 
     @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+    public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surface) {
         return false;
     }
 
     @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) { }
+    public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surface) { }
 
     public TextureView getPlayerView() {
         return mPlayerTextureView;

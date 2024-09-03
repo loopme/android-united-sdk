@@ -1,7 +1,6 @@
 package com.loopme.bridges;
 
 import android.net.Uri;
-import android.text.TextUtils;
 
 import com.loopme.Constants;
 import com.loopme.Logging;

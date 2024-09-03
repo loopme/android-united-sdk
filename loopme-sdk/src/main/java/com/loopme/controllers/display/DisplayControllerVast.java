@@ -2,10 +2,6 @@ package com.loopme.controllers.display;
 
 import static com.loopme.Constants.SKIP_DELAY_INTERSTITIAL;
 import static com.loopme.Constants.SKIP_DELAY_REWARDED;
-import static com.loopme.debugging.Params.ERROR_EXCEPTION;
-import static com.loopme.debugging.Params.ERROR_MSG;
-import static com.loopme.debugging.Params.ERROR_TYPE;
-import static com.loopme.debugging.Params.ERROR_URL;
 
 import android.media.MediaPlayer;
 import android.os.Handler;
@@ -33,7 +29,6 @@ import com.loopme.models.Errors;
 import com.loopme.om.OmidEventTrackerWrapper;
 import com.loopme.om.OmidHelper;
 import com.loopme.tracker.constants.EventConstants;
-import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.ApiLevel;
 import com.loopme.utils.Utils;
 import com.loopme.vast.TrackingEvent;
@@ -41,7 +36,6 @@ import com.loopme.xml.Tracking;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

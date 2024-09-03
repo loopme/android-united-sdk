@@ -238,7 +238,6 @@ public class ViewAbilityUtils {
 
     public static class ViewAbilityInfo {
         private double mVisibility;
-        private double mOverlapping;
 
         public double getVisibility() {
             return mVisibility;
@@ -250,7 +249,6 @@ public class ViewAbilityUtils {
         }
 
         public void setOverlapping(double mOverlapping) {
-            this.mOverlapping = mOverlapping;
             Logging.out(LOG_TAG, "overlapping : " + ((int) (mOverlapping * 100)) + "%");
         }
 

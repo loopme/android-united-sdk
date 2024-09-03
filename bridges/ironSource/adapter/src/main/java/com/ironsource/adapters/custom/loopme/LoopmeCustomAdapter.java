@@ -23,14 +23,9 @@ public class LoopmeCustomAdapter extends BaseAdapter {
         LoopmeCustomAdapter.class.getSimpleName() + ".KEY_PUBLISHER_CONSENT";
 
     @Override
-    public void init(AdData adData, Context context, NetworkInitializationListener networkInitializationListener) {
+    public void init(@NonNull AdData adData, @NonNull Context context, NetworkInitializationListener networkInitializationListener) {
         if (LoopMeSdk.isInitialized()) {
             onNetworkInitializationFinished(networkInitializationListener, null, true);
-            return;
-        }
-
-        if (context == null) {
-            onNetworkInitializationFinished(networkInitializationListener, null, false);
             return;
         }
 

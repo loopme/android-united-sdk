@@ -34,7 +34,6 @@ import com.loopme.request.RequestParamsUtils;
 import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
 import com.loopme.tracker.partners.LoopMeTracker;
-import com.loopme.utils.Utils;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -46,7 +45,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     private static final String LOG_TAG = LoopMeAd.class.getSimpleName();
     private static final String WRONG_PARAMETERS = "Context or AppKey is null!";
 
-    protected Handler mHandler = new Handler(Looper.getMainLooper());
+    protected final Handler mHandler = new Handler(Looper.getMainLooper());
     private IntegrationType mIntegrationType = IntegrationType.NORMAL;
     private final AdTargetingData mAdTargetingData = new AdTargetingData();
     protected BaseTrackableController mDisplayController;
@@ -243,19 +242,19 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         runOnUiThread(() -> LoopMeTracker.post(packErrorInfo(error.getMessage())));
     }
 
-    private void startTimer(TimersType fetcherTimer, AdParams adParam) {
+    private void startTimer(AdParams adParam) {
         if (mTimers == null) {
             return;
         }
         if (adParam != null) {
             mTimers.setExpirationValidTime(adParam.getExpiredTime());
         }
-        mTimers.startTimer(fetcherTimer);
+        mTimers.startTimer(TimersType.EXPIRATION_TIMER);
     }
 
-    protected void stopTimer(TimersType timersType) {
+    protected void stopTimer() {
         if (mTimers != null) {
-            mTimers.stopTimer(timersType);
+            mTimers.stopTimer(TimersType.EXPIRATION_TIMER);
         }
     }
 
@@ -280,11 +279,10 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
      */
     public void load() { load(mIntegrationType); }
 
-    public AdFetchTask load(String url) {
+    public void load(String url) {
         setAdState(Constants.AdState.LOADING);
         AdFetchTask adFetchTask = new AdFetchTaskByUrl(this, adFetchListener, url);
         adFetchTask.fetch();
-        return adFetchTask;
     }
 
     private boolean isCouldLoadAd() {
@@ -305,7 +303,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
             onAdLoadFail(new LoopMeError(error));
             return false;
         }
-        if (!HttpUtils.isOnline(getContext())) {
+        if (HttpUtils.isOffline(getContext())) {
             error = "No connection";
             Logging.out(LOG_TAG, error);
             onAdLoadFail(new LoopMeError(error));
@@ -346,7 +344,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     private void proceedPrepareAd(AdParams adParams) {
         setBackendAutoLoadingValue(adParams.getAutoLoading());
-        startTimer(TimersType.EXPIRATION_TIMER, adParams);
+        startTimer(adParams);
         setAdParams(adParams);
         if (isVpaidAd()) {
             mDisplayController = new DisplayControllerVpaid(this);
@@ -402,10 +400,12 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         if (arg == TimersType.EXPIRATION_TIMER) onAdExpired();
     }
 
-    public void runOnUiThread(Runnable runnable) { if (mHandler != null) mHandler.post(runnable); }
+    public void runOnUiThread(Runnable runnable) {
+        mHandler.post(runnable);
+    }
 
     public void runOnUiThreadDelayed(Runnable runnable, long time) {
-        if (mHandler != null) mHandler.postDelayed(runnable, time);
+        mHandler.postDelayed(runnable, time);
     }
 
     public void onNewContainer(@NonNull FrameLayout containerView) {

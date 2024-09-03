@@ -34,7 +34,7 @@ public class Constants {
     public static final int DEFAULT_BANNER_HEIGHT = 50;
     public static final long DESTROY_TIME_DELAY = 200;
 
-    public static boolean sDebugMode = false;
+    public static final boolean sDebugMode = false;
     public static final String MRAID_SCRIPT = "<script src=\"mraid.js\"></script>";
 
     public static final String HTTPS_SCHEME = "https";
@@ -79,8 +79,8 @@ public class Constants {
     public static final int PREPARE_VPAID_JS_TIMEOUT = 1000 * 10; //10 seconds
     public static final int SHRINK_MODE_KEEP_AFTER_FINISH_TIME = 1000;
     public static final int DEFAULT_EXPIRED_TIME = 1000 * 60 * 10;//10 minutes
-    public static long CACHED_VIDEO_LIFE_TIME = 1000 * 60 * 60 * 32;//32 hours
-    public static boolean USE_MOBILE_NETWORK_FOR_CACHING = true;
+    public static final long CACHED_VIDEO_LIFE_TIME = 1000 * 60 * 60 * 32;//32 hours
+    public static final boolean USE_MOBILE_NETWORK_FOR_CACHING = true;
     public static String sCacheDirectory = "";
     public static final String EXTRAS_ALLOW_ORIENTATION_CHANGE = "allowOrientationChange";
     public static final String EXTRAS_FORCE_ORIENTATION = "forceOrientation";
@@ -99,9 +99,7 @@ public class Constants {
         }
     }
 
-    public enum PlacementType {
-        BANNER, INTERSTITIAL, REWARDED;
-    }
+    public enum PlacementType { BANNER, INTERSTITIAL, REWARDED }
 
     public enum AdState {
         /**
@@ -246,8 +244,8 @@ public class Constants {
         public static final int EXPAND_BANNER_HEIGHT = 50;
         public static final int SIZE_DISCREPANCY = 2;
 
-        public static int[] EXPANDABLE_BANNER_SIZE = {EXPAND_BANNER_WIDTH, EXPAND_BANNER_HEIGHT};
-        public static int[] MPU_BANNER_SIZE = {MPU_BANNER_WIDTH, MPU_BANNER_HEIGHT};
+        public static final int[] EXPANDABLE_BANNER_SIZE = {EXPAND_BANNER_WIDTH, EXPAND_BANNER_HEIGHT};
+        public static final int[] MPU_BANNER_SIZE = {MPU_BANNER_WIDTH, MPU_BANNER_HEIGHT};
     }
 
     public static class Layout {

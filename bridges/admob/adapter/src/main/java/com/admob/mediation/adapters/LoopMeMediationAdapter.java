@@ -33,10 +33,6 @@ public class LoopMeMediationAdapter extends Adapter {
 
     private static final String LOG_TAG = LoopMeMediationAdapter.class.getSimpleName();
 
-    private LoopMeInterstitialListener interstitialLoader;
-    private LoopMeRewardedListener rewardedLoader;
-    private LoopMeBannerListener bannerLoader;
-    
     @NonNull
     @Override
     public VersionInfo getSDKVersionInfo() {
@@ -108,7 +104,7 @@ public class LoopMeMediationAdapter extends Adapter {
         @NonNull MediationInterstitialAdConfiguration adConfiguration,
         @NonNull MediationAdLoadCallback<MediationInterstitialAd, MediationInterstitialAdCallback> callback
     ) {
-        interstitialLoader = new LoopMeInterstitialListener(adConfiguration, callback);
+        LoopMeInterstitialListener interstitialLoader = new LoopMeInterstitialListener(adConfiguration, callback);
         interstitialLoader.loadAd();
     }
 
@@ -117,7 +113,7 @@ public class LoopMeMediationAdapter extends Adapter {
         @NonNull MediationRewardedAdConfiguration adConfiguration,
         @NonNull MediationAdLoadCallback<MediationRewardedAd, MediationRewardedAdCallback> callback
     ) {
-        rewardedLoader = new LoopMeRewardedListener(adConfiguration, callback);
+        LoopMeRewardedListener rewardedLoader = new LoopMeRewardedListener(adConfiguration, callback);
         rewardedLoader.loadAd();
     }
 
@@ -126,7 +122,7 @@ public class LoopMeMediationAdapter extends Adapter {
         @NonNull MediationBannerAdConfiguration adConfiguration,
         @NonNull MediationAdLoadCallback<MediationBannerAd, MediationBannerAdCallback> callback
     ) {
-        bannerLoader = new LoopMeBannerListener(adConfiguration, callback);
+        LoopMeBannerListener bannerLoader = new LoopMeBannerListener(adConfiguration, callback);
         bannerLoader.loadAd();
     }
 }

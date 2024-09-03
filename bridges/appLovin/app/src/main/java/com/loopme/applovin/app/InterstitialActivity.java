@@ -18,7 +18,6 @@ public class InterstitialActivity extends AppCompatActivity implements MaxAdList
     // private static final String APPLOVIN_UNIT_ID = "114e4121c286d22a";
     private static final String APPLOVIN_UNIT_ID = "9dd28ead1f9f70a5";
     private MaxInterstitialAd interstitialAd;
-    private Button mLoadButton;
     private Button mShowButton;
     private void toast(String message) {
         Toast.makeText(InterstitialActivity.this, message, Toast.LENGTH_SHORT).show();
@@ -29,7 +28,7 @@ public class InterstitialActivity extends AppCompatActivity implements MaxAdList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_interstitial);
 
-        mLoadButton = findViewById(R.id.load_button);
+        Button mLoadButton = findViewById(R.id.load_button);
         mLoadButton.setEnabled(true);
         mLoadButton.setOnClickListener((view) -> loadAd());
 

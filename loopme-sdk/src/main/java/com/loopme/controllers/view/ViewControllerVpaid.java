@@ -15,7 +15,6 @@ import com.loopme.Logging;
 import com.loopme.R;
 import com.loopme.controllers.display.DisplayControllerVpaid;
 import com.loopme.time.TimerWithPause;
-import com.loopme.utils.ImageUtils;
 import com.loopme.utils.Utils;
 
 public class ViewControllerVpaid implements View.OnClickListener {
@@ -85,7 +84,7 @@ public class ViewControllerVpaid implements View.OnClickListener {
     public void startCloseButtonTimer(long duration) {
         cancelCloseButtonTimer();
         Logging.out(LOG_TAG, "startCloseButtonTimer");
-        mCloseButtonTimer = new TimerWithPause(duration, Constants.ONE_SECOND_IN_MILLIS, true) {
+        mCloseButtonTimer = new TimerWithPause(duration) {
             @Override
             public void onTick(long millisUntilFinished) {
                 Logging.out(LOG_TAG, "Till extra close button " + millisUntilFinished / 1000);

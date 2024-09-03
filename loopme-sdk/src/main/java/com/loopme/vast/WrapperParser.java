@@ -2,9 +2,6 @@ package com.loopme.vast;
 
 import android.text.TextUtils;
 
-
-import androidx.annotation.NonNull;
-
 import com.loopme.Constants;
 import com.loopme.xml.Impression;
 import com.loopme.xml.Tracking;
@@ -18,14 +15,14 @@ import java.util.List;
 import java.util.Map;
 
 public class WrapperParser {
-    private final List<String> mErrorUrlList = new ArrayList<String>();
-    private final List<Tracking> mTrackingList = new ArrayList<Tracking>();
-    private final ArrayList<String> mSimpleImpressionList = new ArrayList<String>();
-    private final Map<String, ArrayList<String>> mViewableImpressionMap = new HashMap<String, ArrayList<String>>();
+    private final List<String> mErrorUrlList = new ArrayList<>();
+    private final List<Tracking> mTrackingList = new ArrayList<>();
+    private final ArrayList<String> mSimpleImpressionList = new ArrayList<>();
+    private final Map<String, ArrayList<String>> mViewableImpressionMap = new HashMap<>();
     private final List<Verification> verificationList = new ArrayList<>();
-    private final List<String> mVideoClicksList = new ArrayList<String>();
-    private final List<String> mCompanionCreativeViewEventsList = new ArrayList<String>();
-    private final List<String> mCompanionClickTrackingList = new ArrayList<String>();
+    private final List<String> mVideoClicksList = new ArrayList<>();
+    private final List<String> mCompanionCreativeViewEventsList = new ArrayList<>();
+    private final List<String> mCompanionClickTrackingList = new ArrayList<>();
 
     public WrapperParser(List<Wrapper> mWrapperList) {
         for (Wrapper wrapper : mWrapperList) {

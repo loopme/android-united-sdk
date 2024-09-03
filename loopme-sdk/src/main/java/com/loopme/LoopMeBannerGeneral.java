@@ -11,7 +11,6 @@ import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
-import com.loopme.time.TimersType;
 import com.loopme.tracker.partners.LoopMeTracker;
 
 /**
@@ -128,7 +127,7 @@ public class LoopMeBannerGeneral extends LoopMeAd {
 
     private void showInternal() {
         setAdState(Constants.AdState.SHOWING);
-        stopTimer(TimersType.EXPIRATION_TIMER);
+        stopTimer();
         mContainerView = mBannerView;
         buildAdView();
         mBannerView.setVisibility(View.VISIBLE);
