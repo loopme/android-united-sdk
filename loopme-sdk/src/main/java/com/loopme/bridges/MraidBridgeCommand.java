@@ -15,13 +15,17 @@ final class MraidBridgeCommand {
     static final String EXPAND = "expand";
     static final String USE_CUSTOM_CLOSE = "usecustomclose";
 
-    static void handleCommand(MraidBridgeListener mMraidBridgeListener, Uri uri, String command) {
+    static void handleCommand(MraidBridgeListener mMraidBridgeListener, Uri uri, String command, boolean isInteracted) {
         boolean useCustomClose = false;
         if (MraidBridgeCommand.USE_CUSTOM_CLOSE.equals(command)) {
             mMraidBridgeListener.onChangeCloseButtonVisibility(useCustomClose);
         }
         if (EXPAND.equals(command)) {
-            mMraidBridgeListener.expand(useCustomClose);
+            if (isInteracted) {
+                mMraidBridgeListener.expand(useCustomClose);
+            } else {
+                Logging.out(LOG_TAG, "Expand blocked: User has not clicked on the ad.");
+            }
         }
         if (MraidBridgeCommand.RESIZE.equals(command)) {
             mMraidBridgeListener.resize(
@@ -33,7 +37,11 @@ final class MraidBridgeCommand {
             mMraidBridgeListener.close();
         }
         if (MraidBridgeCommand.OPEN.equals(command)) {
-            mMraidBridgeListener.open(BridgeQuery.detect(uri, BridgeQuery.URL));
+            if (isInteracted) {
+                mMraidBridgeListener.open(BridgeQuery.detect(uri, BridgeQuery.URL));
+            } else {
+                Logging.out(LOG_TAG, "Redirect blocked: User has not clicked on the ad.");
+            }
         }
         if (MraidBridgeCommand.PLAY_VIDEO.equals(command)) {
             String videoUrl = BridgeQuery.detect(uri, BridgeQuery.URI);

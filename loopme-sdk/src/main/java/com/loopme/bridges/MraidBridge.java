@@ -59,22 +59,7 @@ public class MraidBridge extends WebViewClientCompat {
         }
         if (PROTOCOL.MRAID.equalsIgnoreCase(scheme)) {
             String command = uri.getHost();
-
-            if (MraidBridgeCommand.OPEN.equals(command)) {
-                if (!userClicked) {
-                    Logging.out(LOG_TAG, "Redirect blocked: User has not clicked on the ad.");
-                    return true;
-                }
-            }
-
-            if (MraidBridgeCommand.EXPAND.equals(command)) {
-                if (!userClicked) {
-                    Logging.out(LOG_TAG, "Expand blocked: User has not clicked on the ad.");
-                    return true;
-                }
-            }
-
-            MraidBridgeCommand.handleCommand(mMraidBridgeListener, uri, command);
+            MraidBridgeCommand.handleCommand(mMraidBridgeListener, uri, command, userClicked);
             return true;
         }
         // loopme://webview/close
@@ -87,12 +72,6 @@ public class MraidBridge extends WebViewClientCompat {
             return true;
         }
 
-        // for other URLs, block if no user click
-        if (!userClicked) {
-            Logging.out(LOG_TAG, "Redirect blocked: User has not clicked on the ad.");
-            return true;
-        }
-
         mMraidBridgeListener.open(url);
         return true;
     }
@@ -102,17 +81,11 @@ public class MraidBridge extends WebViewClientCompat {
         super.onPageFinished(view, url);
         mMraidBridgeListener.onLoadSuccess();
         adReadyListener.onCall();
-        resetUserClickStatus();
     }
 
     @Override
     public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
         super.onReceivedError(view, request, error);
         ((MraidView) view).notifyError();
-        resetUserClickStatus();
-    }
-
-    public void resetUserClickStatus() {
-        userClicked = false;
     }
 }
