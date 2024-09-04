@@ -1,6 +1,8 @@
 package com.ironsource.adapters.custom.loopme;
 
 import android.app.Activity;
+import android.content.Context;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
@@ -44,8 +46,8 @@ public class LoopmeCustomBanner extends BaseBanner<LoopmeCustomAdapter> {
                 @Override
                 public void onLoopMeBannerLoadSuccess(LoopMeBanner banner) {
                     listener.onAdLoadSuccess(mBanner.getBannerView(), new FrameLayout.LayoutParams(
-                            FrameLayout.LayoutParams.WRAP_CONTENT,
-                            FrameLayout.LayoutParams.MATCH_PARENT,
+                            convertDpToPixel(activity, isBannerSize.getWidth()),
+                            convertDpToPixel(activity, isBannerSize.getHeight()),
                             Gravity.CENTER
                     ));
                     Log.d(LOG_TAG, "onLoopMeBannerLoadSuccess");
@@ -98,6 +100,10 @@ public class LoopmeCustomBanner extends BaseBanner<LoopmeCustomAdapter> {
             Log.e(LOG_TAG, e.getMessage());
             listener.onAdLoadFailed(AdapterErrorType.ADAPTER_ERROR_TYPE_INTERNAL, -1, e.getMessage());
         }
+    }
+
+    private int convertDpToPixel(Context context, int dp) {
+        return dp * context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT;
     }
 
     @Override
