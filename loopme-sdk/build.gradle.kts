@@ -36,7 +36,7 @@ dependencies {
 
     implementation("com.google.androidbrowserhelper:androidbrowserhelper:2.5.0")
 
-    implementation("androidx.test.ext:junit:1.2.1")
+    testImplementation("androidx.test.ext:junit:1.2.1")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("junit:junit:4.13.2")
