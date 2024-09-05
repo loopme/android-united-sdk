@@ -12,21 +12,16 @@ import java.util.List;
 public class LogDbHelper extends SQLiteOpenHelper {
     private static final String TABLE_NAME = "loopme_logs";
     static final String LOG = "log";
-    private SQLiteDatabase db;
 
     private static final String TABLE_CREATE =
         "create table " + TABLE_NAME + " (id integer primary key autoincrement, log text not null);";
 
     public LogDbHelper(Context context) {
         super(context, "LoopMeLogs.db", null, 1);
-        db = getWritableDatabase();
-
     }
 
     @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL(TABLE_CREATE);
-    }
+    public void onCreate(SQLiteDatabase sqLiteDatabase) { sqLiteDatabase.execSQL(TABLE_CREATE); }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
@@ -35,7 +30,7 @@ public class LogDbHelper extends SQLiteOpenHelper {
     }
 
     public void putLog(String logMessage) {
-//        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
         try (Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null)) {
             if (cursor.getCount() >= 1000) {
                 clear();
@@ -48,17 +43,12 @@ public class LogDbHelper extends SQLiteOpenHelper {
     }
 
     public List<String> getLogs() {
-        try (Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null)) {
+        try (Cursor cursor = getWritableDatabase().rawQuery("SELECT * FROM " + TABLE_NAME, null)) {
             List<String> logs = new ArrayList<>();
             while (cursor.moveToNext()) logs.add(cursor.getString(1));
             return logs;
         }
     }
 
-    public void clear() { db.delete(TABLE_NAME, null, null); }
-
-    @Override
-    public void close() {
-       db.close();
-    }
+    public void clear() { getWritableDatabase().delete(TABLE_NAME, null, null); }
 }
