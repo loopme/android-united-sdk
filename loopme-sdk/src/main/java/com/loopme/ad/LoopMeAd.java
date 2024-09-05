@@ -189,6 +189,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
 
     public void destroy() {
         mIsReady = false;
+        LiveDebug.destroy();
         setAdState(Constants.AdState.NONE);
         if (mAdFetchTask != null) {
             mAdFetchTask.stopFetch();

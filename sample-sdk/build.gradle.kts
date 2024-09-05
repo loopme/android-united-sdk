@@ -39,4 +39,6 @@ dependencies {
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.core:core-ktx:1.13.1")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
+
 }

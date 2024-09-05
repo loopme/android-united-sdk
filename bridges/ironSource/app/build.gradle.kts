@@ -40,4 +40,6 @@ dependencies {
     implementation("com.google.android.material:material:1.6.0")
 
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
+
 }

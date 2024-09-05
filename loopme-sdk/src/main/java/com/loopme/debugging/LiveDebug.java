@@ -33,7 +33,14 @@ public class LiveDebug {
     private static boolean sIsDebugOn;
     public static boolean isDebugOn() { return sIsDebugOn; }
 
-    public static void init(Context context) { sLogDbHelper = new LogDbHelper(context); }
+    public static void init(Context context) {
+        sLogDbHelper = new LogDbHelper(context);
+    }
+
+    public static void destroy() {
+        sLogDbHelper.close();
+        sLogDbHelper = null;
+    }
 
     public static void setLiveDebug(String packageId, final boolean debug, final String appKey) {
         Logging.out(LOG_TAG, "setLiveDebug " + debug);
