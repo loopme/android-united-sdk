@@ -79,6 +79,8 @@ public final class LoopMeSdk {
         Utils.init(context);
 
         if (isInitialized) {
+            long end = System.currentTimeMillis();
+            Utils.setInitializationTimeMillis((int) (end - start));
             sdkInitListener.onSdkInitializationSuccess();
             return;
         }
