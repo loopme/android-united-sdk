@@ -8,6 +8,7 @@ import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.debugging.LiveDebug;
 import com.loopme.om.OmidHelper;
+import com.loopme.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -97,6 +98,7 @@ public class RequestBuilder implements Serializable {
     private static final String CONSENT = "consent";
     private static final String OUTPUT = "audio_output";
     private static final String MUSIC = "music";
+    private static final String SDK_INIT_TIME = "sdk_init_time";
 
     public static JSONObject buildRequestJson(Context context, LoopMeAd loopMeAd) throws JSONException {
         RequestUtils requestUtils = new RequestUtils(context, loopMeAd);
@@ -212,9 +214,10 @@ public class RequestBuilder implements Serializable {
                 )
                 .build()
             }))
-            .put(EXT, isRewarded ? new JSONBuilder()
-                .put(PLACEMENT_TYPE, REWARDED)
-                .build() : null
+            .put(EXT, new JSONBuilder()
+                .put(PLACEMENT_TYPE, isRewarded ? REWARDED : null)
+                .put(SDK_INIT_TIME, Utils.getInitializationTimeMillis())
+                .build()
             )
             .build();
     }
