@@ -19,10 +19,10 @@ import androidx.annotation.NonNull;
 import com.loopme.Logging;
 import com.loopme.request.AES;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 // TODO. Refactor.
 public class Utils {
@@ -34,7 +34,7 @@ public class Utils {
     private static final Lazy<PackageManager> sPackageManager = kotlin.LazyKt.lazy(() -> sContext.getPackageManager());
     private static final Lazy<String> sPackageName = kotlin.LazyKt.lazy(() -> sContext.getPackageName());
     private static final Lazy<String> sUserAgent = kotlin.LazyKt.lazy(() -> WebSettings.getDefaultUserAgent(sContext));
-    private static final Deque<Integer> initializationTimeMillisQueue = new ArrayDeque<>(5);
+    private static final Queue<Integer> initializationTimeMillisQueue = new ConcurrentLinkedQueue();
 
     private static boolean isInitialized = false;
 
@@ -45,12 +45,12 @@ public class Utils {
         }
     }
 
-    public static void setInitializationTimeMillisQueue(int timeInMillis){
-        initializationTimeMillisQueue.offerLast(timeInMillis);
+    public static void setInitializationTimeMillisQueue(int timeInMillis){//
+        initializationTimeMillisQueue.offer(timeInMillis);
     }
 
-    public static int getInitializationTimeMillisQueue() {
-        Integer oldestValue = initializationTimeMillisQueue.pollFirst();
+    public static int getInitializationTimeMillisQueue() { //
+        Integer oldestValue = initializationTimeMillisQueue.poll();
         return oldestValue == null ? 0 : oldestValue;
     }
 
