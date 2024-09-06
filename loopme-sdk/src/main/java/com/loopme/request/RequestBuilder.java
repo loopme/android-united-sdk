@@ -216,7 +216,7 @@ public class RequestBuilder implements Serializable {
             }))
             .put(EXT, new JSONBuilder()
                 .put(PLACEMENT_TYPE, isRewarded ? REWARDED : null)
-                .put(SDK_INIT_TIME, Utils.getInitializationTimeMillis())
+                .put(SDK_INIT_TIME, Utils.getInitializationTimeMillisQueue())
                 .build()
             )
             .build();

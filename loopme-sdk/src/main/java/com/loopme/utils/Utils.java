@@ -19,7 +19,9 @@ import androidx.annotation.NonNull;
 import com.loopme.Logging;
 import com.loopme.request.AES;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 // TODO. Refactor.
@@ -32,7 +34,7 @@ public class Utils {
     private static final Lazy<PackageManager> sPackageManager = kotlin.LazyKt.lazy(() -> sContext.getPackageManager());
     private static final Lazy<String> sPackageName = kotlin.LazyKt.lazy(() -> sContext.getPackageName());
     private static final Lazy<String> sUserAgent = kotlin.LazyKt.lazy(() -> WebSettings.getDefaultUserAgent(sContext));
-    private static int initializationTimeMillis;
+    private static final Deque<Integer> initializationTimeMillisQueue = new ArrayDeque<>(5);
 
     private static boolean isInitialized = false;
 
@@ -43,12 +45,13 @@ public class Utils {
         }
     }
 
-    public static void setInitializationTimeMillis(int timeInMillis){
-        initializationTimeMillis = timeInMillis;
+    public static void setInitializationTimeMillisQueue(int timeInMillis){
+        initializationTimeMillisQueue.offerLast(timeInMillis);
     }
 
-    public static int getInitializationTimeMillis(){
-        return initializationTimeMillis;
+    public static int getInitializationTimeMillisQueue() {
+        Integer oldestValue = initializationTimeMillisQueue.pollFirst();
+        return oldestValue == null ? 0 : oldestValue;
     }
 
     public static String getUserAgent() { return sUserAgent.getValue(); }
