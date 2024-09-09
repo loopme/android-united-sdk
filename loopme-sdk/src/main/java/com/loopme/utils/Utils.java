@@ -21,6 +21,8 @@ import com.loopme.request.AES;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 // TODO. Refactor.
 public class Utils {
@@ -32,6 +34,7 @@ public class Utils {
     private static final Lazy<PackageManager> sPackageManager = kotlin.LazyKt.lazy(() -> sContext.getPackageManager());
     private static final Lazy<String> sPackageName = kotlin.LazyKt.lazy(() -> sContext.getPackageName());
     private static final Lazy<String> sUserAgent = kotlin.LazyKt.lazy(() -> WebSettings.getDefaultUserAgent(sContext));
+    private static final Queue<Integer> initializationTimeMillisQueue = new ConcurrentLinkedQueue();
 
     private static boolean isInitialized = false;
 
@@ -40,6 +43,15 @@ public class Utils {
             isInitialized = true;
             sContext = context.getApplicationContext();
         }
+    }
+
+    public static void setInitializationTimeMillisQueue(int timeInMillis){//
+        initializationTimeMillisQueue.offer(timeInMillis);
+    }
+
+    public static int getInitializationTimeMillisQueue() { //
+        Integer oldestValue = initializationTimeMillisQueue.poll();
+        return oldestValue == null ? 0 : oldestValue;
     }
 
     public static String getUserAgent() { return sUserAgent.getValue(); }

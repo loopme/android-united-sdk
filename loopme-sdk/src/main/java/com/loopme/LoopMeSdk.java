@@ -79,6 +79,8 @@ public final class LoopMeSdk {
         Utils.init(context);
 
         if (isInitialized) {
+            long end = System.currentTimeMillis();
+            Utils.setInitializationTimeMillisQueue((int) (end - start));
             sdkInitListener.onSdkInitializationSuccess();
             return;
         }
@@ -98,6 +100,7 @@ public final class LoopMeSdk {
         GdprChecker.start(context, configuration.getPublisherConsent());
         long end = System.currentTimeMillis();
 
+        Utils.setInitializationTimeMillisQueue((int) (end - start));
         sdkInitListener.onSdkInitializationSuccess();
 
         if (omidEnd - omidStart > 100) {
