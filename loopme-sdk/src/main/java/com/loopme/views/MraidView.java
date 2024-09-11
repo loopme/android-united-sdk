@@ -27,6 +27,7 @@ public class MraidView extends WebView {
 
     private String mCurrentMraidState;
     private Constants.WebviewState mViewState = Constants.WebviewState.CLOSED;
+    private boolean mIsViewable = false;
 
     private static final String LOG_TAG = MraidView.class.getSimpleName();
 
@@ -66,11 +67,15 @@ public class MraidView extends WebView {
 
     public void setIsViewable(boolean isViewable) {
         loadUrl(BridgeCommandBuilder.mraidSetIsViewable(isViewable));
+        mIsViewable = isViewable;
     }
     public void notifySizeChangeEvent(int width, int height) {
         loadUrl(BridgeCommandBuilder.mraidNotifySizeChangeEvent(width, height));
     }
-    public void notifyReady() { loadUrl(BridgeCommandBuilder.mraidNotifyReady()); }
+    public void notifyReady() {
+        loadUrl(BridgeCommandBuilder.mraidNotifyReady());
+        if (mIsViewable) setIsViewable(true);
+    }
     public void notifyError() { loadUrl(BridgeCommandBuilder.mraidNotifyError()); }
     public void notifyStateChange() { loadUrl(BridgeCommandBuilder.mraidNotifyStateChange()); }
     public void onMraidCallComplete() { loadUrl(BridgeCommandBuilder.mraidNativeCallComplete()); }
