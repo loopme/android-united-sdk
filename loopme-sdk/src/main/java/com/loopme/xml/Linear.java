@@ -7,12 +7,10 @@ import androidx.annotation.NonNull;
 import com.loopme.Constants;
 import com.loopme.parser.xml.Attribute;
 import com.loopme.parser.xml.Tag;
-import com.loopme.utils.Utils;
 import com.loopme.xml.vast4.Icons;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class Linear {
@@ -32,6 +30,9 @@ public class Linear {
     private AdParameters adParameters;
     @Tag
     private Icons icons;
+
+    private static final int MAX_RESOLUTION = 1280 * 720;
+    private static final int MAX_BITRATE = 2000;
 
     public Duration getDuration() { return duration; }
     public VideoClicks getVideoClicks() { return videoClicks; }
@@ -58,59 +59,26 @@ public class Linear {
 
     public MediaFiles getMediaFiles() { return mediaFiles; }
 
-    private static Comparator<MediaFile> createMediaSizeComparator(final int screenSquare) {
-        return new Comparator<MediaFile>() {
-            @Override
-            public int compare(MediaFile mediaFile1, MediaFile mediaFile2) {
-                // TODO. Use resolution comparisons instead of squares?
-                int square1 = calculateSquare(mediaFile1);
-                int square2 = calculateSquare(mediaFile2);
-
-                // Higher bitrate first.
-                if (square1 == square2)
-                    return Integer.compare(mediaFile2.getBitrate(), mediaFile1.getBitrate());
-
-                // Equal screen resolutions are top priority.
-                if (screenSquare == square1)
-                    return -1;
-
-                // Equal screen resolutions are top priority.
-                if (screenSquare == square2)
-                    return 1;
-
-                // Lower-than-screen resolutions go first.
-                if (square2 > screenSquare && screenSquare > square1)
-                    return -1;
-
-                // Lower-than-screen resolutions go first.
-                if (square1 > screenSquare && screenSquare > square2)
-                    return 1;
-
-                // The lowest of the higher-than-screen resolutions go first
-                // when there's no lower-than-screen resolution.
-                return square1 > screenSquare
-                        ? Integer.compare(square1, square2)
-                        : Integer.compare(square2, square1);
-            }
-
-            private int calculateSquare(MediaFile mediaFile) {
-                return mediaFile.getHeight() * mediaFile.getWidth();
-            }
-        };
-    }
-
-    private static List<MediaFile> filterAndSortSupportedMediaFiles(List<MediaFile> mediaFileList) {
+    private static List<MediaFile> getSupportedMediaFiles(List<MediaFile> mediaFileList) {
         if (mediaFileList == null) return new ArrayList<>();
         List<MediaFile> supportedMediaFilesList = new ArrayList<>();
         for (MediaFile mediaFile : mediaFileList) {
-            String text = mediaFile == null ? "" : mediaFile.getText();
+            if (mediaFile == null) continue;
+            String text = mediaFile.getText();
             boolean isSupportedFormat =
-                    text.contains(Constants.MP4_FORMAT_EXT) || text.contains(Constants.WEBM_FORMAT_EXT);
-            if (isSupportedFormat) supportedMediaFilesList.add(mediaFile);
+                text.contains(Constants.MP4_FORMAT_EXT) || text.contains(Constants.WEBM_FORMAT_EXT);
+            int resolution = mediaFile.getHeight() * mediaFile.getWidth();
+            boolean isPreferredResolutionAndBitrate =
+                resolution <= MAX_RESOLUTION && mediaFile.getBitrate() < MAX_BITRATE;
+            if (isSupportedFormat && isPreferredResolutionAndBitrate) {
+                supportedMediaFilesList.add(mediaFile);
+            }
         }
-        Comparator<MediaFile> mediaSizeComparator =
-                createMediaSizeComparator(Utils.getScreenWidthInPixels() * Utils.getScreenHeightInPixels());
-        Collections.sort(supportedMediaFilesList, mediaSizeComparator);
+        Collections.sort(supportedMediaFilesList, (mediaFile1, mediaFile2) -> {
+            int square1 = mediaFile1.getHeight() * mediaFile1.getWidth();
+            int square2 = mediaFile2.getHeight() * mediaFile2.getWidth();
+            return Integer.compare(square2, square1);
+        });
         return supportedMediaFilesList;
     }
 
@@ -119,7 +87,7 @@ public class Linear {
         List<MediaFile> mediaFileList = mediaFiles.getMediaFileList();
         if (mediaFileList == null) return new ArrayList<>();
         List<String> videoFileUrlsList = new ArrayList<>();
-        for (MediaFile mediaFile : filterAndSortSupportedMediaFiles(mediaFileList))
+        for (MediaFile mediaFile : getSupportedMediaFiles(mediaFileList))
             videoFileUrlsList.add(mediaFile.getText().trim());
         return(videoFileUrlsList);
     }
