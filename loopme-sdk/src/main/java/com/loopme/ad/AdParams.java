@@ -309,4 +309,10 @@ public class AdParams implements Serializable {
         Vast vast = parseVast(xml);
         return vast != null && vast.getAd() != null;
     }
+
+    public boolean isValid() {
+        return !mVideoFileUrls.isEmpty() ||
+            (mHtml != null && !mHtml.isEmpty()) ||
+            (mVpaidJsUrl != null && !mVpaidJsUrl.isEmpty());
+    }
 }
