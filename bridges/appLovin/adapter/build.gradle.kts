@@ -11,9 +11,10 @@ android {
 }
 
 dependencies {
-    api(project(":loopme-sdk"))
-//    api("com.github.loopme.android-united-sdk:loopme-sdk:9.0.5")
-    api("com.applovin:applovin-sdk:12.6.0")
+//    api(project(":loopme-sdk"))
+    api("com.github.loopme.android-united-sdk:loopme-sdk:9.0.6")
+    //noinspection GradleDynamicVersion
+    api("com.applovin:applovin-sdk:12.+")
 
     //noinspection GradleDependency - appcompat and material > 1.6.0 does not supported by Unity 2021
     implementation("androidx.appcompat:appcompat:1.6.0")
