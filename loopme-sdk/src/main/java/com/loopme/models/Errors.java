@@ -23,7 +23,7 @@ public class Errors {
             104, "Html loading error");
 
     public static final LoopMeError NO_VALID_ADS_FOUND = new LoopMeError(
-            105, "No valid ads found");
+            105, "No valid ads found (Video, VPAID js, HTML does not exist in response)");
 
     public static final LoopMeError AD_PROCESSING_TIMEOUT = new LoopMeError(
             106, "Ad processing timeout");

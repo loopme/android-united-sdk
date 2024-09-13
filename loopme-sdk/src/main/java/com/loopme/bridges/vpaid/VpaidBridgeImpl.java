@@ -94,15 +94,8 @@ public class VpaidBridgeImpl implements VpaidBridge {
     }
 
     private void initAd() {
-        Logging.out(LOG_TAG, "JS: call initAd()");
-        String requestTemplate = "initAd(" +
-            "%1$d," + // width
-            "%2$d," + // height
-            "%3$s," + // viewMode
-            "%4$s," + // desiredBitrate
-            "%5$s," + // creativeData
-            "%6$s)"; // environmentVars
-        String requestFinal = String.format(Locale.US, requestTemplate,
+        String requestFinal = String.format(Locale.US,
+            "initAd(%d, %d, %s, %s, %s, %s);",
             mCreativeParams.getWidth(),
             mCreativeParams.getHeight(),
             mCreativeParams.getViewMode(),
@@ -110,6 +103,7 @@ public class VpaidBridgeImpl implements VpaidBridge {
             mCreativeParams.getCreativeData(),
             mCreativeParams.getEnvironmentVars()
         );
+        Logging.out(LOG_TAG, "JS: call " + requestFinal);
         callWrapper(requestFinal);
     }
 

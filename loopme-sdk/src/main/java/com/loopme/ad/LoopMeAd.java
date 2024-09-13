@@ -67,8 +67,12 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         @Override
         public void onAdFetchCompleted(AdParams adParams) {
             if (adParams != null) {
-                LoopMeTracker.trackSdkFeedBack(adParams.getPackageIds(), adParams.getToken());
-                proceedPrepareAd(adParams);
+                if (adParams.isValid()) {
+                    LoopMeTracker.trackSdkFeedBack(adParams.getPackageIds(), adParams.getToken());
+                    proceedPrepareAd(adParams);
+                } else {
+                    onInternalLoadFail(Errors.NO_VALID_ADS_FOUND);
+                }
             } else {
                 onInternalLoadFail(Errors.DOWNLOAD_ERROR);
             }

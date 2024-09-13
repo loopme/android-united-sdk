@@ -110,6 +110,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         StringBuilder htmlBuilder = readAssets(mContext.getAssets());
         onAdInjectJsVpaid(htmlBuilder);
         String html = htmlBuilder.toString().replace(VPAID_CREATIVE_URL_STRING, mAdParams.getVpaidJsUrl());
+        Logging.out(LOG_TAG, "VPAID html: " + html);
         mIsWaitingForWebView = true;
         ((MraidView) getWebView()).loadHtml(html);
     }

@@ -1,6 +1,7 @@
 package com.ironsource.adapters.custom.loopme;
 
 import android.app.Activity;
+import android.util.Log;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
@@ -40,10 +41,12 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
                 @Override
                 public void onLoopMeInterstitialClicked(LoopMeInterstitial arg0) {
                     rewardedVideoAdListener.onAdClicked();
+                    Log.d(LOG_TAG, "onLoopMeInterstitialClicked");
                 }
 
                 @Override
                 public void onLoopMeInterstitialExpired(LoopMeInterstitial arg0) {
+                    Log.d(LOG_TAG, "onLoopMeInterstitialExpired");
                 }
 
                 @Override
@@ -51,22 +54,27 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
                     if (!isAlreadyRewarded) {
                         rewardedVideoAdListener.onAdRewarded();
                         isAlreadyRewarded = true;
+                        Log.d(LOG_TAG, "onLoopMeInterstitialHide (Rewarded)");
                     }
                     rewardedVideoAdListener.onAdClosed();
+                    Log.d(LOG_TAG, "onLoopMeInterstitialHide");
                 }
 
                 @Override
                 public void onLoopMeInterstitialLeaveApp(LoopMeInterstitial arg0) {
+                    Log.d(LOG_TAG, "onLoopMeInterstitialLeaveApp");
                 }
 
                 @Override
                 public void onLoopMeInterstitialLoadSuccess(LoopMeInterstitial arg0) {
                     rewardedVideoAdListener.onAdLoadSuccess();
+                    Log.d(LOG_TAG, "onLoopMeInterstitialLoadSuccess");
                 }
 
                 @Override
                 public void onLoopMeInterstitialLoadFail(LoopMeInterstitial loopMeInterstitial, LoopMeError i) {
                     rewardedVideoAdListener.onAdLoadFailed(AdapterErrorType.ADAPTER_ERROR_TYPE_INTERNAL, i.getErrorCode(), i.getMessage());
+                    Log.d(LOG_TAG, "onLoopMeInterstitialLoadFail " + i.getMessage() + " " + i.getErrorCode());
                 }
 
                 @Override
@@ -74,6 +82,7 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
                     rewardedVideoAdListener.onAdOpened();
                     rewardedVideoAdListener.onAdShowSuccess();
                     rewardedVideoAdListener.onAdVisible();
+                    Log.d(LOG_TAG, "onLoopMeInterstitialShow");
                 }
 
                 @Override
@@ -81,8 +90,10 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
                     if (!isAlreadyRewarded) {
                         rewardedVideoAdListener.onAdRewarded();
                         isAlreadyRewarded = true;
+                        Log.d(LOG_TAG, "onLoopMeInterstitialVideoDidReachEnd (Rewarded)");
                     }
                     rewardedVideoAdListener.onAdEnded();
+                    Log.d(LOG_TAG, "onLoopMeInterstitialVideoDidReachEnd");
                 }
             });
             mRewarded.load(IntegrationType.NORMAL);
