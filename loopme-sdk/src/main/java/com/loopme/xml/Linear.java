@@ -31,7 +31,7 @@ public class Linear {
     @Tag
     private Icons icons;
 
-    private static final int MAX_RESOLUTION = 1280 * 720;
+    private static final int MAX_RESOLUTION = 1920 * 1080;
     private static final int MAX_BITRATE = 2000;
 
     public Duration getDuration() { return duration; }
