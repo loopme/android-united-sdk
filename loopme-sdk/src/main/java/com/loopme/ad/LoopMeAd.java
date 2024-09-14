@@ -220,6 +220,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     }
 
     public void onInternalLoadFail(LoopMeError error) {
+        Logging.out(LOG_TAG, "Ad load failed: " + error.getMessage());
         runOnUiThread(() -> {
             onAdLoadFail(error);
             onSendPostWarning(error);

@@ -3,24 +3,22 @@ package com.loopme.controllers.display;
 import android.annotation.SuppressLint;
 import android.content.res.AssetManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
 
 import com.loopme.Constants;
+import com.loopme.CreativeParams;
 import com.loopme.Logging;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.bridges.MraidBridge;
 import com.loopme.bridges.vpaid.BridgeEventHandler;
 import com.loopme.bridges.vpaid.VpaidBridge;
-import com.loopme.bridges.vpaid.VpaidBridgeImpl;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.MraidController;
 import com.loopme.controllers.interfaces.VastVpaidDisplayController;
 import com.loopme.controllers.view.ViewControllerVpaid;
-import com.loopme.models.BridgeMethods;
 import com.loopme.models.Errors;
 import com.loopme.time.SimpleTimer;
 import com.loopme.time.Timers;
@@ -44,10 +42,6 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         Vast4WebViewClient.OnPageLoadedListener, Observer {
 
     private static final String LOG_TAG = DisplayControllerVpaid.class.getSimpleName();
-    private static final String HTML_SOURCE_FILE = "loopmeAd.html";
-    private static final String VPAID_CREATIVE_URL_STRING = "[VPAID_CREATIVE_URL]";
-    private static final String ANDROID_JS_INTERFACE = "android";
-    private static final int IMPRESSION_TIMER = 2000;
 
     private final VpaidBridge mVpaidBridge;
     private final ViewControllerVpaid mViewControllerVpaid;
@@ -68,11 +62,12 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     public DisplayControllerVpaid(LoopMeAd loopMeAd) {
         super(loopMeAd);
         mTimer = new Timers(this);
-        mVpaidBridge = new VpaidBridgeImpl(this, mLoopMeAd.getAdParams(), mLoopMeAd.getAdSpotDimensions());
+        mVpaidBridge = new VpaidBridge(
+            this,
+            new CreativeParams(mLoopMeAd.getAdSpotDimensions(), mLoopMeAd.getAdParams().getAdParams())
+        );
         mViewControllerVpaid = new ViewControllerVpaid(this);
         mVideoDuration = mAdParams.getDuration();
-        mLogTag = DisplayControllerVast.class.getSimpleName();
-        Logging.out(mLogTag);
     }
 
     @Override
@@ -82,7 +77,6 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         }
         if (arg == TimersType.PREPARE_VPAID_JS_TIMER) {
             if (mTimer != null) mTimer.stopTimer(TimersType.PREPARE_VPAID_JS_TIMER);
-            Logging.out(LOG_TAG, "Js loading timeout");
             mLoopMeAd.onInternalLoadFail(Errors.JS_LOADING_TIMEOUT);
         }
     }
@@ -90,7 +84,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     //region DisplayController methods
 
     private StringBuilder readAssets(AssetManager assetManager) {
-        try (InputStream inputStream = assetManager.open(HTML_SOURCE_FILE)) {
+        try (InputStream inputStream = assetManager.open("loopmeAd.html")) {
             StringBuilder out = new StringBuilder();
             byte[] buffer = new byte[4096];
             int bytesRead;
@@ -109,10 +103,10 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         if (mTimer != null) mTimer.startTimer(TimersType.PREPARE_VPAID_JS_TIMER);
         StringBuilder htmlBuilder = readAssets(mContext.getAssets());
         onAdInjectJsVpaid(htmlBuilder);
-        String html = htmlBuilder.toString().replace(VPAID_CREATIVE_URL_STRING, mAdParams.getVpaidJsUrl());
-        Logging.out(LOG_TAG, "VPAID html: " + html);
         mIsWaitingForWebView = true;
-        ((MraidView) getWebView()).loadHtml(html);
+        ((MraidView) getWebView()).loadHtml(
+            htmlBuilder.toString().replace("[VPAID_CREATIVE_URL]", mAdParams.getVpaidJsUrl())
+        );
     }
 
     @SuppressLint("JavascriptInterface")
@@ -125,7 +119,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         Vast4WebViewClient vast4WebViewClient = new Vast4WebViewClient();
         vast4WebViewClient.setOnPageLoadedListener(this);
         wv.setWebViewClient(vast4WebViewClient);
-        wv.addJavascriptInterface(mVpaidBridge, ANDROID_JS_INTERFACE);
+        wv.addJavascriptInterface(mVpaidBridge, "android");
         return wv;
     }
 
@@ -137,7 +131,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     @Override
     public void onPlay(int position) {
         mIsStarted = true;
-        callBridgeMethod(BridgeMethods.VPAID_START_AD);
+        runOnUiThread(mVpaidBridge::startAd);
         onStartWebMeasuringDelayed();
         onAdResumedEvent();
     }
@@ -146,16 +140,16 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     public void onPause() {
         if (mIsStarted) {
             super.onPause();
-            callBridgeMethod(BridgeMethods.VPAID_PAUSE_AD);
+            runOnUiThread(mVpaidBridge::pauseAd);
         }
-        if (mViewControllerVpaid != null) mViewControllerVpaid.pause();
+        mViewControllerVpaid.pause();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        callBridgeMethod(BridgeMethods.VPAID_RESUME_AD);
-        if (mViewControllerVpaid != null) mViewControllerVpaid.resume();
+        runOnUiThread(mVpaidBridge::resumeAd);
+        mViewControllerVpaid.resume();
     }
 
     @Override
@@ -166,10 +160,10 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
             mTimer = null;
         }
         runOnUiThread(() -> {
-            callBridgeMethod(BridgeMethods.VPAID_STOP_AD);
+            mVpaidBridge.stopAd();
             destroyWebView();
         });
-        if (mViewControllerVpaid != null) mViewControllerVpaid.destroy();
+        mViewControllerVpaid.destroy();
     }
 
     @Override
@@ -203,24 +197,32 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     }
 
     @Override
-    public void onPrepared() { onAdReady(); }
+    public void onPrepared() {
+        Logging.out(LOG_TAG, "vpaidAdLoaded");
+        onAdReady();
+    }
 
     @Override
     public void onAdSkipped() {
+        Logging.out(LOG_TAG, "vpaidAdSkipped");
         if (!mIsStarted) return;
         mIsWaitingForSkippableState = true;
-        callBridgeMethod(BridgeMethods.VPAID_AD_SKIPPABLE_STATE);
+        runOnUiThread(mVpaidBridge::getAdSkippableState);
     }
 
     @Override
     public void onAdStopped() {
+        Logging.out(LOG_TAG, "vpaidAdStopped");
         if (!mIsStarted) return;
-        postVideoEvent(EventConstants.CLOSE, mCurrentVideoTime);
-        skipVideo();
+        runOnUiThread(() -> {
+            postVideoEvent(EventConstants.CLOSE, mCurrentVideoTime);
+            skipVideo();
+        });
     }
 
     @Override
     public void setSkippableState(boolean skippable) {
+        Logging.out(LOG_TAG, "vpaidAdSetSkippableState: " + skippable);
         if (!mIsStarted) return;
         if (!mIsWaitingForSkippableState || !skippable) return;
         mIsWaitingForSkippableState = false;
@@ -230,6 +232,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     @Override
     public void onRedirect(@Nullable String url, LoopMeAd loopMeAd) {
+        Logging.out(LOG_TAG, "vpaidAdClickThru " + url);
         for (String trackUrl : mAdParams.getVideoClicks()) {
             postVideoEvent(trackUrl);
         }
@@ -243,6 +246,7 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
 
     @Override
     public void trackError(String message) {
+        Logging.out(LOG_TAG, "vpaidAdError " + message);
         if (TextUtils.isEmpty(message)) return;
         UiUtils.broadcastIntent(mLoopMeAd.getContext(), Constants.DESTROY_INTENT, mLoopMeAd.getAdId());
         LoopMeError error = new LoopMeError(901, "Error from vpaid js: trackError(): " + message, Constants.ErrorType.VPAID);
@@ -263,14 +267,15 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     }
 
     @Override
-    public void onDurationChanged() { }
+    public void onDurationChanged() { Logging.out(LOG_TAG, "vpaidAdDurationChanged"); }
     @Override
-    public void onAdLinearChange() { }
+    public void onAdLinearChange() { Logging.out(LOG_TAG, "vpaidAdLinearChange"); }
     @Override
-    public void onAdVolumeChange() { }
+    public void onAdVolumeChange() { Logging.out(LOG_TAG, "vpaidAdVolumeChanged"); }
 
     @Override
     public void postEvent(String eventType) {
+        Logging.out(LOG_TAG, "vpaidAd: " + eventType);
         postVideoEvent(eventType);
         if (TextUtils.equals(eventType, EventConstants.FIRST_QUARTILE) && mCreativeType == CreativeType.VIDEO_OTHER_TYPE) {
             Logging.out(LOG_TAG, "Event video 25% is posted. Dismiss extra close button timer");
@@ -294,105 +299,9 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     }
 
     @Override
-    public void onVideoSource(String source) { videoSourceEventOccurred(source); }
-
-    @Override
-    public void onPageLoaded() {
-        if (!mIsWaitingForWebView) return;
-        Logging.out(LOG_TAG, "Init webView done");
-        callBridgeMethod(BridgeMethods.VPAID_PREPARE_AD);
-        mIsWaitingForWebView = false;
-    }
-
-    @Override
-    public void closeSelf() {
-        mIsWaitingForWebView = false;
-        callBridgeMethod(BridgeMethods.VPAID_STOP_AD);
-        dismissAd();
-    }
-
-    //endregion
-    @Override
-    public void onAdImpression() {
-        mImpressionTimer.stop();
-        for (String url : mAdParams.getImpressionsList()) {
-            postVideoEvent(url);
-            Log.d(mLogTag, "mAdParams.getImpressionsList() " + url);
-        }
-        setVerificationView(getWebView());
-        postViewableEvents(ViewableImpressionTracker.IMPRESSION_TIME_NATIVE_VIDEO);
-    }
-
-
-    @Override
-    public void resizeAd() { callBridgeMethod(BridgeMethods.VPAID_RESIZE_AD); }
-
-    @Override
-    public void adStarted() {
-        mImpressionTimer = new SimpleTimer(IMPRESSION_TIMER, this::onAdImpression);
-        mImpressionTimer.start();
-        if (mCreativeType != CreativeType.VIDEO_OTHER_TYPE) {
-            return;
-        }
-        runOnUiThread(() -> {
-            if (mViewControllerVpaid == null) return;
-            int duration = mVideoDuration * 1000;
-            Logging.out(LOG_TAG, "mVideoDuration " + duration);
-            mViewControllerVpaid.startCloseButtonTimer(duration);
-        });
-    }
-
-    @Override
-    public void setVideoTime(int time) {
-        mCurrentVideoTime = String.valueOf(mVideoDuration - time);
-    }
-
-    private void callBridgeMethod(BridgeMethods method) {
-        runOnUiThread(new CallBridgeRunnable(method));
-    }
-
-    private class CallBridgeRunnable implements Runnable {
-        private final BridgeMethods mMethod;
-        private CallBridgeRunnable(BridgeMethods method) { mMethod = method; }
-        @Override
-        public void run() {
-            if (mVpaidBridge == null) return;
-            switch (mMethod) {
-                case VPAID_PREPARE_AD: {
-                    mVpaidBridge.prepare();
-                    break;
-                }
-                case VPAID_START_AD: {
-                    mVpaidBridge.startAd();
-                    break;
-                }
-                case VPAID_PAUSE_AD: {
-                    mVpaidBridge.pauseAd();
-                    break;
-                }
-                case VPAID_RESUME_AD: {
-                    mVpaidBridge.resumeAd();
-                    break;
-                }
-                case VPAID_RESIZE_AD: {
-                    mVpaidBridge.resizeAd(Utils.getScreenWidthInDp(), Utils.getScreenHeightInDp(), "'fullscreen'");
-                    break;
-                }
-                case VPAID_STOP_AD: {
-                    mVpaidBridge.stopAd();
-                    break;
-                }
-                case VPAID_AD_SKIPPABLE_STATE: {
-                    mVpaidBridge.getAdSkippableState();
-                    break;
-                }
-            }
-        }
-    }
-
-    private void videoSourceEventOccurred(String source) {
+    public void onVideoSource(String source) {
         Logging.out(LOG_TAG, "Video source event received");
-        if (mIsFirstLaunch && mViewControllerVpaid != null) {
+        if (mIsFirstLaunch) {
             mViewControllerVpaid.enableCloseButton(false);
             mIsFirstLaunch = false;
         }
@@ -411,8 +320,62 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
         mLoopMeAd.onSendPostWarning(error);
     }
 
+    @Override
+    public void onPageLoaded() {
+        if (!mIsWaitingForWebView) return;
+        Logging.out(LOG_TAG, "Init webView done");
+        runOnUiThread(mVpaidBridge::prepare);
+        mIsWaitingForWebView = false;
+    }
+
+    @Override
+    public void closeSelf() {
+        mIsWaitingForWebView = false;
+        runOnUiThread(mVpaidBridge::stopAd);
+        dismissAd();
+    }
+
+    //endregion
+    @Override
+    public void onAdImpression() {
+        Logging.out(LOG_TAG, "vpaidAdImpression");
+        mImpressionTimer.stop();
+        for (String url : mAdParams.getImpressionsList()) {
+            postVideoEvent(url);
+            Logging.out(LOG_TAG, "mAdParams.getImpressionsList() " + url);
+        }
+        setVerificationView(getWebView());
+        postViewableEvents(ViewableImpressionTracker.IMPRESSION_TIME_NATIVE_VIDEO);
+    }
+
+    @Override
+    public void resizeAd() {
+        runOnUiThread(() -> mVpaidBridge.resizeAd(
+            Utils.getScreenWidthInDp(), Utils.getScreenHeightInDp(), "'fullscreen'"
+        ));
+    }
+
+    @Override
+    public void adStarted() {
+        Logging.out(LOG_TAG, "vpaidAdStarted");
+        mImpressionTimer = new SimpleTimer(2000, this::onAdImpression);
+        mImpressionTimer.start();
+        if (mCreativeType != CreativeType.VIDEO_OTHER_TYPE) {
+            return;
+        }
+        runOnUiThread(() -> {
+            int duration = mVideoDuration * 1000;
+            Logging.out(LOG_TAG, "mVideoDuration " + duration);
+            mViewControllerVpaid.startCloseButtonTimer(duration);
+        });
+    }
+
+    @Override
+    public void setVideoTime(int time) {
+        mCurrentVideoTime = String.valueOf(mVideoDuration - time);
+    }
+
     private void cancelExtraCloseButton() {
-        if (mViewControllerVpaid == null) return;
         mViewControllerVpaid.cancelCloseButtonTimer();
         mViewControllerVpaid.enableCloseButton(false);
     }

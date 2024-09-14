@@ -1,50 +1,24 @@
 package com.loopme;
 
+import com.loopme.ad.AdSpotDimensions;
+
 public class CreativeParams {
 
-    private final int width;
-    private final int height;
-    private final String viewMode;
-    private final int desiredBitrate;
-    private String creativeData;
-    private String environmentVars;
+    private final AdSpotDimensions dimension;
+    private final String creativeData;
 
-    public CreativeParams(int width, int height, String viewMode, int desiredBitrate) {
-        this.width = width;
-        this.height = height;
-        this.viewMode = "'" + viewMode + "'";
-        this.desiredBitrate = desiredBitrate;
+    public CreativeParams(AdSpotDimensions dimension, String creativeData) {
+        this.dimension = dimension;
+        this.creativeData = creativeData;
     }
 
-    public void setAdParameters(String adParameters) {
-        this.creativeData = adParameters;
-    }
-
-    public void setEnvironmentVars(String environmentVars) {
-        this.environmentVars = environmentVars;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public String getViewMode() {
-        return viewMode;
-    }
-
-    public int getDesiredBitrate() {
-        return desiredBitrate;
-    }
-
-    public String getCreativeData() {
-        return creativeData;
-    }
-
+    public AdSpotDimensions getDimension() { return dimension; }
+    public String getViewMode() { return "'normal'"; }
+    public int getDesiredBitrate() { return 720; }
+    public String getCreativeData() { return "{'AdParameters':'" + creativeData + "'}"; }
     public String getEnvironmentVars() {
-        return environmentVars;
+        return "{ slot: document.getElementById('loopme-slot'), " +
+            "videoSlot: document.getElementById('loopme-videoslot'), " +
+            "videoSlotCanAutoPlay: true }";
     }
 }

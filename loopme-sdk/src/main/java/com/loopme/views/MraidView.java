@@ -56,6 +56,7 @@ public class MraidView extends WebView {
     }
 
     public void loadHtml(String html) {
+        Logging.out(LOG_TAG, "Load html: " + html);
         loadDataWithBaseURL(
             Constants.BASE_URL,
             html,
