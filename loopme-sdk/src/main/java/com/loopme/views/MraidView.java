@@ -36,7 +36,7 @@ public class MraidView extends WebView {
         super(context);
         configureWebSettings();
         getSettings().setAllowUniversalAccessFromFileURLs(true);
-        setDefaultWebChromeClient();
+        setWebChromeClient(new AdViewChromeClient(message -> { }));
         setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 handleUserClick();
@@ -119,8 +119,6 @@ public class MraidView extends WebView {
         cookieManager.setAcceptCookie(true);
         cookieManager.setAcceptThirdPartyCookies(this, true);
     }
-
-    public void setDefaultWebChromeClient() { setWebChromeClient(new AdViewChromeClient()); }
 
     @Override
     public void destroy() {
