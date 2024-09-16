@@ -1,5 +1,8 @@
 package com.loopme.views.webclient;
 
+import static android.webkit.ConsoleMessage.MessageLevel;
+import static android.webkit.ConsoleMessage.MessageLevel.ERROR;
+import static android.webkit.ConsoleMessage.MessageLevel.WARNING;
 import static com.loopme.debugging.Params.ERROR_CONSOLE;
 import static com.loopme.debugging.Params.ERROR_CONSOLE_LEVEL;
 import static com.loopme.debugging.Params.ERROR_CONSOLE_SOURCE_ID;
@@ -21,24 +24,18 @@ import java.util.HashMap;
 
 public class AdViewChromeClient extends WebChromeClient {
     private static final String LOG_TAG = AdViewChromeClient.class.getSimpleName();
-    private static final String UNCAUGHT_ERROR = "Uncaught";
-    private static final String VIDEO_SOURCE = "VIDEO_SOURCE";
 
-    private OnErrorFromJsCallback mCallback;
+    private final OnErrorFromJsCallback mCallback;
     private String mPrevErrorMessage = "";
 
     private PermissionResolver permissionResolveListener;
+    public void setPermissionResolveListener(PermissionResolver listener) {
+        permissionResolveListener = listener;
+    }
+
     private PermissionRequest permissionRequest;
 
-    public AdViewChromeClient() { }
-
-    public AdViewChromeClient(OnErrorFromJsCallback callback) {
-        this.mCallback = callback;
-    }
-
-    public void setPermissionResolveListener(PermissionResolver permissionResolveListener) {
-        this.permissionResolveListener = permissionResolveListener;
-    }
+    public AdViewChromeClient(@NonNull OnErrorFromJsCallback callback) { mCallback = callback; }
 
     @Override
     public void onPermissionRequest(PermissionRequest request) {
@@ -46,7 +43,6 @@ public class AdViewChromeClient extends WebChromeClient {
             request.deny();
             return;
         }
-
         permissionRequest = request;
         permissionResolveListener.onRequestGeneralPermissions(request.getResources());
     }
@@ -54,87 +50,57 @@ public class AdViewChromeClient extends WebChromeClient {
     @Override
     public void onPermissionRequestCanceled(PermissionRequest request) {
         permissionRequest = null;
-
         if (permissionResolveListener != null) {
             permissionResolveListener.onCancelGeneralPermissionsRequest();
         }
     }
 
-    public void setGeneralPermissionsResponse(String[] grantedPermissions) {
+    public void setGeneralPermissionsResponse(@NonNull String[] grantedPermissions) {
         if (permissionRequest == null) return;
-
-        if (grantedPermissions == null || grantedPermissions.length == 0) {
+        if (grantedPermissions.length == 0) {
             permissionRequest.deny();
         } else {
             permissionRequest.grant(grantedPermissions);
         }
-
         permissionRequest = null;
-    }
-
-    private String getSourceUrl(String message) {
-        String result = "";
-        if (message != null) {
-            String[] tokens = message.split(":");
-            if (tokens.length >= 3) {
-                return tokens[tokens.length - 1];
-            }
-        }
-        return result;
     }
 
     @Override
     public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-        if (consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.ERROR ||
-                consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.WARNING) {
-            Logging.out(LOG_TAG, "Console Message: " + consoleMessage.message() + " " + consoleMessage.sourceId());
+        String message = consoleMessage.message();
+        MessageLevel messageLevel = consoleMessage.messageLevel();
+        if (messageLevel == ERROR || messageLevel == WARNING) {
+            Logging.out(LOG_TAG, "Console Message: " + message + " " + consoleMessage.sourceId());
         }
-        if (consoleMessage.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
-            onErrorFromJs(consoleMessage);
+        if (messageLevel == ERROR && message.contains("Uncaught") && !TextUtils.equals(message, mPrevErrorMessage)) {
+            mPrevErrorMessage = message;
+            mCallback.onErrorFromJs(message);
+            HashMap<String, String> errorInfo = new HashMap<>();
+            errorInfo.put(ERROR_MSG, "Error from js console: ");
+            errorInfo.put(ERROR_CONSOLE, message);
+            errorInfo.put(ERROR_CONSOLE_SOURCE_ID, consoleMessage.sourceId());
+            errorInfo.put(ERROR_CONSOLE_LEVEL, messageLevel.toString());
+            errorInfo.put(ERROR_TYPE, Constants.ErrorType.JS);
+            LoopMeTracker.post(errorInfo);
         }
-        if (isVideoSourceEvent(consoleMessage.message())) {
-            onVideoSource(getSourceUrl(consoleMessage.message()));
+
+        // TODO: Find a better way to pass video source from HTML to Player for VPAID ads.
+        // VIDEO_SOURCE: https://example.com/video.mp4
+        // Used in ./assets/loopmeAd.html on video 'canplay' event with console.log
+        // video.addEventListener('canplay', function(event) {
+        //     console.log('VIDEO_SOURCE: ' + video.src);
+        // }, false);
+        if (mCallback instanceof OnErrorFromJsCallbackVpaid) {
+            String[] tokens = message.split(":");
+            if (tokens.length >= 3 && TextUtils.equals(tokens[0], "VIDEO_SOURCE")) {
+                ((OnErrorFromJsCallbackVpaid) mCallback).onVideoSource(tokens[tokens.length - 1]);
+            }
         }
         return super.onConsoleMessage(consoleMessage);
     }
 
-    private boolean isVideoSourceEvent(String message) {
-        String[] tokens = message.split(":");
-        return TextUtils.equals(tokens[0], VIDEO_SOURCE);
-    }
-
-    private void onErrorFromJs(@NonNull ConsoleMessage message) {
-        if (mCallback != null && message.message().contains(UNCAUGHT_ERROR) && isNewError(message.message())) {
-            mCallback.onErrorFromJs(message.message());
-        } else if (mCallback == null) {
-            HashMap<String, String> errorInfo = new HashMap<>();
-            errorInfo.put(ERROR_MSG, "Error from js console: ");
-            errorInfo.put(ERROR_CONSOLE, message.message());
-            errorInfo.put(ERROR_CONSOLE_SOURCE_ID, message.sourceId());
-            errorInfo.put(ERROR_CONSOLE_LEVEL, message.messageLevel().toString());
-            errorInfo.put(ERROR_TYPE, Constants.ErrorType.JS);
-            LoopMeTracker.post(errorInfo);
-        }
-    }
-    
-    private boolean isNewError(String newErrorMessage) {
-        if ((!TextUtils.equals(newErrorMessage, mPrevErrorMessage))) {
-            mPrevErrorMessage = newErrorMessage;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private void onVideoSource(String source) {
-        if (mCallback != null && mCallback instanceof OnErrorFromJsCallbackVpaid) {
-            ((OnErrorFromJsCallbackVpaid) mCallback).onVideoSource(source);
-        }
-    }
-
     public interface OnErrorFromJsCallback {
         void onErrorFromJs(String message);
-
     }
 
     public interface OnErrorFromJsCallbackVpaid extends OnErrorFromJsCallback {

@@ -1,5 +1,7 @@
 package com.loopme.views.activity;
 
+import static android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN;
+import static android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;
 import static com.loopme.Constants.SKIP_DELAY_INTERSTITIAL;
 
 import android.content.Intent;
@@ -34,9 +36,6 @@ import com.loopme.views.CloseButton;
 import com.loopme.views.MraidView;
 import com.loopme.views.webclient.AdViewChromeClient;
 
-import java.util.List;
-
-
 public final class BaseActivity extends FragmentActivity implements AdViewChromeClient.PermissionResolver {
     private static final String LOG_TAG = BaseActivity.class.getSimpleName();
     private static final int START_DEFAULT_POSITION = 0;
@@ -55,27 +54,6 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
     private boolean mIsDestroyBroadcastReceived;
     private String[] generalPermissionsFromWebViewRequest;
 
-    private void registerDestroyReceiver() {
-        mAdReceiver = new AdReceiver(new AdReceiver.Listener() {
-            @Override
-            public void onDestroyBroadcast() {
-                Logging.out(LOG_TAG, "onDestroyBroadcast");
-                mIsDestroyBroadcastReceived = true;
-                unregisterDestroyReceiver();
-                finish();
-            }
-
-            @Override
-            public void onClickBroadcast() {
-                Logging.out(LOG_TAG, "onClickBroadcast()");
-            }
-        }, mLoopMeAd.getAdId());
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Constants.DESTROY_INTENT);
-        filter.addAction(Constants.CLICK_INTENT);
-        ContextCompat.registerReceiver(this, mAdReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,12 +69,8 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
         }
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getWindow().setFlags(
-                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
-                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+        getWindow().setFlags(FLAG_FULLSCREEN, FLAG_FULLSCREEN);
+        getWindow().setFlags(FLAG_HARDWARE_ACCELERATED, FLAG_HARDWARE_ACCELERATED);
 
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         setRequestedOrientation(mDisplayController.getOrientation());
@@ -111,7 +85,21 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
         // TODO. Ugly. For permission dialogs.
         trySetPermissionResolveListener(mDisplayController.getWebView(), this);
 
-        registerDestroyReceiver();
+        mAdReceiver = new AdReceiver(new AdReceiver.Listener() {
+            @Override
+            public void onDestroyBroadcast() {
+                Logging.out(LOG_TAG, "onDestroyBroadcast");
+                mIsDestroyBroadcastReceived = true;
+                unregisterDestroyReceiver();
+                finish();
+            }
+            @Override
+            public void onClickBroadcast() { Logging.out(LOG_TAG, "onClickBroadcast()"); }
+        }, mLoopMeAd.getAdId());
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Constants.DESTROY_INTENT);
+        filter.addAction(Constants.CLICK_INTENT);
+        ContextCompat.registerReceiver(this, mAdReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
 
         if (!mLoopMeAd.isMraidAd()) {
             return;
@@ -148,12 +136,11 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
     }
 
     private static AdViewChromeClient tryGetAdViewChromeClient(WebView webView) {
-        MraidView lwv = webView instanceof MraidView ? (MraidView) webView : null;
-        if (lwv == null)
-            return null;
-
-        WebChromeClient wcc = lwv.getWebChromeClientCompat();
-        return wcc instanceof AdViewChromeClient ? (AdViewChromeClient) wcc : null;
+        if (webView instanceof MraidView) {
+            WebChromeClient wcc = ((MraidView) webView).getWebChromeClientCompat();
+            return wcc instanceof AdViewChromeClient ? (AdViewChromeClient) wcc : null;
+        }
+        return null;
     }
 
     @Override
@@ -163,9 +150,9 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
             return;
         }
         getWindow().getDecorView().setSystemUiVisibility(
-            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
+            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
+            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+            View.SYSTEM_UI_FLAG_FULLSCREEN
         );
     }
 
@@ -200,12 +187,10 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
     protected void onDestroy() {
         if (mDisplayController != null)
             trySetPermissionResolveListener(mDisplayController.getWebView(), null);
-        if (mDisplayController instanceof DisplayControllerLoopMe) {
-            if (mMraidCloseButton != null) {
-                ((DisplayControllerLoopMe) mDisplayController)
-                    .tryRemoveOmidFriendlyObstruction(mMraidCloseButton);
-                mMraidCloseButton.unregisterReceiver();
-            }
+        if (mDisplayController instanceof DisplayControllerLoopMe && mMraidCloseButton != null) {
+            ((DisplayControllerLoopMe) mDisplayController)
+                .tryRemoveOmidFriendlyObstruction(mMraidCloseButton);
+            mMraidCloseButton.unregisterReceiver();
         }
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         if (mLoopMeContainerView != null)
@@ -235,10 +220,8 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
         if (requestCode == REQUEST_GENERAL_PERMISSIONS) {
             chromeClient.setGeneralPermissionsResponse(
                 PermissionUtils.groupPermissions(
-                    this,
-                    generalPermissionsFromWebViewRequest)
-                    .getGrantedPermissions()
-                    .toArray(new String[0])
+                    this, generalPermissionsFromWebViewRequest
+                ).getGrantedPermissions()
             );
             generalPermissionsFromWebViewRequest = null;
         }
@@ -249,13 +232,12 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
         PermissionUtils.GroupedPermissions groupedPermissions =
             PermissionUtils.groupPermissions(this, androidPermissions);
 
-        List<String> deniedPermissions = groupedPermissions.getDeniedPermissions();
+        String[] deniedPermissions = groupedPermissions.getDeniedPermissions();
 
-        if (deniedPermissions.isEmpty()) {
+        if (deniedPermissions.length == 0) {
             AdViewChromeClient chromeClient = tryGetAdViewChromeClient(mDisplayController.getWebView());
             if (chromeClient != null) {
-                chromeClient.setGeneralPermissionsResponse(
-                        groupedPermissions.getGrantedPermissions().toArray(new String[0]));
+                chromeClient.setGeneralPermissionsResponse(groupedPermissions.getGrantedPermissions());
             }
             return;
         }
@@ -263,7 +245,7 @@ public final class BaseActivity extends FragmentActivity implements AdViewChrome
         generalPermissionsFromWebViewRequest = androidPermissions;
 
         ActivityCompat.requestPermissions(
-            this, deniedPermissions.toArray(new String[0]), REQUEST_GENERAL_PERMISSIONS
+            this, deniedPermissions, REQUEST_GENERAL_PERMISSIONS
         );
     }
 
