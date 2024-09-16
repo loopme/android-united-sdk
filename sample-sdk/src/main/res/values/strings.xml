@@ -7,7 +7,7 @@
     <string name="show_interstitial">Show Interstitial</string>
     <string name="default_interstitial_app_key">b5df00223e</string>
     <string name="default_mpu_app_key">f5826542ae</string>
-    <string name="load_mpu">load MPU (300x200)</string>
+    <string name="load_mpu">load MPU (300x250)</string>
     <string name="load_longitudinal">load 320x50)</string>
     <string name="destroy_ad">destroy ad</string>
 </resources>

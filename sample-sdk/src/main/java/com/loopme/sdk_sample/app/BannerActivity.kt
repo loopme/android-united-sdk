@@ -56,7 +56,7 @@ class BannerActivity : AppCompatActivity() {
         with(binding) {
             mpuPlaceholder.makeGone()
             longitudinalBannerPlaceholder.makeVisible()
-            loadBanner(longitudinalBannerPlaceholder)
+            loadBanner(320, 50, longitudinalBannerPlaceholder)
         }
     }
 
@@ -64,11 +64,11 @@ class BannerActivity : AppCompatActivity() {
         with(binding) {
             mpuPlaceholder.makeVisible()
             longitudinalBannerPlaceholder.makeGone()
-            loadBanner(mpuPlaceholder)
+            loadBanner(300, 250, mpuPlaceholder)
         }
     }
 
-    private fun loadBanner(bannerPlaceholder: FrameLayout) {
+    private fun loadBanner(width: Int, height: Int, bannerPlaceholder: FrameLayout) {
         disableLoadingButtons()
         if (mBanner != null) {
             dismissAndDestroyBanner()
@@ -81,6 +81,7 @@ class BannerActivity : AppCompatActivity() {
 
         mBanner = LoopMeBanner.getInstance(appKey, this)
         mBanner?.let { banner ->
+            banner.setSize(width, height)
             banner.bindView(bannerPlaceholder)
             banner.setListener(object : LoopMeBanner.Listener {
                 override fun onLoopMeBannerLoadFail(
