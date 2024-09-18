@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
+import androidx.annotation.UiThread;
+
 import com.loopme.Constants;
 
 public class UiUtils {
@@ -14,6 +16,7 @@ public class UiUtils {
         broadcastIntent(context, intentAction, Constants.DEFAULT_AD_ID);
     }
 
+    @UiThread
     public static void broadcastIntent(Context context, String intentAction, int adId) {
         if (context == null || TextUtils.isEmpty(intentAction)) return;
         Intent intent = new Intent(intentAction);

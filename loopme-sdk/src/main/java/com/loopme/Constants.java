@@ -263,6 +263,11 @@ public class Constants {
         public static final ViewGroup.LayoutParams WRAP_CONTENT_END = new FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.END
         );
+    }
 
+    public static class DISMISS_AD_REASON {
+        public static final String HIDE = "hide";
+        public static final String EXPIRED = "expired";
+        public static final String LOAD_FAIL = "load fail";
     }
 }

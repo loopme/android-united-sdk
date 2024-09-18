@@ -98,24 +98,7 @@ public final class LoopMeInterstitial extends AdWrapper {
      */
     public void setListener(Listener listener) {
         mMainAdListener = listener;
-        setListener(initInternalListener(), mFirstLoopMeAd);
-    }
-
-    private void setListener(LoopMeInterstitialGeneral.Listener listener, LoopMeAd interstitial) {
-        if (interstitial != null) {
-            ((LoopMeInterstitialGeneral) interstitial).setListener(listener);
-        }
-    }
-
-    public Listener getListener() { return mMainAdListener; }
-
-    public void removeListener() {
-        super.removeListener();
-        mMainAdListener = null;
-    }
-
-    private LoopMeInterstitialGeneral.Listener initInternalListener() {
-        return new LoopMeInterstitialGeneral.Listener() {
+        setListener(new LoopMeInterstitialGeneral.Listener() {
             @Override
             public void onLoopMeInterstitialLoadSuccess(LoopMeInterstitialGeneral interstitial) {
                 if (mMainAdListener != null) {
@@ -176,7 +159,20 @@ public final class LoopMeInterstitial extends AdWrapper {
                     mMainAdListener.onLoopMeInterstitialVideoDidReachEnd(LoopMeInterstitial.this);
                 }
             }
-        };
+        }, mFirstLoopMeAd);
+    }
+
+    private void setListener(LoopMeInterstitialGeneral.Listener listener, LoopMeAd interstitial) {
+        if (interstitial != null) {
+            ((LoopMeInterstitialGeneral) interstitial).setListener(listener);
+        }
+    }
+
+    public Listener getListener() { return mMainAdListener; }
+
+    public void removeListener() {
+        super.removeListener();
+        mMainAdListener = null;
     }
 
     public void load(String url) {
