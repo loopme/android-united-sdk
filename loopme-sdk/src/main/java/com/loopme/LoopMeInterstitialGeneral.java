@@ -1,5 +1,9 @@
 package com.loopme;
 
+import static com.loopme.Constants.DISMISS_AD_REASON.EXPIRED;
+import static com.loopme.Constants.DISMISS_AD_REASON.HIDE;
+import static com.loopme.Constants.DISMISS_AD_REASON.LOAD_FAIL;
+
 import android.app.Activity;
 import android.widget.FrameLayout;
 
@@ -9,8 +13,6 @@ import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.utils.UiUtils;
-import com.loopme.utils.Utils;
-
 
 /**
  * The `LoopMeInterstitial` class provides the facilities to display a full-screen ad
@@ -25,17 +27,15 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
 
     private static final String LOG_TAG = LoopMeInterstitialGeneral.class.getSimpleName();
 
-    private transient Listener mAdListener;
-
     private boolean isRewarded = false;
+    public void setRewarded(boolean rewarded) { isRewarded = rewarded; }
+    public boolean isRewarded() { return isRewarded; }
 
-    public void setRewarded(boolean rewarded) {
-        isRewarded = rewarded;
-    }
-
-    public boolean isRewarded() {
-        return isRewarded;
-    }
+    private transient Listener mAdListener;
+    public void setListener(Listener listener) { mAdListener = listener; }
+    public Listener getListener() { return mAdListener; }
+    @Override
+    public void removeListener() { mAdListener = null; }
 
     public LoopMeInterstitialGeneral(Activity activity, String appKey) {
         super(activity, appKey);
@@ -56,44 +56,36 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
         super.destroy();
     }
 
-    public void setListener(Listener listener) {
-        mAdListener = listener;
-    }
-
-    public Listener getListener() {
-        return mAdListener;
-    }
-
-    @Override
-    public void removeListener() {
-        mAdListener = null;
-    }
-
     public void bindView(FrameLayout frameLayout) {
         super.bindView(frameLayout);
         buildAdView();
     }
 
+    /**
+     * Triggered when the interstitial ad appears on the screen
+     */
     @Override
     public void show() {
-        if (isReady()) {
-            if (!isShowing()) {
-                setAdState(Constants.AdState.SHOWING);
-                stopTimer();
-                AdUtils.startAdActivity(this);
-                onLoopMeInterstitialShow();
-                Logging.out(LOG_TAG, "Interstitial will present fullscreen ad. App key: " + getAppKey());
-            }
-        } else {
+        if (!isReady()) {
             Logging.out(LOG_TAG, "Interstitial is not ready");
+            return;
         }
+        if (isShowing()) {
+            Logging.out(LOG_TAG, "Interstitial is already showing");
+            return;
+        }
+        setAdState(Constants.AdState.SHOWING);
+        stopTimer();
+        AdUtils.startAdActivity(this);
+        if (mAdListener != null) {
+            mAdListener.onLoopMeInterstitialShow(this);
+        }
+        Logging.out(LOG_TAG, "Interstitial will present fullscreen ad. App key: " + getAppKey());
     }
 
     @NonNull
     @Override
-    public Constants.AdFormat getAdFormat() {
-        return Constants.AdFormat.INTERSTITIAL;
-    }
+    public Constants.AdFormat getAdFormat() { return Constants.AdFormat.INTERSTITIAL; }
 
     @Override
     public Constants.PlacementType getPlacementType() {
@@ -101,77 +93,13 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
     }
 
     @Override
-    public AdSpotDimensions getAdSpotDimensions() {
-        return new AdSpotDimensions(Utils.getScreenWidthInPixels(), Utils.getScreenHeightInPixels());
-    }
+    public AdSpotDimensions getAdSpotDimensions() { return AdSpotDimensions.getFullscreen(); }
 
-    /**
-     * Triggered when the interstitial has successfully loaded the ad content
-     */
-    private void onLoopMeInterstitialLoadSuccess() {
-        long currentTime = System.currentTimeMillis();
-        long loadingTime = currentTime - mStartLoadingTime;
-
-        setReady(true);
-        setAdState(Constants.AdState.NONE);
+    @Override
+    public void onAdAlreadyLoaded() {
         if (mAdListener != null) {
             mAdListener.onLoopMeInterstitialLoadSuccess(this);
-        } else {
-            Logging.out(LOG_TAG, "Warning: empty listener");
         }
-        Logging.out(LOG_TAG, "Ad successfully loaded (" + loadingTime + "ms)");
-    }
-
-    /**
-     * Triggered when interstitial ad failed to load ad content
-     *
-     * @param error - error of unSuccessful ad loading attempt
-     */
-    private void onLoopMeInterstitialLoadFail(final LoopMeError error) {
-        setReady(false);
-        setAdState(Constants.AdState.NONE);
-        destroyDisplayController();
-        UiUtils.broadcastIntent(getContext(), Constants.DESTROY_INTENT, getAdId());
-        if (mAdListener != null) {
-            mAdListener.onLoopMeInterstitialLoadFail(this, error);
-        } else {
-            Logging.out(LOG_TAG, "Warning: empty listener");
-        }
-        Logging.out(LOG_TAG, "Ad fails to load: " + error.getMessage());
-    }
-
-    /**
-     * Triggered when the interstitial ad appears on the screen
-     */
-    private void onLoopMeInterstitialShow() {
-        if (mAdListener != null) {
-            mAdListener.onLoopMeInterstitialShow(this);
-        }
-        Logging.out(LOG_TAG, "Ad appeared on screen");
-    }
-
-    /**
-     * Triggered when the interstitial ad disappears on the screen
-     */
-    public void onLoopMeInterstitialHide() {
-        setReady(false);
-        setAdState(Constants.AdState.NONE);
-        destroyDisplayController();
-        if (mAdListener != null) {
-            mAdListener.onLoopMeInterstitialHide(this);
-        }
-        Logging.out(LOG_TAG, "Ad disappeared from screen");
-    }
-
-    /**
-     * Triggered when the user taps the interstitial ad and the interstitial is about to perform extra actions
-     * Those actions may lead to displaying a modal browser or leaving your application.
-     */
-    private void onLoopMeInterstitialClicked() {
-        if (mAdListener != null) {
-            mAdListener.onLoopMeInterstitialClicked(this);
-        }
-        Logging.out(LOG_TAG, "Ad received tap event");
     }
 
     /**
@@ -179,7 +107,8 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
      * This may happen in various ways, f.e if user wants open the SDK's browser web page in native browser or clicks
      * on `mailto:` links...
      */
-    private void onLoopMeInterstitialLeaveApp() {
+    @Override
+    public void onAdLeaveApp() {
         if (mAdListener != null) {
             mAdListener.onLoopMeInterstitialLeaveApp(this);
         }
@@ -187,96 +116,95 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
     }
 
     /**
-     * Triggered when the interstitial's loaded ad content is expired.
-     * Expiration happens when loaded ad content wasn't displayed during some period of time, approximately one hour.
-     * Once the interstitial is presented on the screen, the expiration is no longer tracked and interstitial won't
-     * receive this message
+     * Triggered when the user taps the interstitial ad and the interstitial is about to perform extra actions
+     * Those actions may lead to displaying a modal browser or leaving your application.
      */
-    private void onLoopMeInterstitialExpired() {
-        setReady(false);
-        setAdState(Constants.AdState.NONE);
-        destroyDisplayController();
+    @Override
+    public void onAdClicked() {
         if (mAdListener != null) {
-            mAdListener.onLoopMeInterstitialExpired(this);
+            mAdListener.onLoopMeInterstitialClicked(this);
         }
-
-        Logging.out(LOG_TAG, "Ads content expired");
+        Logging.out(LOG_TAG, "Ad received tap event");
     }
 
     /**
      * Triggered only when interstitial's video was played until the end.
      * It won't be sent if the video was skipped or the interstitial was dissmissed during the displaying process
      */
-    private void onLoopMeInterstitialVideoDidReachEnd() {
+    @Override
+    public void onAdVideoDidReachEnd() {
         if (mAdListener != null) {
             mAdListener.onLoopMeInterstitialVideoDidReachEnd(this);
         }
         Logging.out(LOG_TAG, "Video reach end");
     }
 
-    @Override
-    public void onAdExpired() {
-        onLoopMeInterstitialExpired();
-    }
-
+    /**
+     * Triggered when the interstitial has successfully loaded the ad content
+     */
     @Override
     public void onAdLoadSuccess() {
-        onLoopMeInterstitialLoadSuccess();
-    }
+        long currentTime = System.currentTimeMillis();
+        long loadingTime = currentTime - mStartLoadingTime;
 
-    @Override
-    public void onAdAlreadyLoaded() {
+        setReady(true);
+        setAdState(Constants.AdState.NONE);
         if (mAdListener != null) {
             mAdListener.onLoopMeInterstitialLoadSuccess(this);
-        } else {
-            Logging.out(LOG_TAG, "Warning: empty listener");
         }
+        Logging.out(LOG_TAG, "Ad successfully loaded (" + loadingTime + "ms)");
     }
 
+    /**
+     * Triggered when interstitial ad failed to load ad content
+     * @param error - error of unSuccessful ad loading attempt
+     */
     @Override
-    public void onAdLoadFail(final LoopMeError error) {
-        runOnUiThread(() -> onLoopMeInterstitialLoadFail(error));
-    }
+    public void onAdLoadFail(final LoopMeError error) { destroyAd(LOAD_FAIL, error); }
 
+    /**
+     * Triggered when the interstitial ad disappears on the screen
+     */
     @Override
-    public void onAdLeaveApp() {
-        onLoopMeInterstitialLeaveApp();
-    }
+    public void dismiss() { destroyAd(HIDE, null); }
 
+    /**
+     * Triggered when the interstitial's loaded ad content is expired.
+     * Expiration happens when loaded ad content wasn't displayed during some period of time, approximately one hour.
+     * Once the interstitial is presented on the screen, the expiration is no longer tracked and interstitial won't
+     * receive this message
+     */
     @Override
-    public void onAdClicked() {
-        onLoopMeInterstitialClicked();
-    }
+    public void onAdExpired() { destroyAd(EXPIRED, null); }
 
-    @Override
-    public void onAdVideoDidReachEnd() {
-        onLoopMeInterstitialVideoDidReachEnd();
-    }
-
-    @Override
-    public void dismiss() {
-        UiUtils.broadcastIntent(getContext(), Constants.DESTROY_INTENT, getAdId());
-        onLoopMeInterstitialHide();
-        Logging.out(LOG_TAG, "Dismiss ad");
+    private void destroyAd(String reason, LoopMeError error) {
+        setReady(false);
+        setAdState(Constants.AdState.NONE);
+        destroyDisplayController();
+        runOnUiThread(() -> {
+            UiUtils.broadcastIntent(getContext(), Constants.DESTROY_INTENT, getAdId());
+            if (mAdListener == null) return;
+            if (EXPIRED.equals(reason))
+                mAdListener.onLoopMeInterstitialExpired(this);
+            if (LOAD_FAIL.equals(reason))
+                mAdListener.onLoopMeInterstitialLoadFail(this, error);
+            if (HIDE.equals(reason))
+                mAdListener.onLoopMeInterstitialHide(this);
+        });
+        Logging.out(
+            LOG_TAG,
+            "Ad " + reason + (error == null ? "" : " with error: " + error.getMessage())
+        );
     }
 
     public interface Listener {
-
         void onLoopMeInterstitialLoadSuccess(LoopMeInterstitialGeneral interstitial);
-
         void onLoopMeInterstitialLoadFail(LoopMeInterstitialGeneral interstitial, LoopMeError error);
-
         void onLoopMeInterstitialShow(LoopMeInterstitialGeneral interstitial);
-
         void onLoopMeInterstitialHide(LoopMeInterstitialGeneral interstitial);
-
         void onLoopMeInterstitialClicked(LoopMeInterstitialGeneral interstitial);
-
         void onLoopMeInterstitialLeaveApp(LoopMeInterstitialGeneral interstitial);
-
         void onLoopMeInterstitialExpired(LoopMeInterstitialGeneral interstitial);
-
         void onLoopMeInterstitialVideoDidReachEnd(LoopMeInterstitialGeneral interstitial);
     }
-
 }
