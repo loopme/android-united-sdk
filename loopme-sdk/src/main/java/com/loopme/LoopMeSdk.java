@@ -8,6 +8,7 @@ import android.os.Looper;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 
+import com.loopme.common.LoopMeError;
 import com.loopme.debugging.Params;
 import com.loopme.gdpr.GdprChecker;
 import com.loopme.om.OmidHelper;
@@ -112,11 +113,10 @@ public final class LoopMeSdk {
     }
 
     private static void sendInitTimeAlert(String errorMessage, long initTime) {
-        HashMap<String, String> errorInfo = new HashMap<>();
-        errorInfo.put(Params.ERROR_TYPE, Constants.ErrorType.CUSTOM);
-        errorInfo.put(Params.ERROR_MSG, errorMessage);
-        errorInfo.put(Params.TIMEOUT, String.valueOf(initTime));
-        LoopMeTracker.post(errorInfo);
+        LoopMeTracker.post(
+                new LoopMeError(errorMessage, Constants.ErrorType.LATENCY)
+                        .addParam(Params.TIMEOUT, String.valueOf(initTime))
+        );
     }
 
 }
