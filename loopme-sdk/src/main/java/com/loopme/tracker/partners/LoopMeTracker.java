@@ -2,6 +2,7 @@ package com.loopme.tracker.partners;
 
 import static com.loopme.debugging.Params.ERROR_MSG;
 import static com.loopme.debugging.Params.ERROR_TYPE;
+import static com.loopme.models.Errors.NO_ADS_FOUND;
 
 import android.os.Build;
 import android.text.TextUtils;
@@ -53,6 +54,10 @@ public class LoopMeTracker {
         params.putAll(errorInfo);
         if (!params.containsKey(ERROR_TYPE)) {
             params.put(ERROR_TYPE, Constants.ErrorType.CUSTOM);
+        }
+        // "No ads found" don't need to be logged to the server as an error
+        if (params.containsValue(NO_ADS_FOUND.getMessage())) {
+            return;
         }
         sendDataToServer(Constants.ERROR_URL, obtainRequestString(params));
     }
