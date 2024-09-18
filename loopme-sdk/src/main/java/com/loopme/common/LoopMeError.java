@@ -4,11 +4,14 @@ import android.text.TextUtils;
 
 import com.loopme.Constants;
 
+import java.util.HashMap;
+
 public class LoopMeError {
 
     private int mErrorCode;
     private String mErrorMessage;
     private String mErrorType = Constants.ErrorType.CUSTOM;
+    private HashMap<String, String> params = new HashMap<>();
 
     public LoopMeError() { }
 
@@ -30,6 +33,7 @@ public class LoopMeError {
         mErrorCode = error.getErrorCode();
         mErrorMessage = error.getMessage();
         mErrorType = error.getErrorType();
+        params = error.getParams();
     }
 
     public LoopMeError(String message) {
@@ -65,5 +69,19 @@ public class LoopMeError {
 
     public void setErrorType(String mErrorType) {
         this.mErrorType = mErrorType;
+    }
+
+    public HashMap<String, String> getParams() {
+        return params;
+    }
+
+    public LoopMeError addParam(String field, String value) {
+        params.put(field, value);
+        return this;
+    }
+
+    public LoopMeError addParams(HashMap<String, String> params) {
+        this.params.putAll(params);
+        return this;
     }
 }

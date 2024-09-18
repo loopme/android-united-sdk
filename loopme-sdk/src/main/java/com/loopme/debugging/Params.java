@@ -40,6 +40,7 @@ public class Params {
     public static final String ERROR_CONSOLE_LEVEL = "console_error_level";
     public static final String ERROR_EXCEPTION = "error_exception";
     public static final String TIMEOUT = "timeout";
+    public static final String STATUS = "status";
 //            "server" -> "Timeout"
 //            "server" -> "Server code 502"
 //            "bad_asset" -> "Wrong encoding: https://i.loopme.me/fd192b26e6c548af.mp4"

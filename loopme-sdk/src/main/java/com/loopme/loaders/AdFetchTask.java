@@ -12,12 +12,14 @@ import com.loopme.ad.AdParams;
 import com.loopme.ad.AdType;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
+import com.loopme.debugging.Params;
 import com.loopme.models.Errors;
 import com.loopme.network.response.Bid;
 import com.loopme.network.response.BidResponse;
 import com.loopme.network.GetResponse;
 import com.loopme.parser.ParseService;
 import com.loopme.request.RequestBuilder;
+import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.ExecutorHelper;
 import com.loopme.network.LoopMeAdService;
 import com.loopme.xml.vast4.VastInfo;
@@ -64,6 +66,8 @@ public class AdFetchTask implements Runnable {
 
     @Override
     public void run() {
+        long duration;
+        long startTime = System.currentTimeMillis();
         try {
             JSONObject data = RequestBuilder.buildRequestJson(mLoopMeAd.getContext(), mLoopMeAd);
             if (Thread.interrupted()) {
@@ -73,9 +77,17 @@ public class AdFetchTask implements Runnable {
             GetResponse<BidResponse> response = LoopMeAdService.fetchAd(Constants.BASE_URL, data);
             Logging.out(LOG_TAG, "response received");
             parseResponse(response);
+            duration = System.currentTimeMillis() - startTime;
+            if (duration > 1000) {
+                sendOrtbLatencyAlert(duration, true);
+            }
         } catch (Exception e) {
+            duration = System.currentTimeMillis() - startTime;
             Logging.out(LOG_TAG, e.toString());
             handleBadResponse(e.getMessage());
+            if (duration > 1000) {
+                sendOrtbLatencyAlert(duration, false);
+            }
         }
     }
 
@@ -147,5 +159,15 @@ public class AdFetchTask implements Runnable {
         mHandler.post(() -> {
             if (mAdFetcherListener != null) mAdFetcherListener.onAdFetchFailed(error);
         });
+    }
+
+    private void sendOrtbLatencyAlert(long duration, boolean isSuccess) {
+        sendErrorMessage(new LoopMeError("ORTB request takes more then 1sec", Constants.ErrorType.LATENCY), duration, isSuccess);
+    }
+
+    private void sendErrorMessage(LoopMeError error, long duration, boolean isSuccess){
+        error.addParam(Params.TIMEOUT, String.valueOf(duration));
+        error.addParam(Params.STATUS, isSuccess ? Constants.SUCCESS : Constants.FAIL);
+        LoopMeTracker.post(error);
     }
 }

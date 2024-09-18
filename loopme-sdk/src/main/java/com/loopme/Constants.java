@@ -21,6 +21,8 @@ public class Constants {
     public static final String UNKNOWN_MSG = "unknown";
     public static final String BAD_SERVERS_CODE = "Bad servers response code ";
     public static final String AD_ID_TAG = "adIdTag";
+    public static final String SUCCESS = "Success";
+    public static final String FAIL = "Fail";
     public static final int MAX_FAIL_COUNT = 3;
     public static final int ONE_MINUTE_IN_MILLIS = 1000 * 60;
     public static final int SLEEP_TIME = ONE_MINUTE_IN_MILLIS * 15;
@@ -227,6 +229,7 @@ public class Constants {
         public static final String VAST = "vast";
         public static final String VPAID = "vpaid";
         public static final String DO_NOT_TRACK = "do not track";
+        public static final String LATENCY = "latency";
     }
 
     public static class MraidState {

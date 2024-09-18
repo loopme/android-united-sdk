@@ -127,6 +127,7 @@ public class LoopMeTracker {
         HashMap<String, String> errorInfo = new HashMap<>();
         errorInfo.put(ERROR_MSG, error.getMessage());
         errorInfo.put(ERROR_TYPE, error.getErrorType());
+        errorInfo.putAll(error.getParams());
         post(errorInfo);
         String errorType = error.getErrorType();
         boolean isVastError = TextUtils.equals(errorType, Constants.ErrorType.VAST) ||
