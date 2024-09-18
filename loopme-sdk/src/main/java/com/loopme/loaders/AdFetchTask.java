@@ -162,12 +162,10 @@ public class AdFetchTask implements Runnable {
     }
 
     private void sendOrtbLatencyAlert(long duration, boolean isSuccess) {
-        sendErrorMessage(new LoopMeError("ORTB request takes more then 1sec", Constants.ErrorType.LATENCY), duration, isSuccess);
-    }
-
-    private void sendErrorMessage(LoopMeError error, long duration, boolean isSuccess){
-        error.addParam(Params.TIMEOUT, String.valueOf(duration));
-        error.addParam(Params.STATUS, isSuccess ? Constants.SUCCESS : Constants.FAIL);
-        LoopMeTracker.post(error);
+        LoopMeTracker.post(
+                new LoopMeError("ORTB request takes more then 1sec", Constants.ErrorType.LATENCY)
+                        .addParam(Params.TIMEOUT, String.valueOf(duration))
+                        .addParam(Params.STATUS, isSuccess ? Constants.SUCCESS : Constants.FAIL)
+        );
     }
 }
