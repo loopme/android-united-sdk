@@ -16,22 +16,12 @@ public class AdFetchTaskByUrl extends AdFetchTask {
 
     @Override
     public void run() {
-        long duration;
-        long startTime = System.currentTimeMillis();
         try {
             GetResponse<BidResponse> response = LoopMeAdService.fetchAdByUrl(mUrl);
             Logging.out(LOG_TAG, "response received");
             parseResponse(response);
-            duration = System.currentTimeMillis() - startTime;
-            if (duration > 1000) {
-                sendOrtbLatencyAlert(duration, true);
-            }
         } catch (Exception e) {
-            duration = System.currentTimeMillis() - startTime;
             handleBadResponse(e.getMessage());
-            if (duration > 1000) {
-                sendOrtbLatencyAlert(duration, false);
-            }
         }
     }
 }
