@@ -22,12 +22,12 @@ import java.io.Serializable;
 
 public class RequestBuilder implements Serializable {
 
-    private static final String APP = "app";
+    protected static final String APP = "app";
     private static final String ID = "id";
     private static final String BUNDLE = "bundle";
     private static final String NAME = "name";
     private static final String VERSION = "version";
-    private static final String APPKEY = "id";
+    protected static final String APPKEY = "id";
     private static final String DEVICE = "device";
     private static final String DEVICE_TYPE = "devicetype";
     private static final String WIDTH = "w";
@@ -110,7 +110,8 @@ public class RequestBuilder implements Serializable {
         boolean isRewarded = loopMeAd instanceof LoopMeInterstitialGeneral && ((LoopMeInterstitialGeneral) loopMeAd).isRewarded();
 
         JSONObject video = null;
-        return new JSONBuilder()
+        JSONObject request =
+         new JSONBuilder()
             .put(TMAX, RequestConstants.MAX_TIME_TO_SUBMIT_BID)
             .put(BCAT, new JSONArray(RequestConstants.BCAT))
             .put(ID, requestUtils.getUuId())
@@ -220,6 +221,13 @@ public class RequestBuilder implements Serializable {
                 .build()
             )
             .build();
+        RequestValidator validator = new RequestValidator();
+        boolean isValid = validator.validateOrtbRequest(request);
+        if(!isValid){
+            //trigger on fail
+                        validator.getViolations();
+        }
+        return request;
     }
 
     private static JSONObject getVideo(boolean isRewarded, RequestUtils requestUtils) throws JSONException {

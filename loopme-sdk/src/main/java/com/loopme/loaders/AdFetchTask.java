@@ -70,6 +70,7 @@ public class AdFetchTask implements Runnable {
         long startTime = System.currentTimeMillis();
         try {
             JSONObject data = RequestBuilder.buildRequestJson(mLoopMeAd.getContext(), mLoopMeAd);
+
             if (Thread.interrupted()) {
                 Logging.out(LOG_TAG, "Thread interrupted.");
                 return;
