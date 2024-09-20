@@ -1,132 +1,166 @@
 package com.loopme.request
 
+
+import com.loopme.loaders.AdRequestType
+import com.loopme.request.RequestBuilder.*
+import com.loopme.request.RequestValidator.Companion.BANNER_HEIGHT
+import com.loopme.request.RequestValidator.Companion.BANNER_WIDTH
+import com.loopme.request.RequestValidator.Companion.EVENTS_EXT_PN
+import com.loopme.request.RequestValidator.Companion.EVENTS_EXT_PV
+import com.loopme.request.RequestValidator.Companion.SOURCE_EXT_PN
+import com.loopme.request.RequestValidator.Companion.SOURCE_EXT_PV
+import com.loopme.request.RequestValidator.Companion.VIDEO_HEIGHT
+import com.loopme.request.RequestValidator.Companion.VIDEO_WIDTH
 import org.json.JSONObject
 import org.junit.Assert.*
-import com.loopme.request.RequestBuilder.*
-
-
-import org.junit.Before
 import org.junit.Test
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.util.stream.Collectors
+
 
 class RequestValidatorTest {
 
     private val validator = RequestValidator()
-
-    @Before
-    fun setUp() {
-    }
-
-    @Test
-    fun `test one`() {
-        assertTrue(true)
-    }
+    private val classLoader = ClassLoader.getSystemClassLoader()
+    private val dummyAdRequestType = AdRequestType(true, true, true)
 
     @Test
     fun `No app object`() {
-        val req = JSONObject(NO_APP)
-        val isValid = validator.validateOrtbRequest(req)
+        val request = JSONObject(convertFileToString("no_app"))
+        val isValid = validator.validateOrtbRequest(request, dummyAdRequestType)
         val violations = validator.violations
         assertFalse(isValid)
         assertTrue(violations.size == 1)
-        assertEquals(RequestValidator.NOT_PRESENT, violations[APP])
+        assertEquals(RequestValidator.NOT_PRESENT, violations[APPKEY])
     }
 
-    private companion object {
-        const val NO_APP = """{
-	"tmax": 700,
-	"bcat": ["IAB25-3", "IAB25", "IAB26"],
-	"id": "c2c226ca-d2b1-4088-9f5e-d773db0c8753",
-	"source": {
-		"ext": {
-			"omidpn": "Loopme",
-			"omidpv": "9.0.6"
-		}
-	},
-	"events": {
-		"apis": [7],
-		"ext": {
-			"omidpn": "Loopme",
-			"omidpv": "9.0.6"
-		}
-	},
-	"regs": {
-		"coppa": 0,
-		"ext": {
-			"us_privacy": "1---"
-		}
-	},
-	"user": {
-		"ext": {
-			"consent_type": 2
-		}
-	},
-	"device": {
-		"js": 1,
-		"os": "android",
-		"devicetype": 4,
-		"w": 1440,
-		"h": 2892,
-		"ifa": "835fa444-cd80-4acf-b0fb-34011201af1e",
-		"osv": "15",
-		"connectiontype": 2,
-		"language": "en",
-		"make": "Google",
-		"hwv": "ranchu",
-		"ua": "Mozilla\/5.0 (Linux; Android 15; sdk_gphone64_arm64 Build\/AP31.240617.003; wv) AppleWebKit\/537.36 (KHTML, like Gecko) Version\/4.0 Chrome\/127.0.6533.105 Mobile Safari\/537.36",
-		"dnt": "0",
-		"model": "sdk_gphone64_arm64",
-		"ext": {
-			"timezone": "Central European Standard Time",
-			"orientation": "p",
-			"chargelevel": "100",
-			"batterylevel": 8,
-			"batterysaver": 0,
-			"plugin": -1
-		}
-	},
-	"imp": [{
-		"banner": {
-			"id": 1,
-			"battr": [3, 8],
-			"w": 320,
-			"h": 480,
-			"api": [5, 2, 7]
-		},
-		"video": {
-			"maxduration": 999,
-			"linearity": 1,
-			"boxingallowed": 1,
-			"startdelay": 1,
-			"sequence": 1,
-			"minduration": 5,
-			"maxbitrate": 1024,
-			"protocols": [2, 3, 7, 8],
-			"battr": [3, 8],
-			"mimes": ["video\/mp4"],
-			"delivery": [2],
-			"w": 320,
-			"h": 480,
-			"api": [5, 2, 7],
-			"skip": 1,
-			"skipafter": 5,
-			"ext": {
-				"rewarded": 0
-			}
-		},
-		"secure": 1,
-		"bidfloor": 0,
-		"displaymanager": "LOOPME_SDK",
-		"displaymanagerver": "9.0.6",
-		"id": "1726737191780",
-		"metric": [],
-		"instl": 1,
-		"ext": {
-			"it": "normal"
-		}
-	}],
-	"ext": {
-		"sdk_init_time": 5
-	}
-}"""
+    @Test
+    fun `No appKey`() {
+        val req = JSONObject(convertFileToString("no_appkey"))
+        val isValid = validator.validateOrtbRequest(req, dummyAdRequestType)
+        val violations = validator.violations
+        assertFalse(isValid)
+        assertTrue(violations.size == 1)
+        assertEquals(RequestValidator.NOT_PRESENT, violations[APPKEY])
     }
+
+    @Test
+    fun `Empty appKey`() {
+        val request = JSONObject(convertFileToString("empty_appkey"))
+        val isValid = validator.validateOrtbRequest(request, dummyAdRequestType)
+        val violations = validator.violations
+        assertFalse(isValid)
+        assertTrue(violations.size == 1)
+        assertEquals(RequestValidator.BLANK, violations[APPKEY])
+    }
+
+    @Test
+    fun `No source_ext_omidpn,no source_ext_omidpv`() {
+        val request = JSONObject(convertFileToString("all_required_not_present"))
+        val isValid = validator.validateOrtbRequest(request, dummyAdRequestType)
+        val violations = validator.violations
+        assertFalse(isValid)
+        assertEquals(RequestValidator.NOT_PRESENT, violations[SOURCE_EXT_PN])
+        assertEquals(RequestValidator.NOT_PRESENT, violations[SOURCE_EXT_PV])
+    }
+
+    @Test
+    fun `Empty source_ext_omidpn and source_ext_omidpv`() {
+        val request = JSONObject(convertFileToString("all_required_empty"))
+        val isValid = validator.validateOrtbRequest(request, dummyAdRequestType)
+        val violations = validator.violations
+        assertFalse(isValid)
+        assertEquals(RequestValidator.BLANK, violations[SOURCE_EXT_PN])
+        assertEquals(RequestValidator.BLANK, violations[SOURCE_EXT_PV])
+    }
+
+    @Test
+    fun `No events_ext_omidpn,no events_ext_omidpv`() {
+        val request = JSONObject(convertFileToString("all_required_not_present"))
+        val isValid = validator.validateOrtbRequest(request, dummyAdRequestType)
+        val violations = validator.violations
+        assertFalse(isValid)
+        assertEquals(RequestValidator.NOT_PRESENT, violations[EVENTS_EXT_PN])
+        assertEquals(RequestValidator.NOT_PRESENT, violations[EVENTS_EXT_PV])
+    }
+
+    @Test
+    fun `Empty events_ext_omidpn and events_ext_omidpv`() {
+        val request = JSONObject(convertFileToString("all_required_empty"))
+        val isValid = validator.validateOrtbRequest(request, dummyAdRequestType)
+        val violations = validator.violations
+        assertFalse(isValid)
+        assertEquals(RequestValidator.BLANK, violations[EVENTS_EXT_PN])
+        assertEquals(RequestValidator.BLANK, violations[EVENTS_EXT_PV])
+    }
+
+    @Test
+    fun `Banner width and height zero`() {
+        val request = JSONObject(convertFileToString("all_required_empty"))
+        val isValid = validator.validateOrtbRequest(request, dummyAdRequestType)
+        val violations = validator.violations
+        assertFalse(isValid)
+        assertEquals(RequestValidator.VALUE_0, violations[BANNER_WIDTH])
+        assertEquals(RequestValidator.VALUE_0, violations[BANNER_HEIGHT])
+    }
+
+    @Test
+    fun `Banner width and height not present`() {
+        val request = JSONObject(convertFileToString("all_required_not_present"))
+        val isValid = validator.validateOrtbRequest(request, dummyAdRequestType)
+        val violations = validator.violations
+        assertFalse(isValid)
+        assertEquals(RequestValidator.NOT_PRESENT_OR_INVALID, violations[BANNER_WIDTH])
+        assertEquals(RequestValidator.NOT_PRESENT_OR_INVALID, violations[BANNER_HEIGHT])
+    }
+
+    @Test
+    fun `Video width and height invalid value`() {
+        val request = JSONObject(convertFileToString("all_required_empty"))
+        val isValid = validator.validateOrtbRequest(request, dummyAdRequestType.copy())
+        val violations = validator.violations
+        assertFalse(isValid)
+        assertEquals(RequestValidator.NOT_PRESENT_OR_INVALID, violations[VIDEO_WIDTH])
+        assertEquals(RequestValidator.NOT_PRESENT_OR_INVALID, violations[VIDEO_HEIGHT])
+    }
+
+    @Test
+    fun `Video width and height not present`() {
+        val request = JSONObject(convertFileToString("all_required_not_present"))
+        val isValid = validator.validateOrtbRequest(request, dummyAdRequestType.copy())
+        val violations = validator.violations
+        assertFalse(isValid)
+        assertEquals(RequestValidator.NOT_PRESENT_OR_INVALID, violations[VIDEO_WIDTH])
+        assertEquals(RequestValidator.NOT_PRESENT_OR_INVALID, violations[VIDEO_HEIGHT])
+    }
+
+    @Test
+    fun `Banner only when is not a video not rewarded`() {
+        val request = JSONObject(convertFileToString("banner_only"))
+        val adRequestType = dummyAdRequestType.copy(isBanner = true, isVideo = false, isRewarded = false)
+        val isValid = validator.validateOrtbRequest(request, adRequestType)
+        val violations = validator.violations
+        assertFalse(isValid)
+        assertEquals(RequestValidator.VALUE_0, violations[BANNER_WIDTH])
+        assertEquals(RequestValidator.VALUE_0, violations[BANNER_HEIGHT])
+        assertFalse(violations.containsKey(VIDEO_HEIGHT))
+        assertFalse(violations.containsKey(VIDEO_WIDTH))
+    }
+
+    @Test
+    fun `Is valid for banner and video`() {
+        val request = JSONObject(convertFileToString("proper_ad_request"))
+        val isValid = validator.validateOrtbRequest(request, dummyAdRequestType)
+        val violations = validator.violations
+        assertTrue(isValid)
+        assertEquals(0, violations.size)
+    }
+
+    private fun convertFileToString(fileName: String) =
+        BufferedReader(
+            InputStreamReader(
+                classLoader.getResourceAsStream(fileName)
+            )
+        ).lines().collect(Collectors.joining("\n"))
 }

@@ -8,6 +8,7 @@ import android.text.TextUtils;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
+import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.AdType;
 import com.loopme.ad.LoopMeAd;
@@ -19,6 +20,8 @@ import com.loopme.network.response.BidResponse;
 import com.loopme.network.GetResponse;
 import com.loopme.parser.ParseService;
 import com.loopme.request.RequestBuilder;
+import com.loopme.request.RequestUtils;
+import com.loopme.request.RequestValidator;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.ExecutorHelper;
 import com.loopme.network.LoopMeAdService;
@@ -69,7 +72,16 @@ public class AdFetchTask implements Runnable {
         long duration;
         long startTime = System.currentTimeMillis();
         try {
-            JSONObject data = RequestBuilder.buildRequestJson(mLoopMeAd.getContext(), mLoopMeAd);
+            RequestUtils requestUtils = new RequestUtils(mLoopMeAd.getContext(), mLoopMeAd);
+            AdRequestType adRequestType = getAdRequestType(requestUtils, mLoopMeAd);
+            JSONObject data = RequestBuilder.buildRequestJson(adRequestType, mLoopMeAd, mLoopMeAd.getContext(), requestUtils);
+
+            RequestValidator validator = new RequestValidator();
+            boolean invalid = !validator.validateOrtbRequest(data, adRequestType);
+            if(invalid){
+                //trigger on fail
+                validator.getViolations();
+            }
 
             if (Thread.interrupted()) {
                 Logging.out(LOG_TAG, "Thread interrupted.");
@@ -168,5 +180,14 @@ public class AdFetchTask implements Runnable {
                         .addParam(Params.TIMEOUT, String.valueOf(duration))
                         .addParam(Params.STATUS, isSuccess ? Constants.SUCCESS : Constants.FAIL)
         );
+    }
+
+    private AdRequestType getAdRequestType(RequestUtils requestUtils, LoopMeAd loopMeAd){
+        LoopMeAd.Type adType = mLoopMeAd.getPreferredAdType();
+        boolean isBanner = LoopMeAd.Type.ALL == adType || LoopMeAd.Type.HTML == adType;
+        boolean isFullscreenSize = requestUtils.isFullscreenSize();
+        boolean isVideo = isFullscreenSize && (LoopMeAd.Type.ALL == adType || LoopMeAd.Type.VIDEO == adType);
+        boolean isRewarded = mLoopMeAd instanceof LoopMeInterstitialGeneral && ((LoopMeInterstitialGeneral) mLoopMeAd).isRewarded();
+        return new AdRequestType(isBanner, isVideo, isRewarded);
     }
 }
