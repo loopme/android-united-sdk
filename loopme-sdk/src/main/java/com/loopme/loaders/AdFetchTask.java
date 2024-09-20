@@ -19,6 +19,7 @@ import com.loopme.network.response.Bid;
 import com.loopme.network.response.BidResponse;
 import com.loopme.network.GetResponse;
 import com.loopme.parser.ParseService;
+import com.loopme.request.InvalidOrtbRequestException;
 import com.loopme.request.RequestBuilder;
 import com.loopme.request.RequestUtils;
 import com.loopme.request.RequestValidator;
@@ -46,11 +47,14 @@ public class AdFetchTask implements Runnable {
     private volatile AdFetcherListener mAdFetcherListener;
     private final Handler mHandler = new Handler((Looper.getMainLooper()));
     private static final String UNEXPECTED = "Unexpected";
+    private final RequestUtils requestUtils;
+
 
     public AdFetchTask(LoopMeAd loopMeAd, AdFetcherListener adFetcherListener) {
         mLoopMeAd = loopMeAd;
         mAdFetcherListener = adFetcherListener;
         mExecutorService = ExecutorHelper.getExecutor();
+        requestUtils = new RequestUtils(mLoopMeAd.getContext(), mLoopMeAd);
     }
 
     public void fetch() { mFetchTask = mExecutorService.submit(this); }
@@ -72,15 +76,12 @@ public class AdFetchTask implements Runnable {
         long duration;
         long startTime = System.currentTimeMillis();
         try {
-            RequestUtils requestUtils = new RequestUtils(mLoopMeAd.getContext(), mLoopMeAd);
             AdRequestType adRequestType = getAdRequestType(requestUtils, mLoopMeAd);
             JSONObject data = RequestBuilder.buildRequestJson(adRequestType, mLoopMeAd, mLoopMeAd.getContext(), requestUtils);
 
             RequestValidator validator = new RequestValidator();
-            boolean invalid = !validator.validateOrtbRequest(data, adRequestType);
-            if(invalid){
-                //trigger on fail
-                validator.getViolations();
+            if (!validator.validateOrtbRequest(data, adRequestType)) {
+                throw new InvalidOrtbRequestException(validator.getViolations().toString());
             }
 
             if (Thread.interrupted()) {
@@ -97,11 +98,24 @@ public class AdFetchTask implements Runnable {
         } catch (Exception e) {
             duration = System.currentTimeMillis() - startTime;
             Logging.out(LOG_TAG, e.toString());
-            handleBadResponse(e.getMessage());
-            if (duration > 1000) {
-                sendOrtbLatencyAlert(duration, false);
-            }
+            if (duration > 1000) { sendOrtbLatencyAlert(duration, false); }
+            handleException(e);
         }
+    }
+
+    protected void handleException(Exception exception) {
+        String message = exception.getMessage();
+        boolean isUnexpectedError = !TextUtils.isEmpty(message) && message.contains(UNEXPECTED);
+        boolean isInvalidOrtbRequestException = exception instanceof InvalidOrtbRequestException;
+
+        LoopMeError error = Errors.AD_LOAD_ERROR;
+        if (isUnexpectedError) {
+            error.setErrorType(Constants.ErrorType.SERVER);
+            error.addParam(Params.ERROR_EXCEPTION, Errors.ERROR_MESSAGE_RESPONSE_SYNTAX_ERROR);
+        } else if (isInvalidOrtbRequestException) {
+            error.addParam(Params.ERROR_EXCEPTION, exception.getMessage());
+        }
+        onErrorResult(error);
     }
 
     protected void handleBadResponse(String message) {

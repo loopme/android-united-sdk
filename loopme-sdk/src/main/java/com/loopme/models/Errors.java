@@ -6,6 +6,7 @@ import com.loopme.common.LoopMeError;
 public class Errors {
     public static final String ERROR_MESSAGE_NETWORK_OPERATION = "Network operation timeout.";
     public static final String ERROR_MESSAGE_BROKEN_SERVERS_RESPONSE = "Server's response is broken.";
+    public static final String ERROR_MESSAGE_RESPONSE_SYNTAX_ERROR = "Syntax error in response.";
 
     public static final LoopMeError DOWNLOAD_ERROR = new LoopMeError(
             100, "DOWNLOAD_ERROR");
@@ -87,6 +88,9 @@ public class Errors {
 
     public static final LoopMeError SYNTAX_ERROR_IN_RESPONSE = new LoopMeError(
             100, "Syntax error in response", Constants.ErrorType.SERVER);
+
+    public static final LoopMeError AD_LOAD_ERROR = new LoopMeError(
+            121, "Ad load failed", Constants.ErrorType.CUSTOM);
 
     // region DO_NOT_TRACK
 

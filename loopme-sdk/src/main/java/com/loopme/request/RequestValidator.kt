@@ -120,7 +120,7 @@ internal class RequestValidator {
         const val BANNER_WIDTH = IMP + "." + BANNER + "." + WIDTH
         const val VIDEO_HEIGHT = IMP + "." + VIDEO + "." + HEIGHT
         const val VIDEO_WIDTH = IMP + "." + VIDEO + "." + WIDTH
-
-
     }
 }
+
+internal class InvalidOrtbRequestException(message: String): Exception(message)

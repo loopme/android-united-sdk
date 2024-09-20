@@ -2,6 +2,7 @@ package com.loopme.ad;
 
 import static com.loopme.Constants.UNKNOWN_MSG;
 import static com.loopme.debugging.Params.ERROR_MSG;
+import static com.loopme.debugging.Params.ERROR_TYPE;
 import static com.loopme.debugging.Params.PLACEMENT_TYPE;
 
 import android.app.Activity;
@@ -162,6 +163,12 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         errorInfo.put(Params.REQUEST_ID, getRequestId());
         return errorInfo;
     }
+    public HashMap<String, String> packErrorInfo(@NonNull LoopMeError error) {
+        HashMap<String, String> errorInfo = packErrorInfo(error.getMessage());
+        errorInfo.put(ERROR_TYPE, error.getErrorType());
+        errorInfo.putAll(error.getParams());
+        return errorInfo;
+    }
 
     /**
      * Links (@link LoopMeContainerView) view to banner.
@@ -228,7 +235,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     }
 
     public void onSendPostWarning(LoopMeError error) {
-        runOnUiThread(() -> LoopMeTracker.post(packErrorInfo(error.getMessage())));
+        runOnUiThread(() -> LoopMeTracker.post(packErrorInfo(error)));
     }
 
     private void startTimer(AdParams adParam) {
