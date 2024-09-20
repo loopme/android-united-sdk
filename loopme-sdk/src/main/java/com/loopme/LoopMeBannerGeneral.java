@@ -1,5 +1,9 @@
 package com.loopme;
 
+import static com.loopme.Constants.DISMISS_AD_REASON.EXPIRED;
+import static com.loopme.Constants.DISMISS_AD_REASON.HIDE;
+import static com.loopme.Constants.DISMISS_AD_REASON.LOAD_FAIL;
+
 import android.app.Activity;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +16,7 @@ import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
 import com.loopme.tracker.partners.LoopMeTracker;
+import com.loopme.utils.UiUtils;
 
 /**
  * The `LoopMeBanner` class provides facilities to display a custom size ads
@@ -24,12 +29,23 @@ import com.loopme.tracker.partners.LoopMeTracker;
 public class LoopMeBannerGeneral extends LoopMeAd {
 
     private static final String LOG_TAG = LoopMeBannerGeneral.class.getSimpleName();
+
     private Listener mAdListener;
+    public void setListener(@NonNull Listener listener) { mAdListener = listener; }
+    public Listener getListener() { return mAdListener; }
+    @Override
+    public void removeListener() { mAdListener = null; }
 
     private volatile FrameLayout mBannerView;
 
     private int mWidth = 0;
     private int mHeight = 0;
+    public int getWidth() { return mWidth; }
+    public int getHeight() { return mHeight; }
+    public void setSize(int width, int height) {
+        mWidth = width;
+        mHeight = height;
+    }
 
     public interface Listener {
         void onLoopMeBannerLoadSuccess(LoopMeBannerGeneral banner);
@@ -59,19 +75,6 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         });
     }
 
-    public void setSize(int width, int height) {
-        mWidth = width;
-        mHeight = height;
-    }
-
-    public int getWidth() {
-        return mWidth;
-    }
-
-    public int getHeight() {
-        return mHeight;
-    }
-
     /**
      * @param frameLayout - @link FrameLayout (container for ad) where ad will be displayed.
      */
@@ -84,45 +87,31 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         }
     }
 
-    public FrameLayout getBannerView() {
-        return mBannerView;
-    }
-
-    public boolean isViewBinded() {
-        return mBannerView != null;
-    }
-
-    public void setListener(Listener listener) {
-        if (listener != null) {
-            mAdListener = listener;
-        } else {
-            Logging.out(LOG_TAG, "Warning listener is null.");
-        }
-    }
-
-    public Listener getListener() {
-        return mAdListener;
-    }
-
-    @Override
-    public void removeListener() {
-        mAdListener = null;
-    }
+    public FrameLayout getBannerView() { return mBannerView; }
+    public boolean isViewBinded() { return mBannerView != null; }
 
     @Override
     public void show() {
-        if (isReady() && isViewBinded() && !isShowing()) {
-            showInternal();
-            getDisplayController().postImpression();
-            if (isLoopMeAd() || isMraidAd()) {
-                resume();
-            } else if (isVastAd() || isVpaidAd() && mDisplayController != null) {
-                getDisplayController().onPlay(0);
-            }
-            Logging.out(LOG_TAG, "Banner did start showing ad");
-        } else {
-            Logging.out(LOG_TAG, "Banner is not ready");
+        if (!isReady()) {
+            Logging.out(LOG_TAG, "Ad is not ready");
+            return;
         }
+        if (isShowing()) {
+            Logging.out(LOG_TAG, "Ad is already showing");
+            return;
+        }
+        if (!isViewBinded()) {
+            Logging.out(LOG_TAG, "Ad view is not bound");
+            return;
+        }
+        showInternal();
+        getDisplayController().postImpression();
+        if (isLoopMeAd() || isMraidAd()) {
+            resume();
+        } else if (isVastAd() || isVpaidAd() && mDisplayController != null) {
+            getDisplayController().onPlay(0);
+        }
+        Logging.out(LOG_TAG, "Ad did start showing");
     }
 
     private void showInternal() {
@@ -139,27 +128,19 @@ public class LoopMeBannerGeneral extends LoopMeAd {
 
     @Override
     public void pause() {
-        if (isLoopMeController()) {
+        if (mDisplayController instanceof DisplayControllerLoopMe) {
             ((DisplayControllerLoopMe) mDisplayController).setWebViewState(Constants.WebviewState.HIDDEN);
         } else {
             super.pause();
         }
     }
 
-    private boolean isLoopMeController() {
-        return getDisplayController() instanceof DisplayControllerLoopMe;
-    }
-
     @NonNull
     @Override
-    public Constants.AdFormat getAdFormat() {
-        return Constants.AdFormat.BANNER;
-    }
+    public Constants.AdFormat getAdFormat() { return Constants.AdFormat.BANNER; }
 
     @Override
-    public Constants.PlacementType getPlacementType() {
-        return Constants.PlacementType.BANNER;
-    }
+    public Constants.PlacementType getPlacementType() { return Constants.PlacementType.BANNER; }
 
     @Override
     public AdSpotDimensions getAdSpotDimensions() {
@@ -171,68 +152,11 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         return new AdSpotDimensions(0, 0);
     }
 
-    /**
-     * Triggered when the banner's loaded ad content is expired.
-     * Expiration happens when loaded ad content wasn't displayed during some period of time, approximately one hour.
-     * Once the banner is presented on the screen, the expiration is no longer tracked and banner won't
-     * receive this message
-     */
-    @Override
-    public void onAdExpired() {
-        setReady(false);
-        setAdState(Constants.AdState.NONE);
-        destroyDisplayController();
-        if (mAdListener != null) {
-            mAdListener.onLoopMeBannerExpired(this);
-        }
-        Logging.out(LOG_TAG, "Ad content is expired");
-    }
-
-    /**
-     * Triggered when the banner has successfully loaded the ad content
-     */
-    @Override
-    public void onAdLoadSuccess() {
-        long currentTime = System.currentTimeMillis();
-        long loadingTime = currentTime - mStartLoadingTime;
-
-        setReady(true);
-        setAdState(Constants.AdState.NONE);
-        if (mAdListener != null) {
-            mAdListener.onLoopMeBannerLoadSuccess(this);
-        } else {
-            Logging.out(LOG_TAG, "Warning: empty listener");
-        }
-        Logging.out(LOG_TAG, "Ad successfully loaded (" + loadingTime + "ms)");
-    }
-
     @Override
     public void onAdAlreadyLoaded() {
         if (mAdListener != null) {
             mAdListener.onLoopMeBannerLoadSuccess(this);
-        } else {
-            Logging.out(LOG_TAG, "Warning: empty listener");
         }
-    }
-
-    /**
-     * Triggered when banner ad failed to load ad content
-     *
-     * @param error - error of unsuccesful ad loading attempt
-     */
-    @Override
-    public void onAdLoadFail(final LoopMeError error) {
-        mHandler.post(() -> {
-            setReady(false);
-            setAdState(Constants.AdState.NONE);
-            destroyDisplayController();
-            if (mAdListener != null) {
-                mAdListener.onLoopMeBannerLoadFail(this, error);
-            } else {
-                Logging.out(LOG_TAG, "Warning: empty listener");
-            }
-            Logging.out(LOG_TAG, "Ad fails to load: " + error.getMessage());
-        });
     }
 
     /**
@@ -272,26 +196,76 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         Logging.out(LOG_TAG, "Video did reach end");
     }
 
+    /**
+     * Triggered when the banner has successfully loaded the ad content
+     */
+    @Override
+    public void onAdLoadSuccess() {
+        long currentTime = System.currentTimeMillis();
+        long loadingTime = currentTime - mStartLoadingTime;
+
+        setReady(true);
+        setAdState(Constants.AdState.NONE);
+        if (mAdListener != null) {
+            mAdListener.onLoopMeBannerLoadSuccess(this);
+        }
+        Logging.out(LOG_TAG, "Ad successfully loaded (" + loadingTime + "ms)");
+    }
+
+    /**
+     * Triggered when banner ad failed to load ad content
+     * @param error - error of unsuccesful ad loading attempt
+     */
+    @Override
+    public void onAdLoadFail(final LoopMeError error) { destroyAd(LOAD_FAIL, error); }
+
+    /**
+     * Triggered when the banner's loaded ad content is expired.
+     * Expiration happens when loaded ad content wasn't displayed during some period of time, approximately one hour.
+     * Once the banner is presented on the screen, the expiration is no longer tracked and banner won't
+     * receive this message
+     */
+    @Override
+    public void onAdExpired() { destroyAd(EXPIRED, null); }
+
     @Override
     public void dismiss() {
-        Logging.out(LOG_TAG, "Banner will be dismissed");
-        if (isShowing() || isNoneState()) {
-            if (mDisplayController instanceof DisplayControllerLoopMe) {
-                ((DisplayControllerLoopMe) mDisplayController).dismiss();
-            }
-            if (mBannerView != null) {
-                mBannerView.setVisibility(View.GONE);
-                mBannerView.removeAllViews();
-            }
-            setReady(false);
-            setAdState(Constants.AdState.NONE);
-            destroyDisplayController();
-            if (mAdListener != null) {
-                mAdListener.onLoopMeBannerHide(this);
-            }
-            Log.d(LOG_TAG, "Ad disappeared from screen");
-        } else {
-            Log.d(LOG_TAG, "Can't dismiss ad, it's not displaying");
+        Logging.out(LOG_TAG, "Ad will be dismissed");
+        if (!isShowing()) {
+            Logging.out(LOG_TAG, "Can't dismiss ad, it's not displaying");
+            return;
         }
+        if (!isNoneState()) {
+            Logging.out(LOG_TAG, "Can't dismiss ad, Ad is not in NONE state");
+            return;
+        }
+        if (mDisplayController instanceof DisplayControllerLoopMe) {
+            ((DisplayControllerLoopMe) mDisplayController).dismiss();
+        }
+        if (mBannerView != null) {
+            mBannerView.setVisibility(View.GONE);
+            mBannerView.removeAllViews();
+        }
+        destroyAd(HIDE, null);
+    }
+
+    private void destroyAd(String reason, LoopMeError error) {
+        setReady(false);
+        setAdState(Constants.AdState.NONE);
+        destroyDisplayController();
+        runOnUiThread(() -> {
+            UiUtils.broadcastIntent(getContext(), Constants.DESTROY_INTENT, getAdId());
+            if (mAdListener == null) return;
+            if (EXPIRED.equals(reason))
+                mAdListener.onLoopMeBannerExpired(this);
+            if (LOAD_FAIL.equals(reason))
+                mAdListener.onLoopMeBannerLoadFail(this, error);
+            if (HIDE.equals(reason))
+                mAdListener.onLoopMeBannerHide(this);
+        });
+        Logging.out(
+            LOG_TAG,
+            "Ad " + reason + (error == null ? "" : " with error: " + error.getMessage())
+        );
     }
 }
