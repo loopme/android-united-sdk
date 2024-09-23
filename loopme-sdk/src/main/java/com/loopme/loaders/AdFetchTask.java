@@ -49,7 +49,6 @@ public class AdFetchTask implements Runnable {
     private static final String UNEXPECTED = "Unexpected";
     private final RequestUtils requestUtils;
 
-
     public AdFetchTask(LoopMeAd loopMeAd, AdFetcherListener adFetcherListener) {
         mLoopMeAd = loopMeAd;
         mAdFetcherListener = adFetcherListener;
@@ -76,7 +75,7 @@ public class AdFetchTask implements Runnable {
         long duration;
         long startTime = System.currentTimeMillis();
         try {
-            AdRequestType adRequestType = getAdRequestType(requestUtils, mLoopMeAd);
+            AdRequestType adRequestType = getAdRequestType();
             JSONObject data = RequestBuilder.buildRequestJson(adRequestType, mLoopMeAd, mLoopMeAd.getContext(), requestUtils);
 
             RequestValidator validator = new RequestValidator();
@@ -109,21 +108,15 @@ public class AdFetchTask implements Runnable {
         boolean isInvalidOrtbRequestException = exception instanceof InvalidOrtbRequestException;
 
         LoopMeError error = Errors.AD_LOAD_ERROR;
-        if (isUnexpectedError) {
+        if (isInvalidOrtbRequestException) {
+            error.addParam(Params.ERROR_EXCEPTION, exception.getMessage());
+        } else if (isUnexpectedError) {
             error.setErrorType(Constants.ErrorType.SERVER);
             error.addParam(Params.ERROR_EXCEPTION, Errors.ERROR_MESSAGE_RESPONSE_SYNTAX_ERROR);
-        } else if (isInvalidOrtbRequestException) {
-            error.addParam(Params.ERROR_EXCEPTION, exception.getMessage());
+        } else {
+            error = new LoopMeError(message, Constants.ErrorType.SERVER);
         }
         onErrorResult(error);
-    }
-
-    protected void handleBadResponse(String message) {
-        boolean isUnexpectedError = !TextUtils.isEmpty(message) && message.contains(UNEXPECTED);
-        onErrorResult(isUnexpectedError ?
-            Errors.SYNTAX_ERROR_IN_RESPONSE :
-            new LoopMeError(message, Constants.ErrorType.SERVER)
-        );
     }
 
     private void handleResponse(BidResponse bidResponse) {
@@ -196,7 +189,7 @@ public class AdFetchTask implements Runnable {
         );
     }
 
-    private AdRequestType getAdRequestType(RequestUtils requestUtils, LoopMeAd loopMeAd){
+    private AdRequestType getAdRequestType(){
         LoopMeAd.Type adType = mLoopMeAd.getPreferredAdType();
         boolean isBanner = LoopMeAd.Type.ALL == adType || LoopMeAd.Type.HTML == adType;
         boolean isFullscreenSize = requestUtils.isFullscreenSize();

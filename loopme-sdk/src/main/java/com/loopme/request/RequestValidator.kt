@@ -7,12 +7,16 @@ import org.json.JSONObject
 internal class RequestValidator {
 
     private var isValid = true
+
+    /**
+     * After calling validateOrtbRequest function, this field should be populated. If empty hashmap, it means, that request is valid
+     */
     val violations by lazy { HashMap<String, String>() }
 
 
-    // return true if valid, false if not
-    // fail the bigger process if false
-    // send error with string of violations
+    /**
+     * Return true if request valid, false otherwise
+     */
     fun validateOrtbRequest(ortbRequest: JSONObject, adRequestType: AdRequestType): Boolean {
         isValid = true
         val appKey = ortbRequest.optJSONObject(APP)?.optString(APPKEY, FALLBACK)
