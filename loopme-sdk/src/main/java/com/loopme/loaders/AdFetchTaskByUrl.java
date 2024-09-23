@@ -21,7 +21,7 @@ public class AdFetchTaskByUrl extends AdFetchTask {
             Logging.out(LOG_TAG, "response received");
             parseResponse(response);
         } catch (Exception e) {
-            handleException(e);
+            handleBadResponse(e.getMessage());
         }
     }
 }

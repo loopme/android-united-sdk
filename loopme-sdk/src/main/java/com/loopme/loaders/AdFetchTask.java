@@ -105,18 +105,23 @@ public class AdFetchTask implements Runnable {
     protected void handleException(Exception exception) {
         String message = exception.getMessage();
         boolean isUnexpectedError = !TextUtils.isEmpty(message) && message.contains(UNEXPECTED);
-        boolean isInvalidOrtbRequestException = exception instanceof InvalidOrtbRequestException;
 
         LoopMeError error = Errors.AD_LOAD_ERROR;
-        if (isInvalidOrtbRequestException) {
-            error.addParam(Params.ERROR_EXCEPTION, exception.getMessage());
-        } else if (isUnexpectedError) {
+        if (isUnexpectedError) {
             error.setErrorType(Constants.ErrorType.SERVER);
             error.addParam(Params.ERROR_EXCEPTION, Errors.ERROR_MESSAGE_RESPONSE_SYNTAX_ERROR);
         } else {
-            error = new LoopMeError(message, Constants.ErrorType.SERVER);
+            error.addParam(Params.ERROR_EXCEPTION, exception.getMessage());
         }
         onErrorResult(error);
+    }
+
+    protected void handleBadResponse(String message) {
+        boolean isUnexpectedError = !TextUtils.isEmpty(message) && message.contains(UNEXPECTED);
+        onErrorResult(isUnexpectedError ?
+            Errors.SYNTAX_ERROR_IN_RESPONSE :
+            new LoopMeError(message, Constants.ErrorType.SERVER)
+        );
     }
 
     private void handleResponse(BidResponse bidResponse) {

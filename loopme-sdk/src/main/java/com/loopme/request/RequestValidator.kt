@@ -65,40 +65,46 @@ internal class RequestValidator {
             val bannerJson = ortbRequest.optJSONArray(IMP)
                 ?.getJSONObject(0)
                 ?.optJSONObject(BANNER)
+            if (bannerJson == null) {
+                violate(IMP_BANNER, NOT_PRESENT)
+            } else {
+                val bannerWidth = bannerJson
+                    .optInt(WIDTH, -1)
+                when (bannerWidth) {
+                    -1 -> violate(BANNER_WIDTH, NOT_PRESENT_OR_INVALID)
+                    0 -> violate(BANNER_WIDTH, VALUE_0)
+                }
 
-            val bannerWidth = bannerJson
-                ?.optInt(WIDTH, -1)
-            when {
-                bannerWidth == null || bannerWidth == -1 -> violate(BANNER_WIDTH, NOT_PRESENT_OR_INVALID)
-                bannerWidth == 0 -> violate(BANNER_WIDTH, VALUE_0)
-            }
-
-            val bannerHeight = bannerJson
-                ?.optInt(HEIGHT, -1)
-            when {
-                bannerHeight == null || bannerHeight == -1 -> violate(BANNER_HEIGHT, NOT_PRESENT_OR_INVALID)
-                bannerHeight == 0 -> violate(BANNER_HEIGHT, VALUE_0)
+                val bannerHeight = bannerJson
+                    .optInt(HEIGHT, -1)
+                when (bannerHeight) {
+                    -1 -> violate(BANNER_HEIGHT, NOT_PRESENT_OR_INVALID)
+                    0 -> violate(BANNER_HEIGHT, VALUE_0)
+                }
             }
         }
-        if (adRequestType.isVideo || adRequestType.isRewarded){
+        if (adRequestType.isVideo || adRequestType.isRewarded) {
             val videoJson = ortbRequest.optJSONArray(IMP)
                 ?.getJSONObject(0)
                 ?.optJSONObject(VIDEO)
+            if (videoJson == null) {
+                violate(IMP_VIDEO, NOT_PRESENT)
+            } else {
 
-            val videoWidth = videoJson
-                ?.optInt(WIDTH, -1)
-            when {
-                videoWidth == null || videoWidth == -1 -> violate(VIDEO_WIDTH, NOT_PRESENT_OR_INVALID)
-                videoWidth == 0 -> violate(VIDEO_WIDTH, VALUE_0)
+                val videoWidth = videoJson
+                    .optInt(WIDTH, -1)
+                when (videoWidth) {
+                    -1 -> violate(VIDEO_WIDTH, NOT_PRESENT_OR_INVALID)
+                    0 -> violate(VIDEO_WIDTH, VALUE_0)
+                }
+
+                val bannerHeight = videoJson
+                    .optInt(HEIGHT, -1)
+                when (bannerHeight) {
+                    -1 -> violate(VIDEO_HEIGHT, NOT_PRESENT_OR_INVALID)
+                    0 -> violate(VIDEO_HEIGHT, VALUE_0)
+                }
             }
-
-            val bannerHeight = videoJson
-                ?.optInt(HEIGHT, -1)
-            when {
-                bannerHeight == null || bannerHeight == -1 -> violate(VIDEO_HEIGHT, NOT_PRESENT_OR_INVALID)
-                bannerHeight == 0 -> violate(VIDEO_HEIGHT, VALUE_0)
-            }
-
         }
 
         return isValid
@@ -116,15 +122,17 @@ internal class RequestValidator {
         const val BLANK = "is blank"
         const val FALLBACK = "fallback"
         const val VALUE_0 = "is 0"
-        const val SOURCE_EXT_PV = SOURCE + "." + EXT + "." + OMID_PARTNER_VERSION
-        const val SOURCE_EXT_PN = SOURCE + "." + EXT + "." + OMID_PARTNER_NAME
-        const val EVENTS_EXT_PV = EVENTS + "." + EXT + "." + OMID_PARTNER_VERSION
-        const val EVENTS_EXT_PN = EVENTS + "." + EXT + "." + OMID_PARTNER_NAME
-        const val BANNER_HEIGHT = IMP + "." + BANNER + "." + HEIGHT
-        const val BANNER_WIDTH = IMP + "." + BANNER + "." + WIDTH
-        const val VIDEO_HEIGHT = IMP + "." + VIDEO + "." + HEIGHT
-        const val VIDEO_WIDTH = IMP + "." + VIDEO + "." + WIDTH
+        const val SOURCE_EXT_PV = "$SOURCE.$EXT.$OMID_PARTNER_VERSION"
+        const val SOURCE_EXT_PN = "$SOURCE.$EXT.$OMID_PARTNER_NAME"
+        const val EVENTS_EXT_PV = "$EVENTS.$EXT.$OMID_PARTNER_VERSION"
+        const val EVENTS_EXT_PN = "$EVENTS.$EXT.$OMID_PARTNER_NAME"
+        const val BANNER_HEIGHT = "$IMP.$BANNER.$HEIGHT"
+        const val BANNER_WIDTH = "$IMP.$BANNER.$WIDTH"
+        const val VIDEO_HEIGHT = "$IMP.$VIDEO.$HEIGHT"
+        const val VIDEO_WIDTH = "$IMP.$VIDEO.$WIDTH"
+        const val IMP_VIDEO = "$IMP.$VIDEO"
+        const val IMP_BANNER = "$IMP.$BANNER"
     }
 }
 
-internal class InvalidOrtbRequestException(message: String): Exception(message)
+internal class InvalidOrtbRequestException(message: String) : Exception(message)

@@ -7,6 +7,8 @@ import com.loopme.request.RequestValidator.Companion.BANNER_HEIGHT
 import com.loopme.request.RequestValidator.Companion.BANNER_WIDTH
 import com.loopme.request.RequestValidator.Companion.EVENTS_EXT_PN
 import com.loopme.request.RequestValidator.Companion.EVENTS_EXT_PV
+import com.loopme.request.RequestValidator.Companion.IMP_BANNER
+import com.loopme.request.RequestValidator.Companion.IMP_VIDEO
 import com.loopme.request.RequestValidator.Companion.SOURCE_EXT_PN
 import com.loopme.request.RequestValidator.Companion.SOURCE_EXT_PV
 import com.loopme.request.RequestValidator.Companion.VIDEO_HEIGHT
@@ -96,6 +98,45 @@ class RequestValidatorTest {
     }
 
     @Test
+    fun `Banner not present`() {
+        val request = JSONObject(convertFileToString("video_only"))
+        val isValid = validator.validateOrtbRequest(request, dummyAdRequestType)
+        val violations = validator.violations
+        assertFalse(isValid)
+        assertEquals(RequestValidator.NOT_PRESENT, violations[IMP_BANNER])
+        assertFalse(violations.containsKey(BANNER_HEIGHT))
+        assertFalse(violations.containsKey(BANNER_WIDTH))
+    }
+
+    @Test
+    fun `Banner only when is not a video not rewarded`() {
+        val request = JSONObject(convertFileToString("banner_only"))
+        val adRequestType = dummyAdRequestType.copy(isBanner = true, isVideo = false, isRewarded = false)
+        val isValid = validator.validateOrtbRequest(request, adRequestType)
+        val violations = validator.violations
+        assertFalse(isValid)
+        assertEquals(RequestValidator.VALUE_0, violations[BANNER_WIDTH])
+        assertEquals(RequestValidator.VALUE_0, violations[BANNER_HEIGHT])
+        assertFalse(violations.containsKey(IMP_VIDEO))
+        assertFalse(violations.containsKey(VIDEO_HEIGHT))
+        assertFalse(violations.containsKey(VIDEO_WIDTH))
+    }
+
+    @Test
+    fun `Video not present`() {
+        val request = JSONObject(convertFileToString("banner_only"))
+        val adRequestType = dummyAdRequestType
+        val isValid = validator.validateOrtbRequest(request, adRequestType)
+        val violations = validator.violations
+        assertFalse(isValid)
+        assertEquals(RequestValidator.VALUE_0, violations[BANNER_WIDTH])
+        assertEquals(RequestValidator.VALUE_0, violations[BANNER_HEIGHT])
+        assertEquals(RequestValidator.NOT_PRESENT, violations[IMP_VIDEO])
+        assertFalse(violations.containsKey(VIDEO_HEIGHT))
+        assertFalse(violations.containsKey(VIDEO_WIDTH))
+    }
+
+    @Test
     fun `Banner width and height zero`() {
         val request = JSONObject(convertFileToString("all_required_empty"))
         val isValid = validator.validateOrtbRequest(request, dummyAdRequestType)
@@ -133,19 +174,6 @@ class RequestValidatorTest {
         assertFalse(isValid)
         assertEquals(RequestValidator.NOT_PRESENT_OR_INVALID, violations[VIDEO_WIDTH])
         assertEquals(RequestValidator.NOT_PRESENT_OR_INVALID, violations[VIDEO_HEIGHT])
-    }
-
-    @Test
-    fun `Banner only when is not a video not rewarded`() {
-        val request = JSONObject(convertFileToString("banner_only"))
-        val adRequestType = dummyAdRequestType.copy(isBanner = true, isVideo = false, isRewarded = false)
-        val isValid = validator.validateOrtbRequest(request, adRequestType)
-        val violations = validator.violations
-        assertFalse(isValid)
-        assertEquals(RequestValidator.VALUE_0, violations[BANNER_WIDTH])
-        assertEquals(RequestValidator.VALUE_0, violations[BANNER_HEIGHT])
-        assertFalse(violations.containsKey(VIDEO_HEIGHT))
-        assertFalse(violations.containsKey(VIDEO_WIDTH))
     }
 
     @Test
