@@ -22,6 +22,12 @@
             android:name=".views.activity.MraidVideoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:hardwareAccelerated="true" />
+
+        <provider
+            android:name="com.loopme.utils.LoopMeInitializerHelper"
+            android:authorities="${applicationId}.loopmesdkinitializer"
+            android:exported="false"
+            android:enabled="true" />
     </application>
 
 </manifest>

@@ -16,6 +16,7 @@ import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.display.DisplayControllerLoopMe;
 import com.loopme.tracker.partners.LoopMeTracker;
+import com.loopme.utils.SessionManager;
 import com.loopme.utils.UiUtils;
 
 /**
@@ -106,6 +107,9 @@ public class LoopMeBannerGeneral extends LoopMeAd {
         }
         showInternal();
         getDisplayController().postImpression();
+
+        SessionManager.getInstance().incrementAdsShownCount();
+
         if (isLoopMeAd() || isMraidAd()) {
             resume();
         } else if (isVastAd() || isVpaidAd() && mDisplayController != null) {

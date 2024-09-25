@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import com.loopme.ad.AdSpotDimensions;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
+import com.loopme.utils.SessionManager;
 import com.loopme.utils.UiUtils;
 
 /**
@@ -77,6 +78,9 @@ public class LoopMeInterstitialGeneral extends LoopMeAd {
         setAdState(Constants.AdState.SHOWING);
         stopTimer();
         AdUtils.startAdActivity(this);
+
+        SessionManager.getInstance().incrementAdsShownCount();
+
         if (mAdListener != null) {
             mAdListener.onLoopMeInterstitialShow(this);
         }
