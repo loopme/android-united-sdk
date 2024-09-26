@@ -7,18 +7,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
-public class LifecycleManager {
-
-    private static LifecycleManager instance;
-
-    private LifecycleManager() {}
-
-    public static synchronized LifecycleManager getInstance() {
-        if (instance == null) {
-            instance = new LifecycleManager();
-        }
-        return instance;
-    }
+class LifecycleManager {
 
     public void registerActivityLifecycleCallbacks(@NonNull Context context) {
         if (context.getApplicationContext() instanceof Application) {

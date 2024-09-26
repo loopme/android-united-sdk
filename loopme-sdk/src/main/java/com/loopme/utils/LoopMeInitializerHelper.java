@@ -16,7 +16,7 @@ public class LoopMeInitializerHelper extends ContentProvider {
         Context context = getContext();
         if (context != null && context.getApplicationContext() instanceof Application) {
             Application application = (Application) context.getApplicationContext();
-            LifecycleManager.getInstance().registerActivityLifecycleCallbacks(application);
+           new LifecycleManager().registerActivityLifecycleCallbacks(application);
         }
         return true;
     }
