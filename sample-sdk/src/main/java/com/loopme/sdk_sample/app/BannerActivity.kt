@@ -112,6 +112,8 @@ class BannerActivity : AppCompatActivity() {
                 }
             })
             banner.setAutoLoading(false)
+            // Use this method to load an ad by using custom ad url (Required by Qr App)
+            // banner.load("https://storage.googleapis.com/loopme-creatives-eu/assets/2103278/creative_preview_1726833249016.jsonp");
             banner.load()
         }
     }

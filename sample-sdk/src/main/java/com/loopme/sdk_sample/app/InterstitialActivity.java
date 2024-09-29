@@ -99,6 +99,8 @@ public class InterstitialActivity extends AppCompatActivity {
         });
 
         // Start loading immediately
+        // Use this method to load an ad by using custom ad url (Required by Qr App)
+        // mInterstitial.load("https://storage.googleapis.com/loopme-creatives-eu/assets/2103278/creative_preview_1726833249016.jsonp");
         mInterstitial.load();
         binding.showButton.setEnabled(false);
     }

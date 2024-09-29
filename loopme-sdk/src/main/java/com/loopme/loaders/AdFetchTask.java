@@ -74,7 +74,9 @@ public class AdFetchTask implements Runnable {
                 Logging.out(LOG_TAG, "Thread interrupted.");
                 return;
             }
-            GetResponse<BidResponse> response = LoopMeAdService.fetchAd(Constants.BASE_URL, data);
+            GetResponse<BidResponse> response = mLoopMeAd.isCustomAdUrl() ?
+                LoopMeAdService.fetchAdByUrl(mLoopMeAd.getCustomAdUrl()) :
+                LoopMeAdService.fetchAd(Constants.BASE_URL, data);
             Logging.out(LOG_TAG, "response received");
             parseResponse(response);
             duration = System.currentTimeMillis() - startTime;
