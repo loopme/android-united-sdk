@@ -32,6 +32,16 @@ public class ValidationDataExtractor {
     private static final String LOG_TAG = "ValidationDataExtractor";
     private static final String DOT = ".";
     private static final String ARRAY = "[]";
+    private static final String SOURCE_EXT_PV = SOURCE + DOT + EXT + DOT + OMID_PARTNER_VERSION;
+    private static final String SOURCE_EXT_PN = SOURCE + DOT + EXT + DOT + OMID_PARTNER_NAME;
+    private static final String EVENTS_EXT_PV = EVENTS + DOT + EXT + DOT + OMID_PARTNER_VERSION;
+    private static final String EVENTS_EXT_PN = EVENTS + DOT + EXT + DOT + OMID_PARTNER_NAME;
+    private static final String IMP_BANNER = IMP + ARRAY + BANNER;
+    private static final String BANNER_HEIGHT = IMP_BANNER + DOT + HEIGHT;
+    private static final String BANNER_WIDTH = IMP_BANNER + DOT + WIDTH;
+    private static final String IMP_VIDEO = IMP + ARRAY + VIDEO;
+    private static final String VIDEO_HEIGHT = IMP_VIDEO + DOT + HEIGHT;
+    private static final String VIDEO_WIDTH = IMP_VIDEO + DOT + WIDTH;
 
    public ArrayList<Validation> prepare(JSONObject ortbRequest, AdRequestType adRequestType) {
         ArrayList<Validation> validations = new ArrayList<>();
@@ -42,7 +52,7 @@ public class ValidationDataExtractor {
         } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage());
         } finally {
-            validations.add(createValidation(new String[]{APP, DOT, APPKEY}, appKey, REQUIRED));
+            validations.add(createValidation(APP.concat(DOT).concat(APPKEY), appKey, REQUIRED));
         }
 
         JSONObject sourceExtJson = null;
@@ -53,7 +63,7 @@ public class ValidationDataExtractor {
         } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage());
         } finally {
-            validations.add(createValidation(new String[]{SOURCE, DOT, EXT, DOT, OMID_PARTNER_NAME}, sourceExtOmidpn, REQUIRED));
+            validations.add(createValidation(SOURCE_EXT_PN, sourceExtOmidpn, REQUIRED));
         }
 
         String sourceExtOmidpv = null;
@@ -62,7 +72,7 @@ public class ValidationDataExtractor {
         } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage());
         } finally {
-            validations.add(createValidation(new String[]{SOURCE, DOT, EXT, DOT, OMID_PARTNER_VERSION}, sourceExtOmidpv, REQUIRED));
+            validations.add(createValidation(SOURCE_EXT_PV, sourceExtOmidpv, REQUIRED));
 
         }
 
@@ -74,7 +84,7 @@ public class ValidationDataExtractor {
         } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage());
         } finally {
-            validations.add(createValidation(new String[]{EVENTS, DOT, EXT, DOT, OMID_PARTNER_NAME}, eventsExtOmidpn, REQUIRED));
+            validations.add(createValidation(EVENTS_EXT_PN, eventsExtOmidpn, REQUIRED));
         }
 
         String eventsExtOmidpv = null;
@@ -83,7 +93,7 @@ public class ValidationDataExtractor {
         } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage());
         } finally {
-            validations.add(createValidation(new String[]{EVENTS, DOT, EXT, DOT, OMID_PARTNER_VERSION}, eventsExtOmidpv, REQUIRED));
+            validations.add(createValidation(EVENTS_EXT_PV, eventsExtOmidpv, REQUIRED));
 
         }
 
@@ -98,7 +108,7 @@ public class ValidationDataExtractor {
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage());
             } finally {
-                validations.add(createValidation(new String[]{IMP, ARRAY, BANNER, DOT, WIDTH}, String.valueOf(bannerWidth), REQUIRED, GREATER_THEN_ZERO));
+                validations.add(createValidation(BANNER_WIDTH, String.valueOf(bannerWidth), REQUIRED, GREATER_THEN_ZERO));
             }
 
             int bannerHeight = 0;
@@ -107,7 +117,7 @@ public class ValidationDataExtractor {
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage());
             } finally {
-                validations.add(createValidation(new String[]{IMP, ARRAY, BANNER, DOT, HEIGHT}, String.valueOf(bannerHeight), REQUIRED, GREATER_THEN_ZERO));
+                validations.add(createValidation(BANNER_HEIGHT, String.valueOf(bannerHeight), REQUIRED, GREATER_THEN_ZERO));
             }
         }
         if (adRequestType.isVideo() || adRequestType.isRewarded()) {
@@ -115,11 +125,11 @@ public class ValidationDataExtractor {
             int videoWidth = 0;
             try {
                 videoJson = impression.getJSONObject(0).getJSONObject(VIDEO);
-                videoWidth = videoJson.getInt(HEIGHT);
+                videoWidth = videoJson.getInt(WIDTH);
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage());
             } finally {
-                validations.add(createValidation(new String[]{IMP, ARRAY, VIDEO, DOT, WIDTH}, String.valueOf(videoWidth), REQUIRED, GREATER_THEN_ZERO));
+                validations.add(createValidation(VIDEO_WIDTH, String.valueOf(videoWidth), REQUIRED, GREATER_THEN_ZERO));
 
             }
 
@@ -129,18 +139,14 @@ public class ValidationDataExtractor {
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage());
             } finally {
-                validations.add(createValidation(new String[]{IMP, ARRAY, VIDEO, DOT, HEIGHT}, String.valueOf(videoHeight), REQUIRED, GREATER_THEN_ZERO));
+                validations.add(createValidation(VIDEO_HEIGHT, String.valueOf(videoHeight), REQUIRED, GREATER_THEN_ZERO));
             }
         }
         return validations;
     }
 
-
-    private static @NonNull Validation createValidation(String[] path, String value, ValidationRule... rules) {
-        String pathS = "";
-        for (String a : path) {
-            pathS = pathS.concat(a);
-        }
-        return new Validation(pathS, value, rules);
+    private static @NonNull Validation createValidation(String path, String value, ValidationRule... rules) {
+        return new Validation(path, value, rules);
     }
+
 }

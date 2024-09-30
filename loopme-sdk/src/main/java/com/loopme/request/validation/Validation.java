@@ -1,7 +1,5 @@
 package com.loopme.request.validation;
 
-import java.lang.reflect.Array;
-
 public class Validation {
     private String path;
     private String value;

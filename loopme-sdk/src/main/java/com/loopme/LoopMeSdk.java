@@ -104,8 +104,6 @@ public final class LoopMeSdk {
         Utils.setInitializationTimeMillisQueue((int) (end - start));
         sdkInitListener.onSdkInitializationSuccess();
 
-        ViewAbilityUtils.getProceses(context);
-
         if (omidEnd - omidStart > 100) {
             sendInitTimeAlert("OMID init time alert > 100ms", omidEnd - omidStart);
         }

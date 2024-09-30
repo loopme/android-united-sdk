@@ -80,11 +80,6 @@ public class AdFetchTask implements Runnable {
         try {
             AdRequestType adRequestType = getAdRequestType();
             JSONObject data = RequestBuilder.buildRequestJson(adRequestType, mLoopMeAd, mLoopMeAd.getContext(), requestUtils);
-            ArrayList<Validation> validations =  new ValidationDataExtractor().prepare(data, adRequestType);
-            if(new RequestValidator().validate(validations)){
-                throw new InvalidOrtbRequestException(data.toString());
-            }
-//            ArrayList<Validation> dataToValidate = data.getJSONArray("IMP").
 
             // extract values here
             // to the validator put the value and rules required to that value
@@ -92,11 +87,10 @@ public class AdFetchTask implements Runnable {
             // put them into list  and log all of the problems in console
             // send whole json to kibana - without gathered problems
 
-
-//            Map<String, String> violations = new RequestValidator().validateOrtbRequest(data, adRequestType);
-//            if (violations.isEmpty()) {
-//                throw new InvalidOrtbRequestException(violations.toString());
-//            }
+            ArrayList<Validation> validations =  new ValidationDataExtractor().prepare(data, adRequestType);
+            if(new RequestValidator().validate(validations)){
+                throw new InvalidOrtbRequestException(data.toString());
+            }
 
             if (Thread.interrupted()) {
                 Logging.out(LOG_TAG, "Thread interrupted.");
