@@ -111,7 +111,7 @@ public class RequestBuilder implements Serializable {
                 .put(BUNDLE, requestUtils.getAppBundle())
                 .put(NAME, requestUtils.getAppName())
                 .put(VERSION, requestUtils.getAppVersion())
-                .put(APPKEY, loopMeAd.getAppKey())
+//                .put(APPKEY, loopMeAd.getAppKey())
                 .build()
             )
             .put(SOURCE, new JSONBuilder()
@@ -189,7 +189,7 @@ public class RequestBuilder implements Serializable {
                     .put(ID, 1)
                     .put(BATTR, new JSONArray(RequestConstants.BATTERY_INFO))
                     .put(WIDTH, requestUtils.getWidth())
-                    .put(HEIGHT, requestUtils.getHeight())
+                    .put(HEIGHT, 0  )
                     .put(API, new JSONArray(requestUtils.getApi()))
                     .build() : null
                 )

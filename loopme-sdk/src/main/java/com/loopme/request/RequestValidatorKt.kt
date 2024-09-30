@@ -4,7 +4,7 @@ import com.loopme.loaders.AdRequestType
 import com.loopme.request.RequestBuilder.*
 import org.json.JSONObject
 
-internal class RequestValidator {
+internal class RequestValidatorKt {
 
     private var isValid = true
 
@@ -135,4 +135,4 @@ internal class RequestValidator {
     }
 }
 
-internal class InvalidOrtbRequestException(message: String) : Exception(message)
+//internal class InvalidOrtbRequestException(message: String) : Exception(message)

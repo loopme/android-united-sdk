@@ -23,6 +23,8 @@ import com.loopme.request.InvalidOrtbRequestException;
 import com.loopme.request.RequestBuilder;
 import com.loopme.request.RequestUtils;
 import com.loopme.request.RequestValidator;
+import com.loopme.request.ValidationDataExtractor;
+import com.loopme.request.validation.Validation;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.ExecutorHelper;
 import com.loopme.network.LoopMeAdService;
@@ -31,6 +33,7 @@ import com.loopme.xml.vast4.Wrapper;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -77,11 +80,23 @@ public class AdFetchTask implements Runnable {
         try {
             AdRequestType adRequestType = getAdRequestType();
             JSONObject data = RequestBuilder.buildRequestJson(adRequestType, mLoopMeAd, mLoopMeAd.getContext(), requestUtils);
-
-            RequestValidator validator = new RequestValidator();
-            if (!validator.validateOrtbRequest(data, adRequestType)) {
-                throw new InvalidOrtbRequestException(validator.getViolations().toString());
+            ArrayList<Validation> validations =  new ValidationDataExtractor().prepare(data, adRequestType);
+            if(new RequestValidator().validate(validations)){
+                throw new InvalidOrtbRequestException(data.toString());
             }
+//            ArrayList<Validation> dataToValidate = data.getJSONArray("IMP").
+
+            // extract values here
+            // to the validator put the value and rules required to that value
+            // in validator - check if all the values meet validation
+            // put them into list  and log all of the problems in console
+            // send whole json to kibana - without gathered problems
+
+
+//            Map<String, String> violations = new RequestValidator().validateOrtbRequest(data, adRequestType);
+//            if (violations.isEmpty()) {
+//                throw new InvalidOrtbRequestException(violations.toString());
+//            }
 
             if (Thread.interrupted()) {
                 Logging.out(LOG_TAG, "Thread interrupted.");
