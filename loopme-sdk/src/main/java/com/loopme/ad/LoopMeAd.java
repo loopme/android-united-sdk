@@ -26,7 +26,6 @@ import com.loopme.controllers.display.DisplayControllerVpaid;
 import com.loopme.debugging.LiveDebug;
 import com.loopme.debugging.Params;
 import com.loopme.loaders.AdFetchTask;
-import com.loopme.loaders.AdFetchTaskByUrl;
 import com.loopme.loaders.AdFetcherListener;
 import com.loopme.models.Errors;
 import com.loopme.network.HttpUtils;
@@ -62,6 +61,11 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     private final String mAppKey;
     protected boolean mIsReady;
     private final int mAdId;
+
+    private String mUrl;
+    public boolean isCustomAdUrl () { return !TextUtils.isEmpty(mUrl); }
+    public String getCustomAdUrl () { return mUrl; }
+    public void setCustomAdUrl (String url) { mUrl = url; }
 
     private final AdFetcherListener adFetchListener = new AdFetcherListener() {
         @Override
@@ -269,9 +273,8 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     public void load() { load(mIntegrationType); }
 
     public void load(String url) {
-        setAdState(Constants.AdState.LOADING);
-        AdFetchTask adFetchTask = new AdFetchTaskByUrl(this, adFetchListener, url);
-        adFetchTask.fetch();
+        setCustomAdUrl(url);
+        load();
     }
 
     private boolean isCouldLoadAd() {
