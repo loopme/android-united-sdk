@@ -24,6 +24,7 @@ import com.loopme.request.RequestBuilder;
 import com.loopme.request.RequestUtils;
 import com.loopme.request.RequestValidator;
 import com.loopme.request.ValidationDataExtractor;
+import com.loopme.request.validation.Invalidation;
 import com.loopme.request.validation.Validation;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.ExecutorHelper;
@@ -87,9 +88,10 @@ public class AdFetchTask implements Runnable {
             // put them into list  and log all of the problems in console
             // send whole json to kibana - without gathered problems
 
-            ArrayList<Validation> validations =  new ValidationDataExtractor().prepare(data, adRequestType);
-            if(new RequestValidator().validate(validations)){
-                throw new InvalidOrtbRequestException(data.toString());
+            ArrayList<Validation> validations = new ValidationDataExtractor().prepare(data, adRequestType);
+            ArrayList<Invalidation> invalidations = new RequestValidator().validate(validations);
+            if (!invalidations.isEmpty()) {
+                throw new InvalidOrtbRequestException(invalidations.toString(), data.toString());
             }
 
             if (Thread.interrupted()) {
@@ -119,6 +121,9 @@ public class AdFetchTask implements Runnable {
         if (isUnexpectedError) {
             error.setErrorType(Constants.ErrorType.SERVER);
             error.addParam(Params.ERROR_EXCEPTION, Errors.ERROR_MESSAGE_RESPONSE_SYNTAX_ERROR);
+        } else if (exception instanceof InvalidOrtbRequestException) {
+            error.addParam(Params.ERROR_EXCEPTION, exception.getMessage());
+            error.addParam(Params.REQUEST, ((InvalidOrtbRequestException) exception).getRequest());
         } else {
             error.addParam(Params.ERROR_EXCEPTION, exception.getMessage());
         }

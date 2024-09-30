@@ -2,6 +2,7 @@ package com.loopme.request;
 
 import android.util.Log;
 
+import com.loopme.request.validation.Invalidation;
 import com.loopme.request.validation.Validation;
 import com.loopme.request.validation.ValidationRule;
 
@@ -14,23 +15,19 @@ public class RequestValidator {
     /**
      * After calling validateOrtbRequest function, this field should be populated. If empty hashmap, it means, that request is valid
      */
-    public boolean validate(ArrayList<Validation> rules) {
-        boolean isValid = true;
+    public ArrayList<Invalidation> validate(ArrayList<Validation> rules) {
+        ArrayList<Invalidation> invalidations = new ArrayList<>();
         for (Validation validation : rules) {
             for (ValidationRule rule : validation.getRules()) {
                 switch (rule) {
                     case REQUIRED:
-                        if (isValid) {
-                            isValid = validateRequired(validation);
-                        } else {
-                            validateRequired(validation);
+                        if (!validateRequired(validation)) {
+                            invalidations.add(new Invalidation(validation.getPath(), ValidationRule.REQUIRED));
                         }
                         break;
                     case GREATER_THEN_ZERO:
-                        if (isValid) {
-                            isValid = validateGreaterThanZero(validation);
-                        } else {
-                            validateGreaterThanZero(validation);
+                        if (!validateGreaterThanZero(validation)) {
+                            invalidations.add(new Invalidation(validation.getPath(), ValidationRule.GREATER_THEN_ZERO));
                         }
                         break;
                     default:
@@ -40,7 +37,7 @@ public class RequestValidator {
             }
 
         }
-        return isValid;
+        return invalidations;
     }
 
     private boolean validateRequired(Validation validation) {
