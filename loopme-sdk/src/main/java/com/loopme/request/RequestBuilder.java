@@ -8,6 +8,7 @@ import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.debugging.LiveDebug;
 import com.loopme.om.OmidHelper;
+import com.loopme.utils.SessionManager;
 import com.loopme.utils.Utils;
 
 import org.json.JSONArray;
@@ -92,6 +93,8 @@ public class RequestBuilder implements Serializable {
     private static final String COPPA = "coppa";
     private static final String GDPR = "gdpr";
     private static final String US_PRIVACY = "us_privacy";
+    private static final String SESSION_DURATION = "sessionduration";
+    private static final String SESSION_DEPTH = "impdepth";
     private static final String GENDER = "gender";
     private static final String YOB = "yob";
     private static final String KEYWORDS = "keywords";
@@ -157,6 +160,8 @@ public class RequestBuilder implements Serializable {
                              && !requestUtils.getIabTcfTcString(loopMeAd.getContext()).isEmpty()) ?
                              requestUtils.getIabTcfTcString(loopMeAd.getContext())
                              : requestUtils.getUserConsent(loopMeAd.getContext()))
+                        .put(SESSION_DURATION, SessionManager.getInstance().getSessionDuration())
+                        .put(SESSION_DEPTH, SessionManager.getInstance().getAdsShownCount())
                         .build() : null
                 )
                 .build()
