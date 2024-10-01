@@ -23,4 +23,3 @@ public class Validation {
         return rules;
     }
 }
-

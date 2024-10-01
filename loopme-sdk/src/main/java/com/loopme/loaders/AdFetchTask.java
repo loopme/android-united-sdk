@@ -55,7 +55,6 @@ public class AdFetchTask implements Runnable {
     private final ValidationDataExtractor validationDataExtractor;
     private final RequestValidator requestValidator;
 
-
     public AdFetchTask(LoopMeAd loopMeAd, AdFetcherListener adFetcherListener) {
         mLoopMeAd = loopMeAd;
         mAdFetcherListener = adFetcherListener;

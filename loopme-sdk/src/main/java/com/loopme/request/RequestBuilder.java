@@ -22,16 +22,16 @@ import java.io.Serializable;
 
 public class RequestBuilder implements Serializable {
 
-    protected static final String APP = "app";
+    static final String APP = "app";
     private static final String ID = "id";
     private static final String BUNDLE = "bundle";
     private static final String NAME = "name";
     private static final String VERSION = "version";
-    protected static final String APPKEY = "id";
+    static final String APPKEY = "id";
     private static final String DEVICE = "device";
     private static final String DEVICE_TYPE = "devicetype";
-    protected static final String WIDTH = "w";
-    protected static final String HEIGHT = "h";
+    static final String WIDTH = "w";
+    static final String HEIGHT = "h";
     private static final String JS = "js";
     private static final String IFA = "ifa";
     private static final String OSV = "osv";
@@ -43,7 +43,7 @@ public class RequestBuilder implements Serializable {
     private static final String UA = "ua";
     private static final String DNT = "dnt";
     private static final String MODEL = "model";
-    protected static final String EXT = "ext";
+    static final String EXT = "ext";
     private static final String TIMEZONE = "timezone";
     private static final String ORIENTATION = "orientation";
     private static final String CHARGE_LEVEL = "chargelevel";
@@ -52,20 +52,20 @@ public class RequestBuilder implements Serializable {
     private static final String PLUGIN = "plugin";
     private static final String TMAX = "tmax";
     private static final String BCAT = "bcat";
-    protected static final String SOURCE = "source";
-    protected static final String EVENTS = "events";
-    protected static final String OMID_PARTNER_NAME = "omidpn";
-    protected static final String OMID_PARTNER_VERSION = "omidpv";
-    protected static final String IMP = "imp";
+    static final String SOURCE = "source";
+    static final String EVENTS = "events";
+    static final String OMID_PARTNER_NAME = "omidpn";
+    static final String OMID_PARTNER_VERSION = "omidpv";
+    static final String IMP = "imp";
     private static final String SECURE = "secure";
     private static final String DISPLAY_MANAGER_VERSION = "displaymanagerver";
-    protected static final String BANNER = "banner";
+    static final String BANNER = "banner";
     private static final String API = "api";
     private static final String APIS = "apis";
     private static final String BATTR = "battr";
     private static final String IT = "it";
     private static final String BID_FLOOR = "bidfloor";
-    protected static final String VIDEO = "video";
+    static final String VIDEO = "video";
     private static final String MAX_DURATION = "maxduration";
     private static final String PROTOCOLS = "protocols";
     private static final String LINEARITY = "linearity";
@@ -111,7 +111,7 @@ public class RequestBuilder implements Serializable {
                 .put(BUNDLE, requestUtils.getAppBundle())
                 .put(NAME, requestUtils.getAppName())
                 .put(VERSION, requestUtils.getAppVersion())
-//                .put(APPKEY, loopMeAd.getAppKey())
+                .put(APPKEY, loopMeAd.getAppKey())
                 .build()
             )
             .put(SOURCE, new JSONBuilder()
@@ -184,12 +184,12 @@ public class RequestBuilder implements Serializable {
                 )
                 .build()
             )
-            .put(IMP, new JSONArray(new JSONObject[]{ new JSONBuilder()
+            .put(IMP, new JSONArray(new JSONObject[]{new JSONBuilder()
                 .put(BANNER, adRequestType.isBanner() ? new JSONBuilder()
                     .put(ID, 1)
                     .put(BATTR, new JSONArray(RequestConstants.BATTERY_INFO))
-//                    .put(WIDTH, requestUtils.getWidth())
-                    .put(HEIGHT, 0  )
+                    .put(WIDTH, requestUtils.getWidth())
+                    .put(HEIGHT, requestUtils.getHeight())
                     .put(API, new JSONArray(requestUtils.getApi()))
                     .build() : null
                 )

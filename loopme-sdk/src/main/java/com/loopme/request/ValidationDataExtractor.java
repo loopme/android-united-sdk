@@ -29,7 +29,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class ValidationDataExtractor {
-
     private static final String LOG_TAG = "ValidationDataExtractor";
     private static final String DOT = ".";
     private static final String ARRAY = "[]";
@@ -41,7 +40,7 @@ public class ValidationDataExtractor {
     private static final String IMP_BANNER = IMP + ARRAY + BANNER;
     static final String BANNER_HEIGHT = IMP_BANNER + DOT + HEIGHT;
     static final String BANNER_WIDTH = IMP_BANNER + DOT + WIDTH;
-    static final String IMP_VIDEO = IMP + ARRAY + VIDEO;
+    private static final String IMP_VIDEO = IMP + ARRAY + VIDEO;
     static final String VIDEO_HEIGHT = IMP_VIDEO + DOT + HEIGHT;
     static final String VIDEO_WIDTH = IMP_VIDEO + DOT + WIDTH;
 

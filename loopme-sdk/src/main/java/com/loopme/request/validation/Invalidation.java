@@ -25,4 +25,3 @@ public class Invalidation {
         return String.format("%s : %s", path, rule);
     }
 }
-

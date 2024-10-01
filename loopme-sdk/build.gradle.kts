@@ -19,10 +19,6 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
-
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
 }
 
 dependencies {
@@ -45,7 +41,6 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20220924")
-
 
     testImplementation("org.robolectric:robolectric:4.13")
     androidTestImplementation("org.robolectric:robolectric:4.13")

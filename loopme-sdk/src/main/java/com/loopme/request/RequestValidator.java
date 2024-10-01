@@ -9,7 +9,6 @@ import com.loopme.request.validation.ValidationRule;
 import java.util.ArrayList;
 
 public class RequestValidator {
-
     private static final String LOG_TAG = "RequestValidator";
 
     /**
