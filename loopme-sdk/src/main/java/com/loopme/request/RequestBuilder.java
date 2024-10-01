@@ -188,7 +188,7 @@ public class RequestBuilder implements Serializable {
                 .put(BANNER, adRequestType.isBanner() ? new JSONBuilder()
                     .put(ID, 1)
                     .put(BATTR, new JSONArray(RequestConstants.BATTERY_INFO))
-                    .put(WIDTH, requestUtils.getWidth())
+//                    .put(WIDTH, requestUtils.getWidth())
                     .put(HEIGHT, 0  )
                     .put(API, new JSONArray(requestUtils.getApi()))
                     .build() : null

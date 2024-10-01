@@ -52,12 +52,17 @@ public class AdFetchTask implements Runnable {
     private final Handler mHandler = new Handler((Looper.getMainLooper()));
     private static final String UNEXPECTED = "Unexpected";
     private final RequestUtils requestUtils;
+    private final ValidationDataExtractor validationDataExtractor;
+    private final RequestValidator requestValidator;
+
 
     public AdFetchTask(LoopMeAd loopMeAd, AdFetcherListener adFetcherListener) {
         mLoopMeAd = loopMeAd;
         mAdFetcherListener = adFetcherListener;
         mExecutorService = ExecutorHelper.getExecutor();
         requestUtils = new RequestUtils(mLoopMeAd.getContext(), mLoopMeAd);
+        validationDataExtractor = new ValidationDataExtractor();
+        requestValidator = new RequestValidator();
     }
 
     public void fetch() { mFetchTask = mExecutorService.submit(this); }
@@ -88,8 +93,8 @@ public class AdFetchTask implements Runnable {
             // put them into list  and log all of the problems in console
             // send whole json to kibana - without gathered problems
 
-            ArrayList<Validation> validations = new ValidationDataExtractor().prepare(data, adRequestType);
-            ArrayList<Invalidation> invalidations = new RequestValidator().validate(validations);
+            ArrayList<Validation> validations = validationDataExtractor.prepare(data, adRequestType);
+            ArrayList<Invalidation> invalidations = requestValidator.validate(validations);
             if (!invalidations.isEmpty()) {
                 throw new InvalidOrtbRequestException(invalidations.toString(), data.toString());
             }

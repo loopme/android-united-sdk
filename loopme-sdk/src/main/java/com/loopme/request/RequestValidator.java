@@ -13,7 +13,7 @@ public class RequestValidator {
     private static final String LOG_TAG = "RequestValidator";
 
     /**
-     * After calling validateOrtbRequest function, this field should be populated. If empty hashmap, it means, that request is valid
+     * If empty list returned - request is valid
      */
     public ArrayList<Invalidation> validate(ArrayList<Validation> rules) {
         ArrayList<Invalidation> invalidations = new ArrayList<>();
