@@ -85,15 +85,7 @@ public class AdFetchTask implements Runnable {
         try {
             AdRequestType adRequestType = getAdRequestType();
             JSONObject data = RequestBuilder.buildRequestJson(adRequestType, mLoopMeAd, mLoopMeAd.getContext(), requestUtils);
-
-            // extract values here
-            // to the validator put the value and rules required to that value
-            // in validator - check if all the values meet validation
-            // put them into list  and log all of the problems in console
-            // send whole json to kibana - without gathered problems
-
-            ArrayList<Validation> validations = validationDataExtractor.prepare(data, adRequestType);
-            ArrayList<Invalidation> invalidations = requestValidator.validate(validations);
+            ArrayList<Invalidation> invalidations = requestValidator.validate(validationDataExtractor.prepare(data, adRequestType));
             if (!invalidations.isEmpty()) {
                 throw new InvalidOrtbRequestException(invalidations.toString(), data.toString());
             }
