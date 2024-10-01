@@ -12,7 +12,8 @@ import static com.loopme.request.RequestBuilder.OMID_PARTNER_VERSION;
 import static com.loopme.request.RequestBuilder.SOURCE;
 import static com.loopme.request.RequestBuilder.VIDEO;
 import static com.loopme.request.RequestBuilder.WIDTH;
-import static com.loopme.request.validation.ValidationRule.*;
+import static com.loopme.request.validation.ValidationRule.GREATER_THEN_ZERO;
+import static com.loopme.request.validation.ValidationRule.REQUIRED;
 
 import android.util.Log;
 
@@ -32,18 +33,19 @@ public class ValidationDataExtractor {
     private static final String LOG_TAG = "ValidationDataExtractor";
     private static final String DOT = ".";
     private static final String ARRAY = "[]";
-    private static final String SOURCE_EXT_PV = SOURCE + DOT + EXT + DOT + OMID_PARTNER_VERSION;
-    private static final String SOURCE_EXT_PN = SOURCE + DOT + EXT + DOT + OMID_PARTNER_NAME;
-    private static final String EVENTS_EXT_PV = EVENTS + DOT + EXT + DOT + OMID_PARTNER_VERSION;
-    private static final String EVENTS_EXT_PN = EVENTS + DOT + EXT + DOT + OMID_PARTNER_NAME;
+    static final String APP_APPKEY = APP + DOT + APPKEY;
+    static final String SOURCE_EXT_PV = SOURCE + DOT + EXT + DOT + OMID_PARTNER_VERSION;
+    static final String SOURCE_EXT_PN = SOURCE + DOT + EXT + DOT + OMID_PARTNER_NAME;
+    static final String EVENTS_EXT_PV = EVENTS + DOT + EXT + DOT + OMID_PARTNER_VERSION;
+    static final String EVENTS_EXT_PN = EVENTS + DOT + EXT + DOT + OMID_PARTNER_NAME;
     private static final String IMP_BANNER = IMP + ARRAY + BANNER;
-    private static final String BANNER_HEIGHT = IMP_BANNER + DOT + HEIGHT;
-    private static final String BANNER_WIDTH = IMP_BANNER + DOT + WIDTH;
-    private static final String IMP_VIDEO = IMP + ARRAY + VIDEO;
-    private static final String VIDEO_HEIGHT = IMP_VIDEO + DOT + HEIGHT;
-    private static final String VIDEO_WIDTH = IMP_VIDEO + DOT + WIDTH;
+    static final String BANNER_HEIGHT = IMP_BANNER + DOT + HEIGHT;
+    static final String BANNER_WIDTH = IMP_BANNER + DOT + WIDTH;
+    static final String IMP_VIDEO = IMP + ARRAY + VIDEO;
+    static final String VIDEO_HEIGHT = IMP_VIDEO + DOT + HEIGHT;
+    static final String VIDEO_WIDTH = IMP_VIDEO + DOT + WIDTH;
 
-   public ArrayList<Validation> prepare(JSONObject ortbRequest, AdRequestType adRequestType) {
+    public ArrayList<Validation> prepare(JSONObject ortbRequest, AdRequestType adRequestType) {
         ArrayList<Validation> validations = new ArrayList<>();
 
         String appKey = null;
@@ -52,7 +54,7 @@ public class ValidationDataExtractor {
         } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage());
         } finally {
-            validations.add(createValidation(APP.concat(DOT).concat(APPKEY), appKey, REQUIRED));
+            validations.add(createValidation(APP_APPKEY, appKey, REQUIRED));
         }
 
         JSONObject sourceExtJson = null;
@@ -99,47 +101,47 @@ public class ValidationDataExtractor {
 
         JSONArray impression = null;
         JSONObject bannerJson = null;
-        int bannerWidth = 0;
+        String bannerWidth = null;
         if (adRequestType.isBanner()) {
             try {
                 impression = ortbRequest.optJSONArray(IMP);
                 bannerJson = impression.getJSONObject(0).getJSONObject(BANNER);
-                bannerWidth = bannerJson.getInt(WIDTH);
+                bannerWidth = String.valueOf(bannerJson.getInt(WIDTH));
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage());
             } finally {
-                validations.add(createValidation(BANNER_WIDTH, String.valueOf(bannerWidth), REQUIRED, GREATER_THEN_ZERO));
+                validations.add(createValidation(BANNER_WIDTH, bannerWidth, REQUIRED, GREATER_THEN_ZERO));
             }
 
-            int bannerHeight = 0;
+            String bannerHeight = null;
             try {
-                bannerHeight = bannerJson.getInt(HEIGHT);
+                bannerHeight = String.valueOf(bannerJson.getInt(HEIGHT));
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage());
             } finally {
-                validations.add(createValidation(BANNER_HEIGHT, String.valueOf(bannerHeight), REQUIRED, GREATER_THEN_ZERO));
+                validations.add(createValidation(BANNER_HEIGHT, bannerHeight, REQUIRED, GREATER_THEN_ZERO));
             }
         }
         if (adRequestType.isVideo() || adRequestType.isRewarded()) {
             JSONObject videoJson = null;
-            int videoWidth = 0;
+            String videoWidth = null;
             try {
                 videoJson = impression.getJSONObject(0).getJSONObject(VIDEO);
-                videoWidth = videoJson.getInt(WIDTH);
+                videoWidth = String.valueOf(videoJson.getInt(WIDTH));
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage());
             } finally {
-                validations.add(createValidation(VIDEO_WIDTH, String.valueOf(videoWidth), REQUIRED, GREATER_THEN_ZERO));
+                validations.add(createValidation(VIDEO_WIDTH, videoWidth, REQUIRED, GREATER_THEN_ZERO));
 
             }
 
-            int videoHeight = 0;
+            String videoHeight = null;
             try {
-                videoHeight = videoJson.getInt(HEIGHT);
+                videoHeight = String.valueOf(videoJson.getInt(HEIGHT));
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage());
             } finally {
-                validations.add(createValidation(VIDEO_HEIGHT, String.valueOf(videoHeight), REQUIRED, GREATER_THEN_ZERO));
+                validations.add(createValidation(VIDEO_HEIGHT, videoHeight, REQUIRED, GREATER_THEN_ZERO));
             }
         }
         return validations;
