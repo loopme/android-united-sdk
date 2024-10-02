@@ -1,0 +1,27 @@
+{
+	"app": {
+		"id": "dafa602ab1"
+	},
+	"source": {
+		"ext": {
+			"omidpn": "Loopme",
+			"omidpv": "9.0.6"
+		}
+	},
+	"events": {
+		"ext": {
+			"omidpn": "Loopme",
+			"omidpv": "9.0.6"
+		}
+	},
+	"imp": [{
+		"banner": {
+			"w": 320,
+			"h": 480,
+		},
+		"video": {
+			"w": 320,
+			"h": 480,
+		},
+	}],
+}

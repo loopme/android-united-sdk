@@ -4,9 +4,9 @@ import android.content.Context;
 
 import com.loopme.AdTargetingData;
 import com.loopme.JSONBuilder;
-import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.debugging.LiveDebug;
+import com.loopme.loaders.AdRequestType;
 import com.loopme.om.OmidHelper;
 import com.loopme.utils.SessionManager;
 import com.loopme.utils.Utils;
@@ -23,16 +23,16 @@ import java.io.Serializable;
 
 public class RequestBuilder implements Serializable {
 
-    private static final String APP = "app";
+    static final String APP = "app";
     private static final String ID = "id";
     private static final String BUNDLE = "bundle";
     private static final String NAME = "name";
     private static final String VERSION = "version";
-    private static final String APPKEY = "id";
+    static final String APPKEY = "id";
     private static final String DEVICE = "device";
     private static final String DEVICE_TYPE = "devicetype";
-    private static final String WIDTH = "w";
-    private static final String HEIGHT = "h";
+    static final String WIDTH = "w";
+    static final String HEIGHT = "h";
     private static final String JS = "js";
     private static final String IFA = "ifa";
     private static final String OSV = "osv";
@@ -44,7 +44,7 @@ public class RequestBuilder implements Serializable {
     private static final String UA = "ua";
     private static final String DNT = "dnt";
     private static final String MODEL = "model";
-    private static final String EXT = "ext";
+    static final String EXT = "ext";
     private static final String TIMEZONE = "timezone";
     private static final String ORIENTATION = "orientation";
     private static final String CHARGE_LEVEL = "chargelevel";
@@ -53,20 +53,20 @@ public class RequestBuilder implements Serializable {
     private static final String PLUGIN = "plugin";
     private static final String TMAX = "tmax";
     private static final String BCAT = "bcat";
-    private static final String SOURCE = "source";
-    private static final String EVENTS = "events";
-    private static final String OMID_PARTNER_NAME = "omidpn";
-    private static final String OMID_PARTNER_VERSION = "omidpv";
-    private static final String IMP = "imp";
+    static final String SOURCE = "source";
+    static final String EVENTS = "events";
+    static final String OMID_PARTNER_NAME = "omidpn";
+    static final String OMID_PARTNER_VERSION = "omidpv";
+    static final String IMP = "imp";
     private static final String SECURE = "secure";
     private static final String DISPLAY_MANAGER_VERSION = "displaymanagerver";
-    private static final String BANNER = "banner";
+    static final String BANNER = "banner";
     private static final String API = "api";
     private static final String APIS = "apis";
     private static final String BATTR = "battr";
     private static final String IT = "it";
     private static final String BID_FLOOR = "bidfloor";
-    private static final String VIDEO = "video";
+    static final String VIDEO = "video";
     private static final String MAX_DURATION = "maxduration";
     private static final String PROTOCOLS = "protocols";
     private static final String LINEARITY = "linearity";
@@ -103,16 +103,9 @@ public class RequestBuilder implements Serializable {
     private static final String MUSIC = "music";
     private static final String SDK_INIT_TIME = "sdk_init_time";
 
-    public static JSONObject buildRequestJson(Context context, LoopMeAd loopMeAd) throws JSONException {
-        RequestUtils requestUtils = new RequestUtils(context, loopMeAd);
+    public static JSONObject buildRequestJson(AdRequestType adRequestType, LoopMeAd loopMeAd, Context context, RequestUtils requestUtils) throws JSONException {
         AdTargetingData data = loopMeAd.getAdTargetingData();
-        LoopMeAd.Type adType = loopMeAd.getPreferredAdType();
-        boolean isBanner = LoopMeAd.Type.ALL == adType || LoopMeAd.Type.HTML == adType;
-        boolean isFullscreenSize = requestUtils.isFullscreenSize();
-        boolean isVideo = isFullscreenSize && (LoopMeAd.Type.ALL == adType || LoopMeAd.Type.VIDEO == adType);
-        boolean isRewarded = loopMeAd instanceof LoopMeInterstitialGeneral && ((LoopMeInterstitialGeneral) loopMeAd).isRewarded();
 
-        JSONObject video = null;
         return new JSONBuilder()
             .put(TMAX, RequestConstants.MAX_TIME_TO_SUBMIT_BID)
             .put(BCAT, new JSONArray(RequestConstants.BCAT))
@@ -196,8 +189,8 @@ public class RequestBuilder implements Serializable {
                 )
                 .build()
             )
-            .put(IMP, new JSONArray(new JSONObject[]{ new JSONBuilder()
-                .put(BANNER, isBanner ? new JSONBuilder()
+            .put(IMP, new JSONArray(new JSONObject[]{new JSONBuilder()
+                .put(BANNER, adRequestType.isBanner() ? new JSONBuilder()
                     .put(ID, 1)
                     .put(BATTR, new JSONArray(RequestConstants.BATTERY_INFO))
                     .put(WIDTH, requestUtils.getWidth())
@@ -205,7 +198,7 @@ public class RequestBuilder implements Serializable {
                     .put(API, new JSONArray(requestUtils.getApi()))
                     .build() : null
                 )
-                .put(VIDEO, isVideo ? getVideo(isRewarded, requestUtils) : null)
+                .put(VIDEO, adRequestType.isVideo() ? getVideo(adRequestType.isRewarded(), requestUtils) : null)
                 .put(SECURE, RequestConstants.SECURE_IMPRESSION)
                 .put(BID_FLOOR, RequestConstants.BID_FLOOR_DEFAULT_VALUE)
                 .put(DISPLAY_MANAGER, RequestConstants.LOOPME_SDK)
@@ -220,7 +213,7 @@ public class RequestBuilder implements Serializable {
                 .build()
             }))
             .put(EXT, new JSONBuilder()
-                .put(PLACEMENT_TYPE, isRewarded ? REWARDED : null)
+                .put(PLACEMENT_TYPE, adRequestType.isRewarded() ? REWARDED : null)
                 .put(SDK_INIT_TIME, Utils.getInitializationTimeMillisQueue())
                 .build()
             )

@@ -8,6 +8,7 @@ import android.text.TextUtils;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
+import com.loopme.LoopMeInterstitialGeneral;
 import com.loopme.ad.AdParams;
 import com.loopme.ad.AdType;
 import com.loopme.ad.LoopMeAd;
@@ -18,7 +19,13 @@ import com.loopme.network.response.Bid;
 import com.loopme.network.response.BidResponse;
 import com.loopme.network.GetResponse;
 import com.loopme.parser.ParseService;
+import com.loopme.request.InvalidOrtbRequestException;
 import com.loopme.request.RequestBuilder;
+import com.loopme.request.RequestUtils;
+import com.loopme.request.RequestValidator;
+import com.loopme.request.ValidationDataExtractor;
+import com.loopme.request.validation.Invalidation;
+import com.loopme.request.validation.Validation;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.ExecutorHelper;
 import com.loopme.network.LoopMeAdService;
@@ -27,6 +34,7 @@ import com.loopme.xml.vast4.Wrapper;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -43,11 +51,17 @@ public class AdFetchTask implements Runnable {
     private volatile AdFetcherListener mAdFetcherListener;
     private final Handler mHandler = new Handler((Looper.getMainLooper()));
     private static final String UNEXPECTED = "Unexpected";
+    private final RequestUtils requestUtils;
+    private final ValidationDataExtractor validationDataExtractor;
+    private final RequestValidator requestValidator;
 
     public AdFetchTask(LoopMeAd loopMeAd, AdFetcherListener adFetcherListener) {
         mLoopMeAd = loopMeAd;
         mAdFetcherListener = adFetcherListener;
         mExecutorService = ExecutorHelper.getExecutor();
+        requestUtils = new RequestUtils(mLoopMeAd.getContext(), mLoopMeAd);
+        validationDataExtractor = new ValidationDataExtractor();
+        requestValidator = new RequestValidator();
     }
 
     public void fetch() { mFetchTask = mExecutorService.submit(this); }
@@ -69,7 +83,13 @@ public class AdFetchTask implements Runnable {
         long duration;
         long startTime = System.currentTimeMillis();
         try {
-            JSONObject data = RequestBuilder.buildRequestJson(mLoopMeAd.getContext(), mLoopMeAd);
+            AdRequestType adRequestType = getAdRequestType();
+            JSONObject data = RequestBuilder.buildRequestJson(adRequestType, mLoopMeAd, mLoopMeAd.getContext(), requestUtils);
+            ArrayList<Invalidation> invalidations = requestValidator.validate(validationDataExtractor.prepare(data, adRequestType));
+            if (!invalidations.isEmpty()) {
+                throw new InvalidOrtbRequestException(invalidations.toString(), data.toString());
+            }
+
             if (Thread.interrupted()) {
                 Logging.out(LOG_TAG, "Thread interrupted.");
                 return;
@@ -86,11 +106,26 @@ public class AdFetchTask implements Runnable {
         } catch (Exception e) {
             duration = System.currentTimeMillis() - startTime;
             Logging.out(LOG_TAG, e.toString());
-            handleBadResponse(e.getMessage());
-            if (duration > 1000) {
-                sendOrtbLatencyAlert(duration, false);
-            }
+            if (duration > 1000) { sendOrtbLatencyAlert(duration, false); }
+            handleException(e);
         }
+    }
+
+    protected void handleException(Exception exception) {
+        String message = exception.getMessage();
+        boolean isUnexpectedError = !TextUtils.isEmpty(message) && message.contains(UNEXPECTED);
+
+        LoopMeError error = Errors.AD_LOAD_ERROR;
+        if (isUnexpectedError) {
+            error.setErrorType(Constants.ErrorType.SERVER);
+            error.addParam(Params.ERROR_EXCEPTION, Errors.ERROR_MESSAGE_RESPONSE_SYNTAX_ERROR);
+        } else if (exception instanceof InvalidOrtbRequestException) {
+            error.addParam(Params.ERROR_EXCEPTION, exception.getMessage());
+            error.addParam(Params.REQUEST, ((InvalidOrtbRequestException) exception).getRequest());
+        } else {
+            error.addParam(Params.ERROR_EXCEPTION, exception.getMessage());
+        }
+        onErrorResult(error);
     }
 
     protected void handleBadResponse(String message) {
@@ -169,5 +204,14 @@ public class AdFetchTask implements Runnable {
                         .addParam(Params.TIMEOUT, String.valueOf(duration))
                         .addParam(Params.STATUS, isSuccess ? Constants.SUCCESS : Constants.FAIL)
         );
+    }
+
+    private AdRequestType getAdRequestType(){
+        LoopMeAd.Type adType = mLoopMeAd.getPreferredAdType();
+        boolean isBanner = LoopMeAd.Type.ALL == adType || LoopMeAd.Type.HTML == adType;
+        boolean isFullscreenSize = requestUtils.isFullscreenSize();
+        boolean isVideo = isFullscreenSize && (LoopMeAd.Type.ALL == adType || LoopMeAd.Type.VIDEO == adType);
+        boolean isRewarded = mLoopMeAd instanceof LoopMeInterstitialGeneral && ((LoopMeInterstitialGeneral) mLoopMeAd).isRewarded();
+        return new AdRequestType(isBanner, isVideo, isRewarded);
     }
 }
