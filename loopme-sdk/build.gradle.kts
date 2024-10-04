@@ -26,7 +26,6 @@ dependencies {
 
     //noinspection GradleDependency - appcompat and material > 1.6.0 does not supported by Unity 2021
     api("androidx.appcompat:appcompat:1.6.0")
-    api("androidx.core:core:1.6.0")
 
     api("androidx.recyclerview:recyclerview:1.3.2")
 

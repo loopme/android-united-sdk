@@ -8,7 +8,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.os.LocaleListCompat;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
@@ -23,9 +22,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 public class HttpUtils {
     private static final String LOG_TAG = HttpUtils.class.getSimpleName();
@@ -37,9 +33,6 @@ public class HttpUtils {
     private static final String HEADER_USER_AGENT = "User-Agent";
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
     private static final String HEADER_OPEN_RTB_VER = "x-openrtb-version";
-    private static final String HEADER_ACCEPT_LANGUAGE = "accept-language";
-    private static final String HEADER_ACCEPT = "accept ";
-    private static final String ANY_MIME_TYPE = "*/* ";
 
     private HttpUtils() { }
 
@@ -95,8 +88,6 @@ public class HttpUtils {
         connection.setReadTimeout(READ_TIMEOUT);
         connection.setRequestProperty(HEADER_USER_AGENT, Utils.getUserAgent());
         connection.setRequestProperty(HEADER_OPEN_RTB_VER, Constants.OPEN_RTB_VERSION);
-        connection.setRequestProperty(HEADER_ACCEPT_LANGUAGE, getAcceptedLanguageHeaderValue());
-        connection.setRequestProperty(HEADER_ACCEPT, ANY_MIME_TYPE);
         return connection;
     }
 
@@ -209,32 +200,6 @@ public class HttpUtils {
         } catch (IOException e) {
             listener.onError(e);
         }
-    }
-
-    private static String getAcceptedLanguageHeaderValue() {
-        float weight = 1.0F;
-        List<Locale> preferredLocaleList = getPreferredLocaleList();
-        StringBuilder result = new StringBuilder();
-
-        for (int i = 0; i < preferredLocaleList.size(); i++) {
-            Locale locale = preferredLocaleList.get(i);
-            String languageTag = locale.toLanguageTag();
-            if (i > 0) {
-                result.append(",");
-            }
-            result.append(languageTag).append(";q=").append(weight);
-            weight -= 0.1F;
-        }
-        return result.toString();
-    }
-
-    private static List<Locale> getPreferredLocaleList() {
-        LocaleListCompat adjustedLocaleListCompat = LocaleListCompat.getAdjustedDefault();
-        List<Locale> preferredLocaleList = new ArrayList<>();
-        for (int index = 0; index < adjustedLocaleListCompat.size(); index++) {
-            preferredLocaleList.add(adjustedLocaleListCompat.get(index));
-        }
-        return preferredLocaleList;
     }
 
     public interface CacheListener {
