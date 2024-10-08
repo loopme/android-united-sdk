@@ -56,7 +56,7 @@ class BannerActivity : AppCompatActivity() {
         with(binding) {
             mpuPlaceholder.makeGone()
             longitudinalBannerPlaceholder.makeVisible()
-            loadBanner(320, 50, longitudinalBannerPlaceholder)
+            loadBanner(320, 50, longitudinalBannerPlaceholder, getString(R.string.default_longitudinal_app_key))
         }
     }
 
@@ -64,19 +64,14 @@ class BannerActivity : AppCompatActivity() {
         with(binding) {
             mpuPlaceholder.makeVisible()
             longitudinalBannerPlaceholder.makeGone()
-            loadBanner(300, 250, mpuPlaceholder)
+            loadBanner(300, 250, mpuPlaceholder,getString(R.string.default_mpu_app_key))
         }
     }
 
-    private fun loadBanner(width: Int, height: Int, bannerPlaceholder: FrameLayout) {
+    private fun loadBanner(width: Int, height: Int, bannerPlaceholder: FrameLayout, appKey: String) {
         disableLoadingButtons()
         if (mBanner != null) {
             dismissAndDestroyBanner()
-        }
-
-        var appKey = binding.appKeyEt.text.toString()
-        if (appKey.isBlank()) {
-            appKey = getString(R.string.default_mpu_app_key)
         }
 
         mBanner = LoopMeBanner.getInstance(appKey, this)
