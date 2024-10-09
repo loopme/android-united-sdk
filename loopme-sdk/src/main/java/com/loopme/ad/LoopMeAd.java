@@ -34,6 +34,7 @@ import com.loopme.request.RequestParamsUtils;
 import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
 import com.loopme.tracker.partners.LoopMeTracker;
+import com.loopme.utils.ExecutorHelper;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -336,8 +337,10 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
             onAdAlreadyLoaded();
         } else {
             setAdState(Constants.AdState.LOADING);
-            mAdFetchTask = new AdFetchTask(this, adFetchListener);
-            mAdFetchTask.fetch();
+                ExecutorHelper.getExecutor().submit(() -> {
+                    mAdFetchTask = new AdFetchTask(this, adFetchListener);
+                    mAdFetchTask.fetch();
+                });
         }
     }
 
