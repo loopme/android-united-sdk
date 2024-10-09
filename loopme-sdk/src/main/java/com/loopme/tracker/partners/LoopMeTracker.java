@@ -21,6 +21,7 @@ import com.loopme.debugging.Params;
 import com.loopme.network.HttpUtils;
 import com.loopme.request.RequestUtils;
 import com.loopme.utils.ExecutorHelper;
+import com.loopme.utils.SessionManager;
 import com.loopme.utils.StringUtils;
 import com.loopme.utils.Utils;
 
@@ -108,6 +109,7 @@ public class LoopMeTracker {
         params.put(Params.DEVICE_MODEL, Build.MODEL);
         params.put(Params.DEVICE_MANUFACTURER, Build.MANUFACTURER);
         params.put(Params.DEVICE_ID, RequestUtils.getIfa());
+        params.put(Params.SESSION_ID, SessionManager.getInstance().getSessionId());
         params.put(Params.APP_KEY, sAppKey);
         params.put(Params.PACKAGE_ID, Utils.getPackageName());
         params.put(Params.MEDIATION, LoopMeSdk.getConfiguration().getMediation());

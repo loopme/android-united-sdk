@@ -10,6 +10,7 @@ public class Params {
     public static final String MEDIATION = "mediation";//example: ironSource
     public static final String SDK_VERSION = "sdk_version";//example: "6.1.0"
     public static final String DEVICE_ID = "device_id";//example: "ae98582a-a9f2-4caa-8c20-f4e3ab37d001"
+    public static final String SESSION_ID = "session_id";//example: "b6c6c522-63c0-4ad9-a7f1-0d5414a2f890"
     public static final String DEVICE_OS_VERSION = "device_os_version";//example: 13
     public static final String DEVICE_MODEL = "device_model";//example: A201
     public static final String DEVICE_MANUFACTURER = "device_manufacturer";//example: Samsung

@@ -1,5 +1,7 @@
 package com.loopme.utils;
 
+import java.util.UUID;
+
 public class SessionManager {
 
     private static SessionManager instance;
@@ -7,6 +9,7 @@ public class SessionManager {
     private long sessionDuration;
     private int adsShownCount = 0;
     private boolean isSessionActive = false;
+    private String sessionId;
 
     private SessionManager() {}
 
@@ -22,6 +25,7 @@ public class SessionManager {
             sessionStartTime = System.currentTimeMillis();
             adsShownCount = 0;
             isSessionActive = true;
+            sessionId = generateSessionId();
         }
     }
 
@@ -46,11 +50,20 @@ public class SessionManager {
         return adsShownCount;
     }
 
+    private String generateSessionId() {
+        return UUID.randomUUID().toString();
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
     public void resetSessionData() {
         sessionDuration = 0;
         sessionStartTime = 0;
         adsShownCount = 0;
         isSessionActive = false;
+        sessionId = null;
     }
 }
 
