@@ -1,5 +1,7 @@
 package com.loopme.utils;
 
+import com.loopme.LoopMeSdk;
+
 import java.util.UUID;
 
 public class SessionManager {
@@ -55,10 +57,10 @@ public class SessionManager {
     }
 
     public String getSessionId() {
-        return sessionId;
+        return LoopMeSdk.isInitialized() ? sessionId : null;
     }
 
-    public void resetSessionData() {
+  private void resetSessionData() {
         sessionDuration = 0;
         sessionStartTime = 0;
         adsShownCount = 0;
