@@ -14,6 +14,7 @@ import com.ironsource.mediationsdk.model.NetworkSettings;
 import com.loopme.IntegrationType;
 import com.loopme.LoopMeInterstitial;
 import com.loopme.common.LoopMeError;
+import com.loopme.utils.ExecutorHelper;
 
 @Keep
 public class LoopmeCustomInterstitial extends BaseInterstitial<LoopmeCustomAdapter> {
@@ -83,7 +84,7 @@ public class LoopmeCustomInterstitial extends BaseInterstitial<LoopmeCustomAdapt
                     Log.d(LOG_TAG, "onLoopMeInterstitialVideoDidReachEnd");
                 }
             });
-            mInterstitial.load(IntegrationType.NORMAL);
+            ExecutorHelper.executeOnWorkerThread(() -> mInterstitial.load(IntegrationType.NORMAL));
         } catch (Exception e) {
             interstitialAdListener.onAdLoadFailed(AdapterErrorType.ADAPTER_ERROR_TYPE_INTERNAL, -1, e.getMessage());
         }

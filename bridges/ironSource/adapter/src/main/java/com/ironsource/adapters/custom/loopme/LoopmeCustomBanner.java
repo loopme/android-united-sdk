@@ -16,6 +16,7 @@ import com.ironsource.mediationsdk.adunit.adapter.utility.AdapterErrorType;
 import com.ironsource.mediationsdk.model.NetworkSettings;
 import com.loopme.LoopMeBanner;
 import com.loopme.common.LoopMeError;
+import com.loopme.utils.ExecutorHelper;
 
 @Keep
 public class LoopmeCustomBanner extends BaseBanner<LoopmeCustomAdapter> {
@@ -93,7 +94,7 @@ public class LoopmeCustomBanner extends BaseBanner<LoopmeCustomAdapter> {
                     Log.d(LOG_TAG, "onLoopMeBannerExpired");
                 }
             });
-            mBanner.load();
+            ExecutorHelper.executeOnWorkerThread(() -> mBanner.load());
         } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage());
             listener.onAdLoadFailed(AdapterErrorType.ADAPTER_ERROR_TYPE_INTERNAL, -1, e.getMessage());
