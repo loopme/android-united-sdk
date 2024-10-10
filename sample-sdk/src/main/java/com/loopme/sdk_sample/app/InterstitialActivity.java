@@ -9,6 +9,7 @@ import com.loopme.LoopMeInterstitial;
 import com.loopme.sdk_sample.R;
 import com.loopme.sdk_sample.databinding.ActivityInterstitialBinding;
 import com.loopme.common.LoopMeError;
+import com.loopme.utils.ExecutorHelper;
 
 public class InterstitialActivity extends AppCompatActivity {
 
@@ -101,7 +102,7 @@ public class InterstitialActivity extends AppCompatActivity {
         // Start loading immediately
         // Use this method to load an ad by using custom ad url (Required by Qr App)
         // mInterstitial.load("https://storage.googleapis.com/loopme-creatives-eu/assets/2103278/creative_preview_1726833249016.jsonp");
-        mInterstitial.load();
+        ExecutorHelper.executeOnWorkerThread(() -> mInterstitial.load());
         binding.showButton.setEnabled(false);
     }
 
