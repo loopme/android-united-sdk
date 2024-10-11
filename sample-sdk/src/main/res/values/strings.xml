@@ -5,6 +5,7 @@
     <string name="banner">Banner</string>
     <string name="load_interstitial">Load Interstitial</string>
     <string name="load_custom_interstitial">Load Custom Interstitial</string>
+    <string name="load_custom">Load Custom</string>
     <string name="show_interstitial">Show Interstitial</string>
     <string name="default_interstitial_app_key">aefab282dd</string>
     <string name="default_mpu_app_key">f5826542ae</string>
