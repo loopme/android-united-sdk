@@ -53,61 +53,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/show_button" />
 
-    <TextView
-        android:id="@+id/height_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/activity_horizontal_margin"
-        android:text="@string/height_label"
-        app:layout_constraintBottom_toBottomOf="@id/height_et"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias=".55"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <EditText
-        android:id="@+id/height_et"
-        android:layout_width="96dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_horizontal_margin_2"
-        android:hint="320"
-        android:importantForAutofill="no"
-        android:inputType="number"
-        app:layout_constraintEnd_toStartOf="@+id/height_tv"
-        app:layout_constraintTop_toBottomOf="@id/show_button" />
-
-    <EditText
-        android:id="@+id/width_et"
-        android:layout_width="96dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/activity_horizontal_margin"
-        android:hint="480"
-        android:importantForAutofill="no"
-        android:inputType="number"
-        app:layout_constraintBottom_toBottomOf="@id/height_et"
-        app:layout_constraintStart_toEndOf="@+id/height_tv"
-        app:layout_constraintTop_toTopOf="@id/height_et" />
-
-    <TextView
-        android:id="@+id/width_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/activity_horizontal_margin"
-        android:text="@string/width_label"
-        app:layout_constraintBottom_toBottomOf="@id/height_et"
-        app:layout_constraintEnd_toStartOf="@+id/height_et"
-        app:layout_constraintTop_toTopOf="@id/height_et" />
-
     <EditText
         android:id="@+id/app_key_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:layout_margin="@dimen/activity_horizontal_margin_2"
         android:gravity="center"
         android:hint="@string/default_interstitial_app_key"
         android:importantForAutofill="no"
         android:inputType="text"
-        app:layout_constraintTop_toBottomOf="@id/height_et" />
+        app:layout_constraintTop_toBottomOf="@id/show_button" />
 
     <Button
         android:id="@+id/load_Custom_button"
