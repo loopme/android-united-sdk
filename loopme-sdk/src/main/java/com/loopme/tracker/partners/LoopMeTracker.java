@@ -27,11 +27,15 @@ import com.loopme.utils.Utils;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 public class LoopMeTracker {
     private static final String LOG_TAG = LoopMeTracker.class.getSimpleName();
@@ -116,6 +120,7 @@ public class LoopMeTracker {
         params.put(Params.MEDIATION_SDK_VERSION, LoopMeSdk.getConfiguration().getMediationSdkVersion());
         params.put(Params.ADAPTER_VERSION, LoopMeSdk.getConfiguration().getAdapterVersion());
         params.put(Params.MSG, Constants.SDK_ERROR_MSG);
+        params.put(Params.CREATED_AT, getCurrentTimeFormatted());
         return params;
     }
 
@@ -165,5 +170,12 @@ public class LoopMeTracker {
             Logging.out("HttpUtil", "UnsupportedEncoding: UTF-8");
         }
         return String.valueOf(result);
+    }
+
+    private static String getCurrentTimeFormatted() {
+        long currentTimeMillis = System.currentTimeMillis();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return dateFormat.format(new Date(currentTimeMillis));
     }
 }
