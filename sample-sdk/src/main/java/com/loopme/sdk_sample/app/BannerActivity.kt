@@ -43,7 +43,10 @@ class BannerActivity : AppCompatActivity() {
 
         binding.loadLongitudinalBtn.setOnClickListener {
             loadLongitudinal()
+        }
 
+        binding.loadCustomButton.setOnClickListener {
+            loadCustom()
         }
 
         binding.destroyAdBtn.setOnClickListener {
@@ -56,7 +59,7 @@ class BannerActivity : AppCompatActivity() {
         with(binding) {
             mpuPlaceholder.makeGone()
             longitudinalBannerPlaceholder.makeVisible()
-            loadBanner(320, 50, longitudinalBannerPlaceholder)
+            loadBanner(320, 50, longitudinalBannerPlaceholder, getString(R.string.default_longitudinal_app_key))
         }
     }
 
@@ -64,19 +67,35 @@ class BannerActivity : AppCompatActivity() {
         with(binding) {
             mpuPlaceholder.makeVisible()
             longitudinalBannerPlaceholder.makeGone()
-            loadBanner(300, 250, mpuPlaceholder)
+            loadBanner(300, 250, mpuPlaceholder, getString(R.string.default_mpu_app_key))
         }
     }
 
-    private fun loadBanner(width: Int, height: Int, bannerPlaceholder: FrameLayout) {
+    private fun loadCustom() {
+        with(binding) {
+            mpuPlaceholder.makeVisible()
+            longitudinalBannerPlaceholder.makeGone()
+            var width = widthEt.text.toString()
+            if (widthEt.text.toString().isEmpty()) {
+                width = "300"
+            }
+            var height = heightEt.text.toString()
+            if (heightEt.text.toString().isEmpty()) {
+                height = "250"
+            }
+
+            var appKeyEt = appKeyEt.text.toString()
+            if (appKeyEt.isEmpty()) {
+                appKeyEt = getString(R.string.default_mpu_app_key)
+            }
+            loadBanner(width.toInt(), height.toInt(), mpuPlaceholder, appKeyEt)
+        }
+    }
+
+    private fun loadBanner(width: Int, height: Int, bannerPlaceholder: FrameLayout, appKey: String) {
         disableLoadingButtons()
         if (mBanner != null) {
             dismissAndDestroyBanner()
-        }
-
-        var appKey = binding.appKeyEt.text.toString()
-        if (appKey.isBlank()) {
-            appKey = getString(R.string.default_mpu_app_key)
         }
 
         mBanner = LoopMeBanner.getInstance(appKey, this)
@@ -128,10 +147,12 @@ class BannerActivity : AppCompatActivity() {
     private fun disableLoadingButtons() {
         binding.loadMpuBtn.disable()
         binding.loadLongitudinalBtn.disable()
+        binding.loadCustomButton.disable()
     }
 
     private fun enableLoadingButtons() {
         binding.loadMpuBtn.enable()
         binding.loadLongitudinalBtn.enable()
+        binding.loadCustomButton.enable()
     }
 }

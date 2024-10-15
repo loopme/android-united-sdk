@@ -31,29 +31,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title_tv" />
 
-    <EditText
-        android:id="@+id/app_key_et"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/mpu_width"
-        android:gravity="center"
-        android:hint="@string/default_mpu_app_key"
-        android:importantForAutofill="no"
-        android:inputType="text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title_tv" />
-
     <Button
         android:id="@+id/load_mpu_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/activity_vertical_margin"
+        android:layout_marginTop="@dimen/mpu_width"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:gravity="center"
         android:text="@string/load_mpu"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/app_key_et" />
+        app:layout_constraintTop_toBottomOf="@id/title_tv" />
 
     <Button
         android:id="@+id/load_longitudinal_btn"
@@ -73,6 +61,73 @@
         android:text="@string/destroy_ad"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/height_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:text="@string/height_label"
+        app:layout_constraintBottom_toBottomOf="@id/height_et"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias=".55"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
+        android:id="@+id/height_et"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_horizontal_margin_2"
+        android:hint="300"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        app:layout_constraintEnd_toStartOf="@+id/height_tv"
         app:layout_constraintTop_toBottomOf="@id/load_longitudinal_btn" />
+
+    <EditText
+        android:id="@+id/width_et"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:hint="250"
+        android:importantForAutofill="no"
+        android:inputType="number"
+        app:layout_constraintBottom_toBottomOf="@id/height_et"
+        app:layout_constraintStart_toEndOf="@+id/height_tv"
+        app:layout_constraintTop_toTopOf="@id/height_et" />
+
+    <TextView
+        android:id="@+id/width_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:text="@string/width_label"
+        app:layout_constraintBottom_toBottomOf="@id/height_et"
+        app:layout_constraintEnd_toStartOf="@+id/height_et"
+        app:layout_constraintTop_toTopOf="@id/height_et" />
+
+    <EditText
+        android:id="@+id/app_key_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:gravity="center"
+        android:hint="@string/default_interstitial_app_key"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        app:layout_constraintTop_toBottomOf="@id/height_et" />
+
+    <Button
+        android:id="@+id/load_Custom_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:text="@string/load_custom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/app_key_et" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
