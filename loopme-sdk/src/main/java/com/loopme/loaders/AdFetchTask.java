@@ -1,5 +1,6 @@
 package com.loopme.loaders;
 
+import static com.loopme.Constants.RESPONSE_NO_ADS;
 import static com.loopme.utils.Utils.safelyRetrieve;
 
 import android.os.Handler;
@@ -25,7 +26,6 @@ import com.loopme.request.RequestUtils;
 import com.loopme.request.RequestValidator;
 import com.loopme.request.ValidationDataExtractor;
 import com.loopme.request.validation.Invalidation;
-import com.loopme.request.validation.Validation;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.ExecutorHelper;
 import com.loopme.network.LoopMeAdService;
@@ -42,7 +42,9 @@ import java.util.concurrent.Future;
 public class AdFetchTask implements Runnable {
 
     protected static final String LOG_TAG = AdFetchTask.class.getSimpleName();
-    private static final int RESPONSE_NO_ADS = 204;
+
+    private static final String UNEXPECTED = "Unexpected";
+    private static final String INDEX_OUT_OF_BOUNDS = "Index 0 out of bounds for length 0";
 
     private Future mFetchTask;
     private final LoopMeAd mLoopMeAd;
@@ -50,7 +52,6 @@ public class AdFetchTask implements Runnable {
     private final ExecutorService mExecutorService;
     private volatile AdFetcherListener mAdFetcherListener;
     private final Handler mHandler = new Handler((Looper.getMainLooper()));
-    private static final String UNEXPECTED = "Unexpected";
     private final RequestUtils requestUtils;
     private final ValidationDataExtractor validationDataExtractor;
     private final RequestValidator requestValidator;
@@ -114,26 +115,24 @@ public class AdFetchTask implements Runnable {
     protected void handleException(Exception exception) {
         String message = exception.getMessage();
         boolean isUnexpectedError = !TextUtils.isEmpty(message) && message.contains(UNEXPECTED);
+        boolean isResponseEmptyData = exception instanceof IndexOutOfBoundsException && message.contains(INDEX_OUT_OF_BOUNDS);
+        boolean isInvalidOrtbRequestException = exception instanceof InvalidOrtbRequestException;
 
         LoopMeError error = Errors.AD_LOAD_ERROR;
+
         if (isUnexpectedError) {
-            error.setErrorType(Constants.ErrorType.SERVER);
-            error.addParam(Params.ERROR_EXCEPTION, Errors.ERROR_MESSAGE_RESPONSE_SYNTAX_ERROR);
-        } else if (exception instanceof InvalidOrtbRequestException) {
+            error.addParam(Params.ERROR_EXCEPTION, exception.getMessage());
+            error.setErrorMessage(Errors.ERROR_MESSAGE_RESPONSE_SYNTAX_ERROR.getMessage());
+        } else if (isInvalidOrtbRequestException) {
             error.addParam(Params.ERROR_EXCEPTION, exception.getMessage());
             error.addParam(Params.REQUEST, ((InvalidOrtbRequestException) exception).getRequest());
+        } else if (isResponseEmptyData){
+            error.addParam(Params.ERROR_EXCEPTION, exception.getMessage());
+            error.setErrorMessage(Errors.RESPONSE_EMPTY_DATA.getMessage());
         } else {
             error.addParam(Params.ERROR_EXCEPTION, exception.getMessage());
         }
         onErrorResult(error);
-    }
-
-    protected void handleBadResponse(String message) {
-        boolean isUnexpectedError = !TextUtils.isEmpty(message) && message.contains(UNEXPECTED);
-        onErrorResult(isUnexpectedError ?
-            Errors.SYNTAX_ERROR_IN_RESPONSE :
-            new LoopMeError(message, Constants.ErrorType.SERVER)
-        );
     }
 
     private void handleResponse(BidResponse bidResponse) {

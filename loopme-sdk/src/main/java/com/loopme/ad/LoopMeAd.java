@@ -79,7 +79,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
                     onInternalLoadFail(Errors.NO_VALID_ADS_FOUND);
                 }
             } else {
-                onInternalLoadFail(Errors.DOWNLOAD_ERROR);
+                onInternalLoadFail(Errors.RESPONSE_EMPTY_DATA);
             }
         }
         @Override

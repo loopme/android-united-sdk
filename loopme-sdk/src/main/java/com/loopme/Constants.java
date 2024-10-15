@@ -74,6 +74,8 @@ public class Constants {
     public static final String TYPE_APPLICATION_JAVASCRIPT = "application/javascript";
 
     public static final int RESPONSE_SUCCESS = 200;
+    public static final int RESPONSE_NO_ADS = 204;
+
     public static final int START_POSITION = 0;
     public static final int SECONDS_IN_MINUTE = 60;
     public static final int MILLIS_IN_SECOND = 1000;

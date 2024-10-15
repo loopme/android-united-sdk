@@ -46,7 +46,7 @@ public class LoopMeAdService {
         }
         byte[] body = rawResponse.getBody();
         if (body == null) {
-            response.setMessage(Errors.ERROR_MESSAGE_BROKEN_SERVERS_RESPONSE);
+            response.setMessage(Errors.ERROR_MESSAGE_BROKEN_SERVERS_RESPONSE.getMessage());
             return response;
         }
         response.setCode(code);
@@ -71,7 +71,7 @@ public class LoopMeAdService {
             return response;
         } catch (JSONException e) {
             Logging.out(LOG_TAG, e.getMessage());
-            response.setMessage(Errors.ERROR_MESSAGE_BROKEN_SERVERS_RESPONSE);
+            response.setMessage(Errors.ERROR_MESSAGE_BROKEN_SERVERS_RESPONSE.getMessage());
             return response;
         }
     }

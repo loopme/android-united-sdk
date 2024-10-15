@@ -5,11 +5,15 @@ import com.loopme.common.LoopMeError;
 
 public class Errors {
     public static final String ERROR_MESSAGE_NETWORK_OPERATION = "Network operation timeout.";
-    public static final String ERROR_MESSAGE_BROKEN_SERVERS_RESPONSE = "Server's response is broken.";
-    public static final String ERROR_MESSAGE_RESPONSE_SYNTAX_ERROR = "Syntax error in response.";
 
-    public static final LoopMeError DOWNLOAD_ERROR = new LoopMeError(
-            100, "DOWNLOAD_ERROR");
+    public static final LoopMeError ERROR_MESSAGE_BROKEN_SERVERS_RESPONSE = new LoopMeError(
+            "Server's response is broken.", Constants.ErrorType.SERVER);
+
+    public static final LoopMeError ERROR_MESSAGE_RESPONSE_SYNTAX_ERROR = new LoopMeError(
+            "Syntax error in response.", Constants.ErrorType.SERVER);
+
+    public static final LoopMeError RESPONSE_EMPTY_DATA = new LoopMeError(
+            "Response empty data", Constants.ErrorType.SERVER);
 
     public static final LoopMeError NOT_SUPPORTED_ANDROID_VERSION_ERROR = new LoopMeError(
             101, "Not supported Android version. Expected Android 4.4+");
