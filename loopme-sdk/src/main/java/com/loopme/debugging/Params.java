@@ -28,6 +28,7 @@ public class Params {
     public static final String CID = "cid";
     public static final String CRID = "crid";
     public static final String REQUEST_ID = "request_id";
+    public static final String CREATED_AT = "created_at";
     //Live Debug
     public static final String DEBUG_LOGS = "debug_logs";// example: "ui: Debug.LoopMe.BaseAd: Start fetcher timeout timer, ui: Debug.LoopMe.FileUtils: In cache 2 file(s)..."
     public static final String APP_IDS = "app_ids";
