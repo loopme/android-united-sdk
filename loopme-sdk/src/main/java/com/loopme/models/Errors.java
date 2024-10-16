@@ -4,6 +4,20 @@ import com.loopme.Constants;
 import com.loopme.common.LoopMeError;
 
 public class Errors {
+
+    // region LATENCY
+
+    public static final LoopMeError ORTB_REQUEST_TAKES_MORE_THEN_ONE_SEC = new LoopMeError(
+            "ORTB request takes more then 1sec", Constants.ErrorType.LATENCY);
+
+    public static final LoopMeError OMID_INIT_TIME_ALERT = new LoopMeError(
+            "OMID init time alert > 100ms", Constants.ErrorType.LATENCY);
+
+    public static final LoopMeError SDK_INIT_TIME_ALERT = new LoopMeError(
+            "SDK init time alert > 100ms", Constants.ErrorType.LATENCY);
+
+    // endregion
+
     public static final String ERROR_MESSAGE_NETWORK_OPERATION = "Network operation timeout.";
 
     public static final LoopMeError ERROR_MESSAGE_BROKEN_SERVERS_RESPONSE = new LoopMeError(
@@ -14,6 +28,9 @@ public class Errors {
 
     public static final LoopMeError RESPONSE_EMPTY_DATA = new LoopMeError(
             "Response empty data", Constants.ErrorType.SERVER);
+
+    public static final LoopMeError BAD_SERVERS_CODE = new LoopMeError(
+            "Bad servers response code ", Constants.ErrorType.SERVER);
 
     public static final LoopMeError NOT_SUPPORTED_ANDROID_VERSION_ERROR = new LoopMeError(
             101, "Not supported Android version. Expected Android 4.4+");

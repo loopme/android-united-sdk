@@ -11,11 +11,10 @@ import androidx.annotation.NonNull;
 import com.loopme.common.LoopMeError;
 import com.loopme.debugging.Params;
 import com.loopme.gdpr.GdprChecker;
+import com.loopme.models.Errors;
 import com.loopme.om.OmidHelper;
 import com.loopme.utils.Utils;
 import com.loopme.tracker.partners.LoopMeTracker;
-
-import java.util.HashMap;
 
 /**
  * Created by katerina on 4/27/18.
@@ -104,19 +103,25 @@ public final class LoopMeSdk {
         Utils.setInitializationTimeMillisQueue((int) (end - start));
         sdkInitListener.onSdkInitializationSuccess();
 
-        if (omidEnd - omidStart > 100) {
-            sendInitTimeAlert("OMID init time alert > 100ms", omidEnd - omidStart);
-        }
-        if (end - start > 100) {
-            sendInitTimeAlert( "SDK init time alert > 100ms", end - start);
-        }
+        checkAndSendInitTimeAlerts(omidStart, omidEnd, start, end);
     }
 
-    private static void sendInitTimeAlert(String errorMessage, long initTime) {
-        LoopMeTracker.post(
-                new LoopMeError(errorMessage, Constants.ErrorType.LATENCY)
-                        .addParam(Params.TIMEOUT, String.valueOf(initTime))
-        );
-    }
+    private static void checkAndSendInitTimeAlerts(long omidStart, long omidEnd, long start, long end) {
+        long omidDuration = omidEnd - omidStart;
+        long sdkDuration = end - start;
 
+        if (omidDuration > 100) {
+            LoopMeTracker.post(
+                    new LoopMeError(Errors.OMID_INIT_TIME_ALERT)
+                            .addParam(Params.TIMEOUT, String.valueOf(omidDuration))
+            );
+        }
+
+        if (sdkDuration > 100) {
+            LoopMeTracker.post(
+                    new LoopMeError(Errors.SDK_INIT_TIME_ALERT)
+                            .addParam(Params.TIMEOUT, String.valueOf(sdkDuration))
+            );
+        }
+    }
 }

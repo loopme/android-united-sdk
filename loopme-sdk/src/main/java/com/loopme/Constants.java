@@ -19,7 +19,6 @@ public class Constants {
     public static final String SDK_DEBUG_MSG = "sdk_debug";
     public static final String SDK_ERROR_MSG = "sdk_error";
     public static final String UNKNOWN_MSG = "unknown";
-    public static final String BAD_SERVERS_CODE = "Bad servers response code ";
     public static final String AD_ID_TAG = "adIdTag";
     public static final String SUCCESS = "Success";
     public static final String FAIL = "Fail";
