@@ -8,7 +8,6 @@ import com.loopme.LoopMeBanner
 import com.loopme.common.LoopMeError
 import com.loopme.sdk_sample.R
 import com.loopme.sdk_sample.databinding.ActivityBannerNewBinding
-import com.loopme.utils.ExecutorHelper
 
 class BannerActivity : AppCompatActivity() {
 
@@ -115,7 +114,7 @@ class BannerActivity : AppCompatActivity() {
             banner.setAutoLoading(false)
             // Use this method to load an ad by using custom ad url (Required by Qr App)
             // banner.load("https://storage.googleapis.com/loopme-creatives-eu/assets/2103278/creative_preview_1726833249016.jsonp");
-            ExecutorHelper.executeOnWorkerThread{ banner.load() }
+            banner.load()
         }
     }
 

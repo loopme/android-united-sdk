@@ -15,7 +15,6 @@ import com.google.android.gms.ads.mediation.MediationInterstitialAdCallback;
 import com.google.android.gms.ads.mediation.MediationInterstitialAdConfiguration;
 import com.loopme.LoopMeInterstitial;
 import com.loopme.common.LoopMeError;
-import com.loopme.utils.ExecutorHelper;
 
 @Keep
 public class LoopMeInterstitialListener implements LoopMeInterstitial.Listener, MediationInterstitialAd {
@@ -94,7 +93,7 @@ public class LoopMeInterstitialListener implements LoopMeInterstitial.Listener, 
         interstitialAd = LoopMeInterstitial.getInstance(appkey, activity);
         interstitialAd.setListener(this);
         interstitialAd.setAutoLoading(false);
-        ExecutorHelper.executeOnWorkerThread(() -> interstitialAd.load());
+        activity.runOnUiThread(() -> interstitialAd.load());
     }
 
     @Override

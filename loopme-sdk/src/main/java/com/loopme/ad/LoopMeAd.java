@@ -337,8 +337,10 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
             onAdAlreadyLoaded();
         } else {
             setAdState(Constants.AdState.LOADING);
-            mAdFetchTask = new AdFetchTask(this, adFetchListener);
-            mAdFetchTask.fetch();
+                ExecutorHelper.getExecutor().submit(() -> {
+                    mAdFetchTask = new AdFetchTask(this, adFetchListener);
+                    mAdFetchTask.fetch();
+                });
         }
     }
 

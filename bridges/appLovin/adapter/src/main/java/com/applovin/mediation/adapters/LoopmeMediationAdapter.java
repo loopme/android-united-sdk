@@ -27,7 +27,6 @@ import com.loopme.LoopMeBanner;
 import com.loopme.LoopMeInterstitial;
 import com.loopme.LoopMeSdk;
 import com.loopme.common.LoopMeError;
-import com.loopme.utils.ExecutorHelper;
 
 
 /**
@@ -187,7 +186,7 @@ public class LoopmeMediationAdapter
                     Log.d(LOG_TAG, "onLoopMeBannerExpired");
                 }
             });
-            ExecutorHelper.executeOnWorkerThread(() -> mBanner.load());
+            activity.runOnUiThread(() -> mBanner.load());
         } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage());
             maxAdViewAdapterListener.onAdViewAdLoadFailed(MaxAdapterError.INTERNAL_ERROR);
@@ -203,7 +202,7 @@ public class LoopmeMediationAdapter
         mInterstitial = LoopMeInterstitial.getInstance(appkey, activity);
         mInterstitial.setListener(mLoopMeInterstitialListener);
         mInterstitial.setAutoLoading(false);
-        ExecutorHelper.executeOnWorkerThread(() -> mInterstitial.load());
+        activity.runOnUiThread(() -> mInterstitial.load());
     }
     @Override
     public void loadRewardedAd(MaxAdapterResponseParameters maxAdapterResponseParameters, Activity activity, MaxRewardedAdapterListener maxRewardedAdapterListener) {
@@ -214,7 +213,7 @@ public class LoopmeMediationAdapter
             mRewarded = LoopMeInterstitial.getInstance(appkey, activity, true);
             mRewarded.setListener(mLoopMeRewardedListener);
             mRewarded.setAutoLoading(false);
-            ExecutorHelper.executeOnWorkerThread(() -> mRewarded.load(IntegrationType.NORMAL));
+            activity.runOnUiThread(() -> mRewarded.load(IntegrationType.NORMAL));
         } catch (Exception e) {
             maxRewardedAdapterListener.onRewardedAdLoadFailed(MaxAdapterError.INTERNAL_ERROR);
         }

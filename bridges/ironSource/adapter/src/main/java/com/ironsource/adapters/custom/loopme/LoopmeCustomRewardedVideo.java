@@ -14,7 +14,6 @@ import com.ironsource.mediationsdk.model.NetworkSettings;
 import com.loopme.IntegrationType;
 import com.loopme.LoopMeInterstitial;
 import com.loopme.common.LoopMeError;
-import com.loopme.utils.ExecutorHelper;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -97,7 +96,7 @@ public class LoopmeCustomRewardedVideo extends BaseRewardedVideo<LoopmeCustomAda
                     Log.d(LOG_TAG, "onLoopMeInterstitialVideoDidReachEnd");
                 }
             });
-            ExecutorHelper.executeOnWorkerThread(() -> mRewarded.load(IntegrationType.NORMAL));
+            mRewarded.load(IntegrationType.NORMAL);
         } catch (Exception e) {
             rewardedVideoAdListener.onAdLoadFailed(AdapterErrorType.ADAPTER_ERROR_TYPE_INTERNAL, -1, e.getMessage());
         }
