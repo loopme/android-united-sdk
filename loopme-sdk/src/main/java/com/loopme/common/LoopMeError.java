@@ -33,7 +33,7 @@ public class LoopMeError {
         mErrorCode = error.getErrorCode();
         mErrorMessage = error.getMessage();
         mErrorType = error.getErrorType();
-        params = error.getParams();
+        this.params = error.getParams() != null ? new HashMap<>(error.getParams()) : new HashMap<>();
     }
 
     public LoopMeError(String message) {

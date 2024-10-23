@@ -119,17 +119,16 @@ public class AdFetchTask implements Runnable {
         boolean isResponseEmptyData = exception instanceof IndexOutOfBoundsException && message.contains(INDEX_OUT_OF_BOUNDS);
         boolean isInvalidOrtbRequestException = exception instanceof InvalidOrtbRequestException;
 
-        LoopMeError error;
+        LoopMeError error = new LoopMeError(Errors.AD_LOAD_ERROR);
+
         if (isUnexpectedError) {
-            error = Errors.ERROR_MESSAGE_RESPONSE_SYNTAX_ERROR;
+            error = new LoopMeError(Errors.ERROR_MESSAGE_RESPONSE_SYNTAX_ERROR);
         } else if (isInvalidOrtbRequestException) {
-            error = Errors.AD_LOAD_ERROR;
             error.addParam(Params.REQUEST, ((InvalidOrtbRequestException) exception).getRequest());
-        } else if (isResponseEmptyData){
-            error = Errors.RESPONSE_EMPTY_DATA;
-        } else {
-            error = Errors.AD_LOAD_ERROR;
+        } else if (isResponseEmptyData) {
+            error = new LoopMeError(Errors.RESPONSE_EMPTY_DATA);
         }
+
         error.addParam(Params.ERROR_EXCEPTION, message);
         onErrorResult(error);
     }
