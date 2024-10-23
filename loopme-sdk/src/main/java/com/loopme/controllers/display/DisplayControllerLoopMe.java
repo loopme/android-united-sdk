@@ -46,7 +46,7 @@ public class DisplayControllerLoopMe extends BaseTrackableController implements 
         super(loopMeAd);
         mLoopMeAd = loopMeAd;
         mAdParams = mLoopMeAd.getAdParams();
-        mMraidView = new MraidView(mLoopMeAd.getContext());
+        mMraidView = new MraidView(mLoopMeAd.getContext(), mLoopMeAd);
         mMraidController = new MraidController(mLoopMeAd, mMraidView);
         mMraidView.setWebViewClient(new MraidBridge(mMraidController, this::tryCreateOmidAdSession));
     }

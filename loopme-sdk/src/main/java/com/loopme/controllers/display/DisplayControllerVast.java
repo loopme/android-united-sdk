@@ -184,7 +184,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     @Override
     protected WebView createWebView() {
-        return new VastWebView(mLoopMeAd.getContext());
+        return new VastWebView(mLoopMeAd.getContext(), mLoopMeAd);
     }
 
     @Override

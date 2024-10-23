@@ -112,10 +112,10 @@ public class DisplayControllerVpaid extends VastVpaidBaseDisplayController imple
     @SuppressLint("JavascriptInterface")
     @Override
     protected WebView createWebView() {
-        MraidView wv = new MraidView(mLoopMeAd.getContext());
+        MraidView wv = new MraidView(mLoopMeAd.getContext(), mLoopMeAd);
         MraidController mraidController = new MraidController(mLoopMeAd, wv);
         wv.setWebViewClient(new MraidBridge(mraidController, () -> { }));
-        wv.setWebChromeClient(new AdViewChromeClient(this));
+        wv.setWebChromeClient(new AdViewChromeClient(this, mLoopMeAd));
         Vast4WebViewClient vast4WebViewClient = new Vast4WebViewClient();
         vast4WebViewClient.setOnPageLoadedListener(this);
         wv.setWebViewClient(vast4WebViewClient);

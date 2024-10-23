@@ -17,12 +17,14 @@ import android.webkit.WebViewClient;
 import com.loopme.BuildConfig;
 import com.loopme.Constants;
 import com.loopme.Logging;
+import com.loopme.ad.LoopMeAd;
 import com.loopme.bridges.BridgeCommandBuilder;
 import com.loopme.bridges.MraidBridge;
 import com.loopme.utils.ApiLevel;
 import com.loopme.views.webclient.AdViewChromeClient;
 
 
+@SuppressLint("ViewConstructor")
 public class MraidView extends WebView {
 
     private String mCurrentMraidState;
@@ -32,11 +34,11 @@ public class MraidView extends WebView {
     private static final String LOG_TAG = MraidView.class.getSimpleName();
 
     @SuppressLint("ClickableViewAccessibility")
-    public MraidView(Context context) {
+    public MraidView(Context context, LoopMeAd loopMeAd) {
         super(context);
         configureWebSettings();
         getSettings().setAllowUniversalAccessFromFileURLs(true);
-        setWebChromeClient(new AdViewChromeClient(message -> { }));
+        setWebChromeClient(new AdViewChromeClient(message -> { }, loopMeAd));
         setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 handleUserClick();

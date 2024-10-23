@@ -9,12 +9,14 @@ import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
+import com.loopme.ad.LoopMeAd;
 import com.loopme.views.webclient.AdViewChromeClient;
 
+@SuppressLint("ViewConstructor")
 public class VastWebView extends WebView {
 
     @SuppressLint("SetJavaScriptEnabled")
-    public VastWebView(Context context) {
+    public VastWebView(Context context, LoopMeAd loopMeAd) {
         super(context);
 
         getSettings().setJavaScriptEnabled(true);
@@ -23,7 +25,7 @@ public class VastWebView extends WebView {
         // TODO.
         setWebContentsDebuggingEnabled(true);
         setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
-        setWebChromeClient(new AdViewChromeClient(message -> { }));
+        setWebChromeClient(new AdViewChromeClient(message -> { }, loopMeAd));
         setWebViewClient(new Vast4WebViewClient());
 
         CookieManager cookieManager = CookieManager.getInstance();

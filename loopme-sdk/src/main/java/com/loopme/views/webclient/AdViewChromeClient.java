@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
+import com.loopme.ad.LoopMeAd;
 import com.loopme.tracker.partners.LoopMeTracker;
 
 import java.util.HashMap;
@@ -26,6 +27,7 @@ public class AdViewChromeClient extends WebChromeClient {
     private static final String LOG_TAG = AdViewChromeClient.class.getSimpleName();
 
     private final OnErrorFromJsCallback mCallback;
+    private final LoopMeAd mLoopMeAd;
     private String mPrevErrorMessage = "";
 
     private PermissionResolver permissionResolveListener;
@@ -35,7 +37,10 @@ public class AdViewChromeClient extends WebChromeClient {
 
     private PermissionRequest permissionRequest;
 
-    public AdViewChromeClient(@NonNull OnErrorFromJsCallback callback) { mCallback = callback; }
+    public AdViewChromeClient(@NonNull OnErrorFromJsCallback callback,  @NonNull LoopMeAd loopMeAd) {
+        mCallback = callback;
+        mLoopMeAd = loopMeAd;
+    }
 
     @Override
     public void onPermissionRequest(PermissionRequest request) {
@@ -81,6 +86,8 @@ public class AdViewChromeClient extends WebChromeClient {
             errorInfo.put(ERROR_CONSOLE_SOURCE_ID, consoleMessage.sourceId());
             errorInfo.put(ERROR_CONSOLE_LEVEL, messageLevel.toString());
             errorInfo.put(ERROR_TYPE, Constants.ErrorType.JS);
+            errorInfo.putAll(mLoopMeAd.packErrorInfo(message));
+
             LoopMeTracker.post(errorInfo);
         }
 
