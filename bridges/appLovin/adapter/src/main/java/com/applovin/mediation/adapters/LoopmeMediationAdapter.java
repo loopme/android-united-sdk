@@ -1,6 +1,7 @@
 package com.applovin.mediation.adapters;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.Keep;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
 
 import com.applovin.mediation.MaxAdFormat;
@@ -58,7 +60,7 @@ public class LoopmeMediationAdapter
     }
 
     @Override
-    public void initialize(MaxAdapterInitializationParameters maxAdapterInitializationParameters, Activity activity, final OnCompletionListener onCompletionListener) {
+    public void initialize(MaxAdapterInitializationParameters maxAdapterInitializationParameters, @Nullable Activity activity, final OnCompletionListener onCompletionListener) {
         Log.d(LOG_TAG, "initialization");
         if (LoopMeSdk.isInitialized()) {
             initializationStatus = InitializationStatus.INITIALIZED_SUCCESS;
@@ -73,7 +75,7 @@ public class LoopmeMediationAdapter
             loopMeConf.setMediation("applovin");
             loopMeConf.setAdapterVersion(getAdapterVersion());
             loopMeConf.setMediationSdkVersion(getMediationSdkVersion());
-            LoopMeSdk.initialize(activity.getBaseContext(), loopMeConf, new LoopMeSdk.LoopMeSdkListener() {
+            LoopMeSdk.initialize(getContext(activity), loopMeConf, new LoopMeSdk.LoopMeSdkListener() {
                 @Override
                 public void onSdkInitializationSuccess() {
                     initializationStatus = InitializationStatus.INITIALIZED_SUCCESS;
@@ -244,6 +246,11 @@ public class LoopmeMediationAdapter
         } catch (Exception e) {
             maxRewardedAdapterListener.onRewardedAdLoadFailed(MaxAdapterError.INTERNAL_ERROR);
         }
+    }
+
+    private Context getContext(@Nullable final Activity activity) {
+        // activity can be null starting from applovin 11.1.0, also `getApplicationContext()` was introduced in 11.1.0
+        return (activity != null) ? activity.getApplicationContext() : getApplicationContext();
     }
 
     private class LoopMeInterstitialListener implements LoopMeInterstitial.Listener {
