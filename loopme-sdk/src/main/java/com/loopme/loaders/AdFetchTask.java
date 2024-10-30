@@ -1,5 +1,7 @@
 package com.loopme.loaders;
 
+import static com.loopme.Constants.RESPONSE_NO_ADS;
+import static com.loopme.models.Errors.BAD_SERVERS_CODE;
 import static com.loopme.utils.Utils.safelyRetrieve;
 
 import android.os.Handler;
@@ -25,7 +27,6 @@ import com.loopme.request.RequestUtils;
 import com.loopme.request.RequestValidator;
 import com.loopme.request.ValidationDataExtractor;
 import com.loopme.request.validation.Invalidation;
-import com.loopme.request.validation.Validation;
 import com.loopme.tracker.partners.LoopMeTracker;
 import com.loopme.utils.ExecutorHelper;
 import com.loopme.network.LoopMeAdService;
@@ -42,7 +43,9 @@ import java.util.concurrent.Future;
 public class AdFetchTask implements Runnable {
 
     protected static final String LOG_TAG = AdFetchTask.class.getSimpleName();
-    private static final int RESPONSE_NO_ADS = 204;
+
+    private static final String UNEXPECTED = "Unexpected";
+    private static final String INDEX_OUT_OF_BOUNDS = "Index 0 out of bounds for length 0";
 
     private Future mFetchTask;
     private final LoopMeAd mLoopMeAd;
@@ -50,7 +53,6 @@ public class AdFetchTask implements Runnable {
     private final ExecutorService mExecutorService;
     private volatile AdFetcherListener mAdFetcherListener;
     private final Handler mHandler = new Handler((Looper.getMainLooper()));
-    private static final String UNEXPECTED = "Unexpected";
     private final RequestUtils requestUtils;
     private final ValidationDataExtractor validationDataExtractor;
     private final RequestValidator requestValidator;
@@ -114,26 +116,21 @@ public class AdFetchTask implements Runnable {
     protected void handleException(Exception exception) {
         String message = exception.getMessage();
         boolean isUnexpectedError = !TextUtils.isEmpty(message) && message.contains(UNEXPECTED);
+        boolean isResponseEmptyData = exception instanceof IndexOutOfBoundsException && message.contains(INDEX_OUT_OF_BOUNDS);
+        boolean isInvalidOrtbRequestException = exception instanceof InvalidOrtbRequestException;
 
-        LoopMeError error = Errors.AD_LOAD_ERROR;
+        LoopMeError error = new LoopMeError(Errors.AD_LOAD_ERROR);
+
         if (isUnexpectedError) {
-            error.setErrorType(Constants.ErrorType.SERVER);
-            error.addParam(Params.ERROR_EXCEPTION, Errors.ERROR_MESSAGE_RESPONSE_SYNTAX_ERROR);
-        } else if (exception instanceof InvalidOrtbRequestException) {
-            error.addParam(Params.ERROR_EXCEPTION, exception.getMessage());
+            error = new LoopMeError(Errors.ERROR_MESSAGE_RESPONSE_SYNTAX_ERROR);
+        } else if (isInvalidOrtbRequestException) {
             error.addParam(Params.REQUEST, ((InvalidOrtbRequestException) exception).getRequest());
-        } else {
-            error.addParam(Params.ERROR_EXCEPTION, exception.getMessage());
+        } else if (isResponseEmptyData) {
+            error = new LoopMeError(Errors.RESPONSE_EMPTY_DATA);
         }
-        onErrorResult(error);
-    }
 
-    protected void handleBadResponse(String message) {
-        boolean isUnexpectedError = !TextUtils.isEmpty(message) && message.contains(UNEXPECTED);
-        onErrorResult(isUnexpectedError ?
-            Errors.SYNTAX_ERROR_IN_RESPONSE :
-            new LoopMeError(message, Constants.ErrorType.SERVER)
-        );
+        error.addParam(Params.ERROR_EXCEPTION, message);
+        onErrorResult(error);
     }
 
     private void handleResponse(BidResponse bidResponse) {
@@ -178,10 +175,12 @@ public class AdFetchTask implements Runnable {
             onErrorResult(Errors.NO_ADS_FOUND);
             return;
         }
-        String message = response.getCode() != 0 ?
-            Constants.BAD_SERVERS_CODE + response.getCode() :
-            response.getMessage();
-        onErrorResult(new LoopMeError(message));
+        onErrorResult(
+                new LoopMeError(
+                        response.getCode() != 0
+                        ? BAD_SERVERS_CODE.getMessage() + response.getCode()
+                        : response.getMessage()
+        ));
     }
 
     private void onSuccessResult(final AdParams adParams) {
@@ -200,7 +199,7 @@ public class AdFetchTask implements Runnable {
 
     private void sendOrtbLatencyAlert(long duration, boolean isSuccess) {
         LoopMeTracker.post(
-                new LoopMeError("ORTB request takes more then 1sec", Constants.ErrorType.LATENCY)
+                new LoopMeError(Errors.ORTB_REQUEST_TAKES_MORE_THEN_ONE_SEC)
                         .addParam(Params.TIMEOUT, String.valueOf(duration))
                         .addParam(Params.STATUS, isSuccess ? Constants.SUCCESS : Constants.FAIL)
         );
