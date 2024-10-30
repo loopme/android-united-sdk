@@ -3,11 +3,14 @@ package com.loopme.views.webclient;
 import static android.webkit.ConsoleMessage.MessageLevel;
 import static android.webkit.ConsoleMessage.MessageLevel.ERROR;
 import static android.webkit.ConsoleMessage.MessageLevel.WARNING;
+import static com.loopme.debugging.Params.CID;
+import static com.loopme.debugging.Params.CRID;
 import static com.loopme.debugging.Params.ERROR_CONSOLE;
 import static com.loopme.debugging.Params.ERROR_CONSOLE_LEVEL;
 import static com.loopme.debugging.Params.ERROR_CONSOLE_SOURCE_ID;
 import static com.loopme.debugging.Params.ERROR_MSG;
 import static com.loopme.debugging.Params.ERROR_TYPE;
+import static com.loopme.debugging.Params.REQUEST_ID;
 
 import android.text.TextUtils;
 import android.webkit.ConsoleMessage;
@@ -18,6 +21,8 @@ import androidx.annotation.NonNull;
 
 import com.loopme.Constants;
 import com.loopme.Logging;
+import com.loopme.ad.LoopMeAd;
+import com.loopme.debugging.Params;
 import com.loopme.tracker.partners.LoopMeTracker;
 
 import java.util.HashMap;
@@ -26,6 +31,7 @@ public class AdViewChromeClient extends WebChromeClient {
     private static final String LOG_TAG = AdViewChromeClient.class.getSimpleName();
 
     private final OnErrorFromJsCallback mCallback;
+    private final LoopMeAd mLoopMeAd;
     private String mPrevErrorMessage = "";
 
     private PermissionResolver permissionResolveListener;
@@ -35,7 +41,10 @@ public class AdViewChromeClient extends WebChromeClient {
 
     private PermissionRequest permissionRequest;
 
-    public AdViewChromeClient(@NonNull OnErrorFromJsCallback callback) { mCallback = callback; }
+    public AdViewChromeClient(@NonNull OnErrorFromJsCallback callback,  @NonNull LoopMeAd loopMeAd) {
+        mCallback = callback;
+        mLoopMeAd = loopMeAd;
+    }
 
     @Override
     public void onPermissionRequest(PermissionRequest request) {
@@ -81,6 +90,10 @@ public class AdViewChromeClient extends WebChromeClient {
             errorInfo.put(ERROR_CONSOLE_SOURCE_ID, consoleMessage.sourceId());
             errorInfo.put(ERROR_CONSOLE_LEVEL, messageLevel.toString());
             errorInfo.put(ERROR_TYPE, Constants.ErrorType.JS);
+            errorInfo.put(CID, mLoopMeAd.getCurrentCid());
+            errorInfo.put(CRID, mLoopMeAd.getCurrentCrid());
+            errorInfo.put(REQUEST_ID, mLoopMeAd.getRequestId());
+
             LoopMeTracker.post(errorInfo);
         }
 
