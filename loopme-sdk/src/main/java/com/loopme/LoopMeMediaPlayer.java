@@ -1,120 +1,215 @@
 package com.loopme;
 
-import android.media.AudioAttributes;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
+import android.content.Context;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Surface;
 
 import androidx.annotation.NonNull;
+import androidx.media3.common.AudioAttributes;
+import androidx.media3.common.C;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.PlaybackException;
+import androidx.media3.common.Player;
+import androidx.media3.common.VideoSize;
+import androidx.media3.common.util.UnstableApi;
+import androidx.media3.database.DatabaseProvider;
+import androidx.media3.database.StandaloneDatabaseProvider;
+import androidx.media3.datasource.DataSource;
+import androidx.media3.datasource.cache.Cache;
+import androidx.media3.datasource.cache.CacheDataSource;
+import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor;
+import androidx.media3.datasource.cache.SimpleCache;
+import androidx.media3.datasource.okhttp.OkHttpDataSource;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.DefaultLoadControl;
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 
+import com.loopme.tracker.MediaPlayerTracker;
 import com.loopme.utils.Utils;
+import com.loopme.utils.VideoSessionManager;
 
+import java.io.File;
 import java.io.IOException;
 
+import okhttp3.OkHttpClient;
+
+@UnstableApi
 public class LoopMeMediaPlayer {
     private static final String LOG_TAG = LoopMeMediaPlayer.class.getSimpleName();
-    private final MediaPlayer mMediaPlayer;
+    private final ExoPlayer player;
     private final LoopMeMediaPlayerListener mListener;
     private final Handler handler = new Handler();
+    private final VideoSessionManager videoSessionManager;
+
+
+    private static Cache cache;
     private final Runnable onTimeChange = new Runnable() {
         @Override
         public void run() {
-            if (mMediaPlayer.isPlaying()) {
-                mListener.onTimeUpdate(mMediaPlayer.getCurrentPosition(), mMediaPlayer.getDuration());
+            if (player.isPlaying()) {
+                mListener.onTimeUpdate((int) player.getCurrentPosition(), (int) player.getDuration());
                 handler.postDelayed(this, 1000);
             }
         }
     };
 
-    public LoopMeMediaPlayer(@NonNull String source, @NonNull LoopMeMediaPlayerListener listener) {
-        mMediaPlayer = new MediaPlayer();
+    public LoopMeMediaPlayer(
+            @NonNull Context context,
+            @NonNull String sourceUrl,
+            @NonNull LoopMeMediaPlayerListener listener) {
+
+        OkHttpClient okHttpClient = new OkHttpClient().newBuilder().build();
+
+        OkHttpDataSource.Factory okHttpDataSourceFactory = new OkHttpDataSource.Factory(okHttpClient);
+
+        DataSource.Factory cacheDataSourceFactory =
+                new CacheDataSource.Factory()
+                        .setCache(getCache(context))
+                        .setUpstreamDataSourceFactory(okHttpDataSourceFactory)
+                        .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+                        .setEventListener(new CacheDataSource.EventListener() {
+                            @Override
+                            public void onCachedBytesRead(long cacheSizeBytes, long cachedBytesRead) {
+                                Log.d(LOG_TAG, "Cached bytes read: " + cachedBytesRead);
+                            }
+
+                            @Override
+                            public void onCacheIgnored(int reason) {
+                                if (reason == CacheDataSource.CACHE_IGNORED_REASON_ERROR) {
+                                    MediaPlayerTracker.trackCacheError(new IOException("Cache ignored error"), sourceUrl);
+                                }
+                            }
+                        });
+
         mListener = listener;
+
+        videoSessionManager = VideoSessionManager.getInstance(sourceUrl);
+
+        player = new ExoPlayer.Builder(context)
+                .setMediaSourceFactory(
+                        new DefaultMediaSourceFactory(context).setDataSourceFactory(cacheDataSourceFactory))
+                .setLoadControl(new DefaultLoadControl())
+                .build();
+
         AudioAttributes audioAttributes = new AudioAttributes.Builder()
-            .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-            .setUsage(AudioAttributes.USAGE_MEDIA)
-            .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
-            .build();
-        mMediaPlayer.setLooping(false);
-        mMediaPlayer.setAudioAttributes(audioAttributes);
-        mMediaPlayer.setOnPreparedListener(mListener);
-        mMediaPlayer.setOnErrorListener(mListener);
-        mMediaPlayer.setOnCompletionListener(mListener);
-        try {
-            mMediaPlayer.setDataSource(source);
-            mMediaPlayer.prepareAsync();
-        } catch (IllegalStateException | IOException e) {
-            mListener.onErrorOccurred(e);
-        }
+                .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+                .setUsage(C.USAGE_MEDIA)
+                .build();
+        player.setAudioAttributes(audioAttributes, true);
+        player.setRepeatMode(Player.REPEAT_MODE_OFF);
+
+        player.addListener(new Player.Listener() {
+            @Override
+            public void onPlaybackStateChanged(int playbackState) {
+                switch (playbackState) {
+                    case Player.STATE_READY:
+                        if (videoSessionManager.isBuffering()) {
+                            videoSessionManager.endBuffering();
+                        }
+                        mListener.onPrepared();
+                        break;
+                    case Player.STATE_ENDED:
+                        mListener.onCompletion();
+                        if (videoSessionManager.isBuffering()) {
+                            videoSessionManager.endBuffering();
+                        }
+                        break;
+                    case Player.STATE_BUFFERING:
+                        if (!videoSessionManager.isBuffering()) {
+                            videoSessionManager.startBuffering();
+                        }
+                        break;
+                    case Player.STATE_IDLE:
+                        break;
+                }
+            }
+
+            @Override
+            public void onPlayerError(@NonNull PlaybackException error) {
+                Throwable cause = error.getCause();
+                if (cause instanceof IOException) {
+                    Log.e(LOG_TAG, "Caching error detected: " + cause.getMessage());
+                    MediaPlayerTracker.trackCacheError((Exception)cause, sourceUrl);
+                } else {
+                    Log.e(LOG_TAG, "Player error: " + error.getMessage());
+                    mListener.onErrorOccurred(error);
+                }
+            }
+
+        });
+
+        MediaItem mediaItem = MediaItem.fromUri(sourceUrl);
+        player.addMediaItem(mediaItem);
+        player.prepare();
+    }
+
+    public static Cache getCache(Context context) {
+        if (cache!=null)
+            return cache;
+
+        long cacheSizeBytes = 100 * 1024 * 1024;
+        File cacheDir = new File(context.getCacheDir(), "video_cache");
+
+        DatabaseProvider databaseProvider = new StandaloneDatabaseProvider(context);
+
+        cache = new SimpleCache(
+                cacheDir, new LeastRecentlyUsedCacheEvictor(cacheSizeBytes), databaseProvider);
+
+        return cache;
     }
 
     public void muteVideo(boolean muted) {
         float volume = muted ? 0f : Utils.getSystemVolume();
-        mMediaPlayer.setVolume(volume, volume);
-        mListener.onVolumeChanged(volume, mMediaPlayer.getCurrentPosition());
+        player.setVolume(volume);
+        mListener.onVolumeChanged(volume, (int) player.getCurrentPosition());
     }
 
     public void releasePlayer() {
         handler.removeCallbacks(onTimeChange);
-        mMediaPlayer.reset();
-        mMediaPlayer.release();
+        player.release();
     }
 
     public void setSurface(Surface surface) {
-        try {
-            mMediaPlayer.setSurface(surface);
-        } catch (IllegalStateException e) {
-            mListener.onErrorOccurred(e);
-        }
+        player.setVideoSurface(surface);
     }
 
     public boolean isPlaying() {
-        try {
-            return mMediaPlayer.isPlaying();
-        } catch (IllegalStateException e) {
-            mListener.onErrorOccurred(e);
-        }
-        return false;
+        return player.isPlaying();
     }
 
     public void destroyListeners() {
-        mMediaPlayer.setOnErrorListener(null);
-        mMediaPlayer.setOnPreparedListener(null);
-        mMediaPlayer.setOnCompletionListener(null);
+        player.removeListener(this.mListener);
     }
 
     public void pauseMediaPlayer() {
-        try {
-            if (isPlaying()) {
-                handler.removeCallbacks(onTimeChange);
-                mMediaPlayer.pause();
-            }
-        } catch (IllegalStateException e) {
-            mListener.onErrorOccurred(e);
+        if (isPlaying()) {
+            handler.removeCallbacks(onTimeChange);
+            player.pause();
         }
     }
 
     public void start() {
-        try {
-            if (!isPlaying()) {
-                mMediaPlayer.start();
-                handler.removeCallbacks(onTimeChange);
-                handler.postDelayed(onTimeChange, 1000);
-            }
-        } catch (IllegalStateException e) {
-            mListener.onErrorOccurred(e);
+        if (!isPlaying()) {
+            player.play();
+            handler.removeCallbacks(onTimeChange);
+            handler.postDelayed(onTimeChange, 1000);
         }
     }
 
-    public int getVideoDuration() { return mMediaPlayer.getDuration(); }
+    public int getVideoDuration() {
+        return (int) player.getDuration();
+    }
 
-    public interface LoopMeMediaPlayerListener extends
-            MediaPlayer.OnPreparedListener,
-            MediaPlayer.OnCompletionListener,
-            MediaPlayer.OnErrorListener {
+    public VideoSize getVideoSize() {
+        return player.getVideoSize();
+    }
 
+    public interface LoopMeMediaPlayerListener extends Player.Listener {
         void onTimeUpdate(int currentTime, int duration);
         void onErrorOccurred(Exception e);
         void onVolumeChanged(float volume, int currentPosition);
+        void onPrepared();
+        void onCompletion();
     }
 }

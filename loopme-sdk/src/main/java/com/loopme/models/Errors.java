@@ -243,6 +243,8 @@ public class Errors {
     public static final LoopMeError VAST_UNDEFINED_ERROR = new LoopMeError(
             900, "Undefined error", Constants.ErrorType.VAST);
 
-
     // endregion
+
+    public static final LoopMeError VIDEO_BUFFERING_AVERAGE = new LoopMeError(
+            "video_buffering_average", Constants.ErrorType.CUSTOM);
 }

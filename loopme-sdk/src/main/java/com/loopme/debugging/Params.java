@@ -44,6 +44,10 @@ public class Params {
     public static final String TIMEOUT = "timeout";
     public static final String STATUS = "status";
     public static final String REQUEST = "request";
+    public static final String DURATION = "duration";
+    public static final String DURATION_AVG = "duration_avg";
+    public static final String BUFFER_COUNT = "bufferCount";
+    public static final String MEDIA_URL = "media_url";
 //            "server" -> "Timeout"
 //            "server" -> "Server code 502"
 //            "bad_asset" -> "Wrong encoding: https://i.loopme.me/fd192b26e6c548af.mp4"

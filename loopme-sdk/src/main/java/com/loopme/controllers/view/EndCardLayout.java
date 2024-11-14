@@ -13,6 +13,8 @@ import androidx.annotation.NonNull;
 import com.loopme.Constants;
 import com.loopme.Constants.Layout;
 import com.loopme.R;
+import com.loopme.tracker.MediaPlayerTracker;
+import com.loopme.utils.FileUtils;
 import com.loopme.utils.ImageUtils;
 import com.loopme.utils.Utils;
 import com.loopme.utils.ViewUtils;
@@ -106,7 +108,16 @@ public class EndCardLayout extends FrameLayout implements GestureDetector.OnGest
     }
 
     public void setEndCard(String imageUri) {
-        ImageUtils.setScaledImage(mEndCardImageView, imageUri);
+        FileUtils.startCaching(imageUri, getContext(), new FileUtils.Listener() {
+            @Override
+            public void onError(Exception e) {
+                MediaPlayerTracker.trackCacheError(e, imageUri);
+            }
+            @Override
+            public void onSuccess(String endCardUrl) {
+                ImageUtils.setScaledImage(mEndCardImageView, endCardUrl);
+            }
+        });
     }
 
     public interface OnEndCardListener {
