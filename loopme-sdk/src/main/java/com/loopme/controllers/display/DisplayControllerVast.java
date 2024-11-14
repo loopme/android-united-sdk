@@ -73,6 +73,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         super.onStartLoad();
 
         mVideoUrl = mAdParams.getVideoFileUrl();
+        mEndCardUrl = mAdParams.getEndCardUrl();
 
         if (mVideoUrl != null) {
             videoSessionManager = VideoSessionManager.getInstance(mVideoUrl);
