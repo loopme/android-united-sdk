@@ -36,7 +36,7 @@ public class MediaPlayerTracker {
     }
 
     public static void trackBufferingStats(VideoSessionManager videoSessionManager) {
-        long totalBufferingTime = videoSessionManager.getTotalBufferingTime();
+        long totalBufferingTime = videoSessionManager.getTotalBufferingTimeInSec();
         long averageBufferingTime = videoSessionManager.getAverageBufferingTime();
         int bufferCount = videoSessionManager.getBufferCount();
         String mediaUrl = videoSessionManager.getMediaUrl();

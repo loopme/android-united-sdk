@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@UnstableApi
 public class DisplayControllerVast extends VastVpaidBaseDisplayController implements
         LoopMeMediaPlayer.LoopMeMediaPlayerListener,
         ViewControllerVast.ViewControllerVastListener {
@@ -76,7 +75,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         mEndCardUrl = mAdParams.getEndCardUrl();
 
         if (mVideoUrl != null) {
-            videoSessionManager = VideoSessionManager.getInstance(mVideoUrl);
+            videoSessionManager = new VideoSessionManager(mVideoUrl);
         } else {
             new LoopMeError(Errors.VAST_COULD_NOT_FIND_SUPPORTED_FORMAT);
         }
@@ -188,12 +187,13 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         }
     }
 
+    @UnstableApi
     @Override
     public void onPlay(int position) {
         mIsAdSkipped = false;
         mLoopMeAd.runOnUiThreadDelayed(() -> {
             destroyMediaPlayer();
-            mLoopMePlayer = new LoopMeMediaPlayer(mContext, mVideoUrl, DisplayControllerVast.this);
+            mLoopMePlayer = new LoopMeMediaPlayer(mContext, mVideoUrl, videoSessionManager, DisplayControllerVast.this);
         }, 100);
         onAdResumedEvent();
     }
@@ -291,9 +291,8 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     public void onDestroy() {
         super.onDestroy();
 
-        if (videoSessionManager != null && videoSessionManager.getBufferCount() > 0) {
+        if (videoSessionManager.getBufferCount() > 0) {
             MediaPlayerTracker.trackBufferingStats(videoSessionManager);
-            VideoSessionManager.resetInstance();
         }
 
         new Handler(Looper.getMainLooper())
@@ -367,11 +366,6 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         postVideoEvent(EventConstants.COMPLETE);
         onAdVideoDidReachEnd();
         onAdCompleteEvent();
-
-        if (videoSessionManager != null && videoSessionManager.getBufferCount() > 0) {
-            MediaPlayerTracker.trackBufferingStats(videoSessionManager);
-            VideoSessionManager.resetInstance();
-        }
 
         if (omidEventTrackerWrapper != null)
             omidEventTrackerWrapper.sendOneTimeCompleteEvent();

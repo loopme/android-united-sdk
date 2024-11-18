@@ -34,16 +34,11 @@ import java.io.IOException;
 
 import okhttp3.OkHttpClient;
 
-@UnstableApi
 public class LoopMeMediaPlayer {
     private static final String LOG_TAG = LoopMeMediaPlayer.class.getSimpleName();
     private final ExoPlayer player;
     private final LoopMeMediaPlayerListener mListener;
     private final Handler handler = new Handler();
-    private final VideoSessionManager videoSessionManager;
-
-
-    private static Cache cache;
     private final Runnable onTimeChange = new Runnable() {
         @Override
         public void run() {
@@ -54,9 +49,12 @@ public class LoopMeMediaPlayer {
         }
     };
 
+
+    @UnstableApi
     public LoopMeMediaPlayer(
             @NonNull Context context,
             @NonNull String sourceUrl,
+            @NonNull VideoSessionManager videoSessionManager,
             @NonNull LoopMeMediaPlayerListener listener) {
 
         OkHttpClient okHttpClient = new OkHttpClient().newBuilder().build();
@@ -83,8 +81,6 @@ public class LoopMeMediaPlayer {
                         });
 
         mListener = listener;
-
-        videoSessionManager = VideoSessionManager.getInstance(sourceUrl);
 
         player = new ExoPlayer.Builder(context)
                 .setMediaSourceFactory(
@@ -144,19 +140,19 @@ public class LoopMeMediaPlayer {
         player.prepare();
     }
 
+    @UnstableApi
     public static Cache getCache(Context context) {
-        if (cache!=null)
-            return cache;
 
         long cacheSizeBytes = 100 * 1024 * 1024;
         File cacheDir = new File(context.getCacheDir(), "video_cache");
 
         DatabaseProvider databaseProvider = new StandaloneDatabaseProvider(context);
 
-        cache = new SimpleCache(
-                cacheDir, new LeastRecentlyUsedCacheEvictor(cacheSizeBytes), databaseProvider);
-
-        return cache;
+        return new SimpleCache(
+                cacheDir,
+                new LeastRecentlyUsedCacheEvictor(cacheSizeBytes),
+                databaseProvider
+        );
     }
 
     public void muteVideo(boolean muted) {
