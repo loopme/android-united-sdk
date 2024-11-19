@@ -44,7 +44,8 @@ public class LoopMeMediaPlayer {
     private final Runnable onTimeChange = new Runnable() {
         @Override
         public void run() {
-            if (player.isPlaying()) {
+            int playbackState = player.getPlaybackState();
+            if (playbackState == Player.STATE_READY || playbackState == Player.STATE_BUFFERING) {
                 mListener.onTimeUpdate((int) player.getCurrentPosition(), (int) player.getDuration());
                 handler.postDelayed(this, 1000);
             }
