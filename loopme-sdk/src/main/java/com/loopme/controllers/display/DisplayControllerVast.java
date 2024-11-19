@@ -29,6 +29,7 @@ import com.loopme.om.OmidHelper;
 import com.loopme.tracker.MediaPlayerTracker;
 import com.loopme.tracker.constants.EventConstants;
 import com.loopme.utils.ApiLevel;
+import com.loopme.utils.EndCardCacheUtils;
 import com.loopme.utils.VideoSessionManager;
 import com.loopme.vast.TrackingEvent;
 
@@ -78,6 +79,10 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
             videoSessionManager = new VideoSessionManager(mVideoUrl);
         } else {
             new LoopMeError(Errors.VAST_COULD_NOT_FIND_SUPPORTED_FORMAT);
+        }
+
+        if (mEndCardUrl != null) {
+            EndCardCacheUtils.cacheEndCard(mEndCardUrl, mContext);
         }
     }
 
