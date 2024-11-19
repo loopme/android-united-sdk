@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
+import androidx.media3.common.util.UnstableApi;
 
 import com.loopme.AdTargeting;
 import com.loopme.AdTargetingData;
@@ -70,6 +71,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
     public void setCustomAdUrl (String url) { mUrl = url; }
 
     private final AdFetcherListener adFetchListener = new AdFetcherListener() {
+        @UnstableApi
         @Override
         public void onAdFetchCompleted(AdParams adParams) {
             if (adParams != null) {
@@ -344,6 +346,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         }
     }
 
+    @UnstableApi
     private void proceedPrepareAd(AdParams adParams) {
         setBackendAutoLoadingValue(adParams.getAutoLoading());
         startTimer(adParams);

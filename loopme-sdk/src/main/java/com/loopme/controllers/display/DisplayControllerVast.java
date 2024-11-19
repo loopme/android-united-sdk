@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@UnstableApi
 public class DisplayControllerVast extends VastVpaidBaseDisplayController implements
         LoopMeMediaPlayer.LoopMeMediaPlayerListener,
         ViewControllerVast.ViewControllerVastListener {

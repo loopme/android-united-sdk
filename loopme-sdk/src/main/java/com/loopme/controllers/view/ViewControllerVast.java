@@ -15,6 +15,7 @@ import com.loopme.Constants;
 import com.loopme.Constants.Layout;
 import com.loopme.controllers.display.DisplayControllerVast;
 
+@UnstableApi
 public class ViewControllerVast {
 
     private final DisplayControllerVast mDisplayControllerVast;
