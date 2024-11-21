@@ -146,8 +146,7 @@ public class RequestBuilder implements Serializable {
                 .put(GENDER, data.getGender())
                 .put(KEYWORDS, data.getKeywords())
                 .put(YOB, data.getYob() != 0 ? data.getYob() : null)
-                .put(EXT, !requestUtils.isIabTcfCmpSdkPresent(loopMeAd.getContext()) ?
-                    new JSONBuilder()
+                .put(EXT, new JSONBuilder()
                         .put(PARAM_CONSENT_TYPE, requestUtils.getConsentType(loopMeAd.getContext()))
                         .put(CONSENT, (requestUtils.getIabTcfTcString(loopMeAd.getContext()) != null
                              && !requestUtils.getIabTcfTcString(loopMeAd.getContext()).isEmpty()) ?
@@ -155,7 +154,7 @@ public class RequestBuilder implements Serializable {
                              : requestUtils.getUserConsent(loopMeAd.getContext()))
                         .put(SESSION_DURATION, SessionManager.getInstance().getSessionDuration())
                         .put(SESSION_DEPTH, SessionManager.getInstance().getAdsShownCount())
-                        .build() : null
+                        .build()
                 )
                 .build()
             )
