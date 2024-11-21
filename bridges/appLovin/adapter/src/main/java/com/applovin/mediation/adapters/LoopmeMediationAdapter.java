@@ -1,6 +1,7 @@
 package com.applovin.mediation.adapters;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.Keep;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
 
 import com.applovin.mediation.MaxAdFormat;
@@ -27,6 +29,9 @@ import com.loopme.LoopMeBanner;
 import com.loopme.LoopMeInterstitial;
 import com.loopme.LoopMeSdk;
 import com.loopme.common.LoopMeError;
+import com.loopme.debugging.Params;
+import com.loopme.models.Errors;
+import com.loopme.tracker.partners.LoopMeTracker;
 
 
 /**
@@ -58,7 +63,7 @@ public class LoopmeMediationAdapter
     }
 
     @Override
-    public void initialize(MaxAdapterInitializationParameters maxAdapterInitializationParameters, Activity activity, final OnCompletionListener onCompletionListener) {
+    public void initialize(MaxAdapterInitializationParameters maxAdapterInitializationParameters, @Nullable Activity activity, final OnCompletionListener onCompletionListener) {
         Log.d(LOG_TAG, "initialization");
         if (LoopMeSdk.isInitialized()) {
             initializationStatus = InitializationStatus.INITIALIZED_SUCCESS;
@@ -73,7 +78,7 @@ public class LoopmeMediationAdapter
             loopMeConf.setMediation("applovin");
             loopMeConf.setAdapterVersion(getAdapterVersion());
             loopMeConf.setMediationSdkVersion(getMediationSdkVersion());
-            LoopMeSdk.initialize(activity.getBaseContext(), loopMeConf, new LoopMeSdk.LoopMeSdkListener() {
+            LoopMeSdk.initialize(getContext(activity), loopMeConf, new LoopMeSdk.LoopMeSdkListener() {
                 @Override
                 public void onSdkInitializationSuccess() {
                     initializationStatus = InitializationStatus.INITIALIZED_SUCCESS;
@@ -115,13 +120,14 @@ public class LoopmeMediationAdapter
     }
 
     @Override
-    public void loadAdViewAd(MaxAdapterResponseParameters maxAdapterResponseParameters, MaxAdFormat maxAdFormat, Activity activity, MaxAdViewAdapterListener maxAdViewAdapterListener) {
+    public void loadAdViewAd(MaxAdapterResponseParameters maxAdapterResponseParameters, MaxAdFormat maxAdFormat, @Nullable Activity activity, MaxAdViewAdapterListener maxAdViewAdapterListener) {
         Log.d(LOG_TAG, "load banner ad");
-
         String placementId = maxAdapterResponseParameters.getThirdPartyAdPlacementId();
 
         if (activity == null ) {
-            MaxAdapterError error = new MaxAdapterError( -5601, "Missing Activity");
+            LoopMeTracker.post(Errors.MISSING_ACTIVITY.addParam(Params.ID, placementId));
+            maxAdViewAdapterListener.onAdViewAdLoadFailed(MaxAdapterError.MISSING_ACTIVITY);
+            return;
         }
 
         try {
@@ -189,25 +195,42 @@ public class LoopmeMediationAdapter
             activity.runOnUiThread(() -> mBanner.load());
         } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage());
+            LoopMeTracker.post(Errors.ADAPTER_ERROR.addParam(Params.ID, placementId));
             maxAdViewAdapterListener.onAdViewAdLoadFailed(MaxAdapterError.INTERNAL_ERROR);
         }
     }
 
     @Override
-    public void loadInterstitialAd(MaxAdapterResponseParameters maxAdapterResponseParameters, Activity activity, MaxInterstitialAdapterListener maxInterstitialAdapterListener) {
+    public void loadInterstitialAd(MaxAdapterResponseParameters maxAdapterResponseParameters, @Nullable Activity activity, MaxInterstitialAdapterListener maxInterstitialAdapterListener) {
         Log.d(LOG_TAG, "load interstitial ad");
 
         String appkey = maxAdapterResponseParameters.getThirdPartyAdPlacementId();
-        mInterstitialListener = maxInterstitialAdapterListener;
-        mInterstitial = LoopMeInterstitial.getInstance(appkey, activity);
-        mInterstitial.setListener(mLoopMeInterstitialListener);
-        mInterstitial.setAutoLoading(false);
-        activity.runOnUiThread(() -> mInterstitial.load());
+        if (activity == null ) {
+            LoopMeTracker.post(Errors.MISSING_ACTIVITY.addParam(Params.ID, appkey));
+            maxInterstitialAdapterListener.onInterstitialAdLoadFailed(MaxAdapterError.MISSING_ACTIVITY);
+            return;
+        }
+        try {
+            mInterstitialListener = maxInterstitialAdapterListener;
+            mInterstitial = LoopMeInterstitial.getInstance(appkey, activity);
+            mInterstitial.setListener(mLoopMeInterstitialListener);
+            mInterstitial.setAutoLoading(false);
+            activity.runOnUiThread(() -> mInterstitial.load());
+        } catch (Exception e) {
+            LoopMeTracker.post(Errors.ADAPTER_ERROR.addParam(Params.ID, appkey));
+            maxInterstitialAdapterListener.onInterstitialAdLoadFailed(MaxAdapterError.INTERNAL_ERROR);
+        }
     }
+
     @Override
-    public void loadRewardedAd(MaxAdapterResponseParameters maxAdapterResponseParameters, Activity activity, MaxRewardedAdapterListener maxRewardedAdapterListener) {
+    public void loadRewardedAd(MaxAdapterResponseParameters maxAdapterResponseParameters, @Nullable Activity activity, MaxRewardedAdapterListener maxRewardedAdapterListener) {
         Log.d(LOG_TAG, "load rewarded ad");
         String appkey = maxAdapterResponseParameters.getThirdPartyAdPlacementId();
+        if (activity == null ) {
+            LoopMeTracker.post(Errors.MISSING_ACTIVITY.addParam(Params.ID, appkey));
+            maxRewardedAdapterListener.onRewardedAdLoadFailed(MaxAdapterError.MISSING_ACTIVITY);
+            return;
+        }
         try {
             mRewardedListener = maxRewardedAdapterListener;
             mRewarded = LoopMeInterstitial.getInstance(appkey, activity, true);
@@ -215,19 +238,20 @@ public class LoopmeMediationAdapter
             mRewarded.setAutoLoading(false);
             activity.runOnUiThread(() -> mRewarded.load(IntegrationType.NORMAL));
         } catch (Exception e) {
+            LoopMeTracker.post(Errors.ADAPTER_ERROR.addParam(Params.ID, appkey));
             maxRewardedAdapterListener.onRewardedAdLoadFailed(MaxAdapterError.INTERNAL_ERROR);
         }
     }
 
     @Override
-    public void showInterstitialAd(MaxAdapterResponseParameters maxAdapterResponseParameters, ViewGroup viewGroup, Lifecycle lifecycle, Activity activity, MaxInterstitialAdapterListener maxInterstitialAdapterListener) {
+    public void showInterstitialAd(MaxAdapterResponseParameters maxAdapterResponseParameters, ViewGroup viewGroup, Lifecycle lifecycle, @Nullable Activity activity, MaxInterstitialAdapterListener maxInterstitialAdapterListener) {
         Log.d(LOG_TAG, "showInterstitial");
         if (mInterstitial != null && mInterstitial.isReady()) {
             mInterstitial.show();
         }
     }
     @Override
-    public void showInterstitialAd(MaxAdapterResponseParameters maxAdapterResponseParameters, Activity activity, MaxInterstitialAdapterListener maxInterstitialAdapterListener) {
+    public void showInterstitialAd(MaxAdapterResponseParameters maxAdapterResponseParameters, Activity activity, @Nullable MaxInterstitialAdapterListener maxInterstitialAdapterListener) {
         Log.d(LOG_TAG, "showInterstitial");
         if (mInterstitial != null && mInterstitial.isReady()) {
             mInterstitial.show();
@@ -235,7 +259,7 @@ public class LoopmeMediationAdapter
     }
 
     @Override
-    public void showRewardedAd(MaxAdapterResponseParameters maxAdapterResponseParameters, Activity activity, MaxRewardedAdapterListener maxRewardedAdapterListener) {
+    public void showRewardedAd(MaxAdapterResponseParameters maxAdapterResponseParameters, Activity activity, @Nullable MaxRewardedAdapterListener maxRewardedAdapterListener) {
         Log.d(LOG_TAG, "showRewarded");
         try {
             if (mRewarded != null && mRewarded.isReady()) {
@@ -244,6 +268,11 @@ public class LoopmeMediationAdapter
         } catch (Exception e) {
             maxRewardedAdapterListener.onRewardedAdLoadFailed(MaxAdapterError.INTERNAL_ERROR);
         }
+    }
+
+    private Context getContext(@Nullable final Activity activity) {
+        // activity can be null starting from applovin 11.1.0, also `getApplicationContext()` was introduced in 11.1.0
+        return (activity != null) ? activity.getApplicationContext() : getApplicationContext();
     }
 
     private class LoopMeInterstitialListener implements LoopMeInterstitial.Listener {

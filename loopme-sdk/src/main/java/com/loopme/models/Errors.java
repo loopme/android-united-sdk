@@ -123,6 +123,10 @@ public class Errors {
 
     // endregion
 
+    // region Adapter errors
+    public static final LoopMeError MISSING_ACTIVITY = new LoopMeError("Missing activity", Constants.ErrorType.CUSTOM);
+    public static final LoopMeError ADAPTER_ERROR = new LoopMeError("Adapter error", Constants.ErrorType.CUSTOM);
+
     // region VPAID
 
     public static final LoopMeError VPAID_FILE_NOT_FOUND = new LoopMeError(
