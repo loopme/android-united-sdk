@@ -3,7 +3,6 @@ package com.loopme.controllers.display;
 import static com.loopme.Constants.SKIP_DELAY_INTERSTITIAL;
 import static com.loopme.Constants.SKIP_DELAY_REWARDED;
 
-import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -13,6 +12,7 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.media3.common.util.UnstableApi;
 import com.iab.omid.library.loopme.adsession.AdEvents;
 import com.iab.omid.library.loopme.adsession.AdSession;
 import com.iab.omid.library.loopme.adsession.VerificationScriptResource;
@@ -23,12 +23,14 @@ import com.loopme.LoopMeMediaPlayer;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.common.LoopMeError;
 import com.loopme.controllers.view.ViewControllerVast;
-import com.loopme.loaders.AssetsCache;
 import com.loopme.models.Errors;
 import com.loopme.om.OmidEventTrackerWrapper;
 import com.loopme.om.OmidHelper;
+import com.loopme.tracker.MediaPlayerTracker;
 import com.loopme.tracker.constants.EventConstants;
 import com.loopme.utils.ApiLevel;
+import com.loopme.utils.EndCardCacheUtils;
+import com.loopme.utils.VideoSessionManager;
 import com.loopme.vast.TrackingEvent;
 
 import java.net.URL;
@@ -36,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@UnstableApi
 public class DisplayControllerVast extends VastVpaidBaseDisplayController implements
         LoopMeMediaPlayer.LoopMeMediaPlayerListener,
         ViewControllerVast.ViewControllerVastListener {
@@ -57,6 +60,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
 
     private AdSession omidAdSession;
     private OmidEventTrackerWrapper omidEventTrackerWrapper;
+    private VideoSessionManager videoSessionManager;
 
     public DisplayControllerVast(@NonNull LoopMeAd loopMeAd) {
         super(loopMeAd);
@@ -68,30 +72,18 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     @Override
     public void onStartLoad() {
         super.onStartLoad();
-        // Cache video and endcard assets.
-        AssetsCache.Listener listener = new AssetsCache.Listener() {
-            @Override
-            public void onAssetsLoaded(String videoUrl, String endCardUrl) {
-                mVideoUrl = videoUrl;
-                mEndCardUrl = endCardUrl;
-            }
-            @Override
-            public void onError(LoopMeError info) {
-                mLoopMeAd.onInternalLoadFail(info);
-            }
-            @Override
-            public void onPostWarning(LoopMeError error) {
-                mLoopMeAd.onSendPostWarning(error);
-            }
-        };
-        mEndCardUrl = mAdParams.getEndCardUrl();
+
         mVideoUrl = mAdParams.getVideoFileUrl();
-        if (mVideoUrl == null) {
-            listener.onError(Errors.VAST_COULD_NOT_FIND_SUPPORTED_FORMAT);
-        } else if (mEndCardUrl == null) {
-            AssetsCache.loadVideo(mVideoUrl, mContext, listener);
+        mEndCardUrl = mAdParams.getEndCardUrl();
+
+        if (mVideoUrl != null) {
+            videoSessionManager = new VideoSessionManager(mVideoUrl);
         } else {
-            AssetsCache.loadVideoWithEndcard(mVideoUrl, mEndCardUrl, mContext, listener);
+            new LoopMeError(Errors.VAST_COULD_NOT_FIND_SUPPORTED_FORMAT);
+        }
+
+        if (mEndCardUrl != null) {
+            EndCardCacheUtils.cacheEndCard(mEndCardUrl, mContext);
         }
     }
 
@@ -201,12 +193,13 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
         }
     }
 
+    @UnstableApi
     @Override
     public void onPlay(int position) {
         mIsAdSkipped = false;
         mLoopMeAd.runOnUiThreadDelayed(() -> {
             destroyMediaPlayer();
-            mLoopMePlayer = new LoopMeMediaPlayer(mVideoUrl, DisplayControllerVast.this);
+            mLoopMePlayer = new LoopMeMediaPlayer(mContext, mVideoUrl, videoSessionManager, DisplayControllerVast.this);
         }, 100);
         onAdResumedEvent();
     }
@@ -303,6 +296,11 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        if (videoSessionManager.getBufferCount() > 0) {
+            MediaPlayerTracker.trackBufferingStats(videoSessionManager);
+        }
+
         new Handler(Looper.getMainLooper())
             .postDelayed(new OmidFinisher(omidAdSession), OmidHelper.FINISH_AD_SESSION_DELAY_MILLIS);
         omidAdSession = null;
@@ -369,7 +367,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     }
 
     @Override
-    public void onCompletion(MediaPlayer mp) {
+    public void onCompletion() {
         skipVideo(false);
         postVideoEvent(EventConstants.COMPLETE);
         onAdVideoDidReachEnd();
@@ -379,31 +377,25 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
             omidEventTrackerWrapper.sendOneTimeCompleteEvent();
     }
 
-    // TODO. Refactor.
     @Override
-    public boolean onError(MediaPlayer mp, int what, int extra) {
-        Logging.out(mLogTag, "MediaPlayer onError():  what - " + what + "; extra - " + extra);
-        onErrorOccurred(null);
-        return false;
-    }
-
-    @Override
-    public void onPrepared(MediaPlayer mp) {
+    public void onPrepared() {
         playerPrepared = true;
-        mViewControllerVast.adjustLayoutParams(mp.getVideoWidth(), mp.getVideoHeight(), mLoopMeAd.isBanner());
-        int duration = mp.getDuration();
-        boolean isRewarded = mLoopMeAd instanceof LoopMeInterstitialGeneral &&
-                ((LoopMeInterstitialGeneral) mLoopMeAd).isRewarded();
+        mViewControllerVast.adjustLayoutParams(mLoopMePlayer.getVideoSize().width, mLoopMePlayer.getVideoSize().height, mLoopMeAd.isBanner());
+
+        long duration = mLoopMePlayer.getVideoDuration();
+        boolean isRewarded = mLoopMeAd instanceof LoopMeInterstitialGeneral && ((LoopMeInterstitialGeneral) mLoopMeAd).isRewarded();
         mSkipTimeMillis = isRewarded ? SKIP_DELAY_REWARDED : SKIP_DELAY_INTERSTITIAL;
+
         mTrackingEventsList = TrackingEvent.createProgressPoints(
-            duration,
-            mAdParams.getImpressionsList(),
-            mAdParams.getTrackingEventsList(),
-            mAdParams.getSkipTime()
-        );
-        mViewControllerVast.setMaxProgress(duration);
+                (int) duration,
+                mAdParams.getImpressionsList(),
+                mAdParams.getTrackingEventsList(),
+                mAdParams.getSkipTime());
+
+        mViewControllerVast.setMaxProgress((int) duration);
+
         resumeMediaPlayer(mViewControllerVast.getSurface());
-        onAdPreparedEvent(mp, mViewControllerVast.getPlayerView());
+        onAdPreparedEvent(null, mViewControllerVast.getPlayerView());
         onAdStartedEvent();
         muteVideo(mViewControllerVast.isMute(), false);
     }

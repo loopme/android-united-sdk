@@ -9,10 +9,13 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 
+import androidx.media3.common.util.UnstableApi;
+
 import com.loopme.Constants;
 import com.loopme.Constants.Layout;
 import com.loopme.controllers.display.DisplayControllerVast;
 
+@UnstableApi
 public class ViewControllerVast {
 
     private final DisplayControllerVast mDisplayControllerVast;
@@ -58,6 +61,7 @@ public class ViewControllerVast {
                 }
             }
             @Override
+            @UnstableApi
             public void onReplayClick() {
                 setEndCardVisibility(View.GONE);
                 setVideoPlayerVisibility(View.VISIBLE);

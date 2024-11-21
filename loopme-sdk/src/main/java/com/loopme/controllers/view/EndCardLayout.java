@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import com.loopme.Constants;
 import com.loopme.Constants.Layout;
 import com.loopme.R;
+import com.loopme.utils.EndCardCacheUtils;
 import com.loopme.utils.ImageUtils;
 import com.loopme.utils.Utils;
 import com.loopme.utils.ViewUtils;
@@ -106,7 +107,8 @@ public class EndCardLayout extends FrameLayout implements GestureDetector.OnGest
     }
 
     public void setEndCard(String imageUri) {
-        ImageUtils.setScaledImage(mEndCardImageView, imageUri);
+        String cachedPath = EndCardCacheUtils.getCachedPath(imageUri, getContext());
+        ImageUtils.setScaledImage(mEndCardImageView, cachedPath);
     }
 
     public interface OnEndCardListener {
