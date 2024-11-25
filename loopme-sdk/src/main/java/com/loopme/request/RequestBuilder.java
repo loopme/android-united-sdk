@@ -72,6 +72,7 @@ public class RequestBuilder implements Serializable {
     private static final String LINEARITY = "linearity";
     private static final String BOXING_ALLOWED = "boxingallowed";
     private static final String MIME_TYPE = "mimes";
+    private static final String PLAYBACK_METHOD = "playbackmethod";
     private static final String START_DELAY = "startdelay";
     private static final String DELIVERY = "delivery";
     private static final String SEQUENCE = "sequence";
@@ -147,11 +148,11 @@ public class RequestBuilder implements Serializable {
                 .put(KEYWORDS, data.getKeywords())
                 .put(YOB, data.getYob() != 0 ? data.getYob() : null)
                 .put(EXT, new JSONBuilder()
-                        .put(PARAM_CONSENT_TYPE, requestUtils.getConsentType(loopMeAd.getContext()))
-                        .put(CONSENT, (requestUtils.getIabTcfTcString(loopMeAd.getContext()) != null
-                             && !requestUtils.getIabTcfTcString(loopMeAd.getContext()).isEmpty()) ?
-                             requestUtils.getIabTcfTcString(loopMeAd.getContext())
-                             : requestUtils.getUserConsent(loopMeAd.getContext()))
+                        .put(PARAM_CONSENT_TYPE, requestUtils.getConsentType(context))
+                        .put(CONSENT, (requestUtils.getIabTcfTcString(context) != null
+                             && !requestUtils.getIabTcfTcString(context).isEmpty()) ?
+                             requestUtils.getIabTcfTcString(context)
+                             : requestUtils.getUserConsent(context))
                         .put(SESSION_DURATION, SessionManager.getInstance().getSessionDuration())
                         .put(SESSION_DEPTH, SessionManager.getInstance().getAdsShownCount())
                         .build()
@@ -197,7 +198,7 @@ public class RequestBuilder implements Serializable {
                     .put(API, new JSONArray(requestUtils.getApi()))
                     .build() : null
                 )
-                .put(VIDEO, adRequestType.isVideo() ? getVideo(adRequestType.isRewarded(), requestUtils) : null)
+                .put(VIDEO, adRequestType.isVideo() ? getVideo(adRequestType.isRewarded(), requestUtils, context) : null)
                 .put(SECURE, RequestConstants.SECURE_IMPRESSION)
                 .put(BID_FLOOR, RequestConstants.BID_FLOOR_DEFAULT_VALUE)
                 .put(DISPLAY_MANAGER, RequestConstants.LOOPME_SDK)
@@ -219,7 +220,7 @@ public class RequestBuilder implements Serializable {
             .build();
     }
 
-    private static JSONObject getVideo(boolean isRewarded, RequestUtils requestUtils) throws JSONException {
+    private static JSONObject getVideo(boolean isRewarded, RequestUtils requestUtils, Context context) throws JSONException {
         return !isRewarded ?
             new JSONBuilder()
                 .put(MAX_DURATION, RequestConstants.DEFAULT_MAX_DURATION)
@@ -233,6 +234,7 @@ public class RequestBuilder implements Serializable {
                 .put(PROTOCOLS, new JSONArray(RequestConstants.PROTOCOLS))
                 .put(BATTR, new JSONArray(RequestConstants.BATTERY_INFO))
                 .put(MIME_TYPE, new JSONArray(RequestConstants.MIME_TYPES))
+                .put(PLAYBACK_METHOD, new JSONArray(requestUtils.getPlaybackMethodArray(context)))
                 .put(DELIVERY, new JSONArray(RequestConstants.DELIVERY_METHODS))
                 .put(WIDTH, requestUtils.getWidth())
                 .put(HEIGHT, requestUtils.getHeight())
@@ -256,6 +258,7 @@ public class RequestBuilder implements Serializable {
                 .put(PROTOCOLS, new JSONArray(RequestConstants.PROTOCOLS))
                 .put(BATTR, new JSONArray(RequestConstants.BATTERY_INFO))
                 .put(MIME_TYPE, new JSONArray(RequestConstants.MIME_TYPES))
+                .put(PLAYBACK_METHOD, new JSONArray(requestUtils.getPlaybackMethodArray(context)))
                 .put(DELIVERY, new JSONArray(RequestConstants.DELIVERY_METHODS))
                 .put(WIDTH, requestUtils.getWidth())
                 .put(HEIGHT, requestUtils.getHeight())

@@ -21,6 +21,7 @@ import com.loopme.R;
 import com.loopme.ad.LoopMeAd;
 import com.loopme.gdpr.ConsentType;
 import com.loopme.network.HttpUtils;
+import com.loopme.utils.Utils;
 
 import org.json.JSONArray;
 
@@ -140,13 +141,27 @@ public class RequestUtils {
         return IABPreferences.getInstance(context).isIabTcfGdprAppliesPresent();
     }
 
+    private static AudioManager getAudioManager(Context context) {
+        return (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+    }
+
+    public int[] getPlaybackMethodArray(Context context) {
+        //todo wjw refactor
+        AudioManager manager = getAudioManager(context);
+        if (manager == null) return new int[]{2};
+        float systemVolume = Utils.getSystemVolume();
+        boolean isMuted = systemVolume == 0.0;
+        int playbackMethod = isMuted ? 2 : 1;
+        return new int[]{playbackMethod};
+    }
+
     public int getMusic(Context context) {
-        AudioManager manager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        AudioManager manager = getAudioManager(context);
         return manager != null && manager.isMusicActive() ? 1 : 0;
     }
 
     private List<String> getAudioOutput(Context context) {
-        AudioManager manager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        AudioManager manager = getAudioManager(context);
         List<String> outputs = new ArrayList<>();
         if (manager == null) {
             return outputs;
