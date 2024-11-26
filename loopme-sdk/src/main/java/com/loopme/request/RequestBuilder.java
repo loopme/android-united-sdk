@@ -44,6 +44,7 @@ public class RequestBuilder implements Serializable {
     private static final String UA = "ua";
     private static final String DNT = "dnt";
     private static final String MODEL = "model";
+    private static final String PXRATIO = "pxratio";
     static final String EXT = "ext";
     private static final String TIMEZONE = "timezone";
     private static final String ORIENTATION = "orientation";
@@ -173,7 +174,8 @@ public class RequestBuilder implements Serializable {
                 .put(UA, requestUtils.getUa())
                 .put(DNT, requestUtils.getDnt())
                 .put(MODEL, requestUtils.getModel())
-                .put(EXT, new JSONBuilder()
+                .put(PXRATIO, Utils.getDisplayMetrics().density)
+                    .put(EXT, new JSONBuilder()
                     .put(TIMEZONE, requestUtils.getTimeZone())
                     .put(ORIENTATION, requestUtils.getOrientation())
                     .put(CHARGE_LEVEL, requestUtils.getChargeLevel(context))
