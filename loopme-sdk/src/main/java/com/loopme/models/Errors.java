@@ -87,7 +87,7 @@ public class Errors {
             "File not cached");
 
     public static final LoopMeError SPECIFIC_WEBVIEW_ERROR = new LoopMeError(
-            117, "Ad received specific URL loopme://webview/fail");
+            117, "Failed to resolve URL");
 
     public static final LoopMeError FAILED_TO_PROCESS_AD = new LoopMeError(
             118, "Failed to process ad");
