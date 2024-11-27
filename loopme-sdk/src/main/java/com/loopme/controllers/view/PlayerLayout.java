@@ -45,6 +45,7 @@ public class PlayerLayout extends FrameLayout
     private final TextureView mPlayerTextureView;
     private final View[] buttonViews;
     private final OnPlayerListener mListener;
+    private SystemUnmuteObserver mSystemUnmuteObserver;
 
     public PlayerLayout(boolean isMuted, @NonNull Context context, WebView webView, OnPlayerListener listener) {
         super(context);
@@ -101,9 +102,8 @@ public class PlayerLayout extends FrameLayout
     }
 
     private void setUpUnmuteObserver(@NonNull Context context) {
-        context.getApplicationContext().getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI,
-                true,
-                new SystemUnmuteObserver(this::unmute, context, new Handler()));
+        mSystemUnmuteObserver = new SystemUnmuteObserver(this::unmute, context, new Handler());
+        context.getApplicationContext().getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI, true, mSystemUnmuteObserver);
     }
 
     private static FrameLayout.LayoutParams calculateNewLayoutParams(
@@ -247,6 +247,7 @@ public class PlayerLayout extends FrameLayout
 
     @Override
     public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surface) {
+        getContext().getApplicationContext().getContentResolver().unregisterContentObserver(mSystemUnmuteObserver);
         return false;
     }
 
