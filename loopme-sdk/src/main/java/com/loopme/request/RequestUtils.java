@@ -148,9 +148,8 @@ public class RequestUtils {
     public int[] getPlaybackMethodArray(Context context) {
         //todo wjw refactor
         AudioManager manager = getAudioManager(context);
-        if (manager == null) return new int[]{2};
-        float systemVolume = Utils.getSystemVolume();
-        boolean isMuted = systemVolume == 0.0;
+        if (manager == null) return null;
+        boolean isMuted = Utils.getSystemVolume() == 0.0;
         int playbackMethod = isMuted ? 2 : 1;
         return new int[]{playbackMethod};
     }
