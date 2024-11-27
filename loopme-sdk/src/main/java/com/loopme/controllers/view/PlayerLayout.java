@@ -2,6 +2,7 @@ package com.loopme.controllers.view;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
+import android.os.Handler;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -35,7 +36,7 @@ public class PlayerLayout extends FrameLayout
     private final int MUTE_BUTTON_ID = View.generateViewId();
 
     private int mViewPosition;
-    private boolean mMuteState;
+    private boolean mIsMuted;
     private Surface mSurface;
     private final TextView mTextView;
     private final ProgressBar mProgressBar;
@@ -94,6 +95,14 @@ public class PlayerLayout extends FrameLayout
         addView(mMuteButton, generateViewPosition());
         addView(mProgressBar, generateViewPosition());
         addView(mTextView, generateViewPosition());
+
+        setUpUnmuteObserver(context);
+    }
+
+    private void setUpUnmuteObserver(@NonNull Context context) {
+        context.getApplicationContext().getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI,
+                true,
+                new SystemUnmuteObserver(() -> unmute(), context, new Handler()));
     }
 
     private static FrameLayout.LayoutParams calculateNewLayoutParams(
@@ -164,14 +173,20 @@ public class PlayerLayout extends FrameLayout
             if (v == null) {
                 mListener.onPlayerClick();
             } else if (v.getId() == MUTE_BUTTON_ID) {
-                mMuteState = !mMuteState;
-                mMuteButton.setImageResource(mMuteState ? R.drawable.l_mute : R.drawable.l_unmute);
-                mListener.onMuteClick(mMuteState);
+                mIsMuted = !mIsMuted;
+                mMuteButton.setImageResource(mIsMuted ? R.drawable.l_mute : R.drawable.l_unmute);
+                mListener.onMuteClick(mIsMuted);
             } else if (v.getId() == SKIP_BUTTON_ID) {
                 mListener.onSkipClick();
             }
         }
         return true;
+    }
+
+    private Void unmute(){
+            mIsMuted = false;
+            mMuteButton.setImageResource(R.drawable.l_unmute);
+            return null;
     }
 
     @Override
@@ -193,7 +208,7 @@ public class PlayerLayout extends FrameLayout
     }
 
     public boolean isMute() {
-        return mMuteState;
+        return mIsMuted;
     }
 
     public void setProgress(int progress) {

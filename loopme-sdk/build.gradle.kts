@@ -19,6 +19,10 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
 
 dependencies {
