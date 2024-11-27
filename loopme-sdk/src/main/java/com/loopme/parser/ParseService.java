@@ -53,6 +53,7 @@ public class ParseService {
             .mraid(false)
             .autoLoading(retrieveAutoLoadingWithDefaultTrue(bid))
             .adSpotDimensions(retrieveAdDimension(bid, type))
+            .isMuted(retrieveIsMuted())
         );
     }
 
@@ -75,5 +76,10 @@ public class ParseService {
         }
 
         return autoLoadingValue == 1;
+    }
+
+    private static boolean retrieveIsMuted(){
+        // TODO: 27/11/2024 retrieve when backend implements this field
+        return false;
     }
 }

@@ -36,6 +36,7 @@ public class AdParamsBuilder {
     boolean mIsMraid;
     boolean mIsDebug;
     boolean mAutoLoading;
+    boolean mIsMuted;
     AdSpotDimensions mAdSpotDimensions;
 
     String mRequestId;
@@ -131,6 +132,11 @@ public class AdParamsBuilder {
 
     public AdParamsBuilder adSpotDimensions(AdSpotDimensions adSpotDimensions) {
         mAdSpotDimensions = adSpotDimensions;
+        return this;
+    }
+
+    public AdParamsBuilder isMuted(Boolean value) {
+        mIsMuted = value;
         return this;
     }
 }

@@ -182,7 +182,7 @@ public class DisplayControllerVast extends VastVpaidBaseDisplayController implem
     @Override
     public void onBuildVideoAdView(FrameLayout containerView) {
         mViewControllerVast.buildVideoAdView(
-            containerView, mLoopMeAd.getContext(), getWebView()
+                mAdParams.isMuted(), containerView, mLoopMeAd.getContext(), getWebView()
         );
         setVerificationView(containerView);
         try {

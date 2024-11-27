@@ -46,7 +46,7 @@ public class PlayerLayout extends FrameLayout
     private final View[] buttonViews;
     private final OnPlayerListener mListener;
 
-    public PlayerLayout(@NonNull Context context, WebView webView, OnPlayerListener listener) {
+    public PlayerLayout(boolean isMuted, @NonNull Context context, WebView webView, OnPlayerListener listener) {
         super(context);
         mListener = listener;
 
@@ -62,9 +62,10 @@ public class PlayerLayout extends FrameLayout
         mMuteButton = new ImageView(getContext());
         mMuteButton.setId(MUTE_BUTTON_ID);
         mMuteButton.setScaleType(ImageView.ScaleType.CENTER);
-        mMuteButton.setImageResource(R.drawable.l_unmute);
+        mMuteButton.setImageResource(isMuted ? R.drawable.l_mute : R.drawable.l_unmute);
         mMuteButton.setVisibility(View.VISIBLE);
         mMuteButton.setLayoutParams(new FrameLayout.LayoutParams(btnSizePx, btnSizePx, Gravity.START));
+        mIsMuted = isMuted;
 
         mProgressBar = new ProgressBar(getContext(), null, android.R.style.Widget_ProgressBar_Horizontal);
         mProgressBar.setProgressDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.l_progress_bar, null));
@@ -102,7 +103,7 @@ public class PlayerLayout extends FrameLayout
     private void setUpUnmuteObserver(@NonNull Context context) {
         context.getApplicationContext().getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI,
                 true,
-                new SystemUnmuteObserver(() -> unmute(), context, new Handler()));
+                new SystemUnmuteObserver(this::unmute, context, new Handler()));
     }
 
     private static FrameLayout.LayoutParams calculateNewLayoutParams(

@@ -41,6 +41,7 @@ public class AdParams implements Serializable {
     private boolean mPartPreload;
     private boolean mOwnCloseButton;
     private boolean mIsDebug;
+    private boolean mIsMuted;
 
     private String mId;
     private int mDuration;
@@ -92,6 +93,7 @@ public class AdParams implements Serializable {
         mRequestId = builder.mRequestId;
         mCid = builder.mCid;
         mCrid = builder.mCrid;
+        mIsMuted = builder.mIsMuted;
         Logging.out(LOG_TAG, "Server response indicates  ad params: "
             + "format: " + mFormat + ", isAutoloading: " + mAutoLoading
             + ", mraid: " + builder.mIsMraid + ", expire in: " + mExpiredDate);
@@ -132,6 +134,8 @@ public class AdParams implements Serializable {
 
     public boolean isDebug() { return mIsDebug; }
     public void setDebug(boolean isDebug) { mIsDebug = isDebug; }
+
+    public boolean isMuted() {return mIsMuted; }
 
     public int getDuration() { return mDuration; }
     public void setDuration(int duration) { mDuration = duration; }

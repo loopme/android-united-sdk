@@ -30,12 +30,12 @@ public class ViewControllerVast {
         mListener = listener;
     }
 
-    public void buildVideoAdView(FrameLayout containerView, Context context, WebView webView) {
+    public void buildVideoAdView(boolean isMuted, FrameLayout containerView, Context context, WebView webView) {
         if (containerView == null || context == null) {
             return;
         }
 
-        mPlayerLayout = new PlayerLayout(context, webView, initOnPlayerListener());
+        mPlayerLayout = new PlayerLayout(isMuted, context, webView, initOnPlayerListener());
         mEndCardLayout = new EndCardLayout(context, initOnEndCardListener());
         mAdLayout = new FrameLayout(containerView.getContext());
         mAdLayout.setLayoutParams(Layout.MATCH_PARENT_CENTER);
