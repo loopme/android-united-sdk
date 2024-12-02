@@ -12,7 +12,7 @@ android {
 
 dependencies {
     api(project(":loopme-sdk"))
-//    api("com.github.loopme.android-united-sdk:loopme-sdk:9.0.6")
+    api("com.github.loopme.android-united-sdk:loopme-sdk:9.0.7")
     //noinspection GradleDynamicVersion
     api("com.applovin:applovin-sdk:12.+")
 
