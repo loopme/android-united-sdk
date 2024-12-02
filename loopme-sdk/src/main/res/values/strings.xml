@@ -2,15 +2,15 @@
 <resources>
     <string name="webservice_internet_unavailable">Internet unavailable</string>
 
-    <string name="gdpr.webservice_internet_unavailable">Internet unavailable</string>
+    <string name="loopme_gdpr.webservice_internet_unavailable">Internet unavailable</string>
     <string name="webservice_unavailable">Web service unavailable</string>
     <string name="start_time">00:00</string>
-    <string name="gdpr.terms_of_service">This app personalizes your advertising experience through LoopMe LTD. By consenting to this enhanced ad experience, you\'ll see ads that LoopMe believe are more relevant to you. Depending on your privacy settings, LoopMe may collect and process personal data such as device identifiers, locations data, and other demographic and interest data about you to provide this personalized advertising experience. <a href="https://loopme.com/privacy/">Learn more.</a> By agreeing, you are confirming that you are over the age of 16 and would like a personalized ad experience.</string>
-    <string name="gdpr.personalize_your_experience">Personalize your experience</string>
-    <string name="gdpr.accept">Yes, I agree.</string>
-    <string name="gdpr.reject">No, thank you.</string>
-    <string name="gdpr.personalize_you_experience">Personalize You Experience</string>
-    <string name="gdpr.thank_you_page_text">Great! We hope you enjoy your personalized ad experience, but if you ever change your mind, you can withdraw your consent by enabling the Opt out of Ads Personalization setting on your mobile device.</string>
-    <string name="gdpr.close">Close</string>
-    <string name="gdpr.no_problem">No problem. LoopMe won\'t collect your data through this app for personalized advertising. If you consent to LoopMe personalizing your ad experience in a different app, we will still collect your data through that app.</string>
+    <string name="loopme_gdpr.terms_of_service">This app personalizes your advertising experience through LoopMe LTD. By consenting to this enhanced ad experience, you\'ll see ads that LoopMe believe are more relevant to you. Depending on your privacy settings, LoopMe may collect and process personal data such as device identifiers, locations data, and other demographic and interest data about you to provide this personalized advertising experience. <a href="https://loopme.com/privacy/">Learn more.</a> By agreeing, you are confirming that you are over the age of 16 and would like a personalized ad experience.</string>
+    <string name="loopme_gdpr.personalize_your_experience">Personalize your experience</string>
+    <string name="loopme_gdpr.accept">Yes, I agree.</string>
+    <string name="loopme_gdpr.reject">No, thank you.</string>
+    <string name="loopme_gdpr.personalize_you_experience">Personalize You Experience</string>
+    <string name="loopme_gdpr.thank_you_page_text">Great! We hope you enjoy your personalized ad experience, but if you ever change your mind, you can withdraw your consent by enabling the Opt out of Ads Personalization setting on your mobile device.</string>
+    <string name="loopme_gdpr.close">Close</string>
+    <string name="loopme_gdpr.no_problem">No problem. LoopMe won\'t collect your data through this app for personalized advertising. If you consent to LoopMe personalizing your ad experience in a different app, we will still collect your data through that app.</string>
 </resources>
