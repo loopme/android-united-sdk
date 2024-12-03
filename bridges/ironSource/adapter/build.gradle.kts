@@ -17,6 +17,6 @@ dependencies {
     implementation("com.google.android.material:material:1.6.0")
 
     api("com.ironsource.sdk:mediationsdk:8.0.0")
-    api(project(":loopme-sdk"))
-//    api("com.github.loopme.android-united-sdk:loopme-sdk:9.0.8")
+//    api(project(":loopme-sdk"))
+    api("com.github.loopme.android-united-sdk:loopme-sdk:9.0.9")
 }
