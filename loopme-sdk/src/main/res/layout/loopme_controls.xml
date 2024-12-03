@@ -34,7 +34,7 @@
             android:layout_margin="@dimen/time_textview_margin"
             android:shadowColor="@color/shadow"
             android:shadowRadius="2"
-            android:text="@string/start_time"
+            android:text="@string/loopme_start_time"
             android:textColor="@color/white_pale"
             android:textSize="@dimen/text_size_12sp" />
 
