@@ -16,7 +16,7 @@ dependencies {
     //noinspection GradleDependency - appcompat and material > 1.6.0 does not supported by Unity 2021
     implementation("com.google.android.material:material:1.6.0")
 
-    api("com.ironsource.sdk:mediationsdk:8.0.0")
+    compileOnly("com.ironsource.sdk:mediationsdk:8.0.0")
 //    api(project(":loopme-sdk"))
     api("com.github.loopme.android-united-sdk:loopme-sdk:9.0.9")
 }
