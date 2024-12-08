@@ -18,5 +18,5 @@ dependencies {
 
     compileOnly("com.ironsource.sdk:mediationsdk:8.0.0")
 //    api(project(":loopme-sdk"))
-    api("com.github.loopme.android-united-sdk:loopme-sdk:9.0.9")
+    api("com.github.loopme.android-united-sdk:loopme-sdk:no-location-SNAPSHOT")
 }
