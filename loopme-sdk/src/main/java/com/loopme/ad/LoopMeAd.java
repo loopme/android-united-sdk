@@ -32,6 +32,7 @@ import com.loopme.loaders.AdFetcherListener;
 import com.loopme.models.Errors;
 import com.loopme.network.HttpUtils;
 import com.loopme.request.RequestParamsUtils;
+import com.loopme.telemetry.TelemetryContainer;
 import com.loopme.time.Timers;
 import com.loopme.time.TimersType;
 import com.loopme.tracker.partners.LoopMeTracker;
@@ -99,6 +100,7 @@ public abstract class LoopMeAd extends AutoLoadingConfig implements AdTargeting,
         if (TextUtils.isEmpty(appKey)) {
             throw new IllegalArgumentException(WRONG_PARAMETERS);
         }
+        TelemetryContainer.INSTANCE.telemetryEventSender();
         mContext = context;
         mAppKey = appKey;
         context.runOnUiThread(() -> mTimers = new Timers(this));

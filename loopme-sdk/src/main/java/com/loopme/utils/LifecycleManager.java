@@ -7,7 +7,19 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
+import com.loopme.telemetry.EventType;
+import com.loopme.telemetry.TelemetryContainer;
+import com.loopme.telemetry.TelemetryEvent;
+import com.loopme.telemetry.TelemetryEventBuilder;
+import com.loopme.telemetry.TelemetryEventSender;
+
 class LifecycleManager {
+
+    // dependency or not?
+//public LifecycleManager(TelemetryEventBuilder builder, TelemetryEventSender sender){
+//    this.builder = builder;
+//    this.sender = sender;
+//};
 
     public void registerActivityLifecycleCallbacks(@NonNull Context context) {
         if (context.getApplicationContext() instanceof Application) {
@@ -21,6 +33,9 @@ class LifecycleManager {
                 public void onActivityStarted(Activity activity) {
                     if (activityReferences == 0 && !isActivityChangingConfigurations) {
                         SessionManager.getInstance().startSession();
+                        // when using it -> do we want to do it this way, or the dependency
+                        TelemetryEvent event = TelemetryContainer.INSTANCE.telemetryEventBuilder().build(EventType.SESSION_START);
+                        TelemetryContainer.INSTANCE.telemetryEventSender().send(event);
                     }
                     activityReferences++;
                 }
