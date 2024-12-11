@@ -38,7 +38,6 @@ dependencies {
 
     // Google Services
     implementation("com.google.android.gms:play-services-ads-identifier:18.1.0")
-    implementation("com.google.android.gms:play-services-location:21.3.0")
 
     // Browser Helper
     implementation("com.google.androidbrowserhelper:androidbrowserhelper:2.5.0")
