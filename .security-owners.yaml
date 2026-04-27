@@ -1,0 +1,22 @@
+# .security-owners.yaml — loopme/android-united-sdk
+#
+# Defines who has access to this repository's vulnerability findings in DefectDojo.
+# Changes detected by reusable scan workflow → security team review + Slack.
+#
+# risk_acceptors → DD Owner (role=4): can accept risk, close findings
+# maintainers    → DD Maintainer (role=3): can triage and work with findings
+#
+# scan_policy is enforced by the reusable workflow and cannot be
+# overridden by the caller workflow in this repo.
+
+scan_policy:
+  fail_on_vulnerability: false
+
+defectdojo:
+  product_type: Engineering
+
+  risk_acceptors:
+    - email: pawel.limanowka@loopme.com              # Engineering Manager
+
+  maintainers:
+    - email: evgen@loopme.com                        # Engineering Manager (2 commits)
