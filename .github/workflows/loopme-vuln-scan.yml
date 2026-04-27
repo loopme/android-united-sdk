@@ -1,0 +1,53 @@
+# ============================================================
+# Vulnerability Scan — managed by loopme/vulnerabilities
+# DO NOT edit scanning logic here. To suppress a CVE, add it to
+# .trivyignore with a justification comment.
+# ============================================================
+name: Loopme Vulnerability Scan
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      severity_threshold:
+        description: 'Minimum severity to fail on'
+        required: false
+        default: 'HIGH'
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+
+jobs:
+  security-scan:
+    uses: loopme/vulnerabilities/.github/workflows/loopme-vuln-scan.yml@main
+    with:
+      project_type: 'gradle'
+      severity_threshold: ${{ inputs.severity_threshold || 'HIGH' }}
+      docker_build_enabled: false
+
+      iac_scan_enabled: true
+      secret_scan_enabled: false  # secrets handled by loopme/secrets (gitleaks)
+      # fail_on_vulnerability is enforced via .security-owners.yaml (not overridable here)
+      pr_delta_check_enabled: true
+      pr_comment_findings_mode: 'summary'
+      defectdojo_enabled: true
+      defectdojo_url: 'https://defectdojo.loopme.cloud'
+      defectdojo_product_type_name: 'Engineering'
+
+    secrets: inherit
+
+  notify-on-failure:
+    name: Notify on Scheduled Scan Failure
+    runs-on: ubuntu-latest
+    needs: security-scan
+    if: failure() && github.event_name == 'schedule'
+    steps:
+      - name: Notify about scheduled scan failure
+        run: echo "::warning::Scheduled security scan found vulnerabilities."
