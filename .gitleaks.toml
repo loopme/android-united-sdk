@@ -1,0 +1,25 @@
+# Default repository-local gitleaks configuration.
+# This file is used automatically when a repo has no .gitleaks.toml.
+# Copy it to your repo root as .gitleaks.toml and add your exclusions.
+# See: https://github.com/loopme/secrets/blob/main/docs/adding-exclusions.md
+
+# Use all built-in gitleaks default rules
+[extend]
+  useDefault = true
+
+# To add repo-specific exclusions, uncomment the block below (strip one "#" from
+# each line) and replace the sample entry with your own. It is valid as written,
+# so the obvious way to uncomment it produces a working config.
+#
+# Every entry must carry a comment justifying why it is safe — see the docs above.
+#
+# NOTE: an [allowlist] table must define at least one of commits/paths/regexes/
+# stopwords. gitleaks >= 8.24 fails fatally on an allowlist that has none, so
+# delete any array you are not using rather than leaving it empty.
+#
+# [allowlist]
+#   description = "repo-local allowlist"
+#   paths = [
+#     # Checked-in fixture holding a deliberately fake key, never a live credential.
+#     '''(^|/)tests/fixtures/sample-credentials\.json$''',
+#   ]
